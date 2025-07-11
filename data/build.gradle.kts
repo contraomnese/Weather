@@ -1,14 +1,15 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.devtools.ksp)
 }
 
 android {
     namespace = "com.contraomnese.weather.data"
-    compileSdk = 35
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = 23
+        minSdk = libs.versions.minSdk.get().toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -31,10 +32,15 @@ android {
 
 dependencies {
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    implementation(project(":domain"))
+
+    implementation(libs.bundles.koin)
+    implementation(libs.bundles.core)
+    implementation(libs.bundles.network)
+    implementation(libs.bundles.room)
+    implementation(libs.bundles.datastore)
+    ksp(libs.androidx.room.compiler)
+
+    testImplementation(libs.bundles.test)
+    androidTestImplementation(libs.bundles.androidTest)
 }
