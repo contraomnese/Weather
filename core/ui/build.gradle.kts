@@ -49,8 +49,8 @@ dependencies {
     implementation(libs.bundles.ui)
     implementation(libs.bundles.navigation)
 
-    testImplementation(libs.bundles.test)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.bundles.androidTest)
-    debugImplementation(libs.bundles.composeDebug)
+//    testImplementation(libs.bundles.test)
+//    androidTestImplementation(platform(libs.androidx.compose.bom))
+//    androidTestImplementation(libs.bundles.androidTest)
+//    debugImplementation(libs.bundles.composeDebug)
 }

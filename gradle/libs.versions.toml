@@ -96,7 +96,6 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-compose-material-iconsExtended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-runtime-android = { group = "androidx.compose.runtime", name = "runtime-android", version.ref = "composeRuntime" }
-androidx-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 
 # ui
 coil = { module = "io.coil-kt.coil3:coil", version.ref = "coil" }
@@ -212,12 +211,9 @@ network = [
 room = [
     "androidx-room-runtime",
     "androidx-room-ktx",
-    "androidx-room-compiler",
     "androidx-room-paging",
     "androidx-paging-compose",
     "androidx-paging-runtime-ktx",
-    "androidx-datastore-preferences",
-    "androidx-datastore-preferences-core"
 ]
 
 datastore = [

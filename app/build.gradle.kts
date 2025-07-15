@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.bundles.ui)
     implementation(libs.bundles.network)
     implementation(libs.bundles.room)
+    ksp(libs.androidx.room.compiler)
     implementation(libs.bundles.datastore)
 
     implementation(libs.androidx.core.splashscreen)
