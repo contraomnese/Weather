@@ -1,10 +1,11 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
-    namespace = "com.contraomnese.weather.domain"
+    namespace = "com.contraomnese.weather.presentation"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
@@ -25,7 +26,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = "11"
     }
 }
 
@@ -34,7 +35,11 @@ tasks.withType<Test>().configureEach {
 }
 
 dependencies {
-    implementation(libs.kotlinx.coroutines.core)
+
+    implementation(project(":domain"))
+
+    implementation(libs.bundles.core)
+    implementation(libs.bundles.presentation)
     testImplementation(libs.bundles.test)
-    testRuntimeOnly(libs.junit.jupiter.engine)
+    androidTestImplementation(libs.bundles.androidTest)
 }

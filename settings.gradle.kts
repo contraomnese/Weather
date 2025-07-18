@@ -24,5 +24,6 @@ rootProject.name = "Weather"
 include(":app")
 include(":core:ui")
 include(":core:design")
+include(":core:presentation")
 include(":data")
 include(":domain")

@@ -30,6 +30,10 @@ android {
     }
 }
 
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+}
+
 dependencies {
 
     implementation(project(":domain"))
@@ -42,5 +46,6 @@ dependencies {
     ksp(libs.androidx.room.compiler)
 
     testImplementation(libs.bundles.test)
+    testRuntimeOnly(libs.junit.jupiter.engine)
     androidTestImplementation(libs.bundles.androidTest)
 }
