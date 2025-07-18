@@ -43,11 +43,16 @@ android {
     }
 }
 
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+}
+
 dependencies {
 
     // modules
     implementation(project(":core:ui"))
     implementation(project(":core:design"))
+    implementation(project(":core:presentation"))
     implementation(project(":data"))
     implementation(project(":domain"))
 
@@ -66,6 +71,7 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
 
     testImplementation(libs.bundles.test)
+    testRuntimeOnly(libs.junit.jupiter.engine)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.bundles.androidTest)
     debugImplementation(libs.bundles.composeDebug)
