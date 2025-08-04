@@ -1,4 +1,4 @@
-package com.arbuzerxxl.vibeshot.core.design.theme
+package com.contraomnese.weather.design.theme
 
 import android.os.Build
 import androidx.annotation.ChecksSdkIntAtLeast
@@ -10,7 +10,6 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import com.contraomnese.weather.design.weatherTypography
 
 
 private val weatherScheme = darkColorScheme(
@@ -20,6 +19,7 @@ private val weatherScheme = darkColorScheme(
     onBackground = Color(0xFFFFFFFF),
     surface = Color(0xFF2D3340),
     onSurface = Color(0xFFFFFFFF),
+    surfaceVariant = Color(0xFFFFFFFF),
     secondary = Color(0xFF81CFFA),
     onSecondary = Color(0xFF000000),
     error = Color(0xFFFF453A),

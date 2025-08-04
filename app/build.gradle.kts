@@ -56,6 +56,7 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":domain"))
 
+    implementation(libs.material)
     implementation(libs.bundles.koin)
     implementation(libs.bundles.core)
     implementation(libs.bundles.navigation)

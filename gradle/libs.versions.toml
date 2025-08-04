@@ -34,7 +34,7 @@ uiTestJunit4 = "1.6.1"
 navigation-compose = "2.8.9"
 
 # ui
-androidxCoreSplashscreen = "1.0.1"
+androidxCoreSplashscreen = "1.0.0"
 uiTextGoogleFonts = "1.8.0"
 coil = "3.0.0"
 browser = "1.8.0"

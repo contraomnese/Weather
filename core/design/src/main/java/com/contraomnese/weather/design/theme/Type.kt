@@ -1,4 +1,4 @@
-package com.contraomnese.weather.design
+package com.contraomnese.weather.design.theme
 
 
 import androidx.annotation.FontRes
@@ -28,7 +28,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.arbuzerxxl.vibeshot.core.design.theme.WeatherTheme
+import com.contraomnese.weather.design.DevicePreviews
+import com.contraomnese.weather.design.R
 
 
 fun interface Buildable {
@@ -260,7 +261,7 @@ fun TypographyPreview(modifier: Modifier = Modifier) {
             Surface (
                 modifier = Modifier
                     .wrapContentWidth()
-                    .clip(RoundedCornerShape(cornerSize8)),
+                    .clip(RoundedCornerShape(cornerRadius8)),
                 tonalElevation = 3.dp,
                 color = MaterialTheme.colorScheme.surface.copy(alpha = 0.2f)
             ) {
@@ -284,7 +285,7 @@ fun TypographyPreview(modifier: Modifier = Modifier) {
             Column (
                 modifier = Modifier
                     .wrapContentWidth()
-                    .clip(RoundedCornerShape(cornerSize8))
+                    .clip(RoundedCornerShape(cornerRadius8))
                     .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.2f)),
             ) {
                 Text(
@@ -315,7 +316,7 @@ fun TypographyPreview(modifier: Modifier = Modifier) {
                     focusedContainerColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f),
                     unfocusedLabelColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f)
                 ),
-                shape = RoundedCornerShape(cornerSize16)
+                shape = RoundedCornerShape(cornerRadius16)
             )
             Text(
                 "H:29° L:15°",

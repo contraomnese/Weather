@@ -1,5 +1,12 @@
 <resources>
-    <style name="Theme.Weather" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:windowBackground">@android:color/white</item>
+
+    <style name="Theme.Weather" parent="Theme.Material3.DayNight.NoActionBar" />
+
+    <style name="Theme.Weather.Splash" parent="Theme.SplashScreen.IconBackground">
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
+        <item name="windowSplashScreenAnimationDuration">500</item>
+        <item name="postSplashScreenTheme">@style/Theme.Weather</item>
+        <item name="windowSplashScreenBackground">#1D4861</item>
     </style>
+
 </resources>
