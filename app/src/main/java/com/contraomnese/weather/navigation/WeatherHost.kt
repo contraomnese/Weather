@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -34,7 +35,7 @@ internal fun WeatherHost(
             Box(
                 Modifier
                     .fillMaxWidth()
-                    .padding(start = padding40, end = padding40, bottom = padding40)
+                    .padding(start = padding40, end = padding40, bottom = 400.dp)
             ) {
                 SnackbarHost(
                     modifier = Modifier

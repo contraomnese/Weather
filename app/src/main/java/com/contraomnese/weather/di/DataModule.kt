@@ -2,6 +2,9 @@ package com.contraomnese.weather.di
 
 import com.contraomnese.weather.BuildConfig
 import com.contraomnese.weather.data.network.interceptors.ApiInterceptor
+import com.contraomnese.weather.data.repository.LocationsRepositoryImpl
+import com.contraomnese.weather.data.storage.db.locations.LocationsDatabase
+import com.contraomnese.weather.domain.home.repository.LocationsRepository
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
@@ -50,4 +53,8 @@ val dataModule = module {
             }
         }
     }
+
+    single<LocationsDatabase> { LocationsDatabase.create(context = get()) }
+
+    single<LocationsRepository> { LocationsRepositoryImpl(database = get()) }
 }

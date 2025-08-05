@@ -1,8 +1,8 @@
 package com.contraomnese.weather.domain.home.usecase
 
 import com.contraomnese.weather.domain.cleanarchitecture.coroutine.CoroutineContextProvider
-import com.contraomnese.weather.domain.home.model.MyLocationDomainModel
-import com.contraomnese.weather.domain.home.repository.MyLocationsRepository
+import com.contraomnese.weather.domain.home.model.CityDomainModel
+import com.contraomnese.weather.domain.home.repository.LocationsRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.confirmVerified
@@ -18,18 +18,18 @@ private const val FIRST_LOCATION_ID = "1"
 private const val FIRST_LOCATION_NAME = "firstName"
 private const val BAD_LOCATION_ID = "bad id"
 
-class GetMyLocationUseCaseTest {
+class GetLocationUseCaseTest {
 
-    private lateinit var useCase: GetMyLocationUseCase
-    private val repositoryMock = mockk<MyLocationsRepository>()
+    private lateinit var useCase: GetLocationUseCase
+    private val repositoryMock = mockk<LocationsRepository>()
     private lateinit var coroutineContextProvider: CoroutineContextProvider
-    private val expectedLocation = MyLocationDomainModel(id = FIRST_LOCATION_ID, name = FIRST_LOCATION_NAME)
+    private val expectedLocation = CityDomainModel(id = FIRST_LOCATION_ID, name = FIRST_LOCATION_NAME)
     private val expectedException = Exception("Location not found")
 
     @BeforeEach
     fun setUp() {
         coroutineContextProvider = FakeCoroutineContextProvider
-        useCase = GetMyLocationUseCase(
+        useCase = GetLocationUseCase(
             repository = repositoryMock,
             coroutineContextProvider = coroutineContextProvider
         )

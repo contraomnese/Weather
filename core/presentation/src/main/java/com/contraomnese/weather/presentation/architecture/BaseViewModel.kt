@@ -1,5 +1,6 @@
 package com.contraomnese.weather.presentation.architecture
 
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -80,7 +81,7 @@ abstract class BaseViewModel<ViewState : UiState, Event : Any>(
     protected fun provideException(exception: DomainException) {
         when (exception) {
             is UnknownDomainException -> showNotification(R.string.unknown_domain_exception)
-            else -> showNotification(R.string.unknown_domain_exception)
+            else -> Log.d("BaseViewModel", "${exception.message}")
         }
     }
 }

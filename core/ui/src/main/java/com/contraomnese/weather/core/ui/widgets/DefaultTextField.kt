@@ -60,20 +60,7 @@ fun DefaultTextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Go),
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    colors: TextFieldColors = TextFieldDefaults.colors(
-        focusedContainerColor = MaterialTheme.colorScheme.onSurface.copy(0.1f),
-        unfocusedContainerColor = MaterialTheme.colorScheme.onSurface.copy(0.1f),
-        focusedLeadingIconColor = MaterialTheme.colorScheme.onSurface.copy(0.8f),
-        unfocusedLeadingIconColor = MaterialTheme.colorScheme.onSurface.copy(0.5f),
-        errorLeadingIconColor = MaterialTheme.colorScheme.onSurface.copy(0.5f),
-        focusedTrailingIconColor = MaterialTheme.colorScheme.onSurface.copy(0.8f),
-        unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurface.copy(0.5f),
-        errorTrailingIconColor = MaterialTheme.colorScheme.onSurface.copy(0.5f),
-        focusedIndicatorColor = Color.Transparent,
-        unfocusedIndicatorColor = Color.Transparent,
-        disabledIndicatorColor = Color.Transparent,
-        errorIndicatorColor = Color.Transparent
-    ),
+    colors: TextFieldColors = defaultFieldColors(),
 ) {
 
     val focusRequester = remember { FocusRequester() }
@@ -98,8 +85,8 @@ fun DefaultTextField(
             maxLines = 1,
             textStyle = MaterialTheme.typography.labelMedium.copy(
                 color = when {
+                    isError -> MaterialTheme.colorScheme.error.copy(alpha = 0.8f)
                     isFocused -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
-                    isError -> MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
                     else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 }
             ),
@@ -144,7 +131,7 @@ fun DefaultTextField(
                     container = {
                         TextFieldDefaults.Container(
                             enabled = enabled,
-                            isError = isError,
+                            isError = false,
                             colors = colors,
                             interactionSource = interactionSource,
                             shape = RoundedCornerShape(cornerRadius10),
@@ -168,6 +155,22 @@ private fun PlaceholderText(placeholder: String) {
     )
 }
 
+@Composable
+private fun defaultFieldColors() = TextFieldDefaults.colors(
+    focusedContainerColor = MaterialTheme.colorScheme.onSurface.copy(0.1f),
+    unfocusedContainerColor = MaterialTheme.colorScheme.onSurface.copy(0.1f),
+    focusedLeadingIconColor = MaterialTheme.colorScheme.onSurface.copy(0.8f),
+    unfocusedLeadingIconColor = MaterialTheme.colorScheme.onSurface.copy(0.5f),
+    focusedTrailingIconColor = MaterialTheme.colorScheme.onSurface.copy(0.8f),
+    unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurface.copy(0.5f),
+    focusedIndicatorColor = Color.Transparent,
+    unfocusedIndicatorColor = Color.Transparent,
+    disabledIndicatorColor = Color.Transparent,
+    errorIndicatorColor = Color.Transparent,
+    errorLeadingIconColor = MaterialTheme.colorScheme.onSurface.copy(0.8f),
+    errorTrailingIconColor = MaterialTheme.colorScheme.onSurface.copy(0.8f),
+)
+
 @Preview
 @Composable
 private fun TextFieldPlaceholderPreview() {
@@ -175,7 +178,7 @@ private fun TextFieldPlaceholderPreview() {
         DefaultTextField(
             value = "",
             onValueChanged = {},
-            isError = true,
+            isError = false,
             singleLine = true,
             placeholder = "Placeholder",
         )
