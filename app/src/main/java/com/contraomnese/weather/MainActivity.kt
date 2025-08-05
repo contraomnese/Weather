@@ -3,15 +3,16 @@ package com.contraomnese.weather
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -22,9 +23,6 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.KoinAndroidContext
 
-private const val SPLASHSCREEN_ANIMATION_DURATION = 1000L
-private const val SPLASHSCREEN_ANIMATION_SCALE = 1.2f
-private const val SPLASHSCREEN_ANIMATION_ALPHA = 0f
 
 class MainActivity : ComponentActivity() {
 
@@ -50,19 +48,12 @@ class MainActivity : ComponentActivity() {
                 keepSplashScreen
             }
 
-            setOnExitAnimationListener { splashScreenProvider ->
-                splashScreenProvider.view.animate()
-                    .scaleX(SPLASHSCREEN_ANIMATION_SCALE)
-                    .scaleY(SPLASHSCREEN_ANIMATION_SCALE)
-                    .alpha(SPLASHSCREEN_ANIMATION_ALPHA)
-                    .setDuration(SPLASHSCREEN_ANIMATION_DURATION)
-                    .withEndAction { splashScreenProvider.remove() }
-                    .start()
-            }
         }
         setContent {
-            WindowCompat.setDecorFitsSystemWindows(window, false)
             WeatherTheme {
+                SideEffect {
+                    enableEdgeToEdge()
+                }
                 KoinAndroidContext {
                     WeatherApp(viewModel)
                 }
