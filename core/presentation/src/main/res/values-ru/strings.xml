@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unknown_domain_exception">Ой! Что-то пошло не так..</string>
+</resources>

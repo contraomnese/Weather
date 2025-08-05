@@ -2,8 +2,6 @@ package com.contraomnese.weather.domain.cleanarchitecture.usecase
 
 import com.contraomnese.weather.domain.cleanarchitecture.exception.DomainException
 import com.contraomnese.weather.domain.cleanarchitecture.exception.UnknownDomainException
-import com.contraomnese.weather.domain.cleanarchitecture.usecase.withRequest.UseCaseWithRequest
-import com.contraomnese.weather.domain.cleanarchitecture.usecase.withoutRequest.UseCase
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -18,7 +16,8 @@ class UseCaseExecutor(
     ) {
         coroutineScope.launch {
             try {
-                useCase(onSuccess)
+                val result = useCase()
+                onSuccess(result)
             } catch (ignore: CancellationException) {
             } catch (throwable: Throwable) {
                 onException(
@@ -37,12 +36,33 @@ class UseCaseExecutor(
     ) {
         coroutineScope.launch {
             try {
-                useCaseWithRequest(value, onSuccess)
+                val result = useCaseWithRequest(value)
+                onSuccess(result)
             } catch (ignore: CancellationException) {
             } catch (throwable: Throwable) {
                 onException(
                     (throwable as? DomainException)
                         ?: UnknownDomainException(throwable)
+                )
+            }
+        }
+    }
+
+    fun <OUTPUT> observe(
+        useCase: StreamingUseCase<OUTPUT>,
+        onEach: (OUTPUT) -> Unit,
+        onException: (DomainException) -> Unit = {},
+    ) {
+        coroutineScope.launch {
+            try {
+                useCase()
+                    .collect {
+                        onEach(it)
+                    }
+            } catch (ignore: CancellationException) {
+            } catch (throwable: Throwable) {
+                onException(
+                    (throwable as? DomainException) ?: UnknownDomainException(throwable)
                 )
             }
         }
