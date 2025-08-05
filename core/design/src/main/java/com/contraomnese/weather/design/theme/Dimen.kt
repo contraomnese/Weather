@@ -49,6 +49,7 @@ val itemHeight10 = 10.dp
 val itemHeight12 = 12.dp
 val itemHeight14 = 14.dp
 val itemHeight16 = 16.dp
+val itemHeight20 = 20.dp
 val itemHeight32 = 32.dp
 val itemHeight40 = 40.dp
 val itemHeight48 = 48.dp
