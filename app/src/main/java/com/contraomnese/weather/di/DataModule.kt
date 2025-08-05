@@ -1,6 +1,7 @@
 package com.contraomnese.weather.di
 
 import com.contraomnese.weather.BuildConfig
+import com.contraomnese.weather.data.network.interceptors.ApiInterceptor
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
@@ -19,7 +20,7 @@ val dataModule = module {
 
     single<Retrofit> {
         Retrofit.Builder()
-            .baseUrl("BuildConfig.WEATHER_API_BASE_URL")
+            .baseUrl(BuildConfig.WEATHER_API_BASE_URL)
             .client(get<OkHttpClient>())
             .addConverterFactory(GsonConverterFactory.create(get()))
             .build()
@@ -31,8 +32,13 @@ val dataModule = module {
             .readTimeout(20, TimeUnit.SECONDS)
             .writeTimeout(20, TimeUnit.SECONDS)
             .retryOnConnectionFailure(true)
+            .addInterceptor(get<ApiInterceptor>())
             .addInterceptor(get<HttpLoggingInterceptor>())
             .build()
+    }
+
+    single<ApiInterceptor> {
+        ApiInterceptor(apiKey = BuildConfig.WEATHER_API_KEY)
     }
 
     factory<HttpLoggingInterceptor> {

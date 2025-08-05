@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,6 +7,9 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.devtools.ksp)
 }
+
+val WEATHER_API_KEY: String = gradleLocalProperties(rootDir, providers).getProperty("WEATHER_API_KEY")
+val WEATHER_API_BASE_URL: String = gradleLocalProperties(rootDir, providers).getProperty("WEATHER_API_BASE_URL")
 
 android {
     namespace = "com.contraomnese.weather"
@@ -23,7 +28,13 @@ android {
     buildFeatures.buildConfig = true
 
     buildTypes {
+        debug {
+            buildConfigField("String", "WEATHER_API_KEY", "\"${WEATHER_API_KEY}\"")
+            buildConfigField("String", "WEATHER_API_BASE_URL", "\"${WEATHER_API_BASE_URL}\"")
+        }
         release {
+            buildConfigField("String", "WEATHER_API_KEY", "\"${WEATHER_API_KEY}\"")
+            buildConfigField("String", "WEATHER_API_BASE_URL", "\"${WEATHER_API_BASE_URL}\"")
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
