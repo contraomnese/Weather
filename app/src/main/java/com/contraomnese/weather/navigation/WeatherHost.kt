@@ -13,12 +13,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.contraomnese.weather.MainActivityUiState
 import com.contraomnese.weather.core.ui.widgets.NotificationSnackBar
-import com.contraomnese.weather.core.ui.widgets.SearchTextField
-import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding40
+import com.contraomnese.weather.home.navigation.HomeDestination
+import com.contraomnese.weather.home.navigation.home
 
 @Composable
 internal fun WeatherHost(
@@ -52,11 +53,12 @@ internal fun WeatherHost(
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-
-            SearchTextField(
-                searchQuery = "London",
-                modifier = Modifier.padding(padding16)
-            )
+            NavHost(
+                navController = navController,
+                startDestination = HomeDestination
+            ) {
+                home(externalNavigator = navController.homeNavigator())
+            }
         }
     }
 }

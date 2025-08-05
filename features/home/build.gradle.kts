@@ -45,6 +45,7 @@ tasks.withType<Test>().configureEach {
 dependencies {
 
     implementation(project(":core:ui"))
+    implementation(project(":core:design"))
     implementation(project(":core:presentation"))
     implementation(project(":domain"))
 
