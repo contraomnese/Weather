@@ -38,6 +38,7 @@ androidxCoreSplashscreen = "1.0.0"
 uiTextGoogleFonts = "1.8.0"
 coil = "3.0.0"
 browser = "1.8.0"
+material = "1.12.0"
 
 # data
 retrofit2 = "2.9.0"
@@ -60,7 +61,6 @@ androidx-test-ext-junit = "1.2.1"
 junitVersion = "1.1.5"
 espressoCore = "3.5.0"
 appcompat = "1.7.1"
-material = "1.12.0"
 
 junitJupiterApi = "5.10.0"
 kotlinTestJunit5 = "1.9.23"
@@ -106,6 +106,7 @@ androidx-compose-material-iconsExtended = { group = "androidx.compose.material",
 androidx-runtime-android = { group = "androidx.compose.runtime", name = "runtime-android", version.ref = "composeRuntime" }
 
 # ui
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 coil = { module = "io.coil-kt.coil3:coil", version.ref = "coil" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
@@ -136,7 +137,6 @@ androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "j
 androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidx-test-runner" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlinTestJunit5" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junitJupiterApi" }
