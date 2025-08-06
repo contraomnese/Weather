@@ -13,7 +13,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -64,7 +63,7 @@ private fun createTextStyle(
 object DisplayLargeConfig : Buildable {
     private const val WEIGHT = 100
     private const val OPTICAL_SIZING = 102
-    private const val LETTER_SPACING = -0.5f
+    private const val LETTER_SPACING = -0.51f
 
     override fun build(@FontRes font: Int): TextStyle = createTextStyle(
         font = createFont(font = font, weight = WEIGHT, opticalSize = OPTICAL_SIZING),
@@ -76,7 +75,7 @@ object DisplayLargeConfig : Buildable {
 object DisplayMediumConfig : Buildable {
     private const val WEIGHT = 300
     private const val OPTICAL_SIZING = 53
-    private const val LETTER_SPACING = 10.5f
+    private const val LETTER_SPACING = 5.565f
 
     override fun build(@FontRes font: Int): TextStyle = createTextStyle(
         font = createFont(font = font, weight = WEIGHT, opticalSize = OPTICAL_SIZING),
@@ -100,7 +99,7 @@ object DisplaySmallConfig : Buildable {
 object HeadlineLargeConfig : Buildable {
     private const val WEIGHT = 400
     private const val OPTICAL_SIZING = 37
-    private const val LETTER_SPACING = -0.5f
+    private const val LETTER_SPACING = -0.185f
 
     override fun build(@FontRes font: Int): TextStyle = createTextStyle(
         font = createFont(font = font, weight = WEIGHT, opticalSize = OPTICAL_SIZING),
@@ -122,7 +121,7 @@ object HeadlineMediumConfig : Buildable {
 object TitleLargeConfig : Buildable {
     private const val WEIGHT = 700
     private const val OPTICAL_SIZING = 25
-    private const val LETTER_SPACING = -1.0f
+    private const val LETTER_SPACING = -0.0625f
 
     override fun build(@FontRes font: Int): TextStyle = createTextStyle(
         font = createFont(font = font, weight = WEIGHT, opticalSize = OPTICAL_SIZING),
@@ -154,7 +153,7 @@ object BodyLargeConfig : Buildable {
 object BodyMediumConfig : Buildable {
     private const val WEIGHT = 400
     private const val OPTICAL_SIZING = 18
-    private const val LETTER_SPACING = 4.0f
+    private const val LETTER_SPACING = 0.72f
     private const val LINE_HEIGHT = 20.0f
 
     override fun build(@FontRes font: Int): TextStyle = createTextStyle(
@@ -168,7 +167,7 @@ object BodyMediumConfig : Buildable {
 object BodySmallConfig : Buildable {
     private const val WEIGHT = 400
     private const val OPTICAL_SIZING = 17
-    private const val LETTER_SPACING = 3.0f
+    private const val LETTER_SPACING = 0.51f
 
     override fun build(@FontRes font: Int): TextStyle = createTextStyle(
         font = createFont(font = font, weight = WEIGHT, opticalSize = OPTICAL_SIZING),
@@ -190,7 +189,7 @@ object LabelMediumConfig : Buildable {
 object LabelSmallConfig : Buildable {
     private const val WEIGHT = 400
     private const val OPTICAL_SIZING = 15
-    private const val LETTER_SPACING = 5.0f
+    private const val LETTER_SPACING = 0.75f
     private const val LINE_HEIGHT = 20.0f
 
     override fun build(@FontRes font: Int): TextStyle = createTextStyle(
@@ -310,12 +309,6 @@ fun TypographyPreview(modifier: Modifier = Modifier) {
                 value = "Search for a city or airport",
                 onValueChange = {},
                 textStyle = MaterialTheme.typography.labelMedium,
-                colors = TextFieldDefaults.colors(
-                    focusedTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                    focusedContainerColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f),
-                    unfocusedLabelColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f)
-                ),
                 shape = RoundedCornerShape(cornerRadius16)
             )
             Text(
