@@ -16,18 +16,16 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.contraomnese.weather.MainActivityUiState
 import com.contraomnese.weather.core.ui.widgets.NotificationSnackBar
 import com.contraomnese.weather.design.theme.padding40
 import com.contraomnese.weather.home.navigation.HomeDestination
 import com.contraomnese.weather.home.navigation.home
+import com.contraomnese.weather.locationforecast.navigation.locationForecast
 
 @Composable
 internal fun WeatherHost(
     navController: NavHostController = rememberNavController(),
     snackBarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    uiState: MainActivityUiState,
-    modifier: Modifier = Modifier,
 ) {
 
     Scaffold(
@@ -59,6 +57,7 @@ internal fun WeatherHost(
                 startDestination = HomeDestination
             ) {
                 home(externalNavigator = navController.homeNavigator())
+                locationForecast(externalNavigator = navController.locationForecastNavigator())
             }
         }
     }

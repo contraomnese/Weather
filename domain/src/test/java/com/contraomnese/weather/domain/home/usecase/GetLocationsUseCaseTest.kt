@@ -13,10 +13,14 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-private const val FIRST_LOCATION_ID = "1"
-private const val FIRST_LOCATION_NAME = "firstName"
-private const val SECOND_LOCATION_ID = "2"
-private const val SECOND_LOCATION_NAME = "secondName"
+
+private const val SEARCH_QUERY = "example"
+private const val FIRST_LOCATION_ID = 1
+private const val FIRST_LOCATION_NAME = "exampleFirstName"
+private const val FIRST_LOCATION_COUNTRY_NAME = "firstCountryName"
+private const val SECOND_LOCATION_ID = 2
+private const val SECOND_LOCATION_NAME = "exampleSecondName"
+private const val SECOND_LOCATION_COUNTRY_NAME = "secondCountryName"
 
 class GetLocationsUseCaseTest {
 
@@ -26,11 +30,13 @@ class GetLocationsUseCaseTest {
     private val expectedLocations = listOf(
         LocationDomainModel(
             id = FIRST_LOCATION_ID,
-            name = FIRST_LOCATION_NAME
+            name = FIRST_LOCATION_NAME,
+            countryName = FIRST_LOCATION_COUNTRY_NAME
         ),
         LocationDomainModel(
             id = SECOND_LOCATION_ID,
-            name = SECOND_LOCATION_NAME
+            name = SECOND_LOCATION_NAME,
+            countryName = SECOND_LOCATION_COUNTRY_NAME
         )
     )
     private val expectedEmptyLocations = emptyList<LocationDomainModel>()
@@ -46,28 +52,28 @@ class GetLocationsUseCaseTest {
 
     @Test
     fun `test use case returns correct locations`() = runTest {
-        coEvery { repositoryMock.getLocationsBy() } returns expectedLocations
-        val actualResult = useCase.executeInBackground()
+        coEvery { repositoryMock.getLocationsBy(SEARCH_QUERY) } returns expectedLocations
+        val actualResult = useCase.executeInBackground(SEARCH_QUERY)
         assertEquals(expectedLocations, actualResult)
         assertEquals(expectedLocations.size, actualResult.size)
         assertEquals(expectedLocations[0], actualResult[0])
         assertEquals(expectedLocations[1], actualResult[1])
-        verify { repositoryMock.getLocationsBy() }
+        verify { repositoryMock.getLocationsBy(SEARCH_QUERY) }
     }
 
     @Test
     fun `test use case returns empty locations`() = runTest {
-        coEvery { repositoryMock.getLocationsBy() } returns expectedEmptyLocations
-        val actualResult = useCase.executeInBackground()
+        coEvery { repositoryMock.getLocationsBy(SEARCH_QUERY) } returns expectedEmptyLocations
+        val actualResult = useCase.executeInBackground(SEARCH_QUERY)
         assertEquals(expectedEmptyLocations, actualResult)
-        verify { repositoryMock.getLocationsBy() }
+        verify { repositoryMock.getLocationsBy(SEARCH_QUERY) }
     }
 
     @Test
     fun `test use case uses repository correctly`() = runTest {
-        coEvery { repositoryMock.getLocationsBy() } returns expectedLocations
-        useCase.executeInBackground()
-        coVerify(exactly = 1) { repositoryMock.getLocationsBy() }
+        coEvery { repositoryMock.getLocationsBy(SEARCH_QUERY) } returns expectedLocations
+        useCase.executeInBackground(SEARCH_QUERY)
+        coVerify(exactly = 1) { repositoryMock.getLocationsBy(SEARCH_QUERY) }
         confirmVerified(repositoryMock)
     }
 }

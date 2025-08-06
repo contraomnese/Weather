@@ -15,7 +15,7 @@ import org.koin.core.annotation.KoinExperimentalAPI
 object HomeDestination
 
 interface HomeNavigator {
-    fun onNavigateToLocation(locationId: Int)
+    fun onNavigateToLocationForecastBy(locationId: Int)
     fun onNavigateUp()
 }
 
@@ -30,7 +30,11 @@ fun NavGraphBuilder.home(
 
         val viewModel: HomeViewModel = koinViewModel(viewModelStoreOwner = backStackEntry)
 
-        HomeRoute(viewModel = viewModel, onNavigateBack = externalNavigator::onNavigateUp)
+        HomeRoute(
+            viewModel = viewModel,
+            onNavigateBack = externalNavigator::onNavigateUp,
+            onNavigateToLocationForecast = externalNavigator::onNavigateToLocationForecastBy
+        )
     }
 }
 

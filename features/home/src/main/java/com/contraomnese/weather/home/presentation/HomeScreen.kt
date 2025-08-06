@@ -1,6 +1,7 @@
 package com.contraomnese.weather.home.presentation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,14 +38,17 @@ import kotlinx.collections.immutable.toPersistentList
 @Composable
 internal fun HomeRoute(
     viewModel: HomeViewModel,
-    onNavigateBack: () -> Unit,
+    onNavigateToLocationForecast: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     HomeScreen(
-        uiState = uiState, onEvent = viewModel::onEvent, modifier = modifier
+        uiState = uiState,
+        onEvent = viewModel::onEvent,
+        onNavigateToLocationForecast = onNavigateToLocationForecast,
+        modifier = modifier
     )
 }
 
@@ -52,6 +56,7 @@ internal fun HomeRoute(
 internal fun HomeScreen(
     uiState: HomeUiState,
     onEvent: (HomeEvent) -> Unit,
+    onNavigateToLocationForecast: (Int) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
 
@@ -60,7 +65,7 @@ internal fun HomeScreen(
             modifier = Modifier.padding(padding16),
             searchQuery = uiState.location.value,
             onSearchQueryChanged = { onEvent(HomeEvent.LocationChanged(it)) },
-            isError = !uiState.location.isValidCity(),
+            isError = !uiState.location.isValidLocation(),
             leadingIcon = if (uiState.isLoading) {
                 {
                     LoadingIndicator(
@@ -89,16 +94,17 @@ internal fun HomeScreen(
             modifier = Modifier
                 .padding(horizontal = padding16)
         ) {
-            uiState.locations.forEach { city ->
+            uiState.locations.forEach { location ->
                 Row(
                     modifier = Modifier
+                        .clickable { onNavigateToLocationForecast(location.id) }
                         .fillMaxWidth()
                         .height(itemHeight40),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = city.name,
+                        text = location.name,
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onBackground
                     )
@@ -106,7 +112,7 @@ internal fun HomeScreen(
                         modifier = Modifier.weight(1f)
                     )
                     Text(
-                        text = city.countryName,
+                        text = location.countryName,
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onBackground
                     )
