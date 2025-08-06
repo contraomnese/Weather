@@ -22,6 +22,8 @@ data class LocationForecastDomainModel(
             )
         )
     }
+
+    fun getPoint(): String = "${point.latitude.value},${point.longitude.value}"
 }
 
 data class LocationDomainPointModel(

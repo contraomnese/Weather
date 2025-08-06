@@ -32,7 +32,6 @@ fun NavGraphBuilder.home(
 
         HomeRoute(
             viewModel = viewModel,
-            onNavigateBack = externalNavigator::onNavigateUp,
             onNavigateToLocationForecast = externalNavigator::onNavigateToLocationForecastBy
         )
     }

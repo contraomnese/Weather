@@ -80,5 +80,5 @@ internal fun WeatherApp(viewModel: MainActivityViewModel) {
         }
     }
 
-    WeatherHost(uiState = uiState, snackBarHostState = snackBarHostState)
+    WeatherHost(snackBarHostState = snackBarHostState)
 }

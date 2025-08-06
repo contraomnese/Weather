@@ -1,7 +1,9 @@
 package com.contraomnese.weather.locationforecast.presentation
 
 import androidx.compose.runtime.Immutable
+import com.contraomnese.weather.domain.locationForecast.model.CurrentWeatherDomainModel
 import com.contraomnese.weather.domain.locationForecast.model.LocationForecastDomainModel
+import com.contraomnese.weather.domain.locationForecast.usecase.GetCurrentWeatherUseCase
 import com.contraomnese.weather.domain.locationForecast.usecase.GetLocationForecastUseCase
 import com.contraomnese.weather.presentation.architecture.BaseViewModel
 import com.contraomnese.weather.presentation.architecture.UiState
@@ -12,6 +14,7 @@ import com.contraomnese.weather.presentation.usecase.UseCaseExecutorProvider
 internal data class LocationForecastUiState(
     override val isLoading: Boolean = false,
     val location: LocationForecastDomainModel,
+    val weather: CurrentWeatherDomainModel? = null,
 ) : UiState {
     override fun loading(): UiState = copy(isLoading = true)
 }
@@ -25,6 +28,7 @@ internal class LocationForecastViewModel(
     private val useCaseExecutorProvider: UseCaseExecutorProvider,
     private val notificationMonitor: NotificationMonitor,
     private val getLocationForecastUseCase: GetLocationForecastUseCase,
+    private val getCurrentWeatherUseCase: GetCurrentWeatherUseCase,
     private val locationId: Int,
 ) : BaseViewModel<LocationForecastUiState, LocationForecastEvent>(useCaseExecutorProvider, notificationMonitor) {
 
@@ -41,8 +45,13 @@ internal class LocationForecastViewModel(
         }
     }
 
-    private fun updateCurrentLocation(location: LocationForecastDomainModel) {
-        updateViewState { copy(location = location, isLoading = false) }
+    private fun updateCurrentLocation(newLocation: LocationForecastDomainModel) {
+        updateViewState { copy(location = newLocation) }
+        execute(getCurrentWeatherUseCase, newLocation.getPoint(), ::updateCurrentWeather, ::provideException)
+    }
+
+    private fun updateCurrentWeather(newWeather: CurrentWeatherDomainModel) {
+        updateViewState { copy(weather = newWeather, isLoading = false) }
     }
 
 }

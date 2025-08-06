@@ -49,8 +49,7 @@ fun NavGraphBuilder.locationForecast(
             })
 
         LocationForecastRoute(
-            viewModel = viewModel,
-            onNavigateBack = externalNavigator::onNavigateBack
+            viewModel = viewModel
         )
     }
 }

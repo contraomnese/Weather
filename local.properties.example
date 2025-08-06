@@ -9,5 +9,5 @@
 # header note.
 sdk.dir=X\:\\Users\\s1r1us\\AppData\\Local
 
-WEATHER_API_BASE_URL=http://api.weatherapi.com/v1/
+WEATHER_API_BASE_URL=https://api.weatherapi.com/v1/
 WEATHER_API_KEY=
