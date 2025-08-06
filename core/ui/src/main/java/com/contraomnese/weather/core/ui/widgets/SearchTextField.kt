@@ -22,6 +22,8 @@ fun SearchTextField(
     isError: Boolean = false,
     enabled: Boolean = true,
     placeholder: String = "Search for a city",
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
 ) {
 
     DefaultTextField(
@@ -31,7 +33,7 @@ fun SearchTextField(
         isError = isError,
         enabled = enabled,
         placeholder = placeholder,
-        leadingIcon = {
+        leadingIcon = leadingIcon ?: {
             Icon(
                 imageVector = WeatherIcons.Search,
                 contentDescription = stringResource(
@@ -39,6 +41,7 @@ fun SearchTextField(
                 ),
             )
         },
+        trailingIcon = trailingIcon,
         modifier = modifier
     )
 }

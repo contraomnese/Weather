@@ -16,6 +16,7 @@ import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.FileUpload
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Interests
+import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material.icons.outlined.PriorityHigh
@@ -44,6 +45,7 @@ object WeatherIcons {
     val Search = Icons.Outlined.Search
     val Notification = Icons.Outlined.PriorityHigh
     val Close = Icons.Outlined.Close
+    val Map = Icons.Outlined.Map
     val Profile = Icons.Outlined.Person
     val Likes = Icons.Outlined.FavoriteBorder
     val Comments = Icons.Outlined.ChatBubbleOutline

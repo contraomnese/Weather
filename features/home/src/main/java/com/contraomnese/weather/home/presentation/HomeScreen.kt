@@ -6,11 +6,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,9 +22,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
 import com.contraomnese.weather.core.ui.widgets.SearchTextField
+import com.contraomnese.weather.design.icons.WeatherIcons
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.cornerRadius1
+import com.contraomnese.weather.design.theme.itemHeight20
 import com.contraomnese.weather.design.theme.itemHeight40
 import com.contraomnese.weather.design.theme.itemThickness2
 import com.contraomnese.weather.design.theme.padding16
@@ -48,19 +54,42 @@ internal fun HomeScreen(
     onEvent: (HomeEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+
     Column {
         SearchTextField(
-            searchQuery = uiState.city.value,
-            onSearchQueryChanged = { onEvent(HomeEvent.CityChanged(it)) },
-            isError = !uiState.city.isValidCity(),
-            modifier = Modifier.padding(padding16)
+            modifier = Modifier.padding(padding16),
+            searchQuery = uiState.location.value,
+            onSearchQueryChanged = { onEvent(HomeEvent.LocationChanged(it)) },
+            isError = !uiState.location.isValidCity(),
+            leadingIcon = if (uiState.isLoading) {
+                {
+                    LoadingIndicator(
+                        modifier =
+                            Modifier
+                                .height(itemHeight20)
+                                .aspectRatio(1f)
+                    )
+                }
+            } else null,
+            trailingIcon = if (uiState.location.value.isEmpty()) {
+                {
+                    IconButton(
+                        onClick = { },
+                    ) {
+                        Icon(
+                            imageVector = WeatherIcons.Map,
+                            contentDescription = null
+                        )
+                    }
+                }
+            } else null
         )
 
         Column(
             modifier = Modifier
                 .padding(horizontal = padding16)
         ) {
-            uiState.cities.forEach { city ->
+            uiState.locations.forEach { city ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -121,7 +150,24 @@ fun HomeScreenPreview(modifier: Modifier = Modifier) {
         }
 
         HomeScreen(
-            uiState = HomeUiState(cities = cities.toPersistentList()),
+            uiState = HomeUiState(locations = cities.toPersistentList()),
+            onEvent = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+fun HomeScreenLoadingPreview(modifier: Modifier = Modifier) {
+    WeatherTheme {
+        Box(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .fillMaxSize()
+        )
+
+        HomeScreen(
+            uiState = HomeUiState(isLoading = true),
             onEvent = {}
         )
     }
