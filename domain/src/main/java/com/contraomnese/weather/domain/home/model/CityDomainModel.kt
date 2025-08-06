@@ -10,15 +10,15 @@ value class CityPresentation(val value: String) {
 }
 
 @JvmInline
-value class LatitudePresentation(val value: Float)
+value class LatitudePresentation(val value: Double)
 
 @JvmInline
-value class LongitudePresentation(val value: Float)
+value class LongitudePresentation(val value: Double)
 
 data class CityDomainModel(
     val id: Int,
     val name: String,
-    val countryId: Int,
+    val countryName: String,
     val point: LocationDomainPoint,
 )
 

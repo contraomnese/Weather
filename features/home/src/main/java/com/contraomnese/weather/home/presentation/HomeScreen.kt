@@ -55,7 +55,7 @@ internal fun HomeScreen(
         ) {
             uiState.cities.forEach { city ->
                 Text(
-                    text = city.name,
+                    text = "${city.name}, ${city.countryName}",
                     style = MaterialTheme.typography.bodyMedium,
                 )
                 Spacer(modifier = Modifier

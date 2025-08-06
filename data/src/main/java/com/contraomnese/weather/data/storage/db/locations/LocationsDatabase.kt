@@ -6,12 +6,13 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.contraomnese.weather.data.storage.db.locations.dao.LocationsDao
 import com.contraomnese.weather.data.storage.db.locations.entities.CityEntity
+import com.contraomnese.weather.data.storage.db.locations.entities.CountryEntity
 
 private const val DATABASE_VERSION = 1
-const val DATABASE_NAME = "cities.sqlite3"
+const val DATABASE_NAME = "locations.sqlite3"
 
 @Database(
-    entities = [CityEntity::class],
+    entities = [CityEntity::class, CountryEntity::class],
     version = DATABASE_VERSION,
     exportSchema = false
 )
