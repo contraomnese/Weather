@@ -1,22 +1,32 @@
 package com.contraomnese.weather.home.presentation
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contraomnese.weather.core.ui.widgets.SearchTextField
+import com.contraomnese.weather.design.theme.WeatherTheme
+import com.contraomnese.weather.design.theme.cornerRadius1
+import com.contraomnese.weather.design.theme.itemHeight40
 import com.contraomnese.weather.design.theme.itemThickness2
 import com.contraomnese.weather.design.theme.padding16
-import com.contraomnese.weather.design.theme.padding24
+import com.contraomnese.weather.domain.home.model.LocationDomainModel
+import kotlinx.collections.immutable.toPersistentList
 
 @Composable
 internal fun HomeRoute(
@@ -28,9 +38,7 @@ internal fun HomeRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     HomeScreen(
-        uiState = uiState,
-        onEvent = viewModel::onEvent,
-        modifier = modifier
+        uiState = uiState, onEvent = viewModel::onEvent, modifier = modifier
     )
 }
 
@@ -50,18 +58,71 @@ internal fun HomeScreen(
 
         Column(
             modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = padding24)
+                .padding(horizontal = padding16)
         ) {
             uiState.cities.forEach { city ->
-                Text(
-                    text = "${city.name}, ${city.countryName}",
-                    style = MaterialTheme.typography.bodyMedium,
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(itemHeight40),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = city.name,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    Spacer(
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = city.countryName,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+
+                }
+
+                Spacer(
+                    modifier = Modifier
+                        .height(itemThickness2)
+                        .background(
+                            MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f),
+                            RoundedCornerShape(cornerRadius1)
+                        )
+                        .fillMaxWidth()
                 )
-                Spacer(modifier = Modifier
-                    .height(itemThickness2)
-                    .fillMaxWidth())
             }
         }
+    }
+}
+
+@Preview
+@Composable
+fun HomeScreenPreview(modifier: Modifier = Modifier) {
+    WeatherTheme {
+        Box(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .fillMaxSize()
+        )
+        val original = LocationDomainModel(
+            id = 1,
+            name = "",
+            countryName = "",
+        )
+        val cities = List(10) { index ->
+            original.copy(
+                id = index,
+                name = "City $index",
+                countryName = "Country $index"
+            )
+        }
+
+        HomeScreen(
+            uiState = HomeUiState(cities = cities.toPersistentList()),
+            onEvent = {}
+        )
     }
 }

@@ -1,8 +1,8 @@
 package com.contraomnese.weather.home.presentation
 
 import androidx.compose.runtime.Immutable
-import com.contraomnese.weather.domain.home.model.CityDomainModel
 import com.contraomnese.weather.domain.home.model.CityPresentation
+import com.contraomnese.weather.domain.home.model.LocationDomainModel
 import com.contraomnese.weather.domain.home.usecase.GetLocationsUseCase
 import com.contraomnese.weather.presentation.architecture.BaseViewModel
 import com.contraomnese.weather.presentation.architecture.UiState
@@ -17,7 +17,7 @@ import kotlinx.collections.immutable.toPersistentList
 internal data class HomeUiState(
     override val isLoading: Boolean = false,
     val city: CityPresentation = CityPresentation(""),
-    val cities: ImmutableList<CityDomainModel> = persistentListOf(),
+    val cities: ImmutableList<LocationDomainModel> = persistentListOf(),
 ) : UiState {
     override fun loading(): UiState = copy(isLoading = true)
 }
@@ -43,10 +43,13 @@ internal class HomeViewModel(
 
     private fun onCityChanged(newCity: String) {
         updateViewState { copy(city = CityPresentation(newCity)) }
-        execute(getLocationsUseCase, newCity, ::onCitiesUpdate, ::provideException)
+        if (newCity.isNotEmpty()) {
+            execute(getLocationsUseCase, newCity, ::onCitiesUpdate, ::provideException)
+        } else onCitiesUpdate(persistentListOf())
+
     }
 
-    private fun onCitiesUpdate(newCities: List<CityDomainModel>) {
+    private fun onCitiesUpdate(newCities: List<LocationDomainModel>) {
         updateViewState { copy(cities = newCities.toPersistentList()) }
     }
 
