@@ -2,7 +2,6 @@ package com.contraomnese.weather.data.repository
 
 import com.contraomnese.weather.data.mappers.toDomain
 import com.contraomnese.weather.data.storage.db.locations.LocationsDatabase
-import com.contraomnese.weather.domain.cleanarchitecture.exception.UnknownDomainException
 import com.contraomnese.weather.domain.home.model.LocationDomainModel
 import com.contraomnese.weather.domain.home.repository.LocationsRepository
 import com.contraomnese.weather.domain.weatherByLocation.model.GeoLocationDomainModel
@@ -15,7 +14,7 @@ class LocationsRepositoryImpl(
         return try {
             database.locationsDao().getLocationsBy("$name%").map { it.toDomain() }
         } catch (throwable: Throwable) {
-            throw UnknownDomainException(throwable)
+            throw throwable
         }
     }
 
@@ -23,7 +22,7 @@ class LocationsRepositoryImpl(
         return try {
             database.locationsDao().getLocationBy(id).toDomain()
         } catch (throwable: Throwable) {
-            throw UnknownDomainException(throwable)
+            throw throwable
         }
     }
 

@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="weather_for_location_not_found_domain_exception">Извините! Погода для данной локации не найдена.</string>
+    <string name="authorization_domain_exception">Извините! В данный момент сервис не доступен. Попробуйте позже.</string>
+    <string name="weather_api_domain_exception">Извините! По независящим от нас причинам сервис не доступен. Попробуйте позже.</string>
+    <string name="wrong_request_domain_exception">Неверные данные. Попробуйте ещё раз.</string>
     <string name="unknown_domain_exception">Ой! Что-то пошло не так..</string>
+    <string name="unforeseen_internal_exception">Ого! Непредвиденная ошибка.</string>
 </resources>
