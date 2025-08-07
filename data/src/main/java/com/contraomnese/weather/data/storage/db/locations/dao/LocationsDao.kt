@@ -3,7 +3,7 @@ package com.contraomnese.weather.data.storage.db.locations.dao
 import androidx.room.Dao
 import androidx.room.Query
 import com.contraomnese.weather.data.storage.db.locations.dto.LocationDto
-import com.contraomnese.weather.data.storage.db.locations.dto.LocationForecastDto
+import com.contraomnese.weather.data.storage.db.locations.dto.WeatherLocationDto
 
 @Dao
 interface LocationsDao {
@@ -23,13 +23,13 @@ interface LocationsDao {
 
     @Query(
         "SELECT " +
-                "cities.id AS ${LocationForecastDto.ID}, " +
-                "cities.name AS ${LocationForecastDto.NAME}, " +
-                "cities.latitude AS ${LocationForecastDto.LATITUDE}, " +
-                "cities.longitude AS ${LocationForecastDto.LONGITUDE} " +
+                "cities.id AS ${WeatherLocationDto.ID}, " +
+                "cities.name AS ${WeatherLocationDto.NAME}, " +
+                "cities.latitude AS ${WeatherLocationDto.LATITUDE}, " +
+                "cities.longitude AS ${WeatherLocationDto.LONGITUDE} " +
                 "FROM cities " +
                 "WHERE cities.id LIKE :cityId " +
                 "LIMIT 1"
     )
-    fun getLocationBy(cityId: Int): LocationForecastDto
+    fun getLocationBy(cityId: Int): WeatherLocationDto
 }

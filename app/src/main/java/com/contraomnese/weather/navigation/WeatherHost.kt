@@ -20,7 +20,7 @@ import com.contraomnese.weather.core.ui.widgets.NotificationSnackBar
 import com.contraomnese.weather.design.theme.padding40
 import com.contraomnese.weather.home.navigation.HomeDestination
 import com.contraomnese.weather.home.navigation.home
-import com.contraomnese.weather.locationforecast.navigation.locationForecast
+import com.contraomnese.weather.weatherByLocation.navigation.weatherByLocation
 
 @Composable
 internal fun WeatherHost(
@@ -57,7 +57,7 @@ internal fun WeatherHost(
                 startDestination = HomeDestination
             ) {
                 home(externalNavigator = navController.homeNavigator())
-                locationForecast(externalNavigator = navController.locationForecastNavigator())
+                weatherByLocation(externalNavigator = navController.weatherByLocationNavigator())
             }
         }
     }

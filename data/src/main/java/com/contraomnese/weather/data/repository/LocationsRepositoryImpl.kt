@@ -5,7 +5,7 @@ import com.contraomnese.weather.data.storage.db.locations.LocationsDatabase
 import com.contraomnese.weather.domain.cleanarchitecture.exception.UnknownDomainException
 import com.contraomnese.weather.domain.home.model.LocationDomainModel
 import com.contraomnese.weather.domain.home.repository.LocationsRepository
-import com.contraomnese.weather.domain.locationForecast.model.LocationForecastDomainModel
+import com.contraomnese.weather.domain.weatherByLocation.model.GeoLocationDomainModel
 
 class LocationsRepositoryImpl(
     private val database: LocationsDatabase,
@@ -19,7 +19,7 @@ class LocationsRepositoryImpl(
         }
     }
 
-    override fun getLocationBy(id: Int): LocationForecastDomainModel {
+    override fun getLocationBy(id: Int): GeoLocationDomainModel {
         return try {
             database.locationsDao().getLocationBy(id).toDomain()
         } catch (throwable: Throwable) {

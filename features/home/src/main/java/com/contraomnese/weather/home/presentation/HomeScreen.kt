@@ -38,7 +38,7 @@ import kotlinx.collections.immutable.toPersistentList
 @Composable
 internal fun HomeRoute(
     viewModel: HomeViewModel,
-    onNavigateToLocationForecast: (Int) -> Unit,
+    onNavigateToWeatherByLocation: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
@@ -47,7 +47,7 @@ internal fun HomeRoute(
     HomeScreen(
         uiState = uiState,
         onEvent = viewModel::onEvent,
-        onNavigateToLocationForecast = onNavigateToLocationForecast,
+        onNavigateToWeatherByLocation = onNavigateToWeatherByLocation,
         modifier = modifier
     )
 }
@@ -56,7 +56,7 @@ internal fun HomeRoute(
 internal fun HomeScreen(
     uiState: HomeUiState,
     onEvent: (HomeEvent) -> Unit,
-    onNavigateToLocationForecast: (Int) -> Unit = {},
+    onNavigateToWeatherByLocation: (Int) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
 
@@ -97,7 +97,7 @@ internal fun HomeScreen(
             uiState.locations.forEach { location ->
                 Row(
                     modifier = Modifier
-                        .clickable { onNavigateToLocationForecast(location.id) }
+                        .clickable { onNavigateToWeatherByLocation(location.id) }
                         .fillMaxWidth()
                         .height(itemHeight40),
                     verticalAlignment = Alignment.CenterVertically,

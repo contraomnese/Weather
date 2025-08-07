@@ -4,8 +4,8 @@ import com.contraomnese.weather.data.mappers.toDomain
 import com.contraomnese.weather.data.network.api.WeatherApi
 import com.contraomnese.weather.data.network.models.ErrorResponse
 import com.contraomnese.weather.data.network.parsers.parseOrThrowError
-import com.contraomnese.weather.domain.locationForecast.model.CurrentWeatherDomainModel
-import com.contraomnese.weather.domain.locationForecast.repository.CurrentWeatherRepository
+import com.contraomnese.weather.domain.weatherByLocation.model.CurrentWeatherDomainModel
+import com.contraomnese.weather.domain.weatherByLocation.repository.CurrentWeatherRepository
 import okhttp3.ResponseBody
 import retrofit2.Converter
 

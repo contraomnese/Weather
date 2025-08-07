@@ -2,13 +2,13 @@ package com.contraomnese.weather.navigation
 
 import androidx.navigation.NavHostController
 import com.contraomnese.weather.home.navigation.HomeNavigator
-import com.contraomnese.weather.locationforecast.navigation.LocationForecastNavigator
-import com.contraomnese.weather.locationforecast.navigation.navigateToLocationForecast
+import com.contraomnese.weather.weatherByLocation.navigation.WeatherByLocationNavigator
+import com.contraomnese.weather.weatherByLocation.navigation.navigateToWeatherByLocation
 
 fun NavHostController.homeNavigator() = object : HomeNavigator {
 
-    override fun onNavigateToLocationForecastBy(locationId: Int) {
-        navigateToLocationForecast(locationId)
+    override fun onNavigateToWeatherByLocation(locationId: Int) {
+        navigateToWeatherByLocation(locationId)
     }
 
     override fun onNavigateUp() {
@@ -16,4 +16,4 @@ fun NavHostController.homeNavigator() = object : HomeNavigator {
     }
 }
 
-fun NavHostController.locationForecastNavigator() = LocationForecastNavigator { popBackStack() }
+fun NavHostController.weatherByLocationNavigator() = WeatherByLocationNavigator { popBackStack() }

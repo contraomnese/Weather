@@ -1,8 +1,8 @@
 package com.contraomnese.weather.di
 
 import com.contraomnese.weather.domain.home.usecase.GetLocationsUseCase
-import com.contraomnese.weather.domain.locationForecast.usecase.GetCurrentWeatherUseCase
-import com.contraomnese.weather.domain.locationForecast.usecase.GetLocationForecastUseCase
+import com.contraomnese.weather.domain.weatherByLocation.usecase.GetCurrentWeatherUseCase
+import com.contraomnese.weather.domain.weatherByLocation.usecase.GetGeoLocationUseCase
 import org.koin.dsl.module
 
 val domainModule = module {
@@ -13,8 +13,8 @@ val domainModule = module {
             coroutineContextProvider = get()
         )
     }
-    factory<GetLocationForecastUseCase> {
-        GetLocationForecastUseCase(
+    factory<GetGeoLocationUseCase> {
+        GetGeoLocationUseCase(
             repository = get(),
             coroutineContextProvider = get()
         )
