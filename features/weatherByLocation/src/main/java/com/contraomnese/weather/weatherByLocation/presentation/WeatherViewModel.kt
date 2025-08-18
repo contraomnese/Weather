@@ -15,6 +15,21 @@ internal data class WeatherUiState(
     override val isLoading: Boolean = false,
     val location: GeoLocationDomainModel,
     val weather: CurrentWeatherDomainModel? = null,
+    val hourlyForecastStub: List<String> = listOf(
+        "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00"
+    ),
+    val dailyForecastStub: List<Pair<String, String>> = listOf(
+        "Сегодня" to "+25° / +17°",
+        "Завтра" to "+26° / +18°",
+        "Пн" to "+27° / +19°",
+        "Вт" to "+28° / +20°",
+        "Ср" to "+29° / +21°",
+        "Чт" to "+30° / +22°",
+        "Пт" to "+31° / +23°",
+        "Сб" to "+32° / +24°",
+        "Вс" to "+33° / +25°",
+        "Пн" to "+34° / +26°"
+    ),
 ) : UiState {
     override fun loading(): UiState = copy(isLoading = true)
 }

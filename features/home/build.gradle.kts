@@ -49,6 +49,8 @@ dependencies {
     implementation(project(":core:presentation"))
     implementation(project(":domain"))
 
+    implementation(project(":features:weatherByLocation"))
+
     implementation(libs.bundles.koin)
     implementation(libs.bundles.core)
     implementation(libs.bundles.navigation)

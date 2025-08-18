@@ -33,6 +33,7 @@ import com.contraomnese.weather.design.theme.itemHeight40
 import com.contraomnese.weather.design.theme.itemThickness2
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.domain.home.model.LocationDomainModel
+import com.contraomnese.weather.weatherByLocation.presentation.MainScreen
 import kotlinx.collections.immutable.toPersistentList
 
 @Composable
@@ -44,12 +45,14 @@ internal fun HomeRoute(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    HomeScreen(
-        uiState = uiState,
-        onEvent = viewModel::onEvent,
-        onNavigateToWeatherByLocation = onNavigateToWeatherByLocation,
-        modifier = modifier
-    )
+    MainScreen()
+
+//    HomeScreen(
+//        uiState = uiState,
+//        onEvent = viewModel::onEvent,
+//        onNavigateToWeatherByLocation = onNavigateToWeatherByLocation,
+//        modifier = modifier
+//    )
 }
 
 @Composable
