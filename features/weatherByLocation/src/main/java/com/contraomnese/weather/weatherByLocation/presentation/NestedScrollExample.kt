@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -44,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.cornerRadius16
 import com.contraomnese.weather.design.theme.padding8
+import com.contraomnese.weather.design.theme.space16
 import com.contraomnese.weather.design.theme.space32
 import kotlinx.coroutines.flow.map
 import kotlin.math.abs
@@ -57,15 +57,15 @@ fun NestedScrollExample() {
     val density = LocalDensity.current
 
     // title
-    val minTitleBoxHeightPx = 60.dp.toPx()
-    val maxTitleBoxHeightPx = 200.dp.toPx()
+    val minTitleBoxHeightPx = 100.dp.toPx()
+    val maxTitleBoxHeightPx = 300.dp.toPx()
     var currentTitleBoxHeight by remember { mutableFloatStateOf(maxTitleBoxHeightPx) }
 
     // containers
     val verticalSpacing = 12.dp
     val collapsableContainerHeaderHeightDefault = 40.dp
     val collapsableContainerBodyHeightFirstPx = 200.dp.toPx()
-    val collapsableContainerBodyHeightSecondPx = 700.dp.toPx()
+    val collapsableContainerBodyHeightSecondPx = 500.dp.toPx()
     val collapsableContainerBodyHeightThirdPx = 400.dp.toPx()
     val collapsableContainerBodyHeightFourthPx = 200.dp.toPx()
     val collapsableContainerBodyHeightFifthPx = 200.dp.toPx()
@@ -143,25 +143,18 @@ fun NestedScrollExample() {
                 val currentCollapseContainerOffset =
                     currentCollapseContainer?.offset?.toFloat() ?: Float.NEGATIVE_INFINITY
 
-                // make sure we don't steal more scroll than needed to show a new container when scrolling DOWN
-                if (availableScrollResult > 0f && currentCollapseContainerOffset < 0) {
-                    if (availableScrollResult + currentCollapseContainerOffset > 0) {
-                        val exactOffsetConsumed = availableScrollResult + currentCollapseContainerOffset
-                        return Offset(0f, exactOffsetConsumed)
-                    } else {
-                        return Offset(0f, consumedResult)
-                    }
-                }
 
                 // checking that all container's bodies after current container are expanded
                 if (availableScrollResult > 0) {
                     collapsableContainersHeights.drop(currentVisibleCollapseContainerIndex + 1)
-                        .forEach { (bodyContainerHeight, bodyContainerMaxHeight) ->
+                        .forEachIndexed { nextContainerBodyIndex, (bodyContainerHeight, bodyContainerMaxHeight) ->
                             if (bodyContainerHeight != bodyContainerMaxHeight) {
                                 val newBodyContainerHeight =
                                     (bodyContainerHeight + availableScrollResult).coerceIn(0f, bodyContainerMaxHeight)
                                 collapsableContainersHeights = collapsableContainersHeights.mapIndexed { index, pair ->
-                                    if (index == currentVisibleCollapseContainerIndex + 1) newBodyContainerHeight to bodyContainerMaxHeight else pair
+                                    val curIdxWithOffset =
+                                        nextContainerBodyIndex + currentVisibleCollapseContainerIndex + 1
+                                    if (curIdxWithOffset == index) newBodyContainerHeight to bodyContainerMaxHeight else pair
                                 }
                                 val consumedScrollYByBody = newBodyContainerHeight - bodyContainerHeight
                                 consumedResult += consumedScrollYByBody
@@ -171,9 +164,25 @@ fun NestedScrollExample() {
                                     return Offset(0f, availableScrollResult - maxVisibleCollapsableContainerOffset)
                                 }
 
-                                return@forEach
+                                return@forEachIndexed
                             }
                         }
+                }
+
+
+                if (availableScrollResult == 0f) {
+                    return Offset(0f, consumedResult)
+                }
+                // end block
+
+                // make sure we don't steal more scroll than needed to show a new container when scrolling DOWN
+                if (availableScrollResult > 0f && currentCollapseContainerOffset < 0) {
+                    if (availableScrollResult + currentCollapseContainerOffset > 0) {
+                        val exactOffsetConsumed = availableScrollResult + currentCollapseContainerOffset
+                        return Offset(0f, exactOffsetConsumed)
+                    } else {
+                        return Offset(0f, consumedResult)
+                    }
                 }
 
                 val nextCollapseContainer =
@@ -203,10 +212,8 @@ fun NestedScrollExample() {
 
                     // for some reason when offset = 0 the next index does not take the correct value
                     currentVisibleCollapseContainerIndex--
-
                     return Offset(0f, exactOffsetConsumed)
                 }
-
                 // we give away the remaining scroll
                 return Offset(0f, consumedResult)
             }
@@ -236,31 +243,39 @@ fun NestedScrollExample() {
                 .background(MaterialTheme.colorScheme.surface.copy(alpha = .0f)),
             contentAlignment = Alignment.Center
         ) {
-            if (maxHeight > 120.dp) {
+            if (maxHeight > 250.dp) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(padding8)
                 ) {
                     Text(
-                        "123", style = MaterialTheme.typography.headlineLarge,
+                        "Астрахань", style = MaterialTheme.typography.headlineLarge,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        "321", style = MaterialTheme.typography.headlineLarge,
+                        "32°", style = MaterialTheme.typography.displayLarge,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        "Преимущественно Ясно", style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        "Макс.: 33°, Мин.: 21°", style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             } else {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(padding8)
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(padding8)
                 ) {
                     Text(
-                        "123", style = MaterialTheme.typography.headlineLarge,
+                        "Астрахань", style = MaterialTheme.typography.headlineLarge,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        "321", style = MaterialTheme.typography.headlineLarge,
+                        "32° | Преимущественно Ясно", style = MaterialTheme.typography.headlineMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }
@@ -276,14 +291,99 @@ fun NestedScrollExample() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(verticalSpacing),
         ) {
-            // Первый контейнер
-            items(collapsableContainersHeights) {
+            item {
                 ExpandableItem(
-                    collapsableContainerHeaderHeightDefault,
-                    it.first,
-                    it.second
+                    headerHeight = collapsableContainerHeaderHeightDefault,
+                    currentHeight = collapsableContainersHeights[0].first,
+                    maxHeight = collapsableContainersHeights[0].second,
                 ) {
                     repeat(10) { Text("Body$it") }
+                }
+            }
+            item {
+                ExpandableItem(
+                    headerHeight = collapsableContainerHeaderHeightDefault,
+                    currentHeight = collapsableContainersHeights[1].first,
+                    maxHeight = collapsableContainersHeights[1].second,
+                ) {
+                    repeat(4) { Text("Body$it") }
+                }
+            }
+            item {
+                ExpandableItem(
+                    headerHeight = collapsableContainerHeaderHeightDefault,
+                    currentHeight = collapsableContainersHeights[2].first,
+                    maxHeight = collapsableContainersHeights[2].second,
+                ) {
+                    repeat(4) { Text("Body$it") }
+                }
+            }
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(space16)
+                ) {
+                    repeat(2) {
+                        ExpandableItem(
+                            headerHeight = collapsableContainerHeaderHeightDefault,
+                            currentHeight = collapsableContainersHeights[3].first,
+                            maxHeight = collapsableContainersHeights[3].second,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            repeat(5) { Text("Body$it") }
+                        }
+                    }
+                }
+            }
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(space16)
+                ) {
+                    repeat(2) {
+                        ExpandableItem(
+                            headerHeight = collapsableContainerHeaderHeightDefault,
+                            currentHeight = collapsableContainersHeights[4].first,
+                            maxHeight = collapsableContainersHeights[4].second,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            repeat(5) { Text("Body$it") }
+                        }
+                    }
+                }
+            }
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(space16)
+                ) {
+                    repeat(2) {
+                        ExpandableItem(
+                            headerHeight = collapsableContainerHeaderHeightDefault,
+                            currentHeight = collapsableContainersHeights[5].first,
+                            maxHeight = collapsableContainersHeights[5].second,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            repeat(5) { Text("Body$it") }
+                        }
+                    }
+                }
+            }
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(space16)
+                ) {
+                    repeat(2) {
+                        ExpandableItem(
+                            headerHeight = collapsableContainerHeaderHeightDefault,
+                            currentHeight = collapsableContainersHeights[6].first,
+                            maxHeight = collapsableContainersHeights[6].second,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            repeat(5) { Text("Body$it") }
+                        }
+                    }
                 }
             }
             item {
@@ -300,13 +400,14 @@ fun NestedScrollExample() {
 
 @Composable
 private fun ExpandableItem(
+    modifier: Modifier = Modifier,
     headerHeight: Dp,
     currentHeight: Float,
     maxHeight: Float,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .wrapContentHeight()
             .fillMaxWidth()
             .clip(RoundedCornerShape(cornerRadius16))
