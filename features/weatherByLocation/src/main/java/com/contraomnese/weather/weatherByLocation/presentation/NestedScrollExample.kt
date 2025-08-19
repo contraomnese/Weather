@@ -1,6 +1,5 @@
 package com.contraomnese.weather.weatherByLocation.presentation
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,7 +44,7 @@ import androidx.compose.ui.unit.dp
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.cornerRadius16
 import com.contraomnese.weather.design.theme.padding8
-import com.contraomnese.weather.design.theme.space16
+import com.contraomnese.weather.design.theme.space32
 import kotlinx.coroutines.flow.map
 import kotlin.math.abs
 
@@ -57,155 +56,171 @@ fun NestedScrollExample() {
     val lazyListState = rememberLazyListState()
     val density = LocalDensity.current
 
-    val headerHeightDefault = 40.dp
+    // title
+    val minTitleBoxHeightPx = 60.dp.toPx()
+    val maxTitleBoxHeightPx = 200.dp.toPx()
+    var currentTitleBoxHeight by remember { mutableFloatStateOf(maxTitleBoxHeightPx) }
+
+    // containers
     val verticalSpacing = 12.dp
-    val bodyMaxHeightFirstPx = 200.dp.toPx()
-    val bodyMaxHeightSecondPx = 700.dp.toPx()
-    val bodyMaxHeightThirdPx = 400.dp.toPx()
-    val bodyMaxHeightFourthPx = 200.dp.toPx()
-    val bodyMaxHeightFifthPx = 200.dp.toPx()
-    val bodyMaxHeightSixthPx = 200.dp.toPx()
-    val bodyMaxHeightSeventhPx = 200.dp.toPx()
+    val collapsableContainerHeaderHeightDefault = 40.dp
+    val collapsableContainerBodyHeightFirstPx = 200.dp.toPx()
+    val collapsableContainerBodyHeightSecondPx = 700.dp.toPx()
+    val collapsableContainerBodyHeightThirdPx = 400.dp.toPx()
+    val collapsableContainerBodyHeightFourthPx = 200.dp.toPx()
+    val collapsableContainerBodyHeightFifthPx = 200.dp.toPx()
+    val collapsableContainerBodyHeightSixthPx = 200.dp.toPx()
+    val collapsableContainerBodyHeightSeventhPx = 200.dp.toPx()
 
-    var currentBodyIndexState by remember { mutableIntStateOf(-1) }
+    val maxVisibleCollapsableContainerOffset =
+        collapsableContainerHeaderHeightDefault.toPx() + verticalSpacing.toPx()
 
-    val minColumnHeaderHeightPx = 60.dp.toPx()
-    val maxColumnHeaderHeightPx = 200.dp.toPx()
-    var currentColumnHeaderHeight by remember { mutableFloatStateOf(maxColumnHeaderHeightPx) }
-
-    val maxItemOffset = headerHeightDefault.toPx() + verticalSpacing.toPx()
-
+    var currentVisibleCollapseContainerIndex by remember { mutableIntStateOf(-1) }
     LaunchedEffect(lazyListState) {
         snapshotFlow { lazyListState.layoutInfo.visibleItemsInfo }
-            .map { vis -> vis.firstOrNull { it.offset >= -maxItemOffset }?.index ?: -1 }
-            .collect { currentBodyIndexState = it }
+            .map { vis -> vis.firstOrNull { it.offset >= -maxVisibleCollapsableContainerOffset }?.index ?: -1 }
+            .collect { currentVisibleCollapseContainerIndex = it }
     }
 
-    var currentBodyHeights by remember {
+    var collapsableContainersHeights by remember {
         mutableStateOf(
             listOf(
-                bodyMaxHeightFirstPx to bodyMaxHeightFirstPx,
-                bodyMaxHeightSecondPx to bodyMaxHeightSecondPx,
-                bodyMaxHeightThirdPx to bodyMaxHeightThirdPx,
-                bodyMaxHeightFourthPx to bodyMaxHeightFourthPx,
-                bodyMaxHeightFifthPx to bodyMaxHeightFifthPx,
-                bodyMaxHeightSixthPx to bodyMaxHeightSixthPx,
-                bodyMaxHeightSeventhPx to bodyMaxHeightSeventhPx,
+                collapsableContainerBodyHeightFirstPx to collapsableContainerBodyHeightFirstPx,
+                collapsableContainerBodyHeightSecondPx to collapsableContainerBodyHeightSecondPx,
+                collapsableContainerBodyHeightThirdPx to collapsableContainerBodyHeightThirdPx,
+                collapsableContainerBodyHeightFourthPx to collapsableContainerBodyHeightFourthPx,
+                collapsableContainerBodyHeightFifthPx to collapsableContainerBodyHeightFifthPx,
+                collapsableContainerBodyHeightSixthPx to collapsableContainerBodyHeightSixthPx,
+                collapsableContainerBodyHeightSeventhPx to collapsableContainerBodyHeightSeventhPx,
             )
         )
     }
 
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
-            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
 
-                Log.d("123", "INDEX: $currentBodyIndexState")
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
 
                 if (available.y == 0f) return Offset.Zero
 
-                var consumedScrollY = 0f
-                var reserveScrollY = available.y
-                Log.d("123", "reserveScrollY: ($reserveScrollY)")
-                // ==== 1) header растет/сжимается ====
-                if (available.y < 0 && currentBodyIndexState == 0 && lazyListState.firstVisibleItemScrollOffset == 0) {
-                    val prevHeaderHeight = currentColumnHeaderHeight
-                    currentColumnHeaderHeight =
-                        (currentColumnHeaderHeight + reserveScrollY).coerceIn(
-                            minColumnHeaderHeightPx,
-                            maxColumnHeaderHeightPx
-                        )
-                    val headerConsumed = currentColumnHeaderHeight - prevHeaderHeight
-                    consumedScrollY += headerConsumed
-                    reserveScrollY -= headerConsumed
+                // disable scroll when last item is visible
+                val lastItem = lazyListState.layoutInfo.let {
+                    it.visibleItemsInfo.firstOrNull { lastItem ->
+                        lastItem.index == collapsableContainersHeights.size &&
+                                lastItem.offset + lastItem.size > it.viewportEndOffset
+                    }
+                }
+                if (lastItem != null && available.y < 0) {
+                    return Offset(0f, available.y)
+                }
+                // end block
 
-                    Log.d("123", "HEADER ЗАБРАЛ $headerConsumed PX")
-                    Log.d("123", "ОСТАЛОСЬ $reserveScrollY PX")
+                var consumedResult = 0f
+                var availableScrollResult = available.y
+
+                // steal scroll to change title height
+                if (availableScrollResult < 0 && currentVisibleCollapseContainerIndex == 0) {
+                    val prevTitleBoxHeight = currentTitleBoxHeight
+                    currentTitleBoxHeight =
+                        (currentTitleBoxHeight + availableScrollResult).coerceIn(
+                            minTitleBoxHeightPx,
+                            maxTitleBoxHeightPx
+                        )
+                    val consumedByTitle = currentTitleBoxHeight - prevTitleBoxHeight
+                    consumedResult += consumedByTitle
+                    availableScrollResult -= consumedByTitle
                 }
 
-                if (reserveScrollY == 0f) return Offset(0f, consumedScrollY)
+                if (availableScrollResult == 0f) {
+                    return Offset(0f, consumedResult)
+                }
+                // end block
 
-                // ==== 2) body текущего элемента ====
-                val bodyIndex = currentBodyIndexState
-                Log.d("123", "bodyIndex $bodyIndex")
+                // collapsableContainer height changing
                 val currentCollapseContainer =
-                    lazyListState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == bodyIndex }
+                    lazyListState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == currentVisibleCollapseContainerIndex }
+
                 val currentCollapseContainerOffset =
                     currentCollapseContainer?.offset?.toFloat() ?: Float.NEGATIVE_INFINITY
 
-                Log.d("123", "ОТСТУП ТЕКУЩЕГО КОНТЕЙНЕРА $currentCollapseContainerOffset PX")
-
-                val nextCollapseContainer =
-                    lazyListState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == bodyIndex + 1 }
-                val nextCollapseContainerOffset = nextCollapseContainer?.offset?.toFloat() ?: Float.POSITIVE_INFINITY
-                Log.d("123", "ОТСТУП СЛЕДУЮЩЕГО КОНТЕЙНЕРА $nextCollapseContainerOffset PX")
-
-                if (bodyIndex in currentBodyHeights.indices) {
-
-                    val (nextBodyHeight, nextMaxBodyHeight) = currentBodyHeights[bodyIndex + 1]
-                    if (available.y > 0 && nextBodyHeight != nextMaxBodyHeight) {
-                        val newBodyHeight = (nextBodyHeight + reserveScrollY).coerceIn(0f, nextMaxBodyHeight)
-                        currentBodyHeights = currentBodyHeights.mapIndexed { index, pair ->
-                            if (index == bodyIndex + 1) newBodyHeight to nextMaxBodyHeight else pair
-                        }
-                        val consumedScrollYByBody = newBodyHeight - nextBodyHeight
-                        consumedScrollY += consumedScrollYByBody
-                        reserveScrollY -= consumedScrollYByBody
-
-                        Log.d("123", "BODY ЗАБРАЛ $consumedScrollYByBody PX")
-                        Log.d("123", "ОСТАЛОСЬ $reserveScrollY PX")
-
-                        if (newBodyHeight == 0f && reserveScrollY < 0 && abs(reserveScrollY + consumedScrollY) > nextCollapseContainerOffset) {
-                            val exactOffsetConsumed = reserveScrollY + consumedScrollY + nextCollapseContainerOffset
-                            Log.d("123", "EXACT OFFSET: $exactOffsetConsumed")
-                            return Offset(0f, exactOffsetConsumed)
-                        }
-                        if (newBodyHeight == nextMaxBodyHeight && reserveScrollY > maxItemOffset) {
-                            return Offset(0f, reserveScrollY - maxItemOffset)
-                        }
-                    }
-
-                    if (reserveScrollY > 0f && currentCollapseContainerOffset < 0) {
-                        if (reserveScrollY + nextCollapseContainerOffset > maxItemOffset) {
-                            val exactOffsetConsumed = reserveScrollY - (maxItemOffset - nextCollapseContainerOffset)
-                            return Offset(0f, exactOffsetConsumed)
-                        } else return Offset(0f, consumedScrollY)
-                    }
-
-                    val (currentBodyHeight, maxBodyHeight) = currentBodyHeights[bodyIndex]
-                    val newBodyHeight = (currentBodyHeight + reserveScrollY).coerceIn(0f, maxBodyHeight)
-                    currentBodyHeights = currentBodyHeights.mapIndexed { index, pair ->
-                        if (index == bodyIndex) newBodyHeight to maxBodyHeight else pair
-                    }
-                    val consumedScrollYByBody = newBodyHeight - currentBodyHeight
-                    consumedScrollY += consumedScrollYByBody
-                    reserveScrollY -= consumedScrollYByBody
-
-                    Log.d("123", "BODY ЗАБРАЛ $consumedScrollYByBody PX")
-                    Log.d("123", "ОСТАЛОСЬ $reserveScrollY PX")
-
-                    if (newBodyHeight == 0f && reserveScrollY < 0 && abs(reserveScrollY + consumedScrollY) > nextCollapseContainerOffset) {
-                        val exactOffsetConsumed = reserveScrollY + consumedScrollY + nextCollapseContainerOffset
-                        Log.d("123", "EXACT OFFSET: $exactOffsetConsumed")
+                // make sure we don't steal more scroll than needed to show a new container when scrolling DOWN
+                if (availableScrollResult > 0f && currentCollapseContainerOffset < 0) {
+                    if (availableScrollResult + currentCollapseContainerOffset > 0) {
+                        val exactOffsetConsumed = availableScrollResult + currentCollapseContainerOffset
                         return Offset(0f, exactOffsetConsumed)
-                    }
-                    if (newBodyHeight == maxBodyHeight && reserveScrollY > maxItemOffset) {
-                        return Offset(0f, reserveScrollY - maxItemOffset)
-
+                    } else {
+                        return Offset(0f, consumedResult)
                     }
                 }
 
-                Log.d("123", "ДВИГАЕМ СПИСОК НА ($reserveScrollY) PX")
-                return Offset(0f, consumedScrollY)
+                // checking that all container's bodies after current container are expanded
+                if (availableScrollResult > 0) {
+                    collapsableContainersHeights.drop(currentVisibleCollapseContainerIndex + 1)
+                        .forEach { (bodyContainerHeight, bodyContainerMaxHeight) ->
+                            if (bodyContainerHeight != bodyContainerMaxHeight) {
+                                val newBodyContainerHeight =
+                                    (bodyContainerHeight + availableScrollResult).coerceIn(0f, bodyContainerMaxHeight)
+                                collapsableContainersHeights = collapsableContainersHeights.mapIndexed { index, pair ->
+                                    if (index == currentVisibleCollapseContainerIndex + 1) newBodyContainerHeight to bodyContainerMaxHeight else pair
+                                }
+                                val consumedScrollYByBody = newBodyContainerHeight - bodyContainerHeight
+                                consumedResult += consumedScrollYByBody
+                                availableScrollResult -= consumedScrollYByBody
+
+                                if (newBodyContainerHeight == bodyContainerMaxHeight && availableScrollResult > maxVisibleCollapsableContainerOffset) {
+                                    return Offset(0f, availableScrollResult - maxVisibleCollapsableContainerOffset)
+                                }
+
+                                return@forEach
+                            }
+                        }
+                }
+
+                val nextCollapseContainer =
+                    lazyListState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == currentVisibleCollapseContainerIndex + 1 }
+
+                val nextCollapseContainerOffset = nextCollapseContainer?.offset?.toFloat() ?: Float.POSITIVE_INFINITY
+
+                // checking that current container's body is expanded
+                val (currentBodyHeight, maxBodyHeight) = collapsableContainersHeights[currentVisibleCollapseContainerIndex]
+                val newBodyHeight = (currentBodyHeight + availableScrollResult).coerceIn(0f, maxBodyHeight)
+                collapsableContainersHeights = collapsableContainersHeights.mapIndexed { index, pair ->
+                    if (index == currentVisibleCollapseContainerIndex) newBodyHeight to maxBodyHeight else pair
+                }
+                val consumedScrollYByBody = newBodyHeight - currentBodyHeight
+                consumedResult += consumedScrollYByBody
+                availableScrollResult -= consumedScrollYByBody
+
+                // make sure we don't steal more scroll than needed to show a new container when scrolling UP
+                if (newBodyHeight == 0f && availableScrollResult < 0 && abs(availableScrollResult + consumedResult) > nextCollapseContainerOffset) {
+                    val exactOffsetConsumed = availableScrollResult + consumedResult + nextCollapseContainerOffset
+                    return Offset(0f, exactOffsetConsumed)
+                }
+                // make sure we don't steal more scroll than needed to show a new container when scrolling DOWN
+                if (newBodyHeight == maxBodyHeight && (currentCollapseContainerOffset + availableScrollResult) > maxVisibleCollapsableContainerOffset) {
+                    val exactOffsetConsumed =
+                        availableScrollResult + consumedResult - maxVisibleCollapsableContainerOffset
+
+                    // for some reason when offset = 0 the next index does not take the correct value
+                    currentVisibleCollapseContainerIndex--
+
+                    return Offset(0f, exactOffsetConsumed)
+                }
+
+                // we give away the remaining scroll
+                return Offset(0f, consumedResult)
             }
 
             override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
-                val dy = available.y
-                if (dy > 0 && lazyListState.firstVisibleItemIndex == 0 && lazyListState.firstVisibleItemScrollOffset == 0) {
-                    val prev = currentColumnHeaderHeight
-                    currentColumnHeaderHeight =
-                        (currentColumnHeaderHeight + dy).coerceIn(minColumnHeaderHeightPx, maxColumnHeaderHeightPx)
-                    return Offset(0f, currentColumnHeaderHeight - prev)
+                val availableScroll = available.y
+                // steal scroll to change title height
+                if (availableScroll > 0 && lazyListState.firstVisibleItemIndex == 0 && lazyListState.firstVisibleItemScrollOffset == 0) {
+                    val prevTitleBoxHeight = currentTitleBoxHeight
+                    currentTitleBoxHeight =
+                        (currentTitleBoxHeight + availableScroll).coerceIn(minTitleBoxHeightPx, maxTitleBoxHeightPx)
+                    return Offset(0f, currentTitleBoxHeight - prevTitleBoxHeight)
                 }
+                // end title height changing
                 return Offset.Zero
             }
         }
@@ -216,7 +231,7 @@ fun NestedScrollExample() {
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(with(density) { currentColumnHeaderHeight.toDp() })
+                .height(with(density) { currentTitleBoxHeight.toDp() })
                 .padding(horizontal = padding8)
                 .background(MaterialTheme.colorScheme.surface.copy(alpha = .0f)),
             contentAlignment = Alignment.Center
@@ -262,9 +277,9 @@ fun NestedScrollExample() {
             verticalArrangement = Arrangement.spacedBy(verticalSpacing),
         ) {
             // Первый контейнер
-            items(currentBodyHeights) {
+            items(collapsableContainersHeights) {
                 ExpandableItem(
-                    headerHeightDefault,
+                    collapsableContainerHeaderHeightDefault,
                     it.first,
                     it.second
                 ) {
@@ -272,7 +287,11 @@ fun NestedScrollExample() {
                 }
             }
             item {
-                Spacer(modifier = Modifier.height(space16))
+                Spacer(
+                    modifier = Modifier
+                        .height(space32)
+                        .background(MaterialTheme.colorScheme.error)
+                )
             }
         }
     }
