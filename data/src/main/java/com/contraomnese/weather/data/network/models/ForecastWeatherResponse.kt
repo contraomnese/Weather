@@ -1,6 +1,7 @@
 package com.contraomnese.weather.data.network.models
 
-data class CurrentWeatherResponse(
+data class ForecastWeatherResponse(
     val location: LocationWeatherNetwork,
     val current: CurrentWeatherNetwork,
+    val forecast: ForecastWeatherNetwork,
 )

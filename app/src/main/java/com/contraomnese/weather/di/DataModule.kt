@@ -5,10 +5,12 @@ import com.contraomnese.weather.data.network.api.WeatherApi
 import com.contraomnese.weather.data.network.interceptors.ApiInterceptor
 import com.contraomnese.weather.data.network.models.ErrorResponse
 import com.contraomnese.weather.data.repository.CurrentWeatherRepositoryImpl
+import com.contraomnese.weather.data.repository.ForecastWeatherRepositoryImpl
 import com.contraomnese.weather.data.repository.LocationsRepositoryImpl
 import com.contraomnese.weather.data.storage.db.locations.LocationsDatabase
 import com.contraomnese.weather.domain.home.repository.LocationsRepository
 import com.contraomnese.weather.domain.weatherByLocation.repository.CurrentWeatherRepository
+import com.contraomnese.weather.domain.weatherByLocation.repository.ForecastWeatherRepository
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
@@ -70,4 +72,5 @@ val dataModule = module {
 
     single<LocationsRepository> { LocationsRepositoryImpl(database = get()) }
     single<CurrentWeatherRepository> { CurrentWeatherRepositoryImpl(api = get(), errorConverter = get()) }
+    single<ForecastWeatherRepository> { ForecastWeatherRepositoryImpl(api = get(), errorConverter = get()) }
 }

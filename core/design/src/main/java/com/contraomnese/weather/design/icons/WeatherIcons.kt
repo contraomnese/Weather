@@ -10,6 +10,7 @@ import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Contrast
 import androidx.compose.material.icons.outlined.Copyright
+import androidx.compose.material.icons.outlined.DisabledByDefault
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Exposure
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -43,6 +44,7 @@ object WeatherIcons {
     val DarkMode = Icons.Rounded.DarkMode
     val Interests = Icons.Outlined.Interests
     val Search = Icons.Outlined.Search
+    val Default = Icons.Outlined.DisabledByDefault
     val Notification = Icons.Outlined.PriorityHigh
     val Close = Icons.Outlined.Close
     val Map = Icons.Outlined.Map

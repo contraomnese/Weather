@@ -5,17 +5,17 @@ import com.contraomnese.weather.data.network.api.WeatherApi
 import com.contraomnese.weather.data.network.models.ErrorResponse
 import com.contraomnese.weather.data.network.parsers.parseOrThrowError
 import com.contraomnese.weather.domain.weatherByLocation.model.WeatherDomainModel
-import com.contraomnese.weather.domain.weatherByLocation.repository.CurrentWeatherRepository
+import com.contraomnese.weather.domain.weatherByLocation.repository.ForecastWeatherRepository
 import okhttp3.ResponseBody
 import retrofit2.Converter
 
-class CurrentWeatherRepositoryImpl(
+class ForecastWeatherRepositoryImpl(
     private val api: WeatherApi,
     private val errorConverter: Converter<ResponseBody, ErrorResponse>,
-) : CurrentWeatherRepository {
+) : ForecastWeatherRepository {
 
     override suspend fun getBy(point: String): WeatherDomainModel {
-        val response = api.getCurrentWeather(query = point)
+        val response = api.getForecastWeather(query = point)
         return response.parseOrThrowError(errorConverter).toDomain()
     }
 }

@@ -1,6 +1,7 @@
 package com.contraomnese.weather.data.network.api
 
 import com.contraomnese.weather.data.network.models.CurrentWeatherResponse
+import com.contraomnese.weather.data.network.models.ForecastWeatherResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -11,4 +12,9 @@ interface WeatherApi {
     suspend fun getCurrentWeather(
         @Query("q") query: String,
     ): Response<CurrentWeatherResponse>
+
+    @GET("forecast.json")
+    suspend fun getForecastWeather(
+        @Query("q") query: String,
+    ): Response<ForecastWeatherResponse>
 }
