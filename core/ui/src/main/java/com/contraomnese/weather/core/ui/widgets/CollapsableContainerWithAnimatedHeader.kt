@@ -19,25 +19,39 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.contraomnese.weather.design.icons.WeatherIcons
+import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.cornerRadius16
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding4
 import com.contraomnese.weather.design.theme.padding8
 
 @Composable
-fun CollapsableContainer(
+fun CollapsableContainerWithAnimatedHeader(
     modifier: Modifier = Modifier,
     headerHeight: Dp,
+    headerTitleFirst: String = "Cloudy conditions from 1AM-9AM, with showers expected at 9AM.",
+    headerIcon: ImageVector = WeatherIcons.Default,
+    headerTitleSecond: String = "Header 2",
     currentBodyHeight: Float,
     maxBodyHeight: Float,
-    headerTitle: String = "Header",
-    headerIcon: ImageVector = WeatherIcons.Default,
+    progress: Float,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val headerModifier = if (progress < 0.1f) {
+        Modifier.height(headerHeight)
+    } else {
+        Modifier.wrapContentHeight()
+    }
+
     Column(
         modifier = modifier
             .wrapContentHeight()
@@ -49,12 +63,29 @@ fun CollapsableContainer(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = padding16, vertical = padding4)
-                .height(headerHeight),
+                .then(headerModifier),
             contentAlignment = Alignment.CenterStart
         ) {
+            Text(
+                text = headerTitleFirst,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontSize = 18.sp
+                ),
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.graphicsLayer {
+                    alpha = progress
+                    translationY = -(1f - progress) * 5f
+                },
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+
             Row(
                 horizontalArrangement = Arrangement.spacedBy(padding8),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.graphicsLayer {
+                    alpha = if (progress < 0.1f) 1f - progress else 0f
+                }
             ) {
                 Icon(
                     imageVector = headerIcon,
@@ -62,7 +93,7 @@ fun CollapsableContainer(
                     tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
                 )
                 Text(
-                    text = headerTitle,
+                    text = headerTitleSecond,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
                 )
@@ -87,5 +118,18 @@ fun CollapsableContainer(
                 content = content
             )
         }
+    }
+}
+
+@Composable
+@Preview
+private fun CollapsableContainerWithAnimatedHeaderPreview() {
+    WeatherTheme {
+        CollapsableContainerWithAnimatedHeader(
+            headerHeight = 40.dp,
+            currentBodyHeight = 650f,
+            maxBodyHeight = 650f,
+            progress = 0f
+        ) { }
     }
 }

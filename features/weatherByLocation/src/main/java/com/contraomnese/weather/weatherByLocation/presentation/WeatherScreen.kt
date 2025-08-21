@@ -1,5 +1,6 @@
 package com.contraomnese.weather.weatherByLocation.presentation
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -38,6 +40,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contraomnese.weather.core.ui.widgets.CollapsableContainer
+import com.contraomnese.weather.core.ui.widgets.CollapsableContainerWithAnimatedHeader
 import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
@@ -94,6 +97,16 @@ internal fun WeatherScreen(
     val minTitleBoxHeightPx = 100.dp.toPx()
     val maxTitleBoxHeightPx = 300.dp.toPx()
     var currentTitleBoxHeight by remember { mutableFloatStateOf(maxTitleBoxHeightPx) }
+
+    val progress by remember(currentTitleBoxHeight, minTitleBoxHeightPx, maxTitleBoxHeightPx) {
+        derivedStateOf {
+            ((currentTitleBoxHeight - minTitleBoxHeightPx) / (maxTitleBoxHeightPx - currentTitleBoxHeight))
+                .coerceIn(0f, 1f)
+        }
+    }
+
+    Log.d("123", "Progress: $progress")
+    Log.d("123", "currentTitleBoxHeight: $currentTitleBoxHeight")
 
     val sectionVerticalSpacing = 12.dp
     val headerSectionHeight = 40.dp
@@ -304,17 +317,18 @@ internal fun WeatherScreen(
                         is WeatherSection.DailyForecastSection,
                             -> CollapsableContainer(
                             headerHeight = headerSectionHeight,
-                            currentHeight = sectionType.section.bodyHeight,
-                            maxHeight = sectionType.section.bodyMaxHeight,
+                            currentBodyHeight = sectionType.section.bodyHeight,
+                            maxBodyHeight = sectionType.section.bodyMaxHeight,
                         ) {
                             repeat(7) { Text("Body$it") }
                         }
 
                         is WeatherSection.HourlyForecastSection,
-                            -> CollapsableContainer(
+                            -> CollapsableContainerWithAnimatedHeader(
                             headerHeight = headerSectionHeight,
-                            currentHeight = sectionType.section.bodyHeight,
-                            maxHeight = sectionType.section.bodyMaxHeight,
+                            currentBodyHeight = sectionType.section.bodyHeight,
+                            maxBodyHeight = sectionType.section.bodyMaxHeight,
+                            progress = progress
                         ) {
                             repeat(8) { Text("Body$it") }
                         }
@@ -329,16 +343,16 @@ internal fun WeatherScreen(
                     ) {
                         CollapsableContainer(
                             headerHeight = headerSectionHeight,
-                            currentHeight = sectionType.firstSection.bodyHeight,
-                            maxHeight = sectionType.firstSection.bodyMaxHeight,
+                            currentBodyHeight = sectionType.firstSection.bodyHeight,
+                            maxBodyHeight = sectionType.firstSection.bodyMaxHeight,
                             modifier = Modifier.weight(1f)
                         ) {
                             repeat(5) { Text("Body$it") }
                         }
                         CollapsableContainer(
                             headerHeight = headerSectionHeight,
-                            currentHeight = sectionType.secondSection.bodyHeight,
-                            maxHeight = sectionType.secondSection.bodyMaxHeight,
+                            currentBodyHeight = sectionType.secondSection.bodyHeight,
+                            maxBodyHeight = sectionType.secondSection.bodyMaxHeight,
                             modifier = Modifier.weight(1f)
                         ) {
                             repeat(5) { Text("Body$it") }
