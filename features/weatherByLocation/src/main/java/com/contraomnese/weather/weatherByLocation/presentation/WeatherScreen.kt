@@ -41,10 +41,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contraomnese.weather.core.ui.widgets.CollapsableContainer
 import com.contraomnese.weather.core.ui.widgets.CollapsableContainerWithAnimatedHeader
+import com.contraomnese.weather.core.ui.widgets.ForecastHourlyLazyRow
 import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight64
+import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.design.theme.space16
 import com.contraomnese.weather.design.theme.space32
@@ -52,7 +54,6 @@ import com.contraomnese.weather.domain.weatherByLocation.model.CoordinatesDomain
 import com.contraomnese.weather.domain.weatherByLocation.model.GeoLocationDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.LatitudeDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.LongitudeDomainModel
-import com.contraomnese.weather.domain.weatherByLocation.model.WeatherDomainModel
 import com.contraomnese.weather.weatherByLocation.presentation.data.WeatherSection
 import com.contraomnese.weather.weatherByLocation.presentation.data.WeatherSectionType
 import com.contraomnese.weather.weatherByLocation.presentation.data.mapSections
@@ -108,10 +109,10 @@ internal fun WeatherScreen(
     Log.d("123", "Progress: $progress")
     Log.d("123", "currentTitleBoxHeight: $currentTitleBoxHeight")
 
-    val sectionVerticalSpacing = 12.dp
-    val headerSectionHeight = 40.dp
+    val sectionVerticalSpacing = 10.dp
+    val headerSectionHeight = 46.dp
     val dailySection = WeatherSection.DailyForecastSection(400.dp.toPx())
-    val hourlySection = WeatherSection.HourlyForecastSection(700.dp.toPx())
+    val hourlySection = WeatherSection.HourlyForecastSection(200.dp.toPx())
     val uvIndexSection = WeatherSection.UVIndexSection(200.dp.toPx())
     val sunriseSection = WeatherSection.SunriseSection(200.dp.toPx())
 
@@ -295,10 +296,10 @@ internal fun WeatherScreen(
         TitleSection(
             currentTitleBoxHeight,
             location = uiState.location.name,
-            currentTemp = uiState.weather?.currentTemperature ?: "?",
-            maxTemp = uiState.weather?.maxTemperature ?: "?",
-            minTemp = uiState.weather?.minTemperature ?: "?",
-            condition = uiState.weather?.condition ?: "?",
+            currentTemp = uiState.weather?.currentInfo?.temperatureC ?: "?",
+            maxTemp = uiState.weather?.forecastInfo?.today?.maxTemperatureC ?: "?",
+            minTemp = uiState.weather?.forecastInfo?.today?.minTemperatureC ?: "?",
+            condition = uiState.weather?.forecastInfo?.today?.conditionText ?: "?",
         )
         LazyColumn(
             modifier = Modifier
@@ -330,7 +331,10 @@ internal fun WeatherScreen(
                             maxBodyHeight = sectionType.section.bodyMaxHeight,
                             progress = progress
                         ) {
-                            repeat(8) { Text("Body$it") }
+                            ForecastHourlyLazyRow(
+                                modifier = Modifier.padding(padding16),
+                                items = uiState.weather?.forecastInfo?.forecastHours ?: emptyList()
+                            )
                         }
 
                         is WeatherSection.SunriseSection, is WeatherSection.UVIndexSection -> Unit
@@ -449,12 +453,7 @@ fun MainScreenPreview(modifier: Modifier = Modifier) {
                             value = 4.5
                         ), longitude = LongitudeDomainModel(value = 6.7)
                     )
-                ), weather = WeatherDomainModel(
-                    currentTemperature = "33",
-                    maxTemperature = "34",
-                    minTemperature = "35",
-                    condition = "Ясно"
-                )
+                ), weather = null
             ),
         )
     }

@@ -5,4 +5,5 @@
     <string name="current_temperature_title" translatable="false">%1$s°</string>
     <string name="max_min_temperature_title">Max.:%1$s°, Min.:%2$s°</string>
     <string name="temperature_and_condition_title" translatable="false">%1$s° | %2$s</string>
+    <string name="now">Now</string>
 </resources>

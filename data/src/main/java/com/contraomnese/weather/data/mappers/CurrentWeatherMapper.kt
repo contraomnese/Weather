@@ -8,7 +8,5 @@ fun CurrentWeatherResponse.toDomain(): WeatherDomainModel {
     return WeatherDomainModel(
         currentTemperature = current.tempC.roundToInt().toString(),
         condition = current.condition.text,
-        maxTemperature = "",
-        minTemperature = ""
     )
 }

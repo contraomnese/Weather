@@ -1,8 +1,8 @@
 package com.contraomnese.weather.weatherByLocation.presentation
 
 import androidx.compose.runtime.Immutable
+import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeatherDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.GeoLocationDomainModel
-import com.contraomnese.weather.domain.weatherByLocation.model.WeatherDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.usecase.GetForecastWeatherUseCase
 import com.contraomnese.weather.domain.weatherByLocation.usecase.GetGeoLocationUseCase
 import com.contraomnese.weather.presentation.architecture.BaseViewModel
@@ -14,7 +14,7 @@ import com.contraomnese.weather.presentation.usecase.UseCaseExecutorProvider
 internal data class WeatherUiState(
     override val isLoading: Boolean = false,
     val location: GeoLocationDomainModel,
-    val weather: WeatherDomainModel? = null,
+    val weather: ForecastWeatherDomainModel? = null,
 ) : UiState {
     override fun loading(): UiState = copy(isLoading = true)
 }
@@ -50,7 +50,7 @@ internal class WeatherViewModel(
         execute(getForecastWeatherUseCase, newLocation.getPoint(), ::updateCurrentWeather, ::provideException)
     }
 
-    private fun updateCurrentWeather(newWeather: WeatherDomainModel) {
+    private fun updateCurrentWeather(newWeather: ForecastWeatherDomainModel) {
         updateViewState { copy(weather = newWeather, isLoading = false) }
     }
 

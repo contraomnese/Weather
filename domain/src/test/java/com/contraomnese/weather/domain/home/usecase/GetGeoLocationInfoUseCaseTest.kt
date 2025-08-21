@@ -25,7 +25,7 @@ private const val GEO_LOCATION_LONGITUDE = 321.321
 
 private const val BAD_GEO_LOCATION_ID = 0
 
-class GetGeoLocationUseCaseTest {
+class GetGeoLocationInfoUseCaseTest {
 
     private lateinit var useCase: GetGeoLocationUseCase
     private val repositoryMock = mockk<LocationsRepository>()
