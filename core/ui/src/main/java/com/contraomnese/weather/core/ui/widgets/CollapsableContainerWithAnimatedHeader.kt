@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,9 +39,9 @@ import com.contraomnese.weather.design.theme.padding8
 fun CollapsableContainerWithAnimatedHeader(
     modifier: Modifier = Modifier,
     headerHeight: Dp,
-    headerTitleFirst: String = "Cloudy conditions from 1AM-9AM, with showers expected at 9AM.",
+    headerTitle: String = "Header",
     headerIcon: ImageVector = WeatherIcons.Default,
-    headerTitleSecond: String = "Header 2",
+    alertTitle: String = "Alert",
     currentBodyHeight: Float,
     maxBodyHeight: Float,
     progress: Float,
@@ -49,7 +50,7 @@ fun CollapsableContainerWithAnimatedHeader(
     val headerModifier = if (progress < 0.1f) {
         Modifier.height(headerHeight)
     } else {
-        Modifier.wrapContentHeight()
+        Modifier.heightIn(min = headerHeight)
     }
 
     Column(
@@ -67,7 +68,7 @@ fun CollapsableContainerWithAnimatedHeader(
             contentAlignment = Alignment.CenterStart
         ) {
             Text(
-                text = headerTitleFirst,
+                text = alertTitle,
                 style = MaterialTheme.typography.bodySmall.copy(
                     fontSize = 18.sp
                 ),
@@ -93,7 +94,7 @@ fun CollapsableContainerWithAnimatedHeader(
                     tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
                 )
                 Text(
-                    text = headerTitleSecond,
+                    text = headerTitle,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
                 )
@@ -126,8 +127,8 @@ fun CollapsableContainerWithAnimatedHeader(
 private fun CollapsableContainerWithAnimatedHeaderPreview() {
     WeatherTheme {
         CollapsableContainerWithAnimatedHeader(
-            headerHeight = 40.dp,
-            currentBodyHeight = 650f,
+            headerHeight = 46.dp,
+            currentBodyHeight = 100f,
             maxBodyHeight = 650f,
             progress = 0f
         ) { }

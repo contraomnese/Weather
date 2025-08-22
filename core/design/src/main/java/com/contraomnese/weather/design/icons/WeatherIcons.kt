@@ -1,6 +1,7 @@
 package com.contraomnese.weather.design.icons
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material.icons.outlined.AddTask
 import androidx.compose.material.icons.outlined.Bolt
 import androidx.compose.material.icons.outlined.CalendarMonth
@@ -45,6 +46,7 @@ object WeatherIcons {
     val Interests = Icons.Outlined.Interests
     val Search = Icons.Outlined.Search
     val Default = Icons.Outlined.DisabledByDefault
+    val Today = Icons.Outlined.AccessTime
     val Notification = Icons.Outlined.PriorityHigh
     val Close = Icons.Outlined.Close
     val Map = Icons.Outlined.Map

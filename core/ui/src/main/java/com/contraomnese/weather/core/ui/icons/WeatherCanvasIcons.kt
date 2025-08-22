@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
@@ -83,14 +84,23 @@ fun SunnyIcon(modifier: Modifier = Modifier, isNight: Boolean = false) {
 }
 
 @Composable
-fun CloudyIcon(modifier: Modifier = Modifier) {
+fun CloudyIcon(
+    modifier: Modifier = Modifier,
+    cloudColor: Color = Color.LightGray,
+) {
     Canvas(modifier) {
         val w = size.width
         val h = size.height
 
-        drawCircle(Color.LightGray, radius = w / 4, center = Offset(w * 0.3f, h * 0.6f))
-        drawCircle(Color.LightGray, radius = w / 3, center = Offset(w * 0.5f, h * 0.5f))
-        drawCircle(Color.LightGray, radius = w / 4, center = Offset(w * 0.7f, h * 0.6f))
+        drawCircle(cloudColor, radius = w / 4, center = Offset(w * 0.3f, h * 0.6f))
+        drawCircle(cloudColor, radius = w / 3, center = Offset(w * 0.5f, h * 0.5f))
+        drawCircle(cloudColor, radius = w / 4, center = Offset(w * 0.7f, h * 0.6f))
+
+        drawRect(
+            topLeft = Offset(w * 0.3f, h * 0.6f),
+            size = Size(w * 0.4f, w / 4),
+            color = cloudColor
+        )
     }
 }
 
@@ -134,6 +144,12 @@ fun PartlyCloudyIcon(
         drawCircle(cloudColor, radius = w / 3, center = Offset(w * 0.5f, h * 0.5f))
         drawCircle(cloudColor, radius = w / 4, center = Offset(w * 0.7f, h * 0.6f))
 
+        drawRect(
+            topLeft = Offset(w * 0.3f, h * 0.6f),
+            size = Size(w * 0.4f, w / 4),
+            color = cloudColor
+        )
+
     }
 }
 
@@ -142,7 +158,7 @@ fun RainIcon(
     modifier: Modifier = Modifier,
     cloudColor: Color = Color.LightGray,
     rainDropColor: Color = Color(0xFF336D97),
-    rainDropWidth: Float = 4f,
+    rainDropWidth: Float = 3f,
 ) {
     Canvas(modifier) {
 
@@ -153,13 +169,29 @@ fun RainIcon(
         drawCircle(cloudColor, radius = w / 3, center = Offset(w * 0.5f, h * 0.3f))
         drawCircle(cloudColor, radius = w / 4, center = Offset(w * 0.7f, h * 0.4f))
 
-        repeat(4) { i ->
-            val x = w * (0.35f + i * 0.1f)
+        drawRect(
+            topLeft = Offset(w * 0.3f, h * 0.4f),
+            size = Size(w * 0.4f, w / 4),
+            color = cloudColor
+        )
+
+        repeat(5) { i ->
+            val x = w * (0.2f + i * 0.15f)
             drawLine(
                 color = rainDropColor,
                 start = Offset(x, h * 0.7f),
                 end = Offset(x - 5, h * 0.8f),
-                strokeWidth = rainDropWidth,
+                strokeWidth = 3.5f,
+                cap = StrokeCap.Round
+            )
+        }
+        repeat(4) { i ->
+            val x = w * (0.25f + i * 0.15f)
+            drawLine(
+                color = rainDropColor,
+                start = Offset(x, h * 0.75f),
+                end = Offset(x - 5, h * 0.85f),
+                strokeWidth = 3f,
                 cap = StrokeCap.Round
             )
         }
@@ -171,6 +203,7 @@ fun SnowIcon(
     modifier: Modifier = Modifier,
     cloudColor: Color = Color.LightGray,
     snowColor: Color = Color.White,
+    snowRadius: Float = 3f,
 ) {
     Canvas(modifier) {
         val w = size.width
@@ -180,13 +213,19 @@ fun SnowIcon(
         drawCircle(cloudColor, radius = w / 3, center = Offset(w * 0.5f, h * 0.3f))
         drawCircle(cloudColor, radius = w / 4, center = Offset(w * 0.7f, h * 0.4f))
 
-        repeat(3) { i ->
-            val x = w * (0.37f + i * 0.15f)
-            drawCircle(snowColor, radius = 4f, center = Offset(x, h * 0.75f))
+        drawRect(
+            topLeft = Offset(w * 0.3f, h * 0.4f),
+            size = Size(w * 0.4f, w / 4),
+            color = cloudColor
+        )
+
+        repeat(4) { i ->
+            val x = w * (0.27f + i * 0.15f)
+            drawCircle(snowColor, radius = snowRadius, center = Offset(x, h * 0.75f))
         }
-        repeat(3) { i ->
-            val x = w * (0.3f + i * 0.15f)
-            drawCircle(snowColor, radius = 4f, center = Offset(x, h * 0.85f))
+        repeat(4) { i ->
+            val x = w * (0.2f + i * 0.15f)
+            drawCircle(snowColor, radius = snowRadius, center = Offset(x, h * 0.9f))
         }
     }
 }
@@ -205,6 +244,12 @@ fun ThunderIcon(
         drawCircle(cloudColor, radius = w / 4, center = Offset(w * 0.3f, h * 0.4f))
         drawCircle(cloudColor, radius = w / 3, center = Offset(w * 0.5f, h * 0.3f))
         drawCircle(cloudColor, radius = w / 4, center = Offset(w * 0.7f, h * 0.4f))
+
+        drawRect(
+            topLeft = Offset(w * 0.3f, h * 0.4f),
+            size = Size(w * 0.4f, w / 4),
+            color = cloudColor
+        )
 
         drawPath(
             path = Path().apply {
@@ -250,9 +295,9 @@ fun FogIcon(
             }
         }
 
-        val path1 = Path().apply { wave(h * 0.4f) }
+        val path1 = Path().apply { wave(h * 0.3f) }
         val path2 = Path().apply { wave(h * 0.5f) }
-        val path3 = Path().apply { wave(h * 0.6f) }
+        val path3 = Path().apply { wave(h * 0.7f) }
 
         drawPath(path1, fogColor, style = Stroke(width = 3f))
         drawPath(path2, fogColor, style = Stroke(width = 3f))
@@ -267,7 +312,7 @@ fun SleetIcon(
     snowColor: Color = Color.White,
     snowFlakeSize: Float = 3f,
     rainDropColor: Color = Color(0xFF336D97),
-    rainDropWidth: Float = 3f,
+    rainDropWidth: Float = 4f,
 ) {
 
     Canvas(
@@ -280,12 +325,19 @@ fun SleetIcon(
         drawCircle(cloudColor, radius = w / 3, center = Offset(w * 0.5f, h * 0.3f))
         drawCircle(cloudColor, radius = w / 4, center = Offset(w * 0.7f, h * 0.4f))
 
+        drawRect(
+            topLeft = Offset(w * 0.3f, h * 0.4f),
+            size = Size(w * 0.4f, w / 4),
+            color = cloudColor
+        )
+
         repeat(2) { i ->
             val x = w * (0.25f + i * .1f)
             drawCircle(snowColor, radius = snowFlakeSize, center = Offset(x + i * 5, h * 0.75f))
         }
+        drawCircle(snowColor, radius = snowFlakeSize, center = Offset(w * 0.32f, h * 0.85f))
         repeat(2) { i ->
-            val x = w * (0.55f + i * 0.15f)
+            val x = w * (0.55f + i * 0.2f)
             drawLine(
                 color = rainDropColor,
                 start = Offset(x + 5, h * 0.7f),
@@ -294,6 +346,13 @@ fun SleetIcon(
                 cap = StrokeCap.Round
             )
         }
+        drawLine(
+            color = rainDropColor,
+            start = Offset(w * 0.63f + 5, h * 0.75f),
+            end = Offset(w * 0.6f, h * 0.9f),
+            strokeWidth = rainDropWidth,
+            cap = StrokeCap.Round
+        )
     }
 }
 

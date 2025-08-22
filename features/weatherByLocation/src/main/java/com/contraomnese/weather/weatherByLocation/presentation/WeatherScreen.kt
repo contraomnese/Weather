@@ -1,6 +1,5 @@
 package com.contraomnese.weather.weatherByLocation.presentation
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,6 +43,7 @@ import com.contraomnese.weather.core.ui.widgets.CollapsableContainerWithAnimated
 import com.contraomnese.weather.core.ui.widgets.ForecastHourlyLazyRow
 import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
 import com.contraomnese.weather.design.R
+import com.contraomnese.weather.design.icons.WeatherIcons
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight64
 import com.contraomnese.weather.design.theme.padding16
@@ -106,13 +106,10 @@ internal fun WeatherScreen(
         }
     }
 
-    Log.d("123", "Progress: $progress")
-    Log.d("123", "currentTitleBoxHeight: $currentTitleBoxHeight")
-
     val sectionVerticalSpacing = 10.dp
     val headerSectionHeight = 46.dp
     val dailySection = WeatherSection.DailyForecastSection(400.dp.toPx())
-    val hourlySection = WeatherSection.HourlyForecastSection(200.dp.toPx())
+    val hourlySection = WeatherSection.HourlyForecastSection(180.dp.toPx())
     val uvIndexSection = WeatherSection.UVIndexSection(200.dp.toPx())
     val sunriseSection = WeatherSection.SunriseSection(200.dp.toPx())
 
@@ -329,10 +326,12 @@ internal fun WeatherScreen(
                             headerHeight = headerSectionHeight,
                             currentBodyHeight = sectionType.section.bodyHeight,
                             maxBodyHeight = sectionType.section.bodyMaxHeight,
+                            headerTitle = stringResource(R.string.today_forecast_title),
+                            headerIcon = WeatherIcons.Today,
                             progress = progress
                         ) {
                             ForecastHourlyLazyRow(
-                                modifier = Modifier.padding(padding16),
+                                modifier = Modifier.padding(horizontal = padding16),
                                 items = uiState.weather?.forecastInfo?.forecastHours ?: emptyList()
                             )
                         }

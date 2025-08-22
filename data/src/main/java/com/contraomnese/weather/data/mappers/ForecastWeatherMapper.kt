@@ -38,7 +38,7 @@ fun ForecastWeatherResponse.toDomain(): ForecastWeatherDomainModel {
         forecastInfo = ForecastInfo(
             today = forecast.forecastDay.first().toForecastTodayDomain(),
             forecastDays = forecast.forecastDay.map { it.toForecastDayDomain() },
-            forecastHours = forecast.forecastDay.first().hour.filter { it.timeEpoch > forecast.forecastDay.first().hour.first().timeEpoch }
+            forecastHours = forecast.forecastDay.first().hour.filter { it.timeEpoch > location.localtimeEpoch }
                 .map { it.toDomain() }
         ),
     )
