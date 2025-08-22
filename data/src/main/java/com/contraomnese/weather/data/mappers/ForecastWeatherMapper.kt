@@ -3,6 +3,7 @@ package com.contraomnese.weather.data.mappers
 import com.contraomnese.weather.data.network.models.ForecastDayNetwork
 import com.contraomnese.weather.data.network.models.ForecastWeatherResponse
 import com.contraomnese.weather.data.network.models.HourNetwork
+import com.contraomnese.weather.domain.weatherByLocation.model.AlertsInfo
 import com.contraomnese.weather.domain.weatherByLocation.model.CurrentInfo
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastDay
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastHour
@@ -34,6 +35,7 @@ fun ForecastWeatherResponse.toDomain(): ForecastWeatherDomainModel {
             pressureIn = current.pressureIn.toString(),
             humidity = current.humidity.toString(),
             uvIndex = current.uv.toString(),
+            airQualityIndex = current.airQuality.usEpaIndex
         ),
         forecastInfo = ForecastInfo(
             today = forecast.forecastDay.first().toForecastTodayDomain(),
@@ -41,6 +43,9 @@ fun ForecastWeatherResponse.toDomain(): ForecastWeatherDomainModel {
             forecastHours = forecast.forecastDay.first().hour.filter { it.timeEpoch > location.localtimeEpoch }
                 .map { it.toDomain() }
         ),
+        alertsInfo = AlertsInfo(
+            alerts = alerts.alert.map { it.desc }
+        )
     )
 }
 

@@ -57,10 +57,23 @@ data class CurrentWeatherNetwork(
     val gustMph: Double,
     @SerializedName("gust_kph")
     val gustKph: Double,
+    @SerializedName("air_quality")
+    val airQuality: AirQuality,
 )
 
 data class WeatherConditionNetwork(
     val text: String,
     val icon: String,
     val code: Int,
+)
+
+data class AirQuality(
+    @SerializedName("co") val co: Float,
+    @SerializedName("no2") val no2: Float,
+    @SerializedName("o3") val o3: Float,
+    @SerializedName("so2") val so2: Float,
+    @SerializedName("pm2_5") val pm25: Float,
+    @SerializedName("pm10") val pm10: Float,
+    @SerializedName("us-epa-index") val usEpaIndex: Int,
+    @SerializedName("gb-defra-index") val gbDefraIndex: Int,
 )

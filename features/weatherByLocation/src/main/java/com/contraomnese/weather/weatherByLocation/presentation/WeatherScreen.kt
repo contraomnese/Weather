@@ -328,6 +328,7 @@ internal fun WeatherScreen(
                             maxBodyHeight = sectionType.section.bodyMaxHeight,
                             headerTitle = stringResource(R.string.today_forecast_title),
                             headerIcon = WeatherIcons.Today,
+                            alertTitle = uiState.weather?.alertsInfo?.alerts?.firstOrNull(),
                             progress = progress
                         ) {
                             ForecastHourlyLazyRow(

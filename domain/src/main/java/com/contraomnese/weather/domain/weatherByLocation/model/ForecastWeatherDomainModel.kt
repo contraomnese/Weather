@@ -4,6 +4,7 @@ data class ForecastWeatherDomainModel(
     val locationInfo: LocationInfo,
     val currentInfo: CurrentInfo,
     val forecastInfo: ForecastInfo,
+    val alertsInfo: AlertsInfo,
 )
 
 data class LocationInfo(
@@ -27,6 +28,7 @@ data class CurrentInfo(
     val pressureIn: String,
     val humidity: String,
     val uvIndex: String,
+    val airQualityIndex: Int,
 )
 
 data class ForecastInfo(
@@ -63,4 +65,8 @@ data class ForecastDay(
     val minTemperatureF: String,
     val conditionCode: Int,
     val totalRainFullMm: Int,
+)
+
+data class AlertsInfo(
+    val alerts: List<String>,
 )

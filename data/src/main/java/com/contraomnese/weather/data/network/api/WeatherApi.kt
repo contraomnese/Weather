@@ -16,5 +16,8 @@ interface WeatherApi {
     @GET("forecast.json")
     suspend fun getForecastWeather(
         @Query("q") query: String,
+        @Query("days") days: Int = 10,
+        @Query("aqi") aqi: String = "yes",
+        @Query("alerts") alerts: String = "yes",
     ): Response<ForecastWeatherResponse>
 }

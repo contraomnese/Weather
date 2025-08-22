@@ -41,13 +41,13 @@ fun CollapsableContainerWithAnimatedHeader(
     headerHeight: Dp,
     headerTitle: String = "Header",
     headerIcon: ImageVector = WeatherIcons.Default,
-    alertTitle: String = "Alert",
+    alertTitle: String? = null,
     currentBodyHeight: Float,
     maxBodyHeight: Float,
     progress: Float,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val headerModifier = if (progress < 0.1f) {
+    val headerModifier = if (progress < 0.1f || alertTitle == null) {
         Modifier.height(headerHeight)
     } else {
         Modifier.heightIn(min = headerHeight)
@@ -67,25 +67,27 @@ fun CollapsableContainerWithAnimatedHeader(
                 .then(headerModifier),
             contentAlignment = Alignment.CenterStart
         ) {
-            Text(
-                text = alertTitle,
-                style = MaterialTheme.typography.bodySmall.copy(
-                    fontSize = 18.sp
-                ),
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.graphicsLayer {
-                    alpha = progress
-                    translationY = -(1f - progress) * 5f
-                },
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
+            if (alertTitle != null) {
+                Text(
+                    text = alertTitle,
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontSize = 18.sp
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.graphicsLayer {
+                        alpha = progress
+                        translationY = -(1f - progress) * 5f
+                    },
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
 
             Row(
                 horizontalArrangement = Arrangement.spacedBy(padding8),
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.graphicsLayer {
-                    alpha = if (progress < 0.1f) 1f - progress else 0f
+                    alpha = if (alertTitle == null) 1f else if (progress < 0.1f) 1f - progress else 0f
                 }
             ) {
                 Icon(
@@ -128,9 +130,24 @@ private fun CollapsableContainerWithAnimatedHeaderPreview() {
     WeatherTheme {
         CollapsableContainerWithAnimatedHeader(
             headerHeight = 46.dp,
-            currentBodyHeight = 100f,
+            currentBodyHeight = 0f,
+            alertTitle = "Alert",
             maxBodyHeight = 650f,
-            progress = 0f
+            progress = 1f
+        ) { }
+    }
+}
+
+@Composable
+@Preview
+private fun CollapsableContainerWithAnimatedHeaderEmptyAlertTitlePreview() {
+    WeatherTheme {
+        CollapsableContainerWithAnimatedHeader(
+            headerHeight = 46.dp,
+            currentBodyHeight = 0f,
+            alertTitle = null,
+            maxBodyHeight = 650f,
+            progress = 1f
         ) { }
     }
 }
