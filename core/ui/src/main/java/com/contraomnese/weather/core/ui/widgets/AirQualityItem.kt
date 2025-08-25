@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,11 +34,13 @@ fun AirQualityItem(
     pm10Level: PollutantLevel,
 ) {
 
-    val aqi = when (aqiIndex) {
+    val aqi = remember(aqiIndex) {
+        when (aqiIndex) {
         in 1..3 -> GoodAqi()
         in 4..6 -> ModerateAqi()
         in 7..9 -> BadAqi()
         else -> VeryBadAqi()
+        }
     }
 
     Column(
@@ -67,32 +70,32 @@ fun AirQualityItem(
         ) {
             Text(
                 text = "CO",
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyMedium,
                 color = coLevel.toColor()
             )
             Text(
                 text = "NO2",
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyMedium,
                 color = no2Level.toColor()
             )
             Text(
                 text = "O3",
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyMedium,
                 color = o3Level.toColor()
             )
             Text(
                 text = "SO2",
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyMedium,
                 color = so2Level.toColor()
             )
             Text(
                 text = "PM2.5",
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyMedium,
                 color = pm25Level.toColor()
             )
             Text(
                 text = "PM10",
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyMedium,
                 color = pm10Level.toColor()
             )
         }

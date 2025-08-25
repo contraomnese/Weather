@@ -125,6 +125,7 @@ fun HourNetwork.toDomain(): ForecastHour {
         temperature = tempC.roundToInt().toString(),
         conditionCode = condition.code,
         time = time.split(" ")[1],
+        isDay = isDay == 1
     )
 }
 

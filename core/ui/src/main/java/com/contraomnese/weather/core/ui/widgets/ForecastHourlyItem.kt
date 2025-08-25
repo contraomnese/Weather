@@ -27,6 +27,7 @@ fun ForecastHourlyItem(
     conditionCode: Int,
     temperature: String,
     isNow: Boolean = false,
+    isDay: Boolean = false,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -39,7 +40,7 @@ fun ForecastHourlyItem(
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurface
         )
-        WeatherIcon(code = conditionCode, modifier = Modifier.size(itemWidth40))
+        WeatherIcon(code = conditionCode, isNight = !isDay, modifier = Modifier.size(itemWidth40))
         Text(
             modifier = Modifier.height(itemHeight26),
             text = stringResource(R.string.current_temperature_title, temperature),

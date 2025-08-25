@@ -6,11 +6,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.contraomnese.weather.design.theme.WeatherTheme
@@ -21,7 +25,7 @@ import kotlin.math.sin
 fun WeatherIcon(code: Int, modifier: Modifier = Modifier, isNight: Boolean = false) {
     when (code) {
         // ☀️ Ясно
-        1000 -> SunnyIcon(modifier, isNight)
+        1000 -> ClearIcon(modifier, isNight)
 
         // 🌤 Частично облачно
         1003 -> PartlyCloudyIcon(modifier, isNight)
@@ -55,18 +59,42 @@ fun WeatherIcon(code: Int, modifier: Modifier = Modifier, isNight: Boolean = fal
 }
 
 @Composable
-fun SunnyIcon(modifier: Modifier = Modifier, isNight: Boolean = false) {
+fun ClearIcon(
+    modifier: Modifier = Modifier,
+    isNight: Boolean = false,
+    color: Color = if (isNight) Color(0xFFAAA77B) else Color(0xFFF8D74A),
+    sunStroke: Float = 4f,
+) {
     Canvas(modifier) {
         val center = Offset(size.width / 2, size.height / 2)
         val radius = size.minDimension / 4
 
-        drawCircle(
-            color = if (isNight) Color(0xFFAAA77B) else Color(0xFFF8D74A),
-            radius = radius,
-            center = center
-        )
+        if (isNight) {
+            val drawMoon: DrawScope.() -> Unit = {
+                drawCircle(
+                    color = color,
+                    radius = radius,
+                    center = center
+                )
+            }
+            val hole = Path().apply {
+                addOval(
+                    Rect(
+                        center = Offset(center.x * 1.2f, center.y * 0.8f),
+                        radius = radius
+                    )
+                )
+            }
+            clipPath(hole, clipOp = ClipOp.Difference) {
+                drawMoon()
+            }
 
-        if (!isNight) {
+        } else {
+            drawCircle(
+                color = color,
+                radius = radius,
+                center = center
+            )
             repeat(8) { i ->
                 val angle = Math.toRadians((i * 45).toDouble())
                 val start = Offset(
@@ -77,7 +105,7 @@ fun SunnyIcon(modifier: Modifier = Modifier, isNight: Boolean = false) {
                     x = center.x + cos(angle).toFloat() * radius * 1.8f,
                     y = center.y + sin(angle).toFloat() * radius * 1.8f
                 )
-                drawLine(Color(0xFFF8D74A), start, end, strokeWidth = 6f, cap = StrokeCap.Round)
+                drawLine(color, start, end, strokeWidth = sunStroke, cap = StrokeCap.Round)
             }
         }
     }
@@ -109,7 +137,7 @@ fun PartlyCloudyIcon(
     modifier: Modifier = Modifier,
     isNight: Boolean = false,
     cloudColor: Color = Color.LightGray,
-    luminaryColor: Color = if (isNight) Color(0xFFAAA77B) else Color(0xFFF8D74A),
+    color: Color = if (isNight) Color(0xFFAAA77B) else Color(0xFFF8D74A),
     sunStroke: Float = 4f,
 ) {
 
@@ -119,13 +147,33 @@ fun PartlyCloudyIcon(
         val center = Offset(size.width / 2 + size.width / 6, size.height / 3)
         val radius = size.minDimension / 6
 
-        drawCircle(
-            color = luminaryColor,
-            radius = radius,
-            center = center
-        )
+        if (isNight) {
+            val moonCenter = Offset(center.x * 1.25f, center.y * 0.55f)
+            val drawMoon: DrawScope.() -> Unit = {
+                drawCircle(
+                    color = color,
+                    radius = radius,
+                    center = moonCenter
+                )
+            }
+            val hole = Path().apply {
+                addOval(
+                    Rect(
+                        center = Offset(moonCenter.x * 1.08f, moonCenter.y * 0.75f),
+                        radius = radius
+                    )
+                )
+            }
+            clipPath(hole, clipOp = ClipOp.Difference) {
+                drawMoon()
+            }
 
-        if (!isNight) {
+        } else {
+            drawCircle(
+                color = color,
+                radius = radius,
+                center = center
+            )
             repeat(8) { i ->
                 val angle = Math.toRadians((i * 45).toDouble())
                 val start = Offset(
@@ -136,7 +184,7 @@ fun PartlyCloudyIcon(
                     x = center.x + cos(angle).toFloat() * radius * 1.8f,
                     y = center.y + sin(angle).toFloat() * radius * 1.8f
                 )
-                drawLine(luminaryColor, start, end, strokeWidth = sunStroke, cap = StrokeCap.Round)
+                drawLine(color, start, end, strokeWidth = sunStroke, cap = StrokeCap.Round)
             }
         }
 
@@ -365,10 +413,11 @@ private fun ThunderIconPreview() {
         val sizeIcon = 32.dp
 
         Column {
-            SunnyIcon(modifier = Modifier.size(sizeIcon))
-            SunnyIcon(modifier = Modifier.size(sizeIcon), isNight = true)
+            ClearIcon(modifier = Modifier.size(sizeIcon))
+            ClearIcon(modifier = Modifier.size(sizeIcon), isNight = true)
             CloudyIcon(modifier = Modifier.size(sizeIcon))
             PartlyCloudyIcon(modifier = Modifier.size(sizeIcon))
+            PartlyCloudyIcon(modifier = Modifier.size(sizeIcon), isNight = true)
             RainIcon(modifier = Modifier.size(sizeIcon))
             ThunderIcon(modifier = Modifier.size(sizeIcon))
             SnowIcon(modifier = Modifier.size(sizeIcon))

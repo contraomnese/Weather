@@ -1,9 +1,9 @@
 package com.contraomnese.weather.weatherByLocation.presentation
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,18 +32,18 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.contraomnese.weather.core.ui.utils.toPx
 import com.contraomnese.weather.core.ui.widgets.AirQualityItem
 import com.contraomnese.weather.core.ui.widgets.CollapsableContainer
 import com.contraomnese.weather.core.ui.widgets.CollapsableContainerWithAnimatedHeader
 import com.contraomnese.weather.core.ui.widgets.ForecastDailyColumn
 import com.contraomnese.weather.core.ui.widgets.ForecastHourlyLazyRow
 import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
+import com.contraomnese.weather.core.ui.widgets.TitleSection
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.icons.WeatherIcons
 import com.contraomnese.weather.design.theme.WeatherTheme
@@ -87,9 +87,6 @@ internal fun WeatherRoute(
 }
 
 @Composable
-private fun Dp.toPx() = with(LocalDensity.current) { this@toPx.toPx() }
-
-@Composable
 internal fun WeatherScreen(
     uiState: WeatherUiState,
     modifier: Modifier = Modifier,
@@ -99,7 +96,7 @@ internal fun WeatherScreen(
 
     val lazyListState = rememberLazyListState()
 
-    val minTitleBoxHeightPx = 100.dp.toPx()
+    val minTitleBoxHeightPx = 150.dp.toPx()
     val maxTitleBoxHeightPx = 300.dp.toPx()
     var currentTitleBoxHeight by remember { mutableFloatStateOf(maxTitleBoxHeightPx) }
 
@@ -115,8 +112,8 @@ internal fun WeatherScreen(
     val dailySection = WeatherSection.DailyForecastSection(250.dp.toPx())
     val hourlySection = WeatherSection.HourlyForecastSection(180.dp.toPx())
     val aqiSection = WeatherSection.AqiSection(180.dp.toPx())
-    val uvIndexSection = WeatherSection.UVIndexSection(200.dp.toPx())
-    val sunriseSection = WeatherSection.SunriseSection(200.dp.toPx())
+    val uvIndexSection = WeatherSection.UVIndexSection(400.dp.toPx())
+    val sunriseSection = WeatherSection.SunriseSection(400.dp.toPx())
 
     val maxVisibleSectionOffset = headerSectionHeight.toPx() + sectionVerticalSpacing.toPx()
     var currentVisibleSectionIndex by remember { mutableIntStateOf(-1) }
@@ -170,6 +167,7 @@ internal fun WeatherScreen(
                 if (availableScrollResult == 0f) {
                     return Offset(0f, consumedResult)
                 }
+                Log.d("123", "LOG3")
                 // end block
 
                 // collapsableContainer height changing
@@ -250,9 +248,8 @@ internal fun WeatherScreen(
                 if (newBodyHeight == maxBodyHeight && (currentCollapseContainerOffset + availableScrollResult) > maxVisibleSectionOffset) {
                     val exactOffsetConsumed =
                         availableScrollResult + consumedResult - maxVisibleSectionOffset
-
                     // for some reason when offset = 0 the next index does not take the correct value
-//                    if (currentVisibleSectionIndex != 0) currentVisibleSectionIndex--
+                    if (currentVisibleSectionIndex != 0) currentVisibleSectionIndex--
                     return Offset(0f, exactOffsetConsumed)
                 }
                 // we give away the remaining scroll
@@ -261,10 +258,10 @@ internal fun WeatherScreen(
 
             override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
                 val availableScroll = available.y
-                // steal scroll to change title height
+
                 val firstSection = sections.first().sectionsList().first()
                 if (firstSection.bodyHeight != firstSection.bodyMaxHeight) return Offset(0f, availableScroll)
-
+                // steal scroll to change title height
                 if (availableScroll > 0 && currentVisibleSectionIndex == 0) {
                     val prevTitleBoxHeight = currentTitleBoxHeight
                     currentTitleBoxHeight =
@@ -294,7 +291,7 @@ internal fun WeatherScreen(
             currentTemp = uiState.weather.currentInfo.temperature,
             maxTemp = uiState.weather.forecastInfo.today.maxTemperature,
             minTemp = uiState.weather.forecastInfo.today.minTemperature,
-            condition = uiState.weather.forecastInfo.today.conditionText,
+            conditionCode = uiState.weather.forecastInfo.today.conditionCode,
         )
         LazyColumn(
             modifier = Modifier
@@ -399,73 +396,9 @@ internal fun WeatherScreen(
     }
 }
 
-@Composable
-private fun TitleSection(
-    height: Float,
-    location: String,
-    currentTemp: String,
-    maxTemp: String,
-    minTemp: String,
-    condition: String,
-    modifier: Modifier = Modifier,
-) {
-
-    val density = LocalDensity.current
-
-    BoxWithConstraints(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(with(density) { height.toDp() })
-            .padding(horizontal = padding8)
-            .background(MaterialTheme.colorScheme.surface.copy(alpha = .0f)),
-        contentAlignment = Alignment.Center
-    ) {
-        if (maxHeight > 250.dp) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(padding8)
-            ) {
-                Text(
-                    location, style = MaterialTheme.typography.headlineLarge,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    stringResource(R.string.current_temperature_title, currentTemp),
-                    style = MaterialTheme.typography.displayLarge,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    condition, style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    stringResource(R.string.max_min_temperature_title, maxTemp, minTemp),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-        } else {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(padding8)
-            ) {
-                Text(
-                    location, style = MaterialTheme.typography.headlineLarge,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    stringResource(R.string.temperature_and_condition_title, currentTemp, condition),
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-        }
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
-fun MainScreenPreview(modifier: Modifier = Modifier) {
+fun MainScreenPreview() {
     WeatherTheme {
         WeatherScreen(
             uiState = WeatherUiState(

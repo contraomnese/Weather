@@ -51,6 +51,7 @@ data class ForecastHour(
     val time: String,
     val temperature: String,
     val conditionCode: Int,
+    val isDay: Boolean,
 )
 
 data class ForecastDay(
