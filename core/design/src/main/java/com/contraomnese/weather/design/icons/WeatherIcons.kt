@@ -5,6 +5,7 @@ import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.DisabledByDefault
+import androidx.compose.material.icons.outlined.Equalizer
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.Search
 
@@ -14,6 +15,7 @@ object WeatherIcons {
     val Default = Icons.Outlined.DisabledByDefault
     val Today = Icons.Outlined.AccessTime
     val Daily = Icons.Outlined.CalendarToday
+    val Aqi = Icons.Outlined.Equalizer
     val Close = Icons.Outlined.Close
     val Map = Icons.Outlined.Map
 }

@@ -3,6 +3,7 @@ package com.contraomnese.weather.data.mappers
 import com.contraomnese.weather.data.network.models.ForecastDayNetwork
 import com.contraomnese.weather.data.network.models.ForecastWeatherResponse
 import com.contraomnese.weather.data.network.models.HourNetwork
+import com.contraomnese.weather.domain.weatherByLocation.model.AirQualityInfo
 import com.contraomnese.weather.domain.weatherByLocation.model.AlertsInfo
 import com.contraomnese.weather.domain.weatherByLocation.model.CurrentInfo
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastDay
@@ -11,6 +12,7 @@ import com.contraomnese.weather.domain.weatherByLocation.model.ForecastInfo
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastToday
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeatherDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.LocationInfo
+import com.contraomnese.weather.domain.weatherByLocation.model.PollutantLevel
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -42,7 +44,45 @@ fun ForecastWeatherResponse.toDomain(): ForecastWeatherDomainModel {
             pressure = current.pressureMb.toString(),
             humidity = current.humidity.toString(),
             uvIndex = current.uv.toString(),
-            airQualityIndex = current.airQuality.usEpaIndex
+            airQualityIndex = AirQualityInfo(
+                aqiIndex = current.airQuality.gbDefraIndex,
+                aqiText = when (current.airQuality.gbDefraIndex) {
+                    in 1..3 -> "Low"
+                    in 4..6 -> "Moderate"
+                    in 7..9 -> "High"
+                    else -> "Very High"
+                },
+                coLevel = when (current.airQuality.co / 1000) {
+                    in 0.0..4.5 -> PollutantLevel.Good
+                    in 4.5..9.4 -> PollutantLevel.Moderate
+                    else -> PollutantLevel.Bad
+                },
+                no2Level = when (current.airQuality.no2) {
+                    in 0.0..100.0 -> PollutantLevel.Good
+                    in 100.0..200.0 -> PollutantLevel.Moderate
+                    else -> PollutantLevel.Bad
+                },
+                o3Level = when (current.airQuality.o3) {
+                    in 0.0..100.0 -> PollutantLevel.Good
+                    in 100.0..160.0 -> PollutantLevel.Moderate
+                    else -> PollutantLevel.Bad
+                },
+                so2Level = when (current.airQuality.so2) {
+                    in 0.0..35.0 -> PollutantLevel.Good
+                    in 35.0..75.0 -> PollutantLevel.Moderate
+                    else -> PollutantLevel.Bad
+                },
+                pm25Level = when (current.airQuality.pm25) {
+                    in 0.0..12.0 -> PollutantLevel.Good
+                    in 12.0..35.4 -> PollutantLevel.Moderate
+                    else -> PollutantLevel.Bad
+                },
+                pm10Level = when (current.airQuality.pm10) {
+                    in 0.0..55.0 -> PollutantLevel.Good
+                    in 55.0..154.0 -> PollutantLevel.Moderate
+                    else -> PollutantLevel.Bad
+                },
+            )
         ),
         forecastInfo = ForecastInfo(
             today = forecast.forecastDay.first().toForecastTodayDomain(),

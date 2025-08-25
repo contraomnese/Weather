@@ -37,10 +37,12 @@ fun ForecastDailyColumn(
                 minRangeTemperature = minRangeTemperature,
                 currentTemperature = if (index == 0) currentTemperature else null,
             )
-            HorizontalDivider(
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
-                thickness = itemThickness1,
-            )
+            if (index != items.lastIndex) {
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+                    thickness = itemThickness1,
+                )
+            }
         }
     }
 }

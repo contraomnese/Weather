@@ -26,7 +26,7 @@ data class CurrentInfo(
     val pressure: String,
     val humidity: String,
     val uvIndex: String,
-    val airQualityIndex: Int,
+    val airQualityIndex: AirQualityInfo,
 )
 
 data class ForecastInfo(
@@ -64,3 +64,20 @@ data class ForecastDay(
 data class AlertsInfo(
     val alerts: ImmutableList<String>,
 )
+
+data class AirQualityInfo(
+    val aqiIndex: Int,
+    val aqiText: String,
+    val coLevel: PollutantLevel,
+    val no2Level: PollutantLevel,
+    val o3Level: PollutantLevel,
+    val so2Level: PollutantLevel,
+    val pm25Level: PollutantLevel,
+    val pm10Level: PollutantLevel,
+)
+
+sealed interface PollutantLevel {
+    data object Good : PollutantLevel
+    data object Moderate : PollutantLevel
+    data object Bad : PollutantLevel
+}

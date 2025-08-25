@@ -25,16 +25,15 @@ import com.contraomnese.weather.design.theme.itemHeight8
 import com.contraomnese.weather.design.theme.itemWidth112
 
 val aqiIndexGradientStops = listOf(
-    1f to Color(0xFF43A06D),
-    2f to Color(0xFF39A131),
-    3f to Color(0xFF759E2F),
-    4f to Color(0xFFB8B130),
-    5f to Color(0xFFDCC035),
-    6f to Color(0xFFDCAD35),
-    7f to Color(0xFFCD770E),
-    8f to Color(0xFFB1351C),
-    9f to Color(0xFFC22222),
-    10f to Color(0xFFAA0903),
+    1f to Color(0xFF2D6FA1),
+    2f to Color(0xFF2DA19D),
+    3f to Color(0xFF2DA14E),
+    5f to Color(0xFF569221),
+    6f to Color(0xFFA18931),
+    7f to Color(0xFFB6500F),
+    8f to Color(0xFFCE2421),
+    9f to Color(0xFF951111),
+    10f to Color(0xFF680A05),
 )
 
 val uvIndexGradientStops = listOf(

@@ -13,25 +13,42 @@ sealed interface WeatherSection {
     val bodyHeight: Float
     val bodyMaxHeight: Float
 
+    fun copyWithBodyHeight(newHeight: Float): WeatherSection
+
     data class HourlyForecastSection(
         override val bodyHeight: Float,
         override val bodyMaxHeight: Float = bodyHeight,
-    ) : WeatherSection
+    ) : WeatherSection {
+        override fun copyWithBodyHeight(newHeight: Float): WeatherSection = copy(bodyHeight = newHeight)
+    }
 
     data class DailyForecastSection(
         override val bodyHeight: Float,
         override val bodyMaxHeight: Float = bodyHeight,
-    ) : WeatherSection
+    ) : WeatherSection {
+        override fun copyWithBodyHeight(newHeight: Float): WeatherSection = copy(bodyHeight = newHeight)
+    }
 
     data class UVIndexSection(
         override val bodyHeight: Float,
         override val bodyMaxHeight: Float = bodyHeight,
-    ) : WeatherSection
+    ) : WeatherSection {
+        override fun copyWithBodyHeight(newHeight: Float): WeatherSection = copy(bodyHeight = newHeight)
+    }
 
     data class SunriseSection(
         override val bodyHeight: Float,
         override val bodyMaxHeight: Float = bodyHeight,
-    ) : WeatherSection
+    ) : WeatherSection {
+        override fun copyWithBodyHeight(newHeight: Float): WeatherSection = copy(bodyHeight = newHeight)
+    }
+
+    data class AqiSection(
+        override val bodyHeight: Float,
+        override val bodyMaxHeight: Float = bodyHeight,
+    ) : WeatherSection {
+        override fun copyWithBodyHeight(newHeight: Float): WeatherSection = copy(bodyHeight = newHeight)
+    }
 }
 
 internal fun WeatherSectionType.sectionsList(): List<WeatherSection> =

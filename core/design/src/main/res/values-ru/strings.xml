@@ -6,4 +6,16 @@
     <string name="now">Сейчас</string>
     <string name="today_forecast_title">СЕГОДНЯ</string>
     <string name="daily_forecast_title">ПРОГНОЗ НА 3 ДНЯ</string>
+
+    <string name="aqi_title">КАЧЕСТВО ВОЗДУХА</string>
+    <string name="aqi_good">%1$d - Низкий</string>
+    <string name="aqi_moderate">%1$d - Умеренный</string>
+    <string name="aqi_bad">%1$d - Высокий</string>
+    <string name="aqi_very_bad">%1$d - Очень высокий</string>
+
+    <string name="aqi_good_desc">Качество воздуха хорошее. Риск для здоровья отсутствует.</string>
+    <string name="aqi_moderate_desc">Качество воздуха удовлетворительное. Людям с повышенной чувствительностью стоит ограничить длительное пребывание на улице.</string>
+    <string name="aqi_bad_desc">Качество воздуха плохое. Людям с заболеваниями сердца или лёгких, детям и пожилым следует избегать продолжительных нагрузок на свежем воздухе.</string>
+    <string name="aqi_very_bad_desc">Качество воздуха очень плохое. Негативное воздействие возможно для всех — избегайте физических нагрузок на улице и по возможности оставайтесь в помещении.</string>
+
 </resources>

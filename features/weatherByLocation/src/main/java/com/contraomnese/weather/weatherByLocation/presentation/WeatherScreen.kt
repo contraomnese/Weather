@@ -1,6 +1,5 @@
 package com.contraomnese.weather.weatherByLocation.presentation
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.contraomnese.weather.core.ui.widgets.AirQualityItem
 import com.contraomnese.weather.core.ui.widgets.CollapsableContainer
 import com.contraomnese.weather.core.ui.widgets.CollapsableContainerWithAnimatedHeader
 import com.contraomnese.weather.core.ui.widgets.ForecastDailyColumn
@@ -112,8 +112,9 @@ internal fun WeatherScreen(
 
     val sectionVerticalSpacing = 10.dp
     val headerSectionHeight = 46.dp
-    val dailySection = WeatherSection.DailyForecastSection(550.dp.toPx())
+    val dailySection = WeatherSection.DailyForecastSection(250.dp.toPx())
     val hourlySection = WeatherSection.HourlyForecastSection(180.dp.toPx())
+    val aqiSection = WeatherSection.AqiSection(180.dp.toPx())
     val uvIndexSection = WeatherSection.UVIndexSection(200.dp.toPx())
     val sunriseSection = WeatherSection.SunriseSection(200.dp.toPx())
 
@@ -125,11 +126,11 @@ internal fun WeatherScreen(
             listOf(
                 WeatherSectionType.Solo(hourlySection),
                 WeatherSectionType.Solo(dailySection),
+                WeatherSectionType.Solo(aqiSection),
                 WeatherSectionType.InRow(uvIndexSection, sunriseSection),
             )
         )
     }
-    Log.d("123", "sections: $sections")
 
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
@@ -181,7 +182,6 @@ internal fun WeatherScreen(
                 val flatSections = sections.flatMap { it.sectionsList() }
                 // checking that all container's bodies after current container are expanded
                 if (availableScrollResult > 0) {
-                    // плоский список секций
                     flatSections.drop(currentVisibleSectionIndex + 1)
                         .forEachIndexed { nextIndex, section ->
                             val (bodyHeight, maxHeight) = section
@@ -191,12 +191,7 @@ internal fun WeatherScreen(
                                 sections = sections.mapSections { globalIndex, sec ->
                                     val targetIdx = nextIndex + currentVisibleSectionIndex + 1
                                     if (globalIndex == targetIdx) {
-                                        when (sec) {
-                                            is WeatherSection.HourlyForecastSection -> sec.copy(bodyHeight = newHeight)
-                                            is WeatherSection.DailyForecastSection -> sec.copy(bodyHeight = newHeight)
-                                            is WeatherSection.UVIndexSection -> sec.copy(bodyHeight = newHeight)
-                                            is WeatherSection.SunriseSection -> sec.copy(bodyHeight = newHeight)
-                                        }
+                                        sec.copyWithBodyHeight(newHeight)
                                     } else sec
                                 }
 
@@ -239,12 +234,7 @@ internal fun WeatherScreen(
                 val newBodyHeight = (currentBodyHeight + availableScrollResult).coerceIn(0f, maxBodyHeight)
                 sections = sections.mapSections { globalIndex, sec ->
                     if (globalIndex == currentVisibleSectionIndex) {
-                        when (sec) {
-                            is WeatherSection.HourlyForecastSection -> sec.copy(bodyHeight = newBodyHeight)
-                            is WeatherSection.DailyForecastSection -> sec.copy(bodyHeight = newBodyHeight)
-                            is WeatherSection.UVIndexSection -> sec.copy(bodyHeight = newBodyHeight)
-                            is WeatherSection.SunriseSection -> sec.copy(bodyHeight = newBodyHeight)
-                        }
+                        sec.copyWithBodyHeight(newBodyHeight)
                     } else sec
                 }
                 val consumedScrollYByBody = newBodyHeight - currentBodyHeight
@@ -262,7 +252,7 @@ internal fun WeatherScreen(
                         availableScrollResult + consumedResult - maxVisibleSectionOffset
 
                     // for some reason when offset = 0 the next index does not take the correct value
-                    currentVisibleSectionIndex--
+//                    if (currentVisibleSectionIndex != 0) currentVisibleSectionIndex--
                     return Offset(0f, exactOffsetConsumed)
                 }
                 // we give away the remaining scroll
@@ -279,8 +269,6 @@ internal fun WeatherScreen(
                     val prevTitleBoxHeight = currentTitleBoxHeight
                     currentTitleBoxHeight =
                         (currentTitleBoxHeight + availableScroll).coerceIn(minTitleBoxHeightPx, maxTitleBoxHeightPx)
-                    Log.d("123", "currentTitleBoxHeight1: $currentTitleBoxHeight")
-                    Log.d("123", "minTitleBoxHeightPx1: $minTitleBoxHeightPx")
                     return Offset(0f, currentTitleBoxHeight - prevTitleBoxHeight)
                 }
                 // end title height changing
@@ -350,6 +338,26 @@ internal fun WeatherScreen(
                                 modifier = Modifier.padding(horizontal = padding16),
                                 items = uiState.weather.forecastInfo.forecastDays,
                                 currentTemperature = uiState.weather.currentInfo.temperature.toInt()
+                            )
+                        }
+
+                        is WeatherSection.AqiSection,
+                            -> CollapsableContainer(
+                            headerHeight = headerSectionHeight,
+                            headerTitle = stringResource(R.string.aqi_title),
+                            headerIcon = WeatherIcons.Aqi,
+                            currentBodyHeight = sectionType.section.bodyHeight,
+                            maxBodyHeight = sectionType.section.bodyMaxHeight,
+                        ) {
+                            AirQualityItem(
+                                modifier = Modifier.padding(horizontal = padding16),
+                                aqiIndex = uiState.weather.currentInfo.airQualityIndex.aqiIndex,
+                                coLevel = uiState.weather.currentInfo.airQualityIndex.coLevel,
+                                no2Level = uiState.weather.currentInfo.airQualityIndex.no2Level,
+                                o3Level = uiState.weather.currentInfo.airQualityIndex.o3Level,
+                                so2Level = uiState.weather.currentInfo.airQualityIndex.so2Level,
+                                pm25Level = uiState.weather.currentInfo.airQualityIndex.pm25Level,
+                                pm10Level = uiState.weather.currentInfo.airQualityIndex.pm10Level,
                             )
                         }
 
