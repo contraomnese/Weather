@@ -1,5 +1,6 @@
 package com.contraomnese.weather.weatherByLocation.presentation
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contraomnese.weather.core.ui.widgets.CollapsableContainer
 import com.contraomnese.weather.core.ui.widgets.CollapsableContainerWithAnimatedHeader
+import com.contraomnese.weather.core.ui.widgets.ForecastDailyColumn
 import com.contraomnese.weather.core.ui.widgets.ForecastHourlyLazyRow
 import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
 import com.contraomnese.weather.design.R
@@ -93,6 +95,8 @@ internal fun WeatherScreen(
     modifier: Modifier = Modifier,
 ) {
 
+    requireNotNull(uiState.weather)
+
     val lazyListState = rememberLazyListState()
 
     val minTitleBoxHeightPx = 100.dp.toPx()
@@ -108,7 +112,7 @@ internal fun WeatherScreen(
 
     val sectionVerticalSpacing = 10.dp
     val headerSectionHeight = 46.dp
-    val dailySection = WeatherSection.DailyForecastSection(400.dp.toPx())
+    val dailySection = WeatherSection.DailyForecastSection(550.dp.toPx())
     val hourlySection = WeatherSection.HourlyForecastSection(180.dp.toPx())
     val uvIndexSection = WeatherSection.UVIndexSection(200.dp.toPx())
     val sunriseSection = WeatherSection.SunriseSection(200.dp.toPx())
@@ -125,6 +129,7 @@ internal fun WeatherScreen(
             )
         )
     }
+    Log.d("123", "sections: $sections")
 
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
@@ -267,10 +272,15 @@ internal fun WeatherScreen(
             override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
                 val availableScroll = available.y
                 // steal scroll to change title height
-                if (availableScroll > 0 && lazyListState.firstVisibleItemIndex == 0 && lazyListState.firstVisibleItemScrollOffset == 0) {
+                val firstSection = sections.first().sectionsList().first()
+                if (firstSection.bodyHeight != firstSection.bodyMaxHeight) return Offset(0f, availableScroll)
+
+                if (availableScroll > 0 && currentVisibleSectionIndex == 0) {
                     val prevTitleBoxHeight = currentTitleBoxHeight
                     currentTitleBoxHeight =
                         (currentTitleBoxHeight + availableScroll).coerceIn(minTitleBoxHeightPx, maxTitleBoxHeightPx)
+                    Log.d("123", "currentTitleBoxHeight1: $currentTitleBoxHeight")
+                    Log.d("123", "minTitleBoxHeightPx1: $minTitleBoxHeightPx")
                     return Offset(0f, currentTitleBoxHeight - prevTitleBoxHeight)
                 }
                 // end title height changing
@@ -293,10 +303,10 @@ internal fun WeatherScreen(
         TitleSection(
             currentTitleBoxHeight,
             location = uiState.location.name,
-            currentTemp = uiState.weather?.currentInfo?.temperatureC ?: "?",
-            maxTemp = uiState.weather?.forecastInfo?.today?.maxTemperatureC ?: "?",
-            minTemp = uiState.weather?.forecastInfo?.today?.minTemperatureC ?: "?",
-            condition = uiState.weather?.forecastInfo?.today?.conditionText ?: "?",
+            currentTemp = uiState.weather.currentInfo.temperature,
+            maxTemp = uiState.weather.forecastInfo.today.maxTemperature,
+            minTemp = uiState.weather.forecastInfo.today.minTemperature,
+            condition = uiState.weather.forecastInfo.today.conditionText,
         )
         LazyColumn(
             modifier = Modifier
@@ -312,28 +322,34 @@ internal fun WeatherScreen(
 
                     is WeatherSectionType.Solo,
                         -> when (sectionType.section) {
-                        is WeatherSection.DailyForecastSection,
-                            -> CollapsableContainer(
-                            headerHeight = headerSectionHeight,
-                            currentBodyHeight = sectionType.section.bodyHeight,
-                            maxBodyHeight = sectionType.section.bodyMaxHeight,
-                        ) {
-                            repeat(7) { Text("Body$it") }
-                        }
-
                         is WeatherSection.HourlyForecastSection,
                             -> CollapsableContainerWithAnimatedHeader(
-                            headerHeight = headerSectionHeight,
+                            minHeaderHeight = headerSectionHeight,
                             currentBodyHeight = sectionType.section.bodyHeight,
                             maxBodyHeight = sectionType.section.bodyMaxHeight,
                             headerTitle = stringResource(R.string.today_forecast_title),
                             headerIcon = WeatherIcons.Today,
-                            alertTitle = uiState.weather?.alertsInfo?.alerts?.firstOrNull(),
+                            alertTitle = uiState.weather.alertsInfo.alerts.firstOrNull(),
                             progress = progress
                         ) {
                             ForecastHourlyLazyRow(
                                 modifier = Modifier.padding(horizontal = padding16),
-                                items = uiState.weather?.forecastInfo?.forecastHours ?: emptyList()
+                                items = uiState.weather.forecastInfo.forecastHours
+                            )
+                        }
+
+                        is WeatherSection.DailyForecastSection,
+                            -> CollapsableContainer(
+                            headerHeight = headerSectionHeight,
+                            headerTitle = stringResource(R.string.daily_forecast_title),
+                            headerIcon = WeatherIcons.Daily,
+                            currentBodyHeight = sectionType.section.bodyHeight,
+                            maxBodyHeight = sectionType.section.bodyMaxHeight,
+                        ) {
+                            ForecastDailyColumn(
+                                modifier = Modifier.padding(horizontal = padding16),
+                                items = uiState.weather.forecastInfo.forecastDays,
+                                currentTemperature = uiState.weather.currentInfo.temperature.toInt() // TODO
                             )
                         }
 

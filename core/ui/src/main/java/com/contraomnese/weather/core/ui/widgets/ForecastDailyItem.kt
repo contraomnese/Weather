@@ -1,0 +1,91 @@
+package com.contraomnese.weather.core.ui.widgets
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import com.contraomnese.weather.core.ui.icons.WeatherIcon
+import com.contraomnese.weather.design.R
+import com.contraomnese.weather.design.theme.WeatherTheme
+import com.contraomnese.weather.design.theme.itemHeight26
+import com.contraomnese.weather.design.theme.itemHeight6
+import com.contraomnese.weather.design.theme.itemHeight64
+import com.contraomnese.weather.design.theme.itemWidth112
+import com.contraomnese.weather.design.theme.itemWidth40
+import com.contraomnese.weather.design.theme.padding12
+
+@Composable
+fun ForecastDailyItem(
+    modifier: Modifier = Modifier,
+    dayName: String,
+    conditionCode: Int,
+    minTemperature: Int,
+    maxTemperature: Int,
+    maxRangeTemperature: Int,
+    minRangeTemperature: Int,
+    currentTemperature: Int? = null,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(itemHeight64),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(padding12),
+    ) {
+        Text(
+            modifier = Modifier.width(itemWidth112),
+            text = if (currentTemperature != null) stringResource(R.string.today_forecast_title) else dayName,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        WeatherIcon(code = conditionCode, modifier = Modifier.size(itemWidth40))
+        Text(
+            modifier = Modifier.height(itemHeight26),
+            text = stringResource(R.string.current_temperature_title, minTemperature.toString()),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+        )
+        GradientRangeLine(
+            minRange = minRangeTemperature.toFloat(),
+            maxRange = maxRangeTemperature.toFloat(),
+            min = minTemperature.toFloat(),
+            current = currentTemperature?.toFloat(),
+            max = maxTemperature.toFloat(),
+            modifier = Modifier
+                .weight(1f)
+                .height(itemHeight6),
+            gradientStops = temperatureGradientStops
+        )
+        Text(
+            modifier = Modifier.height(itemHeight26),
+            text = stringResource(R.string.current_temperature_title, maxTemperature.toString()),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+    }
+}
+
+@Preview(showBackground = true, device = "id:pixel_5", backgroundColor = 0xFF1C232B, showSystemUi = false)
+@Composable
+private fun ForecastDailyItemPreview() {
+    WeatherTheme {
+        ForecastDailyItem(
+            dayName = "Mon",
+            conditionCode = 1000,
+            minTemperature = 19,
+            maxTemperature = 23,
+            maxRangeTemperature = 25,
+            minRangeTemperature = 17,
+            currentTemperature = 21
+        )
+    }
+}

@@ -1,0 +1,180 @@
+package com.contraomnese.weather.core.ui.widgets
+
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.ClipOp
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.tooling.preview.Preview
+import com.contraomnese.weather.design.theme.WeatherTheme
+import com.contraomnese.weather.design.theme.itemHeight6
+import com.contraomnese.weather.design.theme.itemWidth64
+
+val uvIndexGradientStops = listOf(
+    1f to Color(0xFF43A06D),
+    2f to Color(0xFF79A043),
+    3f to Color(0xFFDCC635),
+    4f to Color(0xFFDC8B35),
+    5f to Color(0xFFDC5C35),
+    6f to Color(0xFFDC3535),
+)
+
+val temperatureGradientStops = listOf(
+    -40f to Color(0xFF7015C0),
+    -30f to Color(0xFF4815C0),
+    -20f to Color(0xFF1531C0),
+    -10f to Color(0xFF1565C0),
+    0f to Color(0xFF4FF7C2),
+    10f to Color(0xFF43A06D),
+    20f to Color(0xFF67A043),
+    30f to Color(0xFFDCB835),
+    40f to Color(0xFFDC5C35),
+    50f to Color(0xFFDC3535),
+)
+
+@Composable
+fun GradientRangeLine(
+    modifier: Modifier = Modifier,
+    minRange: Float,
+    maxRange: Float,
+    min: Float,
+    current: Float? = null,
+    currentColor: Color = MaterialTheme.colorScheme.onSurface,
+    max: Float,
+    backgroundColor: Color = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.15f),
+    gradientStops: List<Pair<Float, Color>>,
+) {
+    Canvas(modifier = modifier) {
+        val w = size.width
+        val h = size.height
+        val thickness = h * 0.6f
+        val centerY = h / 2f
+        val cornerRadius = CornerRadius(thickness / 2, thickness / 2)
+        val range = (maxRange - minRange).coerceAtLeast(1f)
+
+        fun toX(value: Float): Float = ((value - minRange) / range).coerceIn(0f, 1f) * w
+
+        val minX = toX(min)
+        val maxX = toX(max)
+        val currentX = current?.let { toX(it) }
+
+        val stopsForBrush = buildList {
+            add(0f to interpolateColor(min, gradientStops))
+            for (i in 0 until gradientStops.lastIndex) {
+                val (t1, _) = gradientStops[i]
+                val (t2, _) = gradientStops[i + 1]
+                if (max < t1 || min > t2) continue
+                val sT = maxOf(min, t1)
+                val eT = minOf(max, t2)
+                val denom = (max - min).coerceAtLeast(1e-6f)
+                val sFrac = (sT - min) / denom
+                val eFrac = (eT - min) / denom
+                add(sFrac to interpolateColor(sT, gradientStops))
+                add(eFrac to interpolateColor(eT, gradientStops))
+            }
+            add(1f to interpolateColor(max, gradientStops))
+        }.distinctBy { it.first }.sortedBy { it.first }
+
+        val gradientBrush = Brush.horizontalGradient(
+            colorStops = stopsForBrush.toTypedArray(),
+            startX = minX,
+            endX = maxX,
+            tileMode = TileMode.Clamp
+        )
+
+        val drawBar: DrawScope.() -> Unit = {
+            drawRoundRect(
+                color = backgroundColor,
+                topLeft = Offset(0f, centerY - thickness / 2),
+                size = Size(w, thickness),
+                cornerRadius = cornerRadius
+            )
+            drawRoundRect(
+                brush = gradientBrush,
+                topLeft = Offset(minX, centerY - thickness / 2),
+                size = Size(maxX - minX, thickness),
+                cornerRadius = cornerRadius
+            )
+        }
+
+        if (currentX == null) {
+            drawBar()
+        } else {
+            val r = thickness * 1.1f
+            val hole = Path().apply {
+                addOval(Rect(currentX - r, centerY - r, currentX + r, centerY + r))
+            }
+            clipPath(hole, clipOp = ClipOp.Difference) {
+                drawBar()
+            }
+            drawCircle(
+                color = currentColor,
+                center = Offset(currentX, centerY),
+                radius = thickness / 2f
+            )
+        }
+    }
+}
+
+fun interpolateColor(value: Float, stops: List<Pair<Float, Color>>): Color {
+    for (i in 0 until stops.lastIndex) {
+        val (t1, c1) = stops[i]
+        val (t2, c2) = stops[i + 1]
+        if (value in t1..t2) {
+            val fraction = (value - t1) / (t2 - t1)
+            return lerp(c1, c2, fraction)
+        }
+    }
+    return if (value <= stops.first().first) stops.first().second else stops.last().second
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TemperatureRangeLinePreview() {
+    WeatherTheme {
+        GradientRangeLine(
+            modifier = Modifier
+                .width(itemWidth64)
+                .height(itemHeight6),
+            minRange = -5f,
+            maxRange = 35f,
+            min = 0f,
+            current = 23f,
+            max = 33f,
+            gradientStops = temperatureGradientStops,
+            currentColor = MaterialTheme.colorScheme.secondary
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun UVIndexRangeLinePreview() {
+    WeatherTheme {
+        GradientRangeLine(
+            modifier = Modifier
+                .width(itemWidth64)
+                .height(itemHeight6),
+            minRange = 1f,
+            maxRange = 6f,
+            min = 1f,
+            current = 2f,
+            max = 6f,
+            gradientStops = uvIndexGradientStops,
+            currentColor = MaterialTheme.colorScheme.secondary
+        )
+    }
+}

@@ -28,7 +28,7 @@ fun ForecastHourlyLazyRow(
         verticalArrangement = Arrangement.spacedBy(padding16)
     ) {
         HorizontalDivider(
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
             thickness = itemThickness1,
         )
         LazyRow(
@@ -41,7 +41,7 @@ fun ForecastHourlyLazyRow(
                 ForecastHourlyItem(
                     time = it.time,
                     conditionCode = it.conditionCode,
-                    temperature = it.temperatureC,
+                    temperature = it.temperature,
                     isNow = index == 0
                 )
             }
@@ -61,8 +61,7 @@ private fun ForecastHourlyLazyRowPreview() {
                 ForecastHour(
                     time = "$index:00",
                     conditionCode = codes.random(),
-                    temperatureC = "${index + index}",
-                    temperatureF = "${index + index}",
+                    temperature = "${index + index}",
                 )
             }
         )

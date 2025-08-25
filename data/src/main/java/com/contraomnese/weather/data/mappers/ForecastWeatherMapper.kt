@@ -11,40 +11,46 @@ import com.contraomnese.weather.domain.weatherByLocation.model.ForecastInfo
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastToday
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeatherDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.LocationInfo
+import kotlinx.collections.immutable.toPersistentList
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlin.math.roundToInt
 
 fun ForecastWeatherResponse.toDomain(): ForecastWeatherDomainModel {
+
+    val nextDayHourLimit = location.localtimeEpoch + 24 * 60 * 60
+    val forecastHours =
+        mutableListOf(forecast.forecastDay.first().hour.last { it.timeEpoch <= location.localtimeEpoch })
+    forecastHours.addAll(forecast.forecastDay.first().hour.filter { it.timeEpoch > location.localtimeEpoch })
+    forecastHours.addAll(forecast.forecastDay.drop(1).first().hour.filter { it.timeEpoch <= nextDayHourLimit })
+
     return ForecastWeatherDomainModel(
         locationInfo = LocationInfo(
             locationTimeEpoch = location.localtimeEpoch,
             locationTime = location.localtime
         ),
         currentInfo = CurrentInfo(
-            temperatureC = current.tempC.roundToInt().toString(),
-            temperatureF = current.tempF.roundToInt().toString(),
-            feelsLikeC = current.feelsLikeC.roundToInt().toString(),
-            feelsLikeF = current.feelsLikeF.roundToInt().toString(),
+            temperature = current.tempC.roundToInt().toString(),
+            feelsLike = current.feelsLikeC.roundToInt().toString(),
             isDay = current.isDay == 1,
             conditionCode = current.condition.code,
             conditionText = current.condition.text,
-            windSpeedKph = current.windKph.roundToInt().toString(),
-            windSpeedMph = current.windMph.roundToInt().toString(),
+            windSpeed = current.windKph.roundToInt().toString(),
             windDirection = current.windDir,
             windDegree = current.windDegree,
-            pressureMb = current.pressureMb.toString(),
-            pressureIn = current.pressureIn.toString(),
+            pressure = current.pressureMb.toString(),
             humidity = current.humidity.toString(),
             uvIndex = current.uv.toString(),
             airQualityIndex = current.airQuality.usEpaIndex
         ),
         forecastInfo = ForecastInfo(
             today = forecast.forecastDay.first().toForecastTodayDomain(),
-            forecastDays = forecast.forecastDay.map { it.toForecastDayDomain() },
-            forecastHours = forecast.forecastDay.first().hour.filter { it.timeEpoch > location.localtimeEpoch }
-                .map { it.toDomain() }
+            forecastDays = forecast.forecastDay.map { it.toForecastDayDomain() }.toPersistentList(),
+            forecastHours = forecastHours.map { it.toDomain() }.toPersistentList()
         ),
         alertsInfo = AlertsInfo(
-            alerts = alerts.alert.map { it.desc }
+            alerts = alerts.alert.map { it.desc }.toPersistentList()
         )
     )
 }
@@ -52,15 +58,13 @@ fun ForecastWeatherResponse.toDomain(): ForecastWeatherDomainModel {
 fun ForecastDayNetwork.toForecastTodayDomain(): ForecastToday {
 
     return ForecastToday(
-        maxTemperatureC = day.maxTempC.roundToInt().toString(),
-        maxTemperatureF = day.maxTempF.roundToInt().toString(),
-        minTemperatureC = day.minTempC.roundToInt().toString(),
-        minTemperatureF = day.minTempF.roundToInt().toString(),
+        maxTemperature = day.maxTempC.roundToInt().toString(),
+        minTemperature = day.minTempC.roundToInt().toString(),
         conditionCode = day.condition.code,
         conditionText = day.condition.text,
         totalUvIndex = day.uv.toString(),
         rainChance = day.dailyChanceOfRain.toString(),
-        totalRainFullMm = day.totalPrecipMm.roundToInt().toString(),
+        totalRainFull = day.totalPrecipMm.roundToInt().toString(),
         sunrise = astro.sunrise,
         sunset = astro.sunset
     )
@@ -68,21 +72,25 @@ fun ForecastDayNetwork.toForecastTodayDomain(): ForecastToday {
 
 fun ForecastDayNetwork.toForecastDayDomain(): ForecastDay {
     return ForecastDay(
-        maxTemperatureC = day.maxTempC.roundToInt().toString(),
-        maxTemperatureF = day.maxTempF.roundToInt().toString(),
-        minTemperatureC = day.minTempC.roundToInt().toString(),
-        minTemperatureF = day.minTempF.roundToInt().toString(),
+        dayName = getDayOfWeek(dateEpoch),
+        maxTemperature = day.maxTempC.roundToInt(),
+        minTemperature = day.minTempC.roundToInt(),
         conditionCode = day.condition.code,
-        totalRainFullMm = day.totalPrecipMm.roundToInt(),
+        totalRainFull = day.totalPrecipMm.roundToInt(),
     )
 }
 
 fun HourNetwork.toDomain(): ForecastHour {
     return ForecastHour(
-        temperatureC = tempC.roundToInt().toString(),
-        temperatureF = tempF.roundToInt().toString(),
+        temperature = tempC.roundToInt().toString(),
         conditionCode = condition.code,
         time = time.split(" ")[1],
     )
+}
+
+fun getDayOfWeek(epochSeconds: Long, timeZone: TimeZone = TimeZone.currentSystemDefault()): String {
+    val instant = Instant.fromEpochSeconds(epochSeconds)
+    val localDate = instant.toLocalDateTime(timeZone).date
+    return localDate.dayOfWeek.name.slice(0..2)
 }
 

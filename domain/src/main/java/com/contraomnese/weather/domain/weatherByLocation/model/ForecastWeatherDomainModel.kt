@@ -1,5 +1,7 @@
 package com.contraomnese.weather.domain.weatherByLocation.model
 
+import kotlinx.collections.immutable.ImmutableList
+
 data class ForecastWeatherDomainModel(
     val locationInfo: LocationInfo,
     val currentInfo: CurrentInfo,
@@ -13,19 +15,15 @@ data class LocationInfo(
 )
 
 data class CurrentInfo(
-    val temperatureC: String,
-    val temperatureF: String,
-    val feelsLikeC: String,
-    val feelsLikeF: String,
+    val temperature: String,
+    val feelsLike: String,
     val isDay: Boolean,
     val conditionCode: Int,
     val conditionText: String,
-    val windSpeedKph: String,
-    val windSpeedMph: String,
+    val windSpeed: String,
     val windDirection: String,
     val windDegree: Int,
-    val pressureMb: String,
-    val pressureIn: String,
+    val pressure: String,
     val humidity: String,
     val uvIndex: String,
     val airQualityIndex: Int,
@@ -33,40 +31,36 @@ data class CurrentInfo(
 
 data class ForecastInfo(
     val today: ForecastToday,
-    val forecastHours: List<ForecastHour>,
-    val forecastDays: List<ForecastDay>,
+    val forecastHours: ImmutableList<ForecastHour>,
+    val forecastDays: ImmutableList<ForecastDay>,
 )
 
 data class ForecastToday(
-    val maxTemperatureC: String,
-    val maxTemperatureF: String,
-    val minTemperatureC: String,
-    val minTemperatureF: String,
+    val maxTemperature: String,
+    val minTemperature: String,
     val conditionCode: Int,
     val conditionText: String,
     val totalUvIndex: String,
     val rainChance: String,
-    val totalRainFullMm: String,
+    val totalRainFull: String,
     val sunrise: String,
     val sunset: String,
 )
 
 data class ForecastHour(
     val time: String,
-    val temperatureC: String,
-    val temperatureF: String,
+    val temperature: String,
     val conditionCode: Int,
 )
 
 data class ForecastDay(
-    val maxTemperatureC: String,
-    val maxTemperatureF: String,
-    val minTemperatureC: String,
-    val minTemperatureF: String,
+    val dayName: String,
+    val maxTemperature: Int,
+    val minTemperature: Int,
     val conditionCode: Int,
-    val totalRainFullMm: Int,
+    val totalRainFull: Int,
 )
 
 data class AlertsInfo(
-    val alerts: List<String>,
+    val alerts: ImmutableList<String>,
 )

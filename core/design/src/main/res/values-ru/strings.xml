@@ -5,4 +5,5 @@
     <string name="max_min_temperature_title">Макс.:%1$s°, Мин.:%2$s°</string>
     <string name="now">Сейчас</string>
     <string name="today_forecast_title">СЕГОДНЯ</string>
+    <string name="daily_forecast_title">ПРОГНОЗ НА 3 ДНЯ</string>
 </resources>

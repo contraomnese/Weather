@@ -7,4 +7,6 @@
     <string name="temperature_and_condition_title" translatable="false">%1$s° | %2$s</string>
     <string name="now">Now</string>
     <string name="today_forecast_title">TODAY</string>
+    <string name="daily_forecast_title">3-DAY FORECAST</string>
+
 </resources>

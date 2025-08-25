@@ -34,7 +34,7 @@ tasks.withType<Test>().configureEach {
 }
 
 dependencies {
-    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.bundles.core)
     testImplementation(libs.bundles.test)
     testRuntimeOnly(libs.junit.jupiter.engine)
 }

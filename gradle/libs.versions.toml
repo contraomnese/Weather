@@ -17,6 +17,7 @@ koin = "4.0.4"
 coreKtx = "1.16.0"
 coroutines = "1.10.1"
 kotlinx-immutable = "0.3.5"
+kotlinxDatetime = "0.6.0"
 
 # presentation
 lifecycleRuntimeKtx = "2.8.7"
@@ -77,7 +78,7 @@ koin-androidx-compose-navigation = { group = "io.insert-koin", name = "koin-andr
 
 # core
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinx-immutable" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -171,6 +172,7 @@ core = [
     "kotlinx-coroutines-android",
     "kotlinx-coroutines-core",
     "kotlinx-serialization-json",
+    "kotlinx-datetime"
 ]
 
 # Navigation
