@@ -54,7 +54,7 @@ fun ForecastDailyItem(
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
         )
-        GradientRangeLine(
+        TemperatureRangeLine(
             minRange = minRangeTemperature.toFloat(),
             maxRange = maxRangeTemperature.toFloat(),
             min = minTemperature.toFloat(),
@@ -63,7 +63,6 @@ fun ForecastDailyItem(
             modifier = Modifier
                 .weight(1f)
                 .height(itemHeight6),
-            gradientStops = temperatureGradientStops
         )
         Text(
             modifier = Modifier.height(itemHeight26),

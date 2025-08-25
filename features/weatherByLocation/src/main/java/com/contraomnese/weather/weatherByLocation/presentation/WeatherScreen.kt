@@ -349,7 +349,7 @@ internal fun WeatherScreen(
                             ForecastDailyColumn(
                                 modifier = Modifier.padding(horizontal = padding16),
                                 items = uiState.weather.forecastInfo.forecastDays,
-                                currentTemperature = uiState.weather.currentInfo.temperature.toInt() // TODO
+                                currentTemperature = uiState.weather.currentInfo.temperature.toInt()
                             )
                         }
 

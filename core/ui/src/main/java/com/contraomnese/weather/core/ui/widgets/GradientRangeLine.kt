@@ -21,15 +21,28 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.tooling.preview.Preview
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight6
-import com.contraomnese.weather.design.theme.itemWidth64
+import com.contraomnese.weather.design.theme.itemHeight8
+import com.contraomnese.weather.design.theme.itemWidth112
+
+val aqiIndexGradientStops = listOf(
+    1f to Color(0xFF43A06D),
+    2f to Color(0xFF39A131),
+    3f to Color(0xFF759E2F),
+    4f to Color(0xFFB8B130),
+    5f to Color(0xFFDCC035),
+    6f to Color(0xFFDCAD35),
+    7f to Color(0xFFCD770E),
+    8f to Color(0xFFB1351C),
+    9f to Color(0xFFC22222),
+    10f to Color(0xFFAA0903),
+)
 
 val uvIndexGradientStops = listOf(
-    1f to Color(0xFF43A06D),
-    2f to Color(0xFF79A043),
+    0f to Color(0xFF3E840D),
     3f to Color(0xFFDCC635),
-    4f to Color(0xFFDC8B35),
-    5f to Color(0xFFDC5C35),
-    6f to Color(0xFFDC3535),
+    6f to Color(0xFFDC6F35),
+    9f to Color(0xFFDC3B35),
+    11f to Color(0xFFBD35DC),
 )
 
 val temperatureGradientStops = listOf(
@@ -46,14 +59,62 @@ val temperatureGradientStops = listOf(
 )
 
 @Composable
-fun GradientRangeLine(
+fun TemperatureRangeLine(
     modifier: Modifier = Modifier,
     minRange: Float,
     maxRange: Float,
     min: Float,
+    max: Float,
+    current: Float? = null,
+) {
+    GradientRangeLine(
+        modifier = modifier,
+        minRange = minRange,
+        maxRange = maxRange,
+        min = min,
+        max = max,
+        current = current,
+        gradientStops = temperatureGradientStops
+    )
+}
+
+@Composable
+fun UvIndexRangeLine(
+    modifier: Modifier = Modifier,
+    current: Float,
+) {
+    GradientRangeLine(
+        modifier = modifier,
+        minRange = 0f,
+        maxRange = 11f,
+        current = current,
+        gradientStops = uvIndexGradientStops
+    )
+}
+
+@Composable
+fun AqiIndexRangeLine(
+    modifier: Modifier = Modifier,
+    current: Float,
+) {
+    GradientRangeLine(
+        modifier = modifier,
+        minRange = 1f,
+        maxRange = 10f,
+        current = current,
+        gradientStops = aqiIndexGradientStops
+    )
+}
+
+@Composable
+private fun GradientRangeLine(
+    modifier: Modifier = Modifier,
+    minRange: Float,
+    maxRange: Float,
+    min: Float = minRange,
+    max: Float = maxRange,
     current: Float? = null,
     currentColor: Color = MaterialTheme.colorScheme.onSurface,
-    max: Float,
     backgroundColor: Color = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.15f),
     gradientStops: List<Pair<Float, Color>>,
 ) {
@@ -145,17 +206,15 @@ fun interpolateColor(value: Float, stops: List<Pair<Float, Color>>): Color {
 @Composable
 fun TemperatureRangeLinePreview() {
     WeatherTheme {
-        GradientRangeLine(
+        TemperatureRangeLine(
             modifier = Modifier
-                .width(itemWidth64)
+                .width(itemWidth112)
                 .height(itemHeight6),
             minRange = -5f,
             maxRange = 35f,
             min = 0f,
             current = 23f,
             max = 33f,
-            gradientStops = temperatureGradientStops,
-            currentColor = MaterialTheme.colorScheme.secondary
         )
     }
 }
@@ -164,17 +223,24 @@ fun TemperatureRangeLinePreview() {
 @Composable
 fun UVIndexRangeLinePreview() {
     WeatherTheme {
-        GradientRangeLine(
+        UvIndexRangeLine(
             modifier = Modifier
-                .width(itemWidth64)
-                .height(itemHeight6),
-            minRange = 1f,
-            maxRange = 6f,
-            min = 1f,
+                .width(itemWidth112)
+                .height(itemHeight8),
             current = 2f,
-            max = 6f,
-            gradientStops = uvIndexGradientStops,
-            currentColor = MaterialTheme.colorScheme.secondary
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AqiRangeLinePreview() {
+    WeatherTheme {
+        AqiIndexRangeLine(
+            modifier = Modifier
+                .width(itemWidth112)
+                .height(itemHeight8),
+            current = 2f,
         )
     }
 }
