@@ -1,6 +1,5 @@
 package com.contraomnese.weather.weatherByLocation.presentation
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -137,13 +136,7 @@ internal fun WeatherScreen(
         object : NestedScrollConnection {
 
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                Log.d("123", "$sections")
-                Log.d(
-                    "123",
-                    "lazyListState.layoutInfo.visibleItemsInfo ${lazyListState.layoutInfo.visibleItemsInfo.map { it.index }}"
-                )
-                Log.d("123", "currentVisibleSectionIndex - $currentVisibleSectionIndex")
-                Log.d("123", "LOG1")
+
                 if (available.y == 0f) return Offset.Zero
 
                 // disable scroll when last item is visible
@@ -154,7 +147,6 @@ internal fun WeatherScreen(
                     }
                 }
                 if (lastItem != null && available.y < 0) {
-                    Log.d("123", "LOG2")
                     return Offset(0f, available.y)
                 }
                 // end block
@@ -164,7 +156,6 @@ internal fun WeatherScreen(
 
                 // steal scroll to change title height
                 if (availableScrollResult < 0 && currentVisibleSectionIndex == 0) {
-                    Log.d("123", "LOG3")
                     val prevTitleBoxHeight = currentTitleBoxHeight
                     currentTitleBoxHeight =
                         (currentTitleBoxHeight + availableScrollResult).coerceIn(
@@ -177,7 +168,6 @@ internal fun WeatherScreen(
                 }
 
                 if (availableScrollResult == 0f) {
-                    Log.d("123", "LOG4")
                     return Offset(0f, consumedResult)
                 }
                 // end block
@@ -203,7 +193,6 @@ internal fun WeatherScreen(
                                         sec.copyWithBodyHeight(newHeight)
                                     } else sec
                                 }
-                                Log.d("123", "LOG5")
                                 val consumedScrollYByBody = newHeight - bodyHeight
                                 consumedResult += consumedScrollYByBody
                                 availableScrollResult -= consumedScrollYByBody
@@ -219,22 +208,17 @@ internal fun WeatherScreen(
 
 
                 if (availableScrollResult == 0f) {
-                    Log.d("123", "LOG6")
                     return Offset(0f, consumedResult)
                 }
                 // end block
 
-                Log.d("123", "currentCollapseContainerOffset: $currentCollapseContainerOffset")
                 // make sure we don't steal more scroll than needed to show a new container when scrolling DOWN
                 if (availableScrollResult > 0f && currentCollapseContainerOffset < 0) {
-                    Log.d("123", "availableScrollResult: $availableScrollResult")
                     return if (availableScrollResult + currentCollapseContainerOffset > 0) {
-                        Log.d("123", "LOG7")
                         val exactOffsetConsumed = availableScrollResult + currentCollapseContainerOffset
                         if (currentVisibleSectionIndex > 0) currentVisibleSectionIndex--
                         Offset(0f, exactOffsetConsumed)
                     } else {
-                        Log.d("123", "LOG8")
                         Offset(0f, consumedResult)
                     }
                 }
@@ -258,34 +242,18 @@ internal fun WeatherScreen(
 
                 // make sure we don't steal more scroll than needed to show a new container when scrolling UP
                 if (newBodyHeight == 0f && availableScrollResult < 0 && abs(availableScrollResult + consumedResult) > nextCollapseContainerOffset) {
-                    Log.d("123", "LOG9")
-                    Log.d("123", "availableScrollResult: $availableScrollResult")
-                    Log.d("123", "consumedResult: $consumedResult")
-                    Log.d("123", "nextCollapseContainerOffset: $nextCollapseContainerOffset")
                     val exactOffsetConsumed = consumedResult + availableScrollResult + nextCollapseContainerOffset
-                    Log.d("123", "exactOffsetConsumed: $exactOffsetConsumed")
                     if (currentVisibleSectionIndex < sections.size - 1) currentVisibleSectionIndex++
                     return Offset(0f, exactOffsetConsumed)
                 }
-                Log.d("123", "maxVisibleSectionOffset: $maxVisibleSectionOffset")
                 // make sure we don't steal more scroll than needed to show a new container when scrolling DOWN
                 if (newBodyHeight == maxBodyHeight && (currentCollapseContainerOffset + availableScrollResult) > maxVisibleSectionOffset) {
                     val exactOffsetConsumed =
                         currentCollapseContainerOffset + availableScrollResult + consumedResult - maxVisibleSectionOffset
-                    // for some reason when offset = 0 the next index does not take the correct value
-                    Log.d("123", "availableScrollResult: $availableScrollResult")
-                    Log.d("123", "consumedResult: $consumedResult")
-                    Log.d("123", "exactOffsetConsumed: $exactOffsetConsumed")
-                    Log.d(
-                        "123",
-                        "currentCollapseContainerOffset + availableScrollResult: ${currentCollapseContainerOffset + availableScrollResult}"
-                    )
-                    Log.d("123", "LOG10")
                     if (currentVisibleSectionIndex > 0) currentVisibleSectionIndex--
                     return Offset(0f, exactOffsetConsumed)
                 }
                 // we give away the remaining scroll
-                Log.d("123", "LOG11")
                 return Offset(0f, consumedResult)
             }
 
@@ -306,12 +274,6 @@ internal fun WeatherScreen(
             }
         }
     }
-
-//    LaunchedEffect(lazyListState) {
-//        snapshotFlow { lazyListState.layoutInfo.visibleItemsInfo }
-//            .map { vis -> vis.firstOrNull { it.offset >= -maxVisibleSectionOffset }?.index ?: -1 }
-//            .collect { currentVisibleSectionIndex = it }
-//    }
 
     Column(
         modifier = Modifier
