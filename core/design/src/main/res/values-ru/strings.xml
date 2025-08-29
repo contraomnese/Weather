@@ -3,6 +3,7 @@
     <string name="search_city">Поиск города</string>
     <string name="clear_search_field">Очистить поле поиска</string>
     <string name="max_min_temperature_title">Макс.:%1$s°, Мин.:%2$s°</string>
+    <string name="wind_speed_title">%1$d м/с</string>
     <string name="now">Сейчас</string>
     <string name="today_forecast_title">СЕГОДНЯ</string>
     <string name="daily_forecast_title">ПРОГНОЗ НА 3 ДНЯ</string>
@@ -17,6 +18,11 @@
     <string name="aqi_moderate_desc">Качество воздуха удовлетворительное. Людям с повышенной чувствительностью стоит ограничить длительное пребывание на улице.</string>
     <string name="aqi_bad_desc">Качество воздуха плохое. Людям с заболеваниями сердца или лёгких, детям и пожилым следует избегать продолжительных нагрузок на свежем воздухе.</string>
     <string name="aqi_very_bad_desc">Качество воздуха очень плохое. Негативное воздействие возможно для всех — избегайте физических нагрузок на улице и по возможности оставайтесь в помещении.</string>
+
+    <string name="cardinal_point_n">С</string>
+    <string name="cardinal_point_e">В</string>
+    <string name="cardinal_point_w">З</string>
+    <string name="cardinal_point_s">Ю</string>
 
     <string name="condition_code_1000">Солнечно</string>
     <string name="condition_code_1003">Переменная облачность</string>

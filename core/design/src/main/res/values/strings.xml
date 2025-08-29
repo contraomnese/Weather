@@ -7,6 +7,7 @@
     <string name="temperature_and_condition_title" translatable="false">%1$s° | %2$s</string>
     <string name="degree" translatable="false">%1$s°</string>
     <string name="degree_with_separator" translatable="false">%1$s° | </string>
+    <string name="wind_speed_title">%1$d m/s</string>
     <string name="now">Now</string>
     <string name="today_forecast_title">TODAY</string>
     <string name="daily_forecast_title">3-DAY FORECAST</string>
@@ -19,6 +20,11 @@
     <string name="aqi_moderate_desc">Air quality is acceptable. Sensitive individuals should consider limiting prolonged outdoor activity.</string>
     <string name="aqi_bad_desc">Air quality is poor. People with heart or lung conditions, children and older adults should avoid prolonged exertion outdoors.</string>
     <string name="aqi_very_bad_desc">Air quality is very poor. Everyone may experience effects — avoid outdoor exercise and stay indoors if possible.</string>
+
+    <string name="cardinal_point_n">N</string>
+    <string name="cardinal_point_e">E</string>
+    <string name="cardinal_point_w">W</string>
+    <string name="cardinal_point_s">S</string>
 
     <string name="condition_code_1000">Sunny</string>
     <string name="condition_code_1003">Partly cloudy</string>
