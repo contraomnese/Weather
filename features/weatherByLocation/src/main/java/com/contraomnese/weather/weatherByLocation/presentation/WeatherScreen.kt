@@ -6,13 +6,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -29,7 +30,6 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contraomnese.weather.core.ui.utils.toPx
@@ -43,6 +43,7 @@ import com.contraomnese.weather.core.ui.widgets.TitleSection
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.icons.WeatherIcons
 import com.contraomnese.weather.design.theme.WeatherTheme
+import com.contraomnese.weather.design.theme.itemHeight512
 import com.contraomnese.weather.design.theme.itemHeight64
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding8
@@ -57,7 +58,6 @@ import com.contraomnese.weather.weatherByLocation.presentation.data.HourlyForeca
 import com.contraomnese.weather.weatherByLocation.presentation.data.HumiditySection
 import com.contraomnese.weather.weatherByLocation.presentation.data.SunriseSection
 import com.contraomnese.weather.weatherByLocation.presentation.data.UVIndexSection
-import com.contraomnese.weather.weatherByLocation.presentation.data.WeatherSection
 import com.contraomnese.weather.weatherByLocation.presentation.data.WindSection
 import kotlin.math.abs
 
@@ -107,13 +107,6 @@ internal fun WeatherScreen(
 
     val sectionVerticalSpacing = 10.dp
     val headerSectionHeight = 46.dp
-    val dailySection = DailyForecastSection(250.dp.toPx())
-    val hourlySection = HourlyForecastSection(180.dp.toPx())
-    val aqiSection = AqiSection(180.dp.toPx())
-    val uvIndexSection = UVIndexSection(200.dp.toPx())
-    val humiditySection = HumiditySection(200.dp.toPx())
-    val sunriseSection = SunriseSection(400.dp.toPx())
-    val windSection = WindSection(400.dp.toPx())
 
     val maxVisibleSectionOffset = headerSectionHeight.toPx() + sectionVerticalSpacing.toPx()
     var currentVisibleSectionIndex by remember { mutableIntStateOf(0) }
@@ -121,13 +114,13 @@ internal fun WeatherScreen(
     var sections by remember {
         mutableStateOf(
             listOf(
-                hourlySection,
-                dailySection,
-                aqiSection,
-                uvIndexSection,
-                humiditySection,
-                sunriseSection,
-                windSection
+                HourlyForecastSection(),
+                DailyForecastSection(),
+                AqiSection(),
+                UVIndexSection(),
+                HumiditySection(),
+                SunriseSection(),
+                WindSection()
             )
         )
     }
@@ -185,7 +178,7 @@ internal fun WeatherScreen(
                         .forEachIndexed { nextIndex, section ->
                             val (bodyHeight, maxHeight) = section
                             if (bodyHeight != maxHeight) {
-                                val newHeight = (bodyHeight + availableScrollResult).coerceIn(0f, maxHeight)
+                                val newHeight = (bodyHeight!! + availableScrollResult).coerceIn(0f, maxHeight)
 
                                 sections = sections.mapIndexed { idx, sec ->
                                     val targetIdx = nextIndex + currentVisibleSectionIndex + 1
@@ -230,7 +223,7 @@ internal fun WeatherScreen(
 
                 // checking that current container's body is expanded
                 val (currentBodyHeight, maxBodyHeight) = sections[currentVisibleSectionIndex]
-                val newBodyHeight = (currentBodyHeight + availableScrollResult).coerceIn(0f, maxBodyHeight)
+                val newBodyHeight = (currentBodyHeight!! + availableScrollResult).coerceIn(0f, maxBodyHeight)
                 sections = sections.mapIndexed { idx, type ->
                     if (idx == currentVisibleSectionIndex) {
                         type.copyWithBodyHeight(newBodyHeight)
@@ -278,6 +271,7 @@ internal fun WeatherScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .wrapContentHeight()
             .background(MaterialTheme.colorScheme.background)
     ) {
         TitleSection(
@@ -298,65 +292,75 @@ internal fun WeatherScreen(
             verticalArrangement = Arrangement.spacedBy(sectionVerticalSpacing),
         ) {
             items(sections) { section ->
+
+                val measureContainerHeight: (Int) -> Unit = {
+                    if (section.bodyHeight == null) {
+                        sections =
+                            sections.map { sec -> if (section == sec) sec.copyWithBodyHeight(it.toFloat()) else sec }
+                    }
+                }
+
                 when (section) {
                     is HourlyForecastSection,
-                            -> CollapsableContainerWithAnimatedHeader(
-                            minHeaderHeight = headerSectionHeight,
+                        -> CollapsableContainerWithAnimatedHeader(
+                        minHeaderHeight = headerSectionHeight,
                         currentBodyHeight = section.bodyHeight,
-                        maxBodyHeight = section.bodyMaxHeight,
-                            headerTitle = stringResource(R.string.today_forecast_title),
-                            headerIcon = WeatherIcons.Today,
-                            alertTitle = uiState.weather.alertsInfo.alerts.firstOrNull(),
-                            progress = progress
-                        ) {
-                            ForecastHourlyLazyRow(
-                                modifier = Modifier.padding(horizontal = padding16),
-                                items = uiState.weather.forecastInfo.forecastHours
-                            )
-                        }
+                        headerTitle = stringResource(R.string.today_forecast_title),
+                        headerIcon = WeatherIcons.Today,
+                        alertTitle = uiState.weather.alertsInfo.alerts.firstOrNull(),
+                        progress = progress,
+                        onContentMeasured = measureContainerHeight
+                    ) {
+                        ForecastHourlyLazyRow(
+                            modifier = Modifier.padding(horizontal = padding16),
+                            items = uiState.weather.forecastInfo.forecastHours
+                        )
+                    }
 
                     is DailyForecastSection,
-                            -> CollapsableContainer(
-                            headerHeight = headerSectionHeight,
-                            headerTitle = stringResource(R.string.daily_forecast_title),
-                            headerIcon = WeatherIcons.Daily,
+                        -> CollapsableContainer(
+                        headerHeight = headerSectionHeight,
+                        headerTitle = stringResource(R.string.daily_forecast_title),
+                        headerIcon = WeatherIcons.Daily,
                         currentBodyHeight = section.bodyHeight,
-                        maxBodyHeight = section.bodyMaxHeight,
-                        ) {
-                            ForecastDailyColumn(
-                                modifier = Modifier.padding(horizontal = padding16),
-                                items = uiState.weather.forecastInfo.forecastDays,
-                                currentTemperature = uiState.weather.currentInfo.temperature.toInt()
-                            )
-                        }
+                        onContentMeasured = measureContainerHeight
+                    ) {
+                        ForecastDailyColumn(
+                            modifier = Modifier.padding(horizontal = padding16),
+                            items = uiState.weather.forecastInfo.forecastDays,
+                            currentTemperature = uiState.weather.currentInfo.temperature.toInt()
+                        )
+                    }
 
                     is AqiSection,
-                            -> CollapsableContainer(
-                            headerHeight = headerSectionHeight,
-                            headerTitle = stringResource(R.string.aqi_title),
-                            headerIcon = WeatherIcons.Aqi,
+                        -> CollapsableContainer(
+                        headerHeight = headerSectionHeight,
+                        headerTitle = stringResource(R.string.aqi_title),
+                        headerIcon = WeatherIcons.Aqi,
                         currentBodyHeight = section.bodyHeight,
-                        maxBodyHeight = section.bodyMaxHeight,
-                        ) {
-                            AirQualityItem(
-                                modifier = Modifier.padding(horizontal = padding16),
-                                aqiIndex = uiState.weather.currentInfo.airQualityIndex.aqiIndex,
-                                coLevel = uiState.weather.currentInfo.airQualityIndex.coLevel,
-                                no2Level = uiState.weather.currentInfo.airQualityIndex.no2Level,
-                                o3Level = uiState.weather.currentInfo.airQualityIndex.o3Level,
-                                so2Level = uiState.weather.currentInfo.airQualityIndex.so2Level,
-                                pm25Level = uiState.weather.currentInfo.airQualityIndex.pm25Level,
-                                pm10Level = uiState.weather.currentInfo.airQualityIndex.pm10Level,
-                            )
-                        }
+                        onContentMeasured = measureContainerHeight
+                    ) {
+                        AirQualityItem(
+                            modifier = Modifier.padding(horizontal = padding16),
+                            aqiIndex = uiState.weather.currentInfo.airQualityIndex.aqiIndex,
+                            coLevel = uiState.weather.currentInfo.airQualityIndex.coLevel,
+                            no2Level = uiState.weather.currentInfo.airQualityIndex.no2Level,
+                            o3Level = uiState.weather.currentInfo.airQualityIndex.o3Level,
+                            so2Level = uiState.weather.currentInfo.airQualityIndex.so2Level,
+                            pm25Level = uiState.weather.currentInfo.airQualityIndex.pm25Level,
+                            pm10Level = uiState.weather.currentInfo.airQualityIndex.pm10Level,
+                        )
+                    }
 
                     is SunriseSection, is UVIndexSection, is HumiditySection, is WindSection,
                         -> CollapsableContainer(
                         headerHeight = headerSectionHeight,
                         currentBodyHeight = section.bodyHeight,
-                        maxBodyHeight = section.bodyMaxHeight,
+                        onContentMeasured = measureContainerHeight
                     ) {
-                        repeat(5) { Text("Body$it") }
+                        Box(modifier = Modifier
+                            .fillMaxWidth()
+                            .height(itemHeight512))
                     }
                 }
             }
@@ -367,90 +371,6 @@ internal fun WeatherScreen(
                         .background(MaterialTheme.colorScheme.error)
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun WeatherSectionItem(
-    section: WeatherSection,
-    uiState: WeatherUiState,
-    headerHeight: Dp,
-    padding: Dp,
-    progress: Float,
-) {
-    requireNotNull(uiState.weather)
-
-    Section(section, uiState, headerHeight, padding, progress)
-
-}
-
-@Composable
-private fun Section(
-    section: WeatherSection,
-    uiState: WeatherUiState,
-    headerHeight: Dp,
-    padding: Dp,
-    progress: Float,
-) {
-    requireNotNull(uiState.weather)
-
-    when (section) {
-        is HourlyForecastSection -> CollapsableContainerWithAnimatedHeader(
-            minHeaderHeight = headerHeight,
-            currentBodyHeight = section.bodyHeight,
-            maxBodyHeight = section.bodyMaxHeight,
-            headerTitle = stringResource(R.string.today_forecast_title),
-            headerIcon = WeatherIcons.Today,
-            alertTitle = uiState.weather.alertsInfo.alerts.firstOrNull(),
-            progress = progress
-        ) {
-            ForecastHourlyLazyRow(
-                modifier = Modifier.padding(horizontal = padding),
-                items = uiState.weather.forecastInfo.forecastHours
-            )
-        }
-
-        is DailyForecastSection -> CollapsableContainer(
-            headerHeight = headerHeight,
-            headerTitle = stringResource(R.string.daily_forecast_title),
-            headerIcon = WeatherIcons.Daily,
-            currentBodyHeight = section.bodyHeight,
-            maxBodyHeight = section.bodyMaxHeight,
-        ) {
-            ForecastDailyColumn(
-                modifier = Modifier.padding(horizontal = padding),
-                items = uiState.weather.forecastInfo.forecastDays,
-                currentTemperature = uiState.weather.currentInfo.temperature.toInt()
-            )
-        }
-
-        is AqiSection -> CollapsableContainer(
-            headerHeight = headerHeight,
-            headerTitle = stringResource(R.string.aqi_title),
-            headerIcon = WeatherIcons.Aqi,
-            currentBodyHeight = section.bodyHeight,
-            maxBodyHeight = section.bodyMaxHeight,
-        ) {
-            AirQualityItem(
-                modifier = Modifier.padding(horizontal = padding),
-                aqiIndex = uiState.weather.currentInfo.airQualityIndex.aqiIndex,
-                coLevel = uiState.weather.currentInfo.airQualityIndex.coLevel,
-                no2Level = uiState.weather.currentInfo.airQualityIndex.no2Level,
-                o3Level = uiState.weather.currentInfo.airQualityIndex.o3Level,
-                so2Level = uiState.weather.currentInfo.airQualityIndex.so2Level,
-                pm25Level = uiState.weather.currentInfo.airQualityIndex.pm25Level,
-                pm10Level = uiState.weather.currentInfo.airQualityIndex.pm10Level,
-            )
-        }
-
-        is SunriseSection, is WindSection, is HumiditySection, is UVIndexSection,
-            -> CollapsableContainer(
-            headerHeight = headerHeight,
-            currentBodyHeight = section.bodyHeight,
-            maxBodyHeight = section.bodyMaxHeight,
-        ) {
-            repeat(5) { Text("Body$it") }
         }
     }
 }

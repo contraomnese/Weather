@@ -1,4 +1,4 @@
-package com.contraomnese.weather.core.ui.widgets
+package com.contraomnese.weather.core.ui.canvas
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.height

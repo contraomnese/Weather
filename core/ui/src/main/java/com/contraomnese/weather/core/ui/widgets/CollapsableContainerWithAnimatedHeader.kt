@@ -3,8 +3,8 @@ package com.contraomnese.weather.core.ui.widgets
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -49,10 +49,10 @@ fun CollapsableContainerWithAnimatedHeader(
     headerTitle: String = "Header",
     headerIcon: ImageVector = WeatherIcons.Default,
     alertTitle: String? = null,
-    currentBodyHeight: Float,
-    maxBodyHeight: Float,
+    currentBodyHeight: Float?,
     progress: Float,
-    content: @Composable ColumnScope.() -> Unit,
+    onContentMeasured: (Int) -> Unit = {},
+    content: @Composable BoxScope.() -> Unit,
 ) {
 
     val density = LocalDensity.current
@@ -85,7 +85,7 @@ fun CollapsableContainerWithAnimatedHeader(
 
     Column(
         modifier = modifier
-            .wrapContentHeight()
+            .wrapContentHeight(Alignment.Top)
             .fillMaxWidth()
             .clip(RoundedCornerShape(cornerRadius16))
             .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.1f))
@@ -131,22 +131,21 @@ fun CollapsableContainerWithAnimatedHeader(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(bottom = padding4)
                 .clipToBounds()
                 .layout { measurable, constraints ->
                     val placeable = measurable.measure(constraints)
-                    layout(constraints.maxWidth, currentBodyHeight.toInt()) {
-                        val y = (maxBodyHeight - currentBodyHeight).toInt()
-                        placeable.place(0, -y)
+                    onContentMeasured(placeable.height)
+                    val visibleHeight = currentBodyHeight?.toInt() ?: placeable.height
+
+                    val offsetY = (placeable.height - visibleHeight).coerceAtLeast(0)
+                    layout(constraints.maxWidth, visibleHeight) {
+                        placeable.place(0, -offsetY)
                     }
                 },
-            contentAlignment = Alignment.TopCenter
-        ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(padding8),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                content = content
-            )
-        }
+            contentAlignment = Alignment.TopCenter,
+            content = content
+        )
     }
 }
 
@@ -158,7 +157,6 @@ private fun CollapsableContainerWithAnimatedHeaderPreview() {
             minHeaderHeight = 46.dp,
             currentBodyHeight = 0f,
             alertTitle = "Alert",
-            maxBodyHeight = 650f,
             progress = 1f
         ) { }
     }
@@ -172,7 +170,6 @@ private fun CollapsableContainerWithAnimatedHeaderEmptyAlertTitlePreview() {
             minHeaderHeight = 46.dp,
             currentBodyHeight = 0f,
             alertTitle = null,
-            maxBodyHeight = 650f,
             progress = 1f
         ) { }
     }

@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.contraomnese.weather.core.ui.canvas.TemperatureRangeLine
 import com.contraomnese.weather.core.ui.icons.WeatherIcon
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme

@@ -1,4 +1,4 @@
-package com.contraomnese.weather.core.ui.widgets
+package com.contraomnese.weather.core.ui.canvas
 
 import android.graphics.BlurMaskFilter
 import android.graphics.Color

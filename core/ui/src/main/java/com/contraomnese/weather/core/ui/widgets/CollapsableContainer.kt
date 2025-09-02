@@ -3,8 +3,8 @@ package com.contraomnese.weather.core.ui.widgets
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,7 +21,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.contraomnese.weather.design.icons.WeatherIcons
 import com.contraomnese.weather.design.theme.cornerRadius16
 import com.contraomnese.weather.design.theme.padding16
@@ -32,23 +34,24 @@ import com.contraomnese.weather.design.theme.padding8
 fun CollapsableContainer(
     modifier: Modifier = Modifier,
     headerHeight: Dp,
-    currentBodyHeight: Float,
-    maxBodyHeight: Float,
+    currentBodyHeight: Float?,
     headerTitle: String = "Header",
     headerIcon: ImageVector = WeatherIcons.Default,
-    content: @Composable ColumnScope.() -> Unit,
+    onContentMeasured: (Int) -> Unit = {},
+    content: @Composable BoxScope.() -> Unit,
 ) {
     Column(
         modifier = modifier
-            .wrapContentHeight()
+            .wrapContentHeight(Alignment.Top)
             .fillMaxWidth()
             .clip(RoundedCornerShape(cornerRadius16))
-            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.1f))
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.1f)),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = padding16, vertical = padding4)
+                .padding(vertical = padding4, horizontal = padding16)
                 .height(headerHeight),
             contentAlignment = Alignment.CenterStart
         ) {
@@ -71,21 +74,58 @@ fun CollapsableContainer(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(bottom = padding4)
                 .clipToBounds()
                 .layout { measurable, constraints ->
                     val placeable = measurable.measure(constraints)
-                    layout(constraints.maxWidth, currentBodyHeight.toInt()) {
-                        val y = (maxBodyHeight - currentBodyHeight).toInt()
-                        placeable.place(0, -y)
+                    onContentMeasured(placeable.height)
+                    val visibleHeight = currentBodyHeight?.toInt() ?: placeable.height
+
+                    val offsetY = (placeable.height - visibleHeight).coerceAtLeast(0)
+                    layout(constraints.maxWidth, visibleHeight) {
+                        placeable.place(0, -offsetY)
                     }
                 },
-            contentAlignment = Alignment.TopCenter
+            contentAlignment = Alignment.TopCenter,
+            content = content
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CollapsableContainerPreview() {
+    MaterialTheme {
+        CollapsableContainer(
+            headerHeight = 46.dp,
+            currentBodyHeight = 350f,
+            headerTitle = "Daily Forecast",
+            headerIcon = WeatherIcons.Daily
         ) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(padding8),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                content = content
-            )
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                repeat(3) { index ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(40.dp)
+                            .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Row $index",
+                            modifier = Modifier.padding(start = 8.dp),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
         }
     }
 }
+
