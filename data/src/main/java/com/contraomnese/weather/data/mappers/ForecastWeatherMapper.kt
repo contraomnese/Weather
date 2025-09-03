@@ -3,6 +3,7 @@ package com.contraomnese.weather.data.mappers
 import com.contraomnese.weather.data.network.models.ForecastDayNetwork
 import com.contraomnese.weather.data.network.models.ForecastWeatherResponse
 import com.contraomnese.weather.data.network.models.HourNetwork
+import com.contraomnese.weather.data.parsers.DateTimeParser
 import com.contraomnese.weather.domain.weatherByLocation.model.AirQualityInfo
 import com.contraomnese.weather.domain.weatherByLocation.model.AlertsInfo
 import com.contraomnese.weather.domain.weatherByLocation.model.CurrentInfo
@@ -27,10 +28,19 @@ fun ForecastWeatherResponse.toDomain(): ForecastWeatherDomainModel {
     forecastHours.addAll(forecast.forecastDay.first().hour.filter { it.timeEpoch > location.localtimeEpoch })
     forecastHours.addAll(forecast.forecastDay.drop(1).first().hour.filter { it.timeEpoch <= nextDayHourLimit })
 
+    val locationTime = DateTimeParser.parseIso(location.localtime)
+    val isMidDay = locationTime?.let { locTime ->
+        val sunrise = DateTimeParser.parseAmPmTime(forecast.forecastDay.first().astro.sunrise)
+        val sunset = DateTimeParser.parseAmPmTime(forecast.forecastDay.first().astro.sunset)
+        if (sunrise != null && sunset != null) locTime.toMinutes() >= sunset.toMinutes() - sunrise.toMinutes()
+        else null
+    }
+
     return ForecastWeatherDomainModel(
         locationInfo = LocationInfo(
             locationTimeEpoch = location.localtimeEpoch,
-            locationTime = location.localtime
+            locationTime = DateTimeParser.parseIso(location.localtime),
+            isMidDay = isMidDay
         ),
         currentInfo = CurrentInfo(
             temperature = current.tempC.roundToInt().toString(),
@@ -105,8 +115,8 @@ fun ForecastDayNetwork.toForecastTodayDomain(): ForecastToday {
         totalUvIndex = day.uv.toString(),
         rainChance = day.dailyChanceOfRain.toString(),
         totalRainFull = day.totalPrecipMm.roundToInt().toString(),
-        sunrise = astro.sunrise,
-        sunset = astro.sunset
+        sunrise = DateTimeParser.parseAmPmTime(astro.sunrise),
+        sunset = DateTimeParser.parseAmPmTime(astro.sunset),
     )
 }
 

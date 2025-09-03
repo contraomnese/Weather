@@ -19,6 +19,9 @@
     <string name="aqi_bad_desc">Качество воздуха плохое. Людям с заболеваниями сердца или лёгких, детям и пожилым следует избегать продолжительных нагрузок на свежем воздухе.</string>
     <string name="aqi_very_bad_desc">Качество воздуха очень плохое. Негативное воздействие возможно для всех — избегайте физических нагрузок на улице и по возможности оставайтесь в помещении.</string>
 
+    <string name="sunset_title">Закат</string>
+    <string name="sunrise_time_title">Восход в %1$s</string>
+    <string name="sunset_time_title">Закат в %1$s</string>
     <string name="cardinal_point_n">С</string>
     <string name="cardinal_point_e">В</string>
     <string name="cardinal_point_w">З</string>
@@ -72,5 +75,6 @@
     <string name="condition_code_1276">Умеренный или сильный дождь с грозой</string>
     <string name="condition_code_1279">Возможен легкий снег с грозой</string>
     <string name="condition_code_1282">Умеренный или сильный снег с грозой</string>
+    <string name="sunrise_title">Восход</string>
 
 </resources>

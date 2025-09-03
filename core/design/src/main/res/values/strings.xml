@@ -21,6 +21,12 @@
     <string name="aqi_bad_desc">Air quality is poor. People with heart or lung conditions, children and older adults should avoid prolonged exertion outdoors.</string>
     <string name="aqi_very_bad_desc">Air quality is very poor. Everyone may experience effects — avoid outdoor exercise and stay indoors if possible.</string>
 
+    <string name="sunrise_title">Sunrise</string>
+    <string name="sunset_title">Sunset</string>
+
+    <string name="sunrise_time_title">Sunrise in %1$s</string>
+    <string name="sunset_time_title">Sunset in %1$s</string>
+
     <string name="cardinal_point_n">N</string>
     <string name="cardinal_point_e">E</string>
     <string name="cardinal_point_w">W</string>

@@ -1,5 +1,6 @@
 package com.contraomnese.weather.weatherByLocation.presentation
 
+import android.util.Log
 import androidx.compose.runtime.Immutable
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeatherDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.GeoLocationDomainModel
@@ -52,6 +53,7 @@ internal class WeatherViewModel(
 
     private fun updateCurrentWeather(newWeather: ForecastWeatherDomainModel) {
         updateViewState { copy(weather = newWeather, isLoading = false) }
+        Log.d("123", "$newWeather")
     }
 
 }

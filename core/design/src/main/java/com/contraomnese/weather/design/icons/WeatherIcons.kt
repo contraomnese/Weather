@@ -8,6 +8,7 @@ import androidx.compose.material.icons.outlined.DisabledByDefault
 import androidx.compose.material.icons.outlined.Equalizer
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.WbSunny
 
 
 object WeatherIcons {
@@ -18,4 +19,5 @@ object WeatherIcons {
     val Aqi = Icons.Outlined.Equalizer
     val Close = Icons.Outlined.Close
     val Map = Icons.Outlined.Map
+    val Sunrise = Icons.Outlined.WbSunny
 }

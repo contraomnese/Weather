@@ -26,20 +26,8 @@ import kotlin.math.abs
 import kotlin.math.min
 import kotlin.math.pow
 
-
-fun parseTimeToMinutes(timeStr: String): Int {
-    val parts = timeStr.split(" ", ":")
-    if (parts.size != 3) return 0
-    var hour = parts[0].toIntOrNull() ?: 0
-    val minute = parts[1].toIntOrNull() ?: 0
-    val ampm = parts[2].uppercase()
-    if (ampm == "PM" && hour < 12) hour += 12
-    if (ampm == "AM" && hour == 12) hour = 0
-    return hour * 60 + minute
-}
-
 @Composable
-fun SunriseSunsetBezierWidget(
+fun SunriseSunset(
     modifier: Modifier = Modifier,
     sunriseMinutes: Int,
     sunsetMinutes: Int,
@@ -67,10 +55,10 @@ fun SunriseSunsetBezierWidget(
 
         val centerX = w / 2f
         val horizonY = h * 0.5f
-        val arcWidth = w * 0.6f
-        val arcHeight = h * 0.5f
-        val strokeWidthArcPath = h * 0.03f
-        val thicknessHorizon = h * 0.008f
+        val arcWidth = w * 0.5f
+        val arcHeight = h * 0.7f
+        val strokeWidthArcPath = min(w, h) * 0.03f
+        val thicknessHorizon = min(w, h) * 0.008f
 
         val leftP0 = PointF(0f - arcWidth / 2, horizonY)
         val leftP1 = PointF(0f, horizonY + arcHeight)
@@ -228,30 +216,30 @@ fun SunriseSunsetBezierWidget(
 
 @Preview(showBackground = true, backgroundColor = 0xFF2E7187)
 @Composable
-fun SunriseSunsetBezierWidgetMoonPreview() {
+fun SunriseSunsetMoonPreview() {
     WeatherTheme {
-        SunriseSunsetBezierWidget(
+        SunriseSunset(
             modifier = Modifier
                 .height(200.dp)
                 .width(600.dp),
-            sunriseMinutes = parseTimeToMinutes("05:25 AM"),
-            sunsetMinutes = parseTimeToMinutes("07:36 PM"),
-            currentMinutes = parseTimeToMinutes("02:20 AM"),
+            sunriseMinutes = 240,
+            sunsetMinutes = 480,
+            currentMinutes = 300,
         )
     }
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF2E7187)
 @Composable
-fun SunriseSunsetBezierWidgetSunPreview() {
+fun SunriseSunsetSunPreview() {
     WeatherTheme {
-        SunriseSunsetBezierWidget(
+        SunriseSunset(
             modifier = Modifier
                 .height(200.dp)
                 .width(600.dp),
-            sunriseMinutes = parseTimeToMinutes("06:25 AM"),
-            sunsetMinutes = parseTimeToMinutes("05:36 PM"),
-            currentMinutes = parseTimeToMinutes("03:38 PM"),
+            sunriseMinutes = 240,
+            sunsetMinutes = 480,
+            currentMinutes = 180,
         )
     }
 }

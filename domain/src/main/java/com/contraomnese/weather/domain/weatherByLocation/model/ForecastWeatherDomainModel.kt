@@ -1,6 +1,10 @@
 package com.contraomnese.weather.domain.weatherByLocation.model
 
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.format
+import kotlinx.datetime.format.char
 
 data class ForecastWeatherDomainModel(
     val locationInfo: LocationInfo,
@@ -11,8 +15,45 @@ data class ForecastWeatherDomainModel(
 
 data class LocationInfo(
     val locationTimeEpoch: Long,
-    val locationTime: String,
+    val locationTime: LocationDateTime?,
+    val isMidDay: Boolean?,
 )
+
+data class LocationDateTime(
+    val dateTime: LocalDateTime,
+) {
+    private val localTimeFormatter = LocalDateTime.Format {
+        hour()
+        char(':')
+        minute()
+    }
+
+    fun toLocalTime(): String {
+        return dateTime.format(localTimeFormatter)
+    }
+
+    fun toMinutes(): Int {
+        return dateTime.hour * 60 + dateTime.minute
+    }
+}
+
+data class LocationTime(
+    val time: LocalTime,
+) {
+    private val localTimeFormatter = LocalTime.Format {
+        hour()
+        char(':')
+        minute()
+    }
+
+    fun toLocalTime(): String {
+        return time.format(localTimeFormatter)
+    }
+
+    fun toMinutes(): Int {
+        return time.hour * 60 + time.minute
+    }
+}
 
 data class CurrentInfo(
     val temperature: String,
@@ -43,8 +84,8 @@ data class ForecastToday(
     val totalUvIndex: String,
     val rainChance: String,
     val totalRainFull: String,
-    val sunrise: String,
-    val sunset: String,
+    val sunrise: LocationTime?,
+    val sunset: LocationTime?,
 )
 
 data class ForecastHour(
