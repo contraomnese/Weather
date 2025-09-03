@@ -34,17 +34,17 @@ import kotlin.math.sqrt
 import androidx.compose.ui.graphics.Color as ComposeColor
 
 @Composable
-fun WindItem(
+fun Wind(
     modifier: Modifier = Modifier,
-    windDegree: Int,
-    windSpeed: Int,
+    degree: Int,
+    direction: String,
 ) {
     val density = LocalDensity.current
-    var width by remember(key1 = windDegree, key2 = windSpeed) { mutableIntStateOf(0) }
+    var width by remember(key1 = degree, key2 = direction) { mutableIntStateOf(0) }
     val textMeasurer = rememberTextMeasurer()
 
     val windSpeedTextLayout = textMeasurer.measure(
-        text = AnnotatedString(stringResource(R.string.wind_speed_title, windSpeed)),
+        text = AnnotatedString(direction),
         style = MaterialTheme.typography.headlineMedium.copy(
             color = ComposeColor.White,
             fontSize = with(density) { (width / 8).toSp() },
@@ -191,8 +191,8 @@ fun WindItem(
 
             val radiusArrowEnd = (radius - shortLineRadius) / 2
 
-            val endArrowWindRad = (windDegree - 90) * Math.PI / 180
-            val startArrowWindRad = (180 + (windDegree - 90)) * Math.PI / 180
+            val endArrowWindRad = (degree - 90 - 180) * Math.PI / 180
+            val startArrowWindRad = (180 + (degree - 90 - 180)) * Math.PI / 180
 
             val arrowCircleCenter = PointF(
                 (center.x + (shortLineRadius + radiusArrowEnd) * cos(startArrowWindRad)).toFloat(),
@@ -273,10 +273,10 @@ fun WindItem(
 @Composable
 private fun WindItemPreview() {
     WeatherTheme {
-        WindItem(
+        Wind(
             modifier = Modifier.size(400.dp),
-            windDegree = 54,
-            windSpeed = 7
+            degree = 54,
+            direction = "NW"
         )
     }
 }
@@ -285,10 +285,10 @@ private fun WindItemPreview() {
 @Composable
 private fun WindItemPreview2() {
     WeatherTheme {
-        WindItem(
+        Wind(
             modifier = Modifier.size(200.dp),
-            windDegree = 57,
-            windSpeed = 5
+            degree = 57,
+            direction = "NW"
         )
     }
 }

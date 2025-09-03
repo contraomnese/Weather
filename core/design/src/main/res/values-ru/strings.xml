@@ -9,6 +9,9 @@
     <string name="daily_forecast_title">ПРОГНОЗ НА 3 ДНЯ</string>
 
     <string name="aqi_title">КАЧЕСТВО ВОЗДУХА</string>
+    <string name="uv_title">УФ-ИНДЕКС</string>
+    <string name="humidity_title">ВЛАЖНОСТЬ</string>
+    <string name="wind_title">ВЕТЕР</string>
     <string name="aqi_good">%1$d - Низкий</string>
     <string name="aqi_moderate">%1$d - Умеренный</string>
     <string name="aqi_bad">%1$d - Высокий</string>
@@ -76,5 +79,20 @@
     <string name="condition_code_1279">Возможен легкий снег с грозой</string>
     <string name="condition_code_1282">Умеренный или сильный снег с грозой</string>
     <string name="sunrise_title">Восход</string>
+
+    <string name="meter_on_second_title">м/с</string>
+    <string name="gust_of_wind_body">Порывы ветра</string>
+    <string name="low_title">Низкий</string>
+    <string name="moderate_title">Умеренный</string>
+    <string name="high_title">Высокий</string>
+    <string name="very_high_title">Очень высокий</string>
+    <string name="extreme_title">Максимальный</string>
+
+    <string name="uv_index_low_desc">Солнечные лучи безопасны для вашего здоровья. Защита не нужна.</string>
+    <string name="uv_index_moderate_desc">Солнечные лучи могут привести к незначительному повреждению кожи. Надевайте солнцезащитные очки и используйте светлый солнцезащитный крем.</string>
+    <string name="uv_index_high_desc">Солнечные лучи вредны. Носите шляпу и избегайте длительного воздействия.</string>
+    <string name="uv_index_very_high_desc">Незащищенная кожа может быстро обгореть. Ищите тень и носите защитную одежду.</string>
+    <string name="uv_index_extreme_desc">Солнечные лучи чрезвычайно опасны. Избегайте прямого солнечного света; требуется полная защита.</string>
+    <string name="wind_body">Ветер</string>
 
 </resources>

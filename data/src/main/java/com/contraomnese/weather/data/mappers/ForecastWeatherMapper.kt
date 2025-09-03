@@ -14,6 +14,7 @@ import com.contraomnese.weather.domain.weatherByLocation.model.ForecastToday
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeatherDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.LocationInfo
 import com.contraomnese.weather.domain.weatherByLocation.model.PollutantLevel
+import com.contraomnese.weather.domain.weatherByLocation.model.UvIndex
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -48,12 +49,13 @@ fun ForecastWeatherResponse.toDomain(): ForecastWeatherDomainModel {
             isDay = current.isDay == 1,
             conditionCode = current.condition.code,
             conditionText = current.condition.text,
-            windSpeed = current.windKph.roundToInt().toString(),
+            windSpeed = current.windKph.toMs().roundToInt().toString(),
+            gustSpeed = current.gustKph.toMs().roundToInt().toString(),
             windDirection = current.windDir,
             windDegree = current.windDegree,
             pressure = current.pressureMb.toString(),
             humidity = current.humidity.toString(),
-            uvIndex = current.uv.toString(),
+            uvIndex = UvIndex(current.uv.roundToInt()),
             airQualityIndex = AirQualityInfo(
                 aqiIndex = current.airQuality.gbDefraIndex,
                 aqiText = when (current.airQuality.gbDefraIndex) {
@@ -143,5 +145,9 @@ fun getDayOfWeek(epochSeconds: Long, timeZone: TimeZone = TimeZone.currentSystem
     val instant = Instant.fromEpochSeconds(epochSeconds)
     val localDate = instant.toLocalDateTime(timeZone).date
     return localDate.dayOfWeek.name.slice(0..2)
+}
+
+fun Double.toMs(): Double {
+    return this * 1000.0 / 3600.0
 }
 

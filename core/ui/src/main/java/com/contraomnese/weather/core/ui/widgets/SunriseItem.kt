@@ -15,10 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.contraomnese.weather.core.ui.canvas.SunriseSunset
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
+import com.contraomnese.weather.design.theme.itemHeight160
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.domain.weatherByLocation.model.LocationDateTime
@@ -38,7 +38,7 @@ fun SunriseItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(160.dp),
+            .height(itemHeight160),
         horizontalArrangement = Arrangement.spacedBy(padding16),
         verticalAlignment = Alignment.CenterVertically
     ) {

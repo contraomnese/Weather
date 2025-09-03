@@ -61,14 +61,18 @@ data class CurrentInfo(
     val isDay: Boolean,
     val conditionCode: Int,
     val conditionText: String,
+    val airQualityIndex: AirQualityInfo,
+    val uvIndex: UvIndex,
     val windSpeed: String,
+    val gustSpeed: String,
     val windDirection: String,
     val windDegree: Int,
-    val pressure: String,
     val humidity: String,
-    val uvIndex: String,
-    val airQualityIndex: AirQualityInfo,
+    val pressure: String,
 )
+
+@JvmInline
+value class UvIndex(val value: Int)
 
 data class ForecastInfo(
     val today: ForecastToday,

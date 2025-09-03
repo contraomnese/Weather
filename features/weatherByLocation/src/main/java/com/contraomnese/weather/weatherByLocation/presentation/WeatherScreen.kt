@@ -42,8 +42,8 @@ import com.contraomnese.weather.core.ui.widgets.ForecastHourlyLazyRow
 import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
 import com.contraomnese.weather.core.ui.widgets.SunriseItem
 import com.contraomnese.weather.core.ui.widgets.TitleSection
-import com.contraomnese.weather.design.R
-import com.contraomnese.weather.design.icons.WeatherIcons
+import com.contraomnese.weather.core.ui.widgets.UvIndexItem
+import com.contraomnese.weather.core.ui.widgets.WindItem
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight240
 import com.contraomnese.weather.design.theme.itemHeight64
@@ -63,6 +63,8 @@ import com.contraomnese.weather.weatherByLocation.presentation.data.SunriseSecti
 import com.contraomnese.weather.weatherByLocation.presentation.data.UVIndexSection
 import com.contraomnese.weather.weatherByLocation.presentation.data.WeatherSection
 import com.contraomnese.weather.weatherByLocation.presentation.data.WindSection
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
 import kotlin.math.abs
 
 @Composable
@@ -82,7 +84,7 @@ internal fun WeatherRoute(
             )
 
             else -> WeatherScreen(
-                uiState = uiState, modifier = modifier
+                uiState = uiState
             )
         }
     }
@@ -91,7 +93,6 @@ internal fun WeatherRoute(
 @Composable
 internal fun WeatherScreen(
     uiState: WeatherUiState,
-    modifier: Modifier = Modifier,
 ) {
 
     requireNotNull(uiState.weather)
@@ -117,14 +118,14 @@ internal fun WeatherScreen(
 
     var sections by remember {
         mutableStateOf(
-            listOf(
+            persistentListOf(
                 HourlyForecastSection(),
                 DailyForecastSection(),
                 AqiSection(),
                 SunriseSection(),
                 UVIndexSection(),
+                WindSection(),
                 HumiditySection(),
-                WindSection()
             )
         )
     }
@@ -189,7 +190,7 @@ internal fun WeatherScreen(
                                     if (idx == targetIdx) {
                                         sec.copyWithBodyHeight(newHeight)
                                     } else sec
-                                }
+                                }.toPersistentList()
                                 val consumedScrollYByBody = newHeight - bodyHeight
                                 consumedResult += consumedScrollYByBody
                                 availableScrollResult -= consumedScrollYByBody
@@ -232,7 +233,7 @@ internal fun WeatherScreen(
                     if (idx == currentVisibleSectionIndex) {
                         type.copyWithBodyHeight(newBodyHeight)
                     } else type
-                }
+                }.toPersistentList()
                 val consumedScrollYByBody = newBodyHeight - currentBodyHeight
                 consumedResult += consumedScrollYByBody
                 availableScrollResult -= consumedScrollYByBody
@@ -300,19 +301,13 @@ internal fun WeatherScreen(
                 val measureContainerHeight: (Int) -> Unit = {
                     if (section.bodyHeight == null) {
                         sections =
-                            sections.map { sec -> if (section == sec) sec.copyWithBodyHeight(it.toFloat()) else sec }
+                            sections.map { sec -> if (section == sec) sec.copyWithBodyHeight(it.toFloat()) else sec }.toPersistentList()
                     }
                 }
 
                 when (section) {
                     is HourlyForecastSection,
-                        -> HourlyForecastSection(
-                        headerSectionHeight,
-                        section,
-                        uiState.weather,
-                        progress,
-                        measureContainerHeight
-                    )
+                        -> HourlyForecastSection(headerSectionHeight, section, uiState.weather, progress, measureContainerHeight)
 
                     is DailyForecastSection,
                         -> DailyForecastSection(headerSectionHeight, section, measureContainerHeight, uiState.weather)
@@ -323,7 +318,14 @@ internal fun WeatherScreen(
                     is SunriseSection,
                         -> SunriseSection(headerSectionHeight, section, measureContainerHeight, uiState.weather)
 
-                    is UVIndexSection, is HumiditySection, is WindSection,
+                    is UVIndexSection,
+                        -> UvIndexSection(headerSectionHeight, section, measureContainerHeight, uiState.weather)
+
+                    is WindSection,
+                        -> WindSection(headerSectionHeight, section, measureContainerHeight, uiState.weather)
+
+
+                    is HumiditySection,
                         -> StubSection(headerSectionHeight, section, measureContainerHeight)
                 }
             }
@@ -360,7 +362,7 @@ private fun StubSection(
 @Composable
 private fun HourlyForecastSection(
     headerSectionHeight: Dp,
-    section: WeatherSection,
+    section: HourlyForecastSection,
     weather: ForecastWeatherDomainModel,
     progress: Float,
     measureContainerHeight: (Int) -> Unit,
@@ -368,8 +370,8 @@ private fun HourlyForecastSection(
     CollapsableContainerWithAnimatedHeader(
         minHeaderHeight = headerSectionHeight,
         currentBodyHeight = section.bodyHeight,
-        headerTitle = stringResource(R.string.today_forecast_title),
-        headerIcon = WeatherIcons.Today,
+        headerTitle = stringResource(section.title),
+        headerIcon = section.icon,
         alertTitle = weather.alertsInfo.alerts.firstOrNull(),
         progress = progress,
         onContentMeasured = measureContainerHeight
@@ -384,14 +386,14 @@ private fun HourlyForecastSection(
 @Composable
 private fun DailyForecastSection(
     headerSectionHeight: Dp,
-    section: WeatherSection,
+    section: DailyForecastSection,
     measureContainerHeight: (Int) -> Unit,
     weather: ForecastWeatherDomainModel,
 ) {
     CollapsableContainer(
         headerHeight = headerSectionHeight,
-        headerTitle = stringResource(R.string.daily_forecast_title),
-        headerIcon = WeatherIcons.Daily,
+        headerTitle = stringResource(section.title),
+        headerIcon = section.icon,
         currentBodyHeight = section.bodyHeight,
         onContentMeasured = measureContainerHeight
     ) {
@@ -412,8 +414,8 @@ private fun AqiSection(
 ) {
     CollapsableContainer(
         headerHeight = headerSectionHeight,
-        headerTitle = stringResource(R.string.aqi_title),
-        headerIcon = WeatherIcons.Aqi,
+        headerTitle = stringResource(section.title),
+        headerIcon = section.icon,
         currentBodyHeight = section.bodyHeight,
         onContentMeasured = measureContainerHeight
     ) {
@@ -433,7 +435,7 @@ private fun AqiSection(
 @Composable
 private fun SunriseSection(
     headerSectionHeight: Dp,
-    section: WeatherSection,
+    section: SunriseSection,
     measureContainerHeight: (Int) -> Unit,
     weather: ForecastWeatherDomainModel,
 ) {
@@ -448,8 +450,8 @@ private fun SunriseSection(
     if (sunrise != null && sunset != null && currentTime != null && isMidDay != null) {
         CollapsableContainer(
             headerHeight = headerSectionHeight,
-            headerTitle = if (isMidDay) stringResource(R.string.sunset_title) else stringResource(R.string.sunrise_title),
-            headerIcon = WeatherIcons.Sunrise,
+            headerTitle = stringResource(section.title),
+            headerIcon = section.icon,
             currentBodyHeight = section.bodyHeight,
             onContentMeasured = measureContainerHeight
         ) {
@@ -461,6 +463,55 @@ private fun SunriseSection(
                 isMidDay = isMidDay
             )
         }
+    }
+}
+
+@Composable
+private fun UvIndexSection(
+    headerSectionHeight: Dp,
+    section: UVIndexSection,
+    measureContainerHeight: (Int) -> Unit,
+    weather: ForecastWeatherDomainModel,
+) {
+    val today = weather.currentInfo
+
+    CollapsableContainer(
+        headerHeight = headerSectionHeight,
+        headerTitle = stringResource(section.title),
+        headerIcon = section.icon,
+        currentBodyHeight = section.bodyHeight,
+        onContentMeasured = measureContainerHeight
+    ) {
+        UvIndexItem(
+            modifier = Modifier.padding(horizontal = padding16),
+            index = today.uvIndex.value
+        )
+    }
+}
+
+@Composable
+private fun WindSection(
+    headerSectionHeight: Dp,
+    section: WindSection,
+    measureContainerHeight: (Int) -> Unit,
+    weather: ForecastWeatherDomainModel,
+) {
+    val today = weather.currentInfo
+
+    CollapsableContainer(
+        headerHeight = headerSectionHeight,
+        headerTitle = stringResource(section.title),
+        headerIcon = section.icon,
+        currentBodyHeight = section.bodyHeight,
+        onContentMeasured = measureContainerHeight
+    ) {
+        WindItem(
+            modifier = Modifier.padding(horizontal = padding16),
+            windSpeed = today.windSpeed,
+            gustSpeed = today.gustSpeed,
+            degree = today.windDegree,
+            direction = today.windDirection
+        )
     }
 }
 
