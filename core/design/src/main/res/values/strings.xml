@@ -58,54 +58,10 @@
     <string name="uv_index_very_high_desc">Unprotected skin can burn quickly. Seek shade, and wear protective clothing.</string>
     <string name="uv_index_extreme_desc">Sun rays are extremely dangerous. Avoid direct sunlight; full protection required.</string>
 
-    <string name="condition_code_1000">Sunny</string>
-    <string name="condition_code_1003">Partly cloudy</string>
-    <string name="condition_code_1006">Cloudy</string>
-    <string name="condition_code_1009">Overcast</string>
-    <string name="condition_code_1030">Mist</string>
-    <string name="condition_code_1063">Patchy rain possible</string>
-    <string name="condition_code_1066">Patchy snow possible</string>
-    <string name="condition_code_1069">Patchy sleet possible</string>
-    <string name="condition_code_1072">Patchy freezing drizzle possible</string>
-    <string name="condition_code_1087">Thundery outbreaks possible</string>
-    <string name="condition_code_1114">Blowing snow</string>
-    <string name="condition_code_1117">Blizzard</string>
-    <string name="condition_code_1135">Fog</string>
-    <string name="condition_code_1147">Freezing fog</string>
-    <string name="condition_code_1150">Patchy light drizzle</string>
-    <string name="condition_code_1153">Light drizzle</string>
-    <string name="condition_code_1168">Freezing drizzle</string>
-    <string name="condition_code_1171">Heavy freezing drizzle</string>
-    <string name="condition_code_1180">Patchy light rain</string>
-    <string name="condition_code_1183">Light rain</string>
-    <string name="condition_code_1186">Moderate rain at times</string>
-    <string name="condition_code_1189">Moderate rain</string>
-    <string name="condition_code_1192">Heavy rain at times</string>
-    <string name="condition_code_1195">Heavy rain</string>
-    <string name="condition_code_1198">Light freezing rain</string>
-    <string name="condition_code_1201">Moderate or heavy freezing rain</string>
-    <string name="condition_code_1204">Light sleet</string>
-    <string name="condition_code_1207">Moderate or heavy sleet</string>
-    <string name="condition_code_1210">Patchy light snow</string>
-    <string name="condition_code_1213">Light snow</string>
-    <string name="condition_code_1216">Patchy moderate snow</string>
-    <string name="condition_code_1219">Moderate snow</string>
-    <string name="condition_code_1222">Patchy heavy snow</string>
-    <string name="condition_code_1225">Heavy snow</string>
-    <string name="condition_code_1237">Ice pellets</string>
-    <string name="condition_code_1240">Light rain shower</string>
-    <string name="condition_code_1243">Moderate or heavy rain shower</string>
-    <string name="condition_code_1246">Torrential rain shower</string>
-    <string name="condition_code_1249">Light sleet showers</string>
-    <string name="condition_code_1252">Moderate or heavy sleet showers</string>
-    <string name="condition_code_1255">Light snow showers</string>
-    <string name="condition_code_1258">Moderate or heavy snow showers</string>
-    <string name="condition_code_1261">Light showers of ice pellets</string>
-    <string name="condition_code_1264">Moderate or heavy showers of ice pellets</string>
-    <string name="condition_code_1273">Patchy light rain with thunder</string>
-    <string name="condition_code_1276">Moderate or heavy rain with thunder</string>
-    <string name="condition_code_1279">Patchy light snow with thunder</string>
-    <string name="condition_code_1282">Moderate or heavy snow with thunder</string>
+    <!--  Pressure section -->
+    <string name="pressure_mm_units">mm Hg</string>
+    <string name="pressure_mbar_units">mbar</string>
+    <string name="pressure_in_units">inches Hg</string>
 
     <string name="empty" translatable="false"></string>
 </resources>

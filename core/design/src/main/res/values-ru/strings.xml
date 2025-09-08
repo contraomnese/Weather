@@ -30,54 +30,7 @@
     <string name="cardinal_point_w">З</string>
     <string name="cardinal_point_s">Ю</string>
 
-    <string name="condition_code_1000">Солнечно</string>
-    <string name="condition_code_1003">Переменная облачность</string>
-    <string name="condition_code_1006">Облачно</string>
-    <string name="condition_code_1009">Пасмурно</string>
-    <string name="condition_code_1030">Дымка</string>
-    <string name="condition_code_1063">Возможен кратковременный дождь</string>
-    <string name="condition_code_1066">Возможен кратковременный снег</string>
-    <string name="condition_code_1069">Возможен кратковременный мокрый снег</string>
-    <string name="condition_code_1072">Возможна кратковременная изморось</string>
-    <string name="condition_code_1087">Возможны грозы</string>
-    <string name="condition_code_1114">Поземок</string>
-    <string name="condition_code_1117">Метель</string>
-    <string name="condition_code_1135">Туман</string>
-    <string name="condition_code_1147">Ледяной туман</string>
-    <string name="condition_code_1150">Возможна легкая морось</string>
-    <string name="condition_code_1153">Легкая морось</string>
-    <string name="condition_code_1168">Ледяная морось</string>
-    <string name="condition_code_1171">Сильная ледяная морось</string>
-    <string name="condition_code_1180">Возможен легкий дождь</string>
-    <string name="condition_code_1183">Легкий дождь</string>
-    <string name="condition_code_1186">Временами умеренный дождь</string>
-    <string name="condition_code_1189">Умеренный дождь</string>
-    <string name="condition_code_1192">Временами сильный дождь</string>
-    <string name="condition_code_1195">Сильный дождь</string>
-    <string name="condition_code_1198">Легкий ледяной дождь</string>
-    <string name="condition_code_1201">Умеренный или сильный ледяной дождь</string>
-    <string name="condition_code_1204">Легкий мокрый снег</string>
-    <string name="condition_code_1207">Умеренный или сильный мокрый снег</string>
-    <string name="condition_code_1210">Возможен легкий снег</string>
-    <string name="condition_code_1213">Легкий снег</string>
-    <string name="condition_code_1216">Возможен умеренный снег</string>
-    <string name="condition_code_1219">Умеренный снег</string>
-    <string name="condition_code_1222">Возможен сильный снег</string>
-    <string name="condition_code_1225">Сильный снег</string>
-    <string name="condition_code_1237">Ледяная крупа</string>
-    <string name="condition_code_1240">Легкий дождь с перерывами</string>
-    <string name="condition_code_1243">Умеренный или сильный дождь с перерывами</string>
-    <string name="condition_code_1246">Ливень</string>
-    <string name="condition_code_1249">Легкий мокрый снег с перерывами</string>
-    <string name="condition_code_1252">Умеренный или сильный мокрый снег с перерывами</string>
-    <string name="condition_code_1255">Легкий снегопад с перерывами</string>
-    <string name="condition_code_1258">Умеренный или сильный снегопад с перерывами</string>
-    <string name="condition_code_1261">Легкие осадки из ледяной крупы</string>
-    <string name="condition_code_1264">Умеренные или сильные осадки из ледяной крупы</string>
-    <string name="condition_code_1273">Возможен легкий дождь с грозой</string>
-    <string name="condition_code_1276">Умеренный или сильный дождь с грозой</string>
-    <string name="condition_code_1279">Возможен легкий снег с грозой</string>
-    <string name="condition_code_1282">Умеренный или сильный снег с грозой</string>
+    <string name="pressure_in_units">дюйм рт.ст.</string>
     <string name="sunrise_title">Восход</string>
 
     <string name="meter_on_second_title">м/с</string>
@@ -94,5 +47,7 @@
     <string name="uv_index_very_high_desc">Незащищенная кожа может быстро обгореть. Ищите тень и носите защитную одежду.</string>
     <string name="uv_index_extreme_desc">Солнечные лучи чрезвычайно опасны. Избегайте прямого солнечного света; требуется полная защита.</string>
     <string name="wind_body">Ветер</string>
+    <string name="pressure_mm_units">мм рт. ст.</string>
+    <string name="pressure_mbar_units">миллибар</string>
 
 </resources>

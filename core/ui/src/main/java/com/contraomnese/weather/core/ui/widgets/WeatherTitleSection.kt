@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -20,7 +19,6 @@ import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.contraomnese.weather.core.ui.utils.toConditionWeatherRes
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.padding8
@@ -32,11 +30,10 @@ fun TitleSection(
     currentTemp: String,
     maxTemp: String,
     minTemp: String,
-    conditionCode: Int,
+    condition: String,
 ) {
 
     val density = LocalDensity.current
-    val conditionRes = remember(conditionCode) { conditionCode.toConditionWeatherRes() }
 
     BoxWithConstraints(
         modifier = Modifier
@@ -61,7 +58,7 @@ fun TitleSection(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = stringResource(conditionRes),
+                    text = condition,
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center
@@ -93,7 +90,7 @@ fun TitleSection(
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                     Text(
-                        text = stringResource(conditionRes),
+                        text = condition,
                         style = MaterialTheme.typography.headlineMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -113,7 +110,7 @@ fun TitleSectionPreview() {
             currentTemp = "23",
             maxTemp = "26",
             minTemp = "20",
-            conditionCode = 1009
+            condition = "Clear"
         )
     }
 }

@@ -1,6 +1,5 @@
 package com.contraomnese.weather.weatherByLocation.presentation
 
-import android.util.Log
 import androidx.compose.runtime.Immutable
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeatherDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.GeoLocationDomainModel
@@ -16,13 +15,14 @@ internal data class WeatherUiState(
     override val isLoading: Boolean = false,
     val location: GeoLocationDomainModel,
     val weather: ForecastWeatherDomainModel? = null,
+    val lang: String = "en",
 ) : UiState {
     override fun loading(): UiState = copy(isLoading = true)
 }
 
 @Immutable
 internal sealed interface WeatherEvent {
-    data class LocationChanged(val newLocation: String) : WeatherEvent
+    data class LocaleChanged(val newLocale: String) : WeatherEvent
 }
 
 internal class WeatherViewModel(
@@ -42,7 +42,7 @@ internal class WeatherViewModel(
 
     override fun onEvent(event: WeatherEvent) {
         when (event) {
-            is WeatherEvent.LocationChanged -> Unit
+            is WeatherEvent.LocaleChanged -> updateViewState { copy(lang = event.newLocale) }
         }
     }
 
@@ -53,7 +53,6 @@ internal class WeatherViewModel(
 
     private fun updateCurrentWeather(newWeather: ForecastWeatherDomainModel) {
         updateViewState { copy(weather = newWeather, isLoading = false) }
-        Log.d("123", "$newWeather")
     }
 
 }

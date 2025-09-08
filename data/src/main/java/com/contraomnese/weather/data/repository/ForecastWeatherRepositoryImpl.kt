@@ -15,7 +15,7 @@ class ForecastWeatherRepositoryImpl(
 ) : ForecastWeatherRepository {
 
     override suspend fun getBy(point: String): ForecastWeatherDomainModel {
-        val response = api.getForecastWeather(query = point)
+        val response = api.getForecastWeather(query = point, lang = "ru")
         return response.parseOrThrowError(errorConverter).toDomain()
     }
 }
