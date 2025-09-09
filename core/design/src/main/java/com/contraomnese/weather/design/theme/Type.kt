@@ -31,7 +31,7 @@ import com.contraomnese.weather.design.DevicePreviews
 import com.contraomnese.weather.design.R
 
 
-fun interface Buildable {
+private fun interface Buildable {
     fun build(@FontRes font: Int): TextStyle
 }
 
@@ -60,7 +60,7 @@ private fun createTextStyle(
     )
 }
 
-object DisplayLargeConfig : Buildable {
+private object DisplayLargeConfig : Buildable {
     private const val WEIGHT = 100
     private const val OPTICAL_SIZING = 102
     private const val LETTER_SPACING = -0.51f
@@ -72,7 +72,7 @@ object DisplayLargeConfig : Buildable {
     )
 }
 
-object DisplayMediumConfig : Buildable {
+private object DisplayMediumConfig : Buildable {
     private const val WEIGHT = 300
     private const val OPTICAL_SIZING = 53
     private const val LETTER_SPACING = 5.565f
@@ -84,7 +84,7 @@ object DisplayMediumConfig : Buildable {
     )
 }
 
-object DisplaySmallConfig : Buildable {
+private object DisplaySmallConfig : Buildable {
     private const val WEIGHT = 400
     private const val OPTICAL_SIZING = 36
     private const val LETTER_SPACING = .0f
@@ -96,7 +96,7 @@ object DisplaySmallConfig : Buildable {
     )
 }
 
-object HeadlineLargeConfig : Buildable {
+private object HeadlineLargeConfig : Buildable {
     private const val WEIGHT = 400
     private const val OPTICAL_SIZING = 37
     private const val LETTER_SPACING = -0.185f
@@ -108,7 +108,7 @@ object HeadlineLargeConfig : Buildable {
     )
 }
 
-object HeadlineMediumConfig : Buildable {
+private object HeadlineMediumConfig : Buildable {
     private const val WEIGHT = 500
     private const val OPTICAL_SIZING = 22
 
@@ -118,7 +118,7 @@ object HeadlineMediumConfig : Buildable {
     )
 }
 
-object TitleLargeConfig : Buildable {
+private object TitleLargeConfig : Buildable {
     private const val WEIGHT = 700
     private const val OPTICAL_SIZING = 25
     private const val LETTER_SPACING = -0.0625f
@@ -130,7 +130,7 @@ object TitleLargeConfig : Buildable {
     )
 }
 
-object TitleMediumConfig : Buildable {
+private object TitleMediumConfig : Buildable {
     private const val WEIGHT = 500
     private const val OPTICAL_SIZING = 15
 
@@ -140,7 +140,7 @@ object TitleMediumConfig : Buildable {
     )
 }
 
-object BodyLargeConfig : Buildable {
+private object BodyLargeConfig : Buildable {
     private const val WEIGHT = 500
     private const val OPTICAL_SIZING = 22
 
@@ -150,7 +150,7 @@ object BodyLargeConfig : Buildable {
     )
 }
 
-object BodyMediumConfig : Buildable {
+private object BodyMediumConfig : Buildable {
     private const val WEIGHT = 400
     private const val OPTICAL_SIZING = 18
     private const val LETTER_SPACING = 0.72f
@@ -164,7 +164,7 @@ object BodyMediumConfig : Buildable {
     )
 }
 
-object BodySmallConfig : Buildable {
+private object BodySmallConfig : Buildable {
     private const val WEIGHT = 400
     private const val OPTICAL_SIZING = 17
     private const val LETTER_SPACING = 0.51f
@@ -176,7 +176,7 @@ object BodySmallConfig : Buildable {
     )
 }
 
-object LabelMediumConfig : Buildable {
+private object LabelMediumConfig : Buildable {
     private const val WEIGHT = 400
     private const val OPTICAL_SIZING = 19
 
@@ -186,7 +186,7 @@ object LabelMediumConfig : Buildable {
     )
 }
 
-object LabelSmallConfig : Buildable {
+private object LabelSmallConfig : Buildable {
     private const val WEIGHT = 400
     private const val OPTICAL_SIZING = 15
     private const val LETTER_SPACING = 0.75f
@@ -206,18 +206,18 @@ val weatherTypography = Typography(
     displaySmall = DisplaySmallConfig.build(R.font.inter_variable),
     headlineLarge = HeadlineLargeConfig.build(R.font.inter_variable),
     headlineMedium = HeadlineMediumConfig.build(R.font.inter_variable),
-    titleLarge = TitleLargeConfig.build(R.font.inter_variable), //
+    titleLarge = TitleLargeConfig.build(R.font.inter_variable),
     titleMedium = TitleMediumConfig.build(R.font.inter_variable),
-    bodyLarge = BodyLargeConfig.build(R.font.inter_variable), //
-    bodyMedium = BodyMediumConfig.build(R.font.inter_variable), //
-    bodySmall = BodySmallConfig.build(R.font.inter_variable), //
-    labelMedium = LabelMediumConfig.build(R.font.inter_variable), //
-    labelSmall = LabelSmallConfig.build(R.font.inter_variable) //
+    bodyLarge = BodyLargeConfig.build(R.font.inter_variable),
+    bodyMedium = BodyMediumConfig.build(R.font.inter_variable),
+    bodySmall = BodySmallConfig.build(R.font.inter_variable),
+    labelMedium = LabelMediumConfig.build(R.font.inter_variable),
+    labelSmall = LabelSmallConfig.build(R.font.inter_variable)
 )
 
 @DevicePreviews
 @Composable
-fun TypographyPreview(modifier: Modifier = Modifier) {
+private fun TypographyPreview() {
     WeatherTheme {
         Column(
             modifier = Modifier
