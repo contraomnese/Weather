@@ -48,24 +48,24 @@ fun Pressure(
         text = AnnotatedString(pressure.toString()),
         style = MaterialTheme.typography.headlineMedium.copy(
             color = Color.White,
-            fontSize = with(density) { (width / 8).toSp() },
+            fontSize = with(density) { (width / 5).toSp() },
             lineBreak = LineBreak.Heading,
             textAlign = TextAlign.Center
         ),
         maxLines = 1,
-        constraints = Constraints(maxWidth = width / 3)
+        constraints = Constraints(maxWidth = width / 2)
     )
 
     val pressureUnitsTextLayout = textMeasurer.measure(
-        text = AnnotatedString(stringResource(R.string.pressure_mm_units)),
+        text = AnnotatedString(stringResource(R.string.units_mm_hg)),
         style = MaterialTheme.typography.headlineMedium.copy(
             color = Color.White,
-            fontSize = with(density) { (width / 14).toSp() },
+            fontSize = with(density) { (width / 10).toSp() },
             lineBreak = LineBreak.Heading,
             textAlign = TextAlign.Center
         ),
         maxLines = 1,
-        constraints = Constraints(maxWidth = width / 3)
+        constraints = Constraints(maxWidth = width / 2)
     )
 
     Canvas(modifier = modifier.onSizeChanged {
@@ -74,11 +74,11 @@ fun Pressure(
         val w = size.width
         val h = size.height
         val center = Offset(x = w / 2f, y = h / 2f)
-        val radius = minOf(w, h) / 3f
+        val radius = minOf(w, h) / 2.1f
         val shortLineRadius = radius * 0.85f
         val endArrowSize = w / 20
-        val strokeLinePath = w / 250
-        val strokeArrowPath = w / 100
+        val strokeLinePath = w / 150
+        val strokeArrowPath = w / 50
 
         drawText(
             pressureTextLayout,
@@ -161,69 +161,60 @@ fun Pressure(
                 isAntiAlias = true
             }
 
-            val endArrowPath = Path().apply {
-                val startArrowPoint = PointF(
-                    center.x,
-                    if (degree < 0) center.y - radius * 0.45f else center.y - radius * 0.75f
-                )
-                val endArrowPoint = PointF(
-                    center.x,
-                    if (degree < 0) center.y - radius * 0.75f else center.y - radius * 0.45f
-                )
+            if (degree != 0) {
+                val endArrowPath = Path().apply {
+                    val startArrowPoint = PointF(
+                        center.x,
+                        if (degree < 0) center.y - radius * 0.45f else center.y - radius * 0.75f
+                    )
+                    val endArrowPoint = PointF(
+                        center.x,
+                        if (degree < 0) center.y - radius * 0.75f else center.y - radius * 0.45f
+                    )
 
-                moveTo(startArrowPoint.x, startArrowPoint.y)
-                lineTo(endArrowPoint.x, endArrowPoint.y)
+                    moveTo(startArrowPoint.x, startArrowPoint.y)
+                    lineTo(endArrowPoint.x, endArrowPoint.y)
 
-                val dx = startArrowPoint.x - endArrowPoint.x
-                val dy = startArrowPoint.y - endArrowPoint.y
-                val len = sqrt(dx * dx + dy * dy)
+                    val dx = startArrowPoint.x - endArrowPoint.x
+                    val dy = startArrowPoint.y - endArrowPoint.y
+                    val len = sqrt(dx * dx + dy * dy)
 
-                val ux = dx / len
-                val uy = dy / len
+                    val ux = dx / len
+                    val uy = dy / len
 
-                val angle = Math.toRadians(30.0)
+                    val angle = Math.toRadians(30.0)
 
-                val x1 = ux * cos(angle) - uy * sin(angle)
-                val y1 = ux * sin(angle) + uy * cos(angle)
+                    val x1 = ux * cos(angle) - uy * sin(angle)
+                    val y1 = ux * sin(angle) + uy * cos(angle)
 
-                val x2 = ux * cos(angle) + uy * sin(angle)
-                val y2 = -ux * sin(angle) + uy * cos(angle)
+                    val x2 = ux * cos(angle) + uy * sin(angle)
+                    val y2 = -ux * sin(angle) + uy * cos(angle)
 
-                moveTo(startArrowPoint.x, startArrowPoint.y)
-                lineTo(
-                    startArrowPoint.x - (x1 * endArrowSize).toFloat(),
-                    startArrowPoint.y - (y1 * endArrowSize).toFloat()
-                )
+                    moveTo(startArrowPoint.x, startArrowPoint.y)
+                    lineTo(
+                        startArrowPoint.x - (x1 * endArrowSize).toFloat(),
+                        startArrowPoint.y - (y1 * endArrowSize).toFloat()
+                    )
 
-                moveTo(startArrowPoint.x, startArrowPoint.y)
-                lineTo(
-                    startArrowPoint.x - (x2 * endArrowSize).toFloat(),
-                    startArrowPoint.y - (y2 * endArrowSize).toFloat()
-                )
+                    moveTo(startArrowPoint.x, startArrowPoint.y)
+                    lineTo(
+                        startArrowPoint.x - (x2 * endArrowSize).toFloat(),
+                        startArrowPoint.y - (y2 * endArrowSize).toFloat()
+                    )
+                }
+                drawPath(endArrowPath, arrowPathPaint)
             }
-            drawPath(endArrowPath, arrowPathPaint)
         }
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF2E7187, showSystemUi = false)
+@Preview(showBackground = true, backgroundColor = 0xFF2E7187, showSystemUi = false, locale = "ru")
 @Composable
 private fun WindItemPreview() {
     WeatherTheme {
         Pressure(
             modifier = Modifier.size(400.dp),
-            pressure = 761
-        )
-    }
-}
-
-@Preview()
-@Composable
-private fun WindItemPreview2() {
-    WeatherTheme {
-        Pressure(
-            modifier = Modifier.size(200.dp),
-            pressure = 761
+            pressure = 759
         )
     }
 }

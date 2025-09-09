@@ -7,28 +7,62 @@ import android.graphics.RectF
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
 import com.contraomnese.weather.design.theme.WeatherTheme
-import kotlin.math.max
+import com.contraomnese.weather.design.theme.itemHeight160
+import kotlinx.collections.immutable.persistentMapOf
 import kotlin.math.roundToInt
 
-private const val maxDewPointFraction = 8f
-private const val minDewPointFraction = 1f
-private const val maxRainfallFraction = 5f
+sealed interface DewPointFractions {
+    data object Dry : DewPointFractions
+    data object VeryComfortable : DewPointFractions
+    data object Comfortable : DewPointFractions
+    data object ComfortableForMost : DewPointFractions
+    data object Unpleasant : DewPointFractions
+    data object Uncomfortable : DewPointFractions
+    data object ExtremelyUncomfortable : DewPointFractions
+    data object Dangerous : DewPointFractions
+
+    companion object {
+        fun from(dewPoint: Int): DewPointFractions {
+            return when (dewPoint) {
+                in 0..10 -> Dry
+                in 11..12 -> VeryComfortable
+                in 13..15 -> Comfortable
+                in 16..17 -> ComfortableForMost
+                in 18..20 -> Unpleasant
+                in 21..23 -> Uncomfortable
+                in 24..26 -> ExtremelyUncomfortable
+                else -> Dangerous
+            }
+        }
+    }
+}
+
+private val dewPointFractions = persistentMapOf(
+    DewPointFractions.Dry to 1,
+    DewPointFractions.VeryComfortable to 2,
+    DewPointFractions.Comfortable to 3,
+    DewPointFractions.ComfortableForMost to 4,
+    DewPointFractions.Unpleasant to 5,
+    DewPointFractions.Uncomfortable to 6,
+    DewPointFractions.ExtremelyUncomfortable to 7,
+    DewPointFractions.Dangerous to 8
+)
 
 @Composable
 fun DewPoint(
     modifier: Modifier = Modifier,
-    dewPointFraction: Float = 1f,
-    rainfallFraction: Float = 0f,
+    dewPointFraction: DewPointFractions = DewPointFractions.Dry,
 ) {
 
+    val dewPoint = remember { dewPointFractions.getValue(dewPointFraction) }
 
     Canvas(modifier = modifier) {
         val canvasWidth = size.width
@@ -38,13 +72,12 @@ fun DewPoint(
         val thermometerWidth = canvasWidth * 0.25f
         val thermometerHeight = canvasHeight * 0.7f
         val bulbRadius = thermometerWidth / 2f
-        val thermometerLeft = canvasWidth / 3f - bulbRadius
-        val thermometerTop = canvasHeight * 0.1f
+        val thermometerLeft = canvasWidth / 2f - bulbRadius
+        val thermometerTop = canvasHeight * 0.05f
         val thermometerRight = thermometerLeft + thermometerWidth
         val thermometerBottom = thermometerTop + thermometerHeight
-        val bulbCenterX = canvasWidth / 3f
+        val bulbCenterX = canvasWidth / 2f
         val bulbCenterY = thermometerBottom + bulbRadius * 0.5f
-        val dropSize = max(canvasWidth, canvasHeight) * 0.04f
 
         val paintStroke = Paint().apply {
             isAntiAlias = true
@@ -56,7 +89,8 @@ fun DewPoint(
         val fractionPaintStroke = Paint().apply {
             isAntiAlias = true
             style = Paint.Style.STROKE
-            strokeWidth = thermometerWidth * 0.05f
+            strokeWidth = thermometerWidth * 0.1f
+            strokeCap = Paint.Cap.ROUND
         }
 
         val paintFill = Paint().apply {
@@ -75,27 +109,23 @@ fun DewPoint(
         val outerTermoPath = Path().apply {
             addRoundRect(
                 outerTermo,
-                floatArrayOf(
-                    0f, 0f,
-                    0f, 0f,
-                    bulbRadius, bulbRadius,
-                    bulbRadius, bulbRadius
-                ),
+                thermometerWidth / 3,
+                thermometerWidth / 3,
                 Path.Direction.CW
             )
         }
 
-        val outerTermoBulbPath = Path().apply {
+        val outerThermometerBulbPath = Path().apply {
             addCircle(bulbCenterX, bulbCenterY, bulbRadius, Path.Direction.CW)
         }
 
-        val outerThermoPath = Path().apply {
-            op(outerTermoPath, outerTermoBulbPath, Path.Op.UNION)
+        val outerThermometerPath = Path().apply {
+            op(outerTermoPath, outerThermometerBulbPath, Path.Op.UNION)
         }
 
-        val fillHeight = thermometerHeight / (maxDewPointFraction + 1) * dewPointFraction.coerceIn(minDewPointFraction, maxDewPointFraction)
+        val fillHeight = thermometerHeight / (dewPointFractions.size + 1) * dewPoint
 
-        val innerTermoPath = Path().apply {
+        val innerThermometerPath = Path().apply {
             moveTo(thermometerLeft, thermometerBottom - fillHeight)
             lineTo(thermometerRight, thermometerBottom - fillHeight)
             lineTo(thermometerRight, thermometerBottom - thermometerWidth / 2f)
@@ -115,67 +145,44 @@ fun DewPoint(
             addCircle(bulbCenterX, bulbCenterY, bulbRadius * 0.95f, Path.Direction.CW)
         }
 
-        val termoFillPath = Path().apply {
-            op(innerTermoPath, innerBulbPath, Path.Op.UNION)
+        val innerThermometerFillPath = Path().apply {
+            op(innerThermometerPath, innerBulbPath, Path.Op.UNION)
         }
 
-        nativeCanvas.drawPath(termoFillPath, paintFill)
-        nativeCanvas.drawPath(outerThermoPath, paintStroke)
+        nativeCanvas.drawPath(innerThermometerFillPath, paintFill)
+        nativeCanvas.drawPath(outerThermometerPath, paintStroke)
 
-        val startColor = Color.argb(150, 255, 0, 0)
-        val endColor = Color.argb(150, 0, 255, 0)
+        val firstFractionY = thermometerBottom * 0.9f
+        nativeCanvas.drawLine(
+            bulbCenterX, firstFractionY,
+            bulbCenterX + thermometerWidth / 2f - fractionPaintStroke.strokeWidth, firstFractionY,
+            fractionPaintStroke.apply {
+                color = Color.argb(180, 100, 100, 20)
+            }
+        )
 
-        repeat(maxDewPointFraction.toInt()) { i ->
+        val startColor = Color.rgb(215, 0, 0)
+        val endColor = Color.rgb(0, 215, 0)
 
-            val fraction = 1.0f - i.toFloat() / (maxDewPointFraction - 1)
+        repeat(dewPointFractions.size - 1) { i ->
 
-            val red = (startColor.red * (1 - fraction) + endColor.red * fraction).roundToInt()
-            val green = (startColor.green * (1 - fraction) + endColor.green * fraction).roundToInt()
-            val blue = (startColor.blue * (1 - fraction) + endColor.blue * fraction).roundToInt()
+            val colorFraction = 1.0f - i.toFloat() / (dewPointFractions.size - 2)
 
-            val interpolatedColor = Color.argb(150, red, green, blue)
+            val red = (startColor.red * (1 - colorFraction) + endColor.red * colorFraction).roundToInt()
+            val green = (startColor.green * (1 - colorFraction) + endColor.green * colorFraction).roundToInt()
+            val blue = (startColor.blue * (1 - colorFraction) + endColor.blue * colorFraction).roundToInt()
 
-            val y = thermometerBottom - (i + 1) * (thermometerHeight / (maxDewPointFraction + 1))
+            val interpolatedColor = Color.argb(180, red, green, blue)
+
+            val y = thermometerBottom * 0.9f - (i + 1) * (thermometerHeight / (dewPointFractions.size + 1))
             nativeCanvas.drawLine(
                 bulbCenterX, y,
-                bulbCenterX + thermometerWidth / 2f - paintStroke.strokeWidth / 2, y,
+                bulbCenterX + thermometerWidth / 2f - fractionPaintStroke.strokeWidth, y,
                 fractionPaintStroke.apply {
                     color = interpolatedColor
                 }
             )
         }
-
-        fun drawDrop(cx: Float, cy: Float, size: Float, isFilled: Boolean = true) {
-            val path = Path().apply {
-                moveTo(cx, cy - size * 2)
-                cubicTo(
-                    cx - size * 0.8f, cy - size * 0.8f,
-                    cx - size, cy - size * 0.5f,
-                    cx - size, cy
-                )
-                arcTo(
-                    RectF(cx - size, cy - size, cx + size, cy + size),
-                    180f, -180f
-                )
-                cubicTo(
-                    cx + size, cy - size * 0.5f,
-                    cx + size * 0.8f, cy - size * 0.8f,
-                    cx, cy - size * 2
-                )
-                close()
-            }
-            if (isFilled) {
-                nativeCanvas.drawPath(path, paintFill)
-            }
-            nativeCanvas.drawPath(path, paintStroke)
-        }
-
-        repeat(maxRainfallFraction.toInt()) { i ->
-            val isFilled = i < rainfallFraction
-
-            drawDrop(canvasWidth * 0.75f, thermometerBottom + bulbRadius - (thermometerHeight * i * 0.25f), dropSize, isFilled)
-        }
-
     }
 }
 
@@ -184,9 +191,8 @@ fun DewPoint(
 private fun DewPointPreview() {
     WeatherTheme {
         DewPoint(
-            modifier = Modifier.size(800.dp),
-            dewPointFraction = 6f,
-            rainfallFraction = 5f
+            modifier = Modifier.size(itemHeight160),
+            dewPointFraction = DewPointFractions.from(11),
         )
     }
 }

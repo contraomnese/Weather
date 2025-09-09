@@ -28,6 +28,7 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -65,7 +66,9 @@ fun CollapsableContainerWithAnimatedHeader(
             val result = textMeasurer.measure(
                 text = alertTitle,
                 style = textStyleHeader,
-                constraints = Constraints.fixedWidth(with(density) { screenWidth.toPx().toInt() })
+                constraints = Constraints.fixedWidth(with(density) { screenWidth.toPx().toInt() }),
+                maxLines = 5,
+                overflow = TextOverflow.Ellipsis
             )
             with(density) { result.size.height.toDp() } + padding32
         } else {
@@ -88,7 +91,7 @@ fun CollapsableContainerWithAnimatedHeader(
             .wrapContentHeight(Alignment.Top)
             .fillMaxWidth()
             .clip(RoundedCornerShape(cornerRadius16))
-            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.1f))
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.2f))
     ) {
         Box(
             modifier = Modifier

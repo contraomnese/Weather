@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.tooling.preview.Preview
 import com.contraomnese.weather.design.theme.WeatherTheme
-import com.contraomnese.weather.design.theme.itemHeight6
 import com.contraomnese.weather.design.theme.itemHeight8
 import com.contraomnese.weather.design.theme.itemWidth112
 
@@ -120,7 +119,7 @@ private fun GradientRangeLine(
     Canvas(modifier = modifier) {
         val w = size.width
         val h = size.height
-        val thickness = h * 0.6f
+        val thickness = h * 0.8f
         val centerY = h / 2f
         val cornerRadius = CornerRadius(thickness / 2, thickness / 2)
         val range = (maxRange - minRange).coerceAtLeast(1f)
@@ -173,9 +172,8 @@ private fun GradientRangeLine(
         if (currentX == null) {
             drawBar()
         } else {
-            val r = thickness * 1.1f
             val hole = Path().apply {
-                addOval(Rect(currentX - r, centerY - r, currentX + r, centerY + r))
+                addOval(Rect(currentX - thickness, centerY - thickness, currentX + thickness, centerY + thickness))
             }
             clipPath(hole, clipOp = ClipOp.Difference) {
                 drawBar()
@@ -183,7 +181,7 @@ private fun GradientRangeLine(
             drawCircle(
                 color = currentColor,
                 center = Offset(currentX, centerY),
-                radius = thickness / 2f
+                radius = thickness / 1.3f
             )
         }
     }
@@ -208,7 +206,7 @@ fun TemperatureRangeLinePreview() {
         TemperatureRangeLine(
             modifier = Modifier
                 .width(itemWidth112)
-                .height(itemHeight6),
+                .height(itemHeight8),
             minRange = -5f,
             maxRange = 35f,
             min = 0f,
@@ -218,7 +216,7 @@ fun TemperatureRangeLinePreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF41865E)
 @Composable
 fun UVIndexRangeLinePreview() {
     WeatherTheme {

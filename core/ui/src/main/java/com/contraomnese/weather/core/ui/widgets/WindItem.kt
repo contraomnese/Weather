@@ -15,13 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.contraomnese.weather.core.ui.canvas.Wind
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight160
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding8
+
 
 @Composable
 fun WindItem(
@@ -35,7 +35,7 @@ fun WindItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(160.dp),
+            .height(itemHeight160),
         horizontalArrangement = Arrangement.spacedBy(padding16),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -59,7 +59,7 @@ fun WindItem(
                 )
                 Column {
                     Text(
-                        text = stringResource(R.string.meter_on_second_title),
+                        text = stringResource(R.string.units_meter_in_second),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
@@ -82,7 +82,7 @@ fun WindItem(
                 )
                 Column {
                     Text(
-                        text = stringResource(R.string.meter_on_second_title),
+                        text = stringResource(R.string.units_meter_in_second),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
@@ -99,7 +99,7 @@ fun WindItem(
 
 @Preview(showBackground = true, backgroundColor = 0x79397E93)
 @Composable
-fun WindItemPreview(modifier: Modifier = Modifier) {
+private fun WindItemPreview(modifier: Modifier = Modifier) {
     WeatherTheme {
         WindItem(
             modifier = modifier, windSpeed = "5", gustSpeed = "13", degree = 34, direction = "NW",

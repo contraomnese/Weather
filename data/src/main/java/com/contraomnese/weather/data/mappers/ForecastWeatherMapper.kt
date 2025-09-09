@@ -4,7 +4,6 @@ import com.contraomnese.weather.data.network.models.ForecastDayNetwork
 import com.contraomnese.weather.data.network.models.ForecastWeatherResponse
 import com.contraomnese.weather.data.network.models.HourNetwork
 import com.contraomnese.weather.data.parsers.DateTimeParser
-import com.contraomnese.weather.domain.weatherByLocation.model.AirQualityInfo
 import com.contraomnese.weather.domain.weatherByLocation.model.AlertsInfo
 import com.contraomnese.weather.domain.weatherByLocation.model.CurrentInfo
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastDay
@@ -13,24 +12,28 @@ import com.contraomnese.weather.domain.weatherByLocation.model.ForecastInfo
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastToday
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeatherDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.LocationInfo
-import com.contraomnese.weather.domain.weatherByLocation.model.PollutantLevel
 import com.contraomnese.weather.domain.weatherByLocation.model.UvIndex
 import kotlinx.collections.immutable.toPersistentList
-import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import kotlin.math.roundToInt
+
+private const val HOURS = 24
+private const val MINUTES = 60
+private const val SECONDS = 60
+private const val MM_IN_INCH = 25.4
+private const val IS_DAY = 1
+private const val DAILY_WILL_RAIN = 1
+private const val DEFAULT_RAINFALL = 0.0
 
 fun ForecastWeatherResponse.toDomain(): ForecastWeatherDomainModel {
 
-    val nextDayHourLimit = location.localtimeEpoch + 24 * 60 * 60
+    val nextDayHourLimit = location.localtimeEpoch + HOURS * MINUTES * SECONDS
     val forecastHours =
         mutableListOf(forecast.forecastDay.first().hour.last { it.timeEpoch <= location.localtimeEpoch })
     forecastHours.addAll(forecast.forecastDay.first().hour.filter { it.timeEpoch > location.localtimeEpoch })
     forecastHours.addAll(forecast.forecastDay.drop(1).first().hour.filter { it.timeEpoch <= nextDayHourLimit })
 
     val locationTime = DateTimeParser.parseIso(location.localtime)
-    val isMidDay = locationTime?.let { locTime ->
+    val isAfterMidDay = locationTime?.let { locTime ->
         val sunrise = DateTimeParser.parseAmPmTime(forecast.forecastDay.first().astro.sunrise)
         val sunset = DateTimeParser.parseAmPmTime(forecast.forecastDay.first().astro.sunset)
         if (sunrise != null && sunset != null) locTime.toMinutes() >= sunset.toMinutes() - sunrise.toMinutes()
@@ -41,60 +44,28 @@ fun ForecastWeatherResponse.toDomain(): ForecastWeatherDomainModel {
         locationInfo = LocationInfo(
             locationTimeEpoch = location.localtimeEpoch,
             locationTime = DateTimeParser.parseIso(location.localtime),
-            isMidDay = isMidDay
+            isAfterMidDay = isAfterMidDay
         ),
         currentInfo = CurrentInfo(
             temperature = current.tempC.roundToInt().toString(),
             feelsLike = current.feelsLikeC.roundToInt().toString(),
-            isDay = current.isDay == 1,
+            isDay = current.isDay == IS_DAY,
             conditionCode = current.condition.code,
             conditionText = current.condition.text,
             windSpeed = current.windKph.toMs().roundToInt().toString(),
             gustSpeed = current.gustKph.toMs().roundToInt().toString(),
-            windDirection = current.windDir,
+            windDirection = current.windDir.translateDirection(),
             windDegree = current.windDegree,
-            pressure = current.pressureMb.toString(),
-            humidity = current.humidity.toString(),
+            pressure = (current.pressureIn * MM_IN_INCH).roundToInt(),
+            isRainingExpected = forecast.forecastDay.first().day.dailyWillItRain == DAILY_WILL_RAIN,
+            rainfallLast24Hours = forecast.forecastDay[0].hour.sumOf { hour -> if (hour.timeEpoch < location.localtimeEpoch) hour.precipMm else DEFAULT_RAINFALL },
+            rainfallNext24Hours = forecast.forecastDay[0].hour.sumOf { hour -> if (hour.timeEpoch >= location.localtimeEpoch) hour.precipMm else DEFAULT_RAINFALL } +
+                    forecast.forecastDay[1].hour.sumOf { hour -> if (hour.timeEpoch < nextDayHourLimit) hour.precipMm else DEFAULT_RAINFALL },
+            rainfallNextHour = current.precipMm,
+            humidity = current.humidity,
+            dewPoint = current.dewPointC.roundToInt(),
             uvIndex = UvIndex(current.uv.roundToInt()),
-            airQualityIndex = AirQualityInfo(
-                aqiIndex = current.airQuality.gbDefraIndex,
-                aqiText = when (current.airQuality.gbDefraIndex) {
-                    in 1..3 -> "Low"
-                    in 4..6 -> "Moderate"
-                    in 7..9 -> "High"
-                    else -> "Very High"
-                },
-                coLevel = when (current.airQuality.co / 1000) {
-                    in 0.0..4.5 -> PollutantLevel.Good
-                    in 4.5..9.4 -> PollutantLevel.Moderate
-                    else -> PollutantLevel.Bad
-                },
-                no2Level = when (current.airQuality.no2) {
-                    in 0.0..100.0 -> PollutantLevel.Good
-                    in 100.0..200.0 -> PollutantLevel.Moderate
-                    else -> PollutantLevel.Bad
-                },
-                o3Level = when (current.airQuality.o3) {
-                    in 0.0..100.0 -> PollutantLevel.Good
-                    in 100.0..160.0 -> PollutantLevel.Moderate
-                    else -> PollutantLevel.Bad
-                },
-                so2Level = when (current.airQuality.so2) {
-                    in 0.0..35.0 -> PollutantLevel.Good
-                    in 35.0..75.0 -> PollutantLevel.Moderate
-                    else -> PollutantLevel.Bad
-                },
-                pm25Level = when (current.airQuality.pm25) {
-                    in 0.0..12.0 -> PollutantLevel.Good
-                    in 12.0..35.4 -> PollutantLevel.Moderate
-                    else -> PollutantLevel.Bad
-                },
-                pm10Level = when (current.airQuality.pm10) {
-                    in 0.0..55.0 -> PollutantLevel.Good
-                    in 55.0..154.0 -> PollutantLevel.Moderate
-                    else -> PollutantLevel.Bad
-                },
-            )
+            airQualityIndex = current.airQuality.toDomain()
         ),
         forecastInfo = ForecastInfo(
             today = forecast.forecastDay.first().toForecastTodayDomain(),
@@ -137,17 +108,9 @@ fun HourNetwork.toDomain(): ForecastHour {
         temperature = tempC.roundToInt().toString(),
         conditionCode = condition.code,
         time = time.split(" ")[1],
-        isDay = isDay == 1
+        isDay = isDay == IS_DAY
     )
 }
 
-fun getDayOfWeek(epochSeconds: Long, timeZone: TimeZone = TimeZone.currentSystemDefault()): String {
-    val instant = Instant.fromEpochSeconds(epochSeconds)
-    val localDate = instant.toLocalDateTime(timeZone).date
-    return localDate.dayOfWeek.name.slice(0..2)
-}
 
-fun Double.toMs(): Double {
-    return this * 1000.0 / 3600.0
-}
 

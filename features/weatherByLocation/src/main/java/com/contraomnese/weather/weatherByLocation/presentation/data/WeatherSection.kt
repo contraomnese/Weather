@@ -87,11 +87,33 @@ data class HumiditySection(
         copy(bodyHeight = newHeight, bodyMaxHeight = bodyMaxHeight ?: newHeight)
 }
 
+data class RainfallSection(
+    override val bodyHeight: Float? = null,
+    override val bodyMaxHeight: Float? = bodyHeight,
+    override val icon: ImageVector = WeatherIcons.Rainfall,
+    override val title: Int = R.string.rainfall_title,
+) :
+    WeatherSection {
+    override fun copyWithBodyHeight(newHeight: Float) =
+        copy(bodyHeight = newHeight, bodyMaxHeight = bodyMaxHeight ?: newHeight)
+}
+
 data class WindSection(
     override val bodyHeight: Float? = null,
     override val bodyMaxHeight: Float? = bodyHeight,
     override val icon: ImageVector = WeatherIcons.Wind,
     override val title: Int = R.string.wind_title,
+) :
+    WeatherSection {
+    override fun copyWithBodyHeight(newHeight: Float) =
+        copy(bodyHeight = newHeight, bodyMaxHeight = bodyMaxHeight ?: newHeight)
+}
+
+data class PressureSection(
+    override val bodyHeight: Float? = null,
+    override val bodyMaxHeight: Float? = bodyHeight,
+    override val icon: ImageVector = WeatherIcons.Pressure,
+    override val title: Int = R.string.pressure_title,
 ) :
     WeatherSection {
     override fun copyWithBodyHeight(newHeight: Float) =

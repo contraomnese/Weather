@@ -12,6 +12,8 @@
     <string name="uv_title">УФ-ИНДЕКС</string>
     <string name="humidity_title">ВЛАЖНОСТЬ</string>
     <string name="wind_title">ВЕТЕР</string>
+    <string name="rainfall_title">ОСАДКИ</string>
+    <string name="pressure_title">ДАВЛЕНИЕ</string>
     <string name="aqi_good">%1$d - Низкий</string>
     <string name="aqi_moderate">%1$d - Умеренный</string>
     <string name="aqi_bad">%1$d - Высокий</string>
@@ -30,10 +32,17 @@
     <string name="cardinal_point_w">З</string>
     <string name="cardinal_point_s">Ю</string>
 
-    <string name="pressure_in_units">дюйм рт.ст.</string>
+    <string name="units_mm">мм</string>
+    <string name="units_inch_hg">дюйм рт.ст.</string>
     <string name="sunrise_title">Восход</string>
 
-    <string name="meter_on_second_title">м/с</string>
+    <string name="rainfall_value">%.1f мм</string>
+    <string name="in_last_24_hours">последние 24 ч.</string>
+    <string name="in_next_1_hour">"в течении часа"</string>
+    <string name="expected_in_next_24_hours">следующие 24 ч.</string>
+    <string name="expected_raining">Скоро ожидается дождь</string>
+    <string name="dew_point">Точка россы в данный момент %1$d°.</string>
+    <string name="units_meter_in_second">м/с</string>
     <string name="gust_of_wind_body">Порывы ветра</string>
     <string name="low_title">Низкий</string>
     <string name="moderate_title">Умеренный</string>
@@ -41,13 +50,19 @@
     <string name="very_high_title">Очень высокий</string>
     <string name="extreme_title">Максимальный</string>
 
+    <!--  Pressure section -->
+    <string name="pressure_is_good">Давление оптимальное и устойчивое. Большинство людей чувствуют себя хорошо, воздух воспринимается комфортным.</string>
+    <string name="pressure_is_moderate">Давление отличается от привычного незначительно. У большинства людей изменения почти не ощущаются, но у метеочувствительных возможна лёгкая усталость или перепады настроения.</string>
+    <string name="pressure_is_low">Давление заметно ниже нормы. Многие ощущают сонливость, усталость и трудности с концентрацией, у метеозависимых людей могут болеть суставы.</string>
+    <string name="pressure_is_high">Давление значительно выше нормы. Воздух может казаться тяжелым. Люди с гипертонией могут ощущать головную боль, напряжение или учащённое сердцебиение.</string>
+
     <string name="uv_index_low_desc">Солнечные лучи безопасны для вашего здоровья. Защита не нужна.</string>
     <string name="uv_index_moderate_desc">Солнечные лучи могут привести к незначительному повреждению кожи. Надевайте солнцезащитные очки и используйте светлый солнцезащитный крем.</string>
     <string name="uv_index_high_desc">Солнечные лучи вредны. Носите шляпу и избегайте длительного воздействия.</string>
     <string name="uv_index_very_high_desc">Незащищенная кожа может быстро обгореть. Ищите тень и носите защитную одежду.</string>
     <string name="uv_index_extreme_desc">Солнечные лучи чрезвычайно опасны. Избегайте прямого солнечного света; требуется полная защита.</string>
     <string name="wind_body">Ветер</string>
-    <string name="pressure_mm_units">мм рт. ст.</string>
-    <string name="pressure_mbar_units">миллибар</string>
+    <string name="units_mm_hg">мм рт. ст.</string>
+    <string name="units_mbar">миллибар</string>
 
 </resources>

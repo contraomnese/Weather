@@ -87,7 +87,7 @@ fun UvIndexItemPreview(modifier: Modifier = Modifier) {
     WeatherTheme {
         UvIndexItem(
             modifier = modifier,
-            index = 3,
+            index = 2,
         )
     }
 }

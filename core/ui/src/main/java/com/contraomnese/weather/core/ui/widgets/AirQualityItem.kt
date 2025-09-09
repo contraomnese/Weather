@@ -51,7 +51,7 @@ fun AirQualityItem(
         Text(
             text = stringResource(aqi.text, aqiIndex),
             style = MaterialTheme.typography.headlineMedium,
-            color = aqi.color
+            color = MaterialTheme.colorScheme.onSurface
         )
         Text(
             text = stringResource(aqi.description),
@@ -103,10 +103,9 @@ fun AirQualityItem(
     }
 }
 
-private val GoodColor = Color(0xFF1D7405)
+private val GoodColor = Color(0xFFFFFFFF)
 private val ModerateColor = Color(0xFFDCD807)
-private val BadColor = Color(0xFFEA3D12)
-private val VeryBadColor = Color(0xFF8E0101)
+private val BadColor = Color(0xFFAA5111)
 
 private fun PollutantLevel.toColor(): Color = when (this) {
     PollutantLevel.Good -> GoodColor
@@ -120,31 +119,26 @@ private interface Aqi {
 
     @get:StringRes
     val description: Int
-    val color: Color
 }
 
 private data class GoodAqi(
     override val text: Int = R.string.aqi_good,
     override val description: Int = R.string.aqi_good_desc,
-    override val color: Color = GoodColor,
 ) : Aqi
 
 private data class ModerateAqi(
     override val text: Int = R.string.aqi_moderate,
     override val description: Int = R.string.aqi_moderate_desc,
-    override val color: Color = ModerateColor,
 ) : Aqi
 
 private data class BadAqi(
     override val text: Int = R.string.aqi_bad,
     override val description: Int = R.string.aqi_bad_desc,
-    override val color: Color = BadColor,
 ) : Aqi
 
 private data class VeryBadAqi(
     override val text: Int = R.string.aqi_very_bad,
     override val description: Int = R.string.aqi_very_bad_desc,
-    override val color: Color = VeryBadColor,
 ) : Aqi
 
 @Preview

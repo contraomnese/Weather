@@ -45,7 +45,7 @@ fun CollapsableContainer(
             .wrapContentHeight(Alignment.Top)
             .fillMaxWidth()
             .clip(RoundedCornerShape(cornerRadius16))
-            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.1f)),
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.2f)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(

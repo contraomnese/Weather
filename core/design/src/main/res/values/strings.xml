@@ -10,13 +10,14 @@
     <string name="now">Now</string>
 
     <!--  Titles -->
-
     <string name="today_forecast_title">TODAY</string>
     <string name="daily_forecast_title">3-DAY FORECAST</string>
     <string name="aqi_title">AIR QUALITY</string>
     <string name="uv_title">UV INDEX</string>
-    <string name="humidity_title">HUMIDITY</string>
     <string name="wind_title">WIND</string>
+    <string name="humidity_title">HUMIDITY</string>
+    <string name="rainfall_title">RAINFALL</string>
+    <string name="pressure_title">PRESSURE</string>
 
     <!--  Aqi section -->
     <string name="aqi_good">%1$d - Low</string>
@@ -41,7 +42,6 @@
     <string name="cardinal_point_w">W</string>
     <string name="cardinal_point_s">S</string>
     <string name="wind_speed_title">%1$d m/s</string>
-    <string name="meter_on_second_title">m/s</string>
     <string name="wind_body">Wind</string>
     <string name="gust_of_wind_body">Gust of wind</string>
 
@@ -59,9 +59,29 @@
     <string name="uv_index_extreme_desc">Sun rays are extremely dangerous. Avoid direct sunlight; full protection required.</string>
 
     <!--  Pressure section -->
-    <string name="pressure_mm_units">mm Hg</string>
-    <string name="pressure_mbar_units">mbar</string>
-    <string name="pressure_in_units">inches Hg</string>
+    <string name="pressure_is_good">Atmospheric pressure is optimal and stable. Most people feel good, the air is perceived as comfortable.</string>
+    <string name="pressure_is_moderate">The pressure differs slightly from the usual. Most people don’t feel much change, but weather-sensitive people may be slightly tired or have mood swings.</string>
+    <string name="pressure_is_low">The pressure is noticeably lower than normal. Many feel drowsiness, fatigue and difficulty with concentration, weather-dependent people may have joint pain.</string>
+    <string name="pressure_is_high">The atmospheric pressure is much higher than normal. The air can seem heavy. People with hypertension may feel a headache, tension or increased heartbeat.</string>
+
+    <!--  Rainfall section -->
+    <string name="rainfall_value">%.1f mm</string>
+    <string name="in_last_24_hours">in the last 24h</string>
+    <string name="in_next_1_hour">in the next 1h</string>
+    <string name="expected_in_next_24_hours">in the next 24h</string>
+    <string name="expected_raining">Rain is expected soon</string>
+
+    <!--  Humidity section -->
+    <string name="dew_point">The dew point is %1$d° right now.</string>
+    <string name="humidity_value" translatable="false">%1$s%%</string>
+
+    <!--  Units -->
+    <string name="units_meter_in_second">m/s</string>
+    <string name="units_mm_hg">mm Hg</string>
+    <string name="units_mbar">mbar</string>
+    <string name="units_mm">mm</string>
+    <string name="units_inch_hg">inches Hg</string>
+    <string name="units_degree" translatable="false">°</string>
 
     <string name="empty" translatable="false"></string>
 </resources>

@@ -60,7 +60,9 @@ val itemHeight40 = 40.dp
 val itemHeight48 = 48.dp
 val itemHeight56 = 56.dp
 val itemHeight64 = 64.dp
+val itemHeight140 = 140.dp
 val itemHeight160 = 160.dp
+val itemHeight180 = 180.dp
 val itemHeight240 = 240.dp
 
 val cornerRadius1 = 1.dp

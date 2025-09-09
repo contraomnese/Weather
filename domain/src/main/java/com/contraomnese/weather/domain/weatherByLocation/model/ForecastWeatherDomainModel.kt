@@ -16,7 +16,7 @@ data class ForecastWeatherDomainModel(
 data class LocationInfo(
     val locationTimeEpoch: Long,
     val locationTime: LocationDateTime?,
-    val isMidDay: Boolean?,
+    val isAfterMidDay: Boolean?,
 )
 
 data class LocationDateTime(
@@ -67,8 +67,13 @@ data class CurrentInfo(
     val gustSpeed: String,
     val windDirection: String,
     val windDegree: Int,
-    val humidity: String,
-    val pressure: String,
+    val humidity: Int,
+    val dewPoint: Int,
+    val pressure: Int,
+    val isRainingExpected: Boolean,
+    val rainfallLast24Hours: Double,
+    val rainfallNext24Hours: Double,
+    val rainfallNextHour: Double,
 )
 
 @JvmInline

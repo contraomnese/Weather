@@ -114,7 +114,7 @@ fun ClearIcon(
 @Composable
 fun CloudyIcon(
     modifier: Modifier = Modifier,
-    cloudColor: Color = Color.LightGray,
+    cloudColor: Color = Color.White,
 ) {
     Canvas(modifier) {
         val w = size.width
@@ -136,7 +136,7 @@ fun CloudyIcon(
 fun PartlyCloudyIcon(
     modifier: Modifier = Modifier,
     isNight: Boolean = false,
-    cloudColor: Color = Color.LightGray,
+    cloudColor: Color = Color.White,
     color: Color = if (isNight) Color(0xFFAAA77B) else Color(0xFFF8D74A),
     sunStroke: Float = 4f,
 ) {
@@ -204,9 +204,9 @@ fun PartlyCloudyIcon(
 @Composable
 fun RainIcon(
     modifier: Modifier = Modifier,
-    cloudColor: Color = Color.LightGray,
-    rainDropColor: Color = Color(0xFF336D97),
-    rainDropWidth: Float = 3f,
+    cloudColor: Color = Color.White,
+    rainDropColor: Color = Color(0xFFFFFFFF),
+    rainDropWidth: Float = 5f,
 ) {
     Canvas(modifier) {
 
@@ -223,23 +223,13 @@ fun RainIcon(
             color = cloudColor
         )
 
-        repeat(5) { i ->
-            val x = w * (0.2f + i * 0.15f)
-            drawLine(
-                color = rainDropColor,
-                start = Offset(x, h * 0.7f),
-                end = Offset(x - 5, h * 0.8f),
-                strokeWidth = 3.5f,
-                cap = StrokeCap.Round
-            )
-        }
         repeat(4) { i ->
             val x = w * (0.25f + i * 0.15f)
             drawLine(
                 color = rainDropColor,
-                start = Offset(x, h * 0.75f),
-                end = Offset(x - 5, h * 0.85f),
-                strokeWidth = 3f,
+                start = Offset(x, h * 0.7f),
+                end = Offset(x - 5, h * 0.8f),
+                strokeWidth = rainDropWidth,
                 cap = StrokeCap.Round
             )
         }
@@ -249,7 +239,7 @@ fun RainIcon(
 @Composable
 fun SnowIcon(
     modifier: Modifier = Modifier,
-    cloudColor: Color = Color.LightGray,
+    cloudColor: Color = Color.White,
     snowColor: Color = Color.White,
     snowRadius: Float = 3f,
 ) {
@@ -281,7 +271,7 @@ fun SnowIcon(
 @Composable
 fun ThunderIcon(
     modifier: Modifier = Modifier,
-    cloudColor: Color = Color.LightGray,
+    cloudColor: Color = Color.White,
     thunderColor: Color = Color.Yellow,
 ) {
 
@@ -356,11 +346,11 @@ fun FogIcon(
 @Composable
 fun SleetIcon(
     modifier: Modifier = Modifier,
-    cloudColor: Color = Color.LightGray,
+    cloudColor: Color = Color.White,
     snowColor: Color = Color.White,
     snowFlakeSize: Float = 3f,
-    rainDropColor: Color = Color(0xFF336D97),
-    rainDropWidth: Float = 4f,
+    rainDropColor: Color = Color(0xFFFFFFFF),
+    rainDropWidth: Float = 5f,
 ) {
 
     Canvas(
