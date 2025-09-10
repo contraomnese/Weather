@@ -10,6 +10,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemThickness1
 import com.contraomnese.weather.design.theme.padding8
+import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastDay
 
 
@@ -18,6 +19,7 @@ fun ForecastDailyColumn(
     modifier: Modifier = Modifier,
     items: List<ForecastDay>,
     currentTemperature: Int,
+    temperatureUnit: TemperatureUnit,
 ) {
 
     val maxRangeTemperature = items.maxOf { it.maxTemperature }
@@ -36,6 +38,7 @@ fun ForecastDailyColumn(
                 maxRangeTemperature = maxRangeTemperature,
                 minRangeTemperature = minRangeTemperature,
                 currentTemperature = if (index == 0) currentTemperature else null,
+                temperatureUnit = temperatureUnit
             )
             if (index != items.lastIndex) {
                 HorizontalDivider(
@@ -66,7 +69,8 @@ private fun ForecastHourlyLazyRowPreview() {
                     totalRainFull = 123,
                 )
             },
-            currentTemperature = 14
+            currentTemperature = 14,
+            temperatureUnit = TemperatureUnit.Celsius
         )
     }
 }

@@ -69,6 +69,7 @@ dependencies {
 
     implementation(project(":features:home"))
     implementation(project(":features:weatherByLocation"))
+    implementation(project(":features:appSettings"))
 
     implementation(libs.material)
     implementation(libs.bundles.koin)

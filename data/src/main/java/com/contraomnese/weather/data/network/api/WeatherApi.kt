@@ -19,6 +19,6 @@ interface WeatherApi {
         @Query("days") days: Int = 3, // max on free pricing plan
         @Query("aqi") aqi: String = "yes",
         @Query("alerts") alerts: String = "yes",
-        @Query("lang") lang: String = "en",
+        @Query("lang") lang: String,
     ): Response<ForecastWeatherResponse>
 }

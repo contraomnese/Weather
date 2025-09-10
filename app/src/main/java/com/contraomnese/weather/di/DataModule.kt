@@ -4,10 +4,14 @@ import com.contraomnese.weather.BuildConfig
 import com.contraomnese.weather.data.network.api.WeatherApi
 import com.contraomnese.weather.data.network.interceptors.ApiInterceptor
 import com.contraomnese.weather.data.network.models.ErrorResponse
+import com.contraomnese.weather.data.repository.AppSettingsRepositoryImpl
 import com.contraomnese.weather.data.repository.CurrentWeatherRepositoryImpl
 import com.contraomnese.weather.data.repository.ForecastWeatherRepositoryImpl
 import com.contraomnese.weather.data.repository.LocationsRepositoryImpl
 import com.contraomnese.weather.data.storage.db.locations.LocationsDatabase
+import com.contraomnese.weather.data.storage.memory.api.AppSettingsStorage
+import com.contraomnese.weather.data.storage.memory.store.AppSettingsStorageImpl
+import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
 import com.contraomnese.weather.domain.home.repository.LocationsRepository
 import com.contraomnese.weather.domain.weatherByLocation.repository.CurrentWeatherRepository
 import com.contraomnese.weather.domain.weatherByLocation.repository.ForecastWeatherRepository
@@ -67,10 +71,12 @@ val dataModule = module {
     }
 
     single<LocationsDatabase> { LocationsDatabase.create(context = get()) }
+    single<AppSettingsStorage> { AppSettingsStorageImpl(context = get()) }
 
     single<WeatherApi> { get<Retrofit>().create(WeatherApi::class.java) }
 
     single<LocationsRepository> { LocationsRepositoryImpl(database = get()) }
     single<CurrentWeatherRepository> { CurrentWeatherRepositoryImpl(api = get(), errorConverter = get()) }
-    single<ForecastWeatherRepository> { ForecastWeatherRepositoryImpl(api = get(), errorConverter = get()) }
+    single<ForecastWeatherRepository> { ForecastWeatherRepositoryImpl(api = get(), appSettingsRepository = get(), errorConverter = get()) }
+    single<AppSettingsRepository> { AppSettingsRepositoryImpl(storage = get()) }
 }

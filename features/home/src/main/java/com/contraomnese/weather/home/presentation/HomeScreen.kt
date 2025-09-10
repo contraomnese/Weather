@@ -39,7 +39,7 @@ import kotlinx.collections.immutable.toPersistentList
 internal fun HomeRoute(
     viewModel: HomeViewModel,
     onNavigateToWeatherByLocation: (Int) -> Unit,
-    modifier: Modifier = Modifier,
+    onNavigateToAppSettings: () -> Unit,
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -48,7 +48,7 @@ internal fun HomeRoute(
         uiState = uiState,
         onEvent = viewModel::onEvent,
         onNavigateToWeatherByLocation = onNavigateToWeatherByLocation,
-        modifier = modifier
+        onNavigateToAppSettings = onNavigateToAppSettings
     )
 }
 
@@ -57,38 +57,54 @@ internal fun HomeScreen(
     uiState: HomeUiState,
     onEvent: (HomeEvent) -> Unit,
     onNavigateToWeatherByLocation: (Int) -> Unit = {},
-    modifier: Modifier = Modifier,
+    onNavigateToAppSettings: () -> Unit = {},
 ) {
 
     Column {
-        SearchTextField(
-            modifier = Modifier.padding(padding16),
-            searchQuery = uiState.location.value,
-            onSearchQueryChanged = { onEvent(HomeEvent.LocationChanged(it)) },
-            isError = !uiState.location.isValidLocation(),
-            leadingIcon = if (uiState.isLoading) {
-                {
-                    LoadingIndicator(
-                        modifier =
-                            Modifier
-                                .height(itemHeight20)
-                                .aspectRatio(1f)
-                    )
-                }
-            } else null,
-            trailingIcon = if (uiState.location.value.isEmpty()) {
-                {
-                    IconButton(
-                        onClick = { },
-                    ) {
-                        Icon(
-                            imageVector = WeatherIcons.Map,
-                            contentDescription = null
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            SearchTextField(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(padding16),
+                searchQuery = uiState.location.value,
+                onSearchQueryChanged = { onEvent(HomeEvent.LocationChanged(it)) },
+                isError = !uiState.location.isValidLocation(),
+                leadingIcon = if (uiState.isLoading) {
+                    {
+                        LoadingIndicator(
+                            modifier =
+                                Modifier
+                                    .height(itemHeight20)
+                                    .aspectRatio(1f)
                         )
                     }
-                }
-            } else null
-        )
+                } else null,
+                trailingIcon = if (uiState.location.value.isEmpty()) {
+                    {
+                        IconButton(
+                            onClick = { },
+                        ) {
+                            Icon(
+                                imageVector = WeatherIcons.Map,
+                                contentDescription = null
+                            )
+                        }
+                    }
+                } else null
+            )
+            IconButton(
+                onClick = onNavigateToAppSettings,
+            ) {
+                Icon(
+                    imageVector = WeatherIcons.Settings,
+                    contentDescription = null
+                )
+            }
+        }
+
 
         Column(
             modifier = Modifier

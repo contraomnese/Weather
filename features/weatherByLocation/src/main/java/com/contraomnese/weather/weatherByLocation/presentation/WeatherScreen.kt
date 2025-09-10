@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -15,7 +14,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -30,7 +28,6 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -50,11 +47,11 @@ import com.contraomnese.weather.core.ui.widgets.TitleSection
 import com.contraomnese.weather.core.ui.widgets.UvIndexItem
 import com.contraomnese.weather.core.ui.widgets.WindItem
 import com.contraomnese.weather.design.theme.WeatherTheme
-import com.contraomnese.weather.design.theme.itemHeight240
 import com.contraomnese.weather.design.theme.itemHeight64
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.design.theme.space32
+import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import com.contraomnese.weather.domain.weatherByLocation.model.CoordinatesDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeatherDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.GeoLocationDomainModel
@@ -81,11 +78,6 @@ internal fun WeatherRoute(
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val locale = Locale.current
-
-    LaunchedEffect(Unit) {
-        viewModel.onEvent(WeatherEvent.LocaleChanged(locale.language))
-    }
 
     Box(modifier = modifier.fillMaxSize()) {
         when {
@@ -108,6 +100,7 @@ internal fun WeatherScreen(
 ) {
 
     requireNotNull(uiState.weather)
+    requireNotNull(uiState.appSettings)
 
     val lazyListState = rememberLazyListState()
 
@@ -324,7 +317,13 @@ internal fun WeatherScreen(
                         -> HourlyForecastSection(headerSectionHeight, section, uiState.weather, progress, measureContainerHeight)
 
                     is DailyForecastSection,
-                        -> DailyForecastSection(headerSectionHeight, section, measureContainerHeight, uiState.weather)
+                        -> DailyForecastSection(
+                        headerSectionHeight,
+                        section,
+                        measureContainerHeight,
+                        uiState.weather,
+                        uiState.appSettings.temperatureUnit
+                    )
 
                     is AqiSection,
                         -> AqiSection(headerSectionHeight, section, measureContainerHeight, uiState.weather)
@@ -339,7 +338,13 @@ internal fun WeatherScreen(
                         -> WindSection(headerSectionHeight, section, measureContainerHeight, uiState.weather)
 
                     is HumiditySection,
-                        -> HumiditySection(headerSectionHeight, section, measureContainerHeight, uiState.weather)
+                        -> HumiditySection(
+                        headerSectionHeight,
+                        section,
+                        measureContainerHeight,
+                        uiState.weather,
+                        uiState.appSettings.temperatureUnit
+                    )
 
                     is RainfallSection,
                         -> RainfallSection(headerSectionHeight, section, measureContainerHeight, uiState.weather)
@@ -356,25 +361,6 @@ internal fun WeatherScreen(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun StubSection(
-    headerSectionHeight: Dp,
-    section: WeatherSection,
-    measureContainerHeight: (Int) -> Unit,
-) {
-    CollapsableContainer(
-        headerHeight = headerSectionHeight,
-        currentBodyHeight = section.bodyHeight,
-        onContentMeasured = measureContainerHeight
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(itemHeight240)
-        )
     }
 }
 
@@ -408,6 +394,7 @@ private fun DailyForecastSection(
     section: DailyForecastSection,
     measureContainerHeight: (Int) -> Unit,
     weather: ForecastWeatherDomainModel,
+    temperatureUnit: TemperatureUnit,
 ) {
     CollapsableContainer(
         headerHeight = headerSectionHeight,
@@ -419,7 +406,8 @@ private fun DailyForecastSection(
         ForecastDailyColumn(
             modifier = Modifier.padding(horizontal = padding16),
             items = weather.forecastInfo.forecastDays,
-            currentTemperature = weather.currentInfo.temperature.toInt()
+            currentTemperature = weather.currentInfo.temperature.toInt(),
+            temperatureUnit = temperatureUnit
         )
     }
 }
@@ -540,6 +528,7 @@ private fun HumiditySection(
     section: HumiditySection,
     measureContainerHeight: (Int) -> Unit,
     weather: ForecastWeatherDomainModel,
+    temperatureUnit: TemperatureUnit,
 ) {
     val today = weather.currentInfo
 
@@ -553,7 +542,8 @@ private fun HumiditySection(
         HumidityItem(
             modifier = Modifier.padding(horizontal = padding16),
             humidity = today.humidity,
-            dewPoint = today.dewPoint
+            dewPoint = today.dewPoint,
+            temperatureUnit = temperatureUnit
         )
     }
 }

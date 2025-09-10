@@ -3,7 +3,7 @@
     <string name="search_city">Поиск города</string>
     <string name="clear_search_field">Очистить поле поиска</string>
     <string name="max_min_temperature_title">Макс.:%1$s°, Мин.:%2$s°</string>
-    <string name="wind_speed_title">%1$d м/с</string>
+    <string name="speed_value">%1$d м/с</string>
     <string name="now">Сейчас</string>
     <string name="today_forecast_title">СЕГОДНЯ</string>
     <string name="daily_forecast_title">ПРОГНОЗ НА 3 ДНЯ</string>
@@ -64,5 +64,34 @@
     <string name="wind_body">Ветер</string>
     <string name="units_mm_hg">мм рт. ст.</string>
     <string name="units_mbar">миллибар</string>
+
+    <!-- Screen titles -->
+    <string name="settings_title">Настройки</string>
+
+    <!-- Temperature -->
+    <string name="temperature_title">Температура</string>
+    <string name="temperature_celsius">Цельсий (°C)</string>
+    <string name="temperature_fahrenheit">Фаренгейт (°F)</string>
+
+    <!-- Wind speed -->
+    <string name="speed_title">Скорость ветра</string>
+    <string name="speed_kph">Километры в час (км/ч)</string>
+    <string name="speed_mph">Мили в час (миль/ч)</string>
+    <string name="speed_ms">Метры в секунду (м/с)</string>
+
+    <!-- Precipitation -->
+    <string name="precipitation_title">Осадки</string>
+    <string name="precipitation_mm">Миллиметры (мм)</string>
+    <string name="precipitation_in">Дюймы (дюйм)</string>
+
+    <!-- Visibility -->
+    <string name="visibility_title">Видимость</string>
+    <string name="visibility_km">Километры (км)</string>
+    <string name="visibility_miles">Мили (ми)</string>
+
+    <!-- Pressure -->
+    <string name="atm_pressure_title">Атмосферное давление</string>
+    <string name="pressure_mmhg">Миллиметры ртутного столба (мм рт. ст.)</string>
+    <string name="pressure_inhg">Дюйм ртутного столба (дюйм рт. ст.)</string>
 
 </resources>

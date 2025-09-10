@@ -68,7 +68,7 @@ data class CurrentInfo(
     val windDirection: String,
     val windDegree: Int,
     val humidity: Int,
-    val dewPoint: Int,
+    val dewPoint: Float,
     val pressure: Int,
     val isRainingExpected: Boolean,
     val rainfallLast24Hours: Double,

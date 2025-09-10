@@ -16,6 +16,7 @@ object HomeDestination
 
 interface HomeNavigator {
     fun onNavigateToWeatherByLocation(locationId: Int)
+    fun onNavigateToAppSettings()
     fun onNavigateUp()
 }
 
@@ -32,7 +33,8 @@ fun NavGraphBuilder.home(
 
         HomeRoute(
             viewModel = viewModel,
-            onNavigateToWeatherByLocation = externalNavigator::onNavigateToWeatherByLocation
+            onNavigateToWeatherByLocation = externalNavigator::onNavigateToWeatherByLocation,
+            onNavigateToAppSettings = externalNavigator::onNavigateToAppSettings
         )
     }
 }

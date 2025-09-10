@@ -67,6 +67,7 @@ appcompat = "1.7.1"
 junitJupiterApi = "5.10.0"
 kotlinTestJunit5 = "1.9.23"
 junitJupiter = "5.8.1"
+junit = "4.13.2"
 
 [libraries]
 
@@ -146,6 +147,7 @@ kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", versi
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junitJupiterApi" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junitJupiterApi" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

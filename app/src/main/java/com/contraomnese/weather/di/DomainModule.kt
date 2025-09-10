@@ -1,5 +1,7 @@
 package com.contraomnese.weather.di
 
+import com.contraomnese.weather.domain.app.usecase.GetAppSettingsUseCase
+import com.contraomnese.weather.domain.app.usecase.UpdateAppSettingsUseCase
 import com.contraomnese.weather.domain.home.usecase.GetLocationsUseCase
 import com.contraomnese.weather.domain.weatherByLocation.usecase.GetCurrentWeatherUseCase
 import com.contraomnese.weather.domain.weatherByLocation.usecase.GetForecastWeatherUseCase
@@ -28,6 +30,17 @@ val domainModule = module {
     }
     factory<GetForecastWeatherUseCase> {
         GetForecastWeatherUseCase(
+            repository = get(),
+            coroutineContextProvider = get()
+        )
+    }
+    factory<GetAppSettingsUseCase> {
+        GetAppSettingsUseCase(
+            repository = get()
+        )
+    }
+    factory<UpdateAppSettingsUseCase> {
+        UpdateAppSettingsUseCase(
             repository = get(),
             coroutineContextProvider = get()
         )

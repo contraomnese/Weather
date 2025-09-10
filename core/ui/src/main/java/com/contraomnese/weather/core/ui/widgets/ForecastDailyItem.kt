@@ -23,6 +23,7 @@ import com.contraomnese.weather.design.theme.itemHeight64
 import com.contraomnese.weather.design.theme.itemWidth112
 import com.contraomnese.weather.design.theme.itemWidth40
 import com.contraomnese.weather.design.theme.padding12
+import com.contraomnese.weather.domain.app.model.TemperatureUnit
 
 @Composable
 fun ForecastDailyItem(
@@ -34,6 +35,7 @@ fun ForecastDailyItem(
     maxRangeTemperature: Int,
     minRangeTemperature: Int,
     currentTemperature: Int? = null,
+    temperatureUnit: TemperatureUnit,
 ) {
     Row(
         modifier = modifier
@@ -61,6 +63,7 @@ fun ForecastDailyItem(
             min = minTemperature.toFloat(),
             current = currentTemperature?.toFloat(),
             max = maxTemperature.toFloat(),
+            temperatureUnit = temperatureUnit,
             modifier = Modifier
                 .weight(1f)
                 .height(itemHeight6),
@@ -85,7 +88,8 @@ private fun ForecastDailyItemPreview() {
             maxTemperature = 23,
             maxRangeTemperature = 25,
             minRangeTemperature = 17,
-            currentTemperature = 21
+            currentTemperature = 21,
+            temperatureUnit = TemperatureUnit.Celsius
         )
     }
 }

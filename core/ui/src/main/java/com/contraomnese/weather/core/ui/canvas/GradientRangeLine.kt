@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight8
 import com.contraomnese.weather.design.theme.itemWidth112
+import com.contraomnese.weather.domain.app.model.TemperatureUnit
 
 val aqiIndexGradientStops = listOf(
     1f to Color(0xFF2D6FA1),
@@ -56,6 +57,11 @@ val temperatureGradientStops = listOf(
     50f to Color(0xFFDC3535),
 )
 
+private fun Float.toCelsius(unit: TemperatureUnit): Float = when (unit) {
+    TemperatureUnit.Celsius -> this
+    TemperatureUnit.Fahrenheit -> (this - 32f) / 1.8f
+}
+
 @Composable
 fun TemperatureRangeLine(
     modifier: Modifier = Modifier,
@@ -64,14 +70,16 @@ fun TemperatureRangeLine(
     min: Float,
     max: Float,
     current: Float? = null,
+    temperatureUnit: TemperatureUnit,
 ) {
+
     GradientRangeLine(
         modifier = modifier,
-        minRange = minRange,
-        maxRange = maxRange,
-        min = min,
-        max = max,
-        current = current,
+        minRange = minRange.toCelsius(temperatureUnit),
+        maxRange = maxRange.toCelsius(temperatureUnit),
+        min = min.toCelsius(temperatureUnit),
+        max = max.toCelsius(temperatureUnit),
+        current = current?.toCelsius(temperatureUnit),
         gradientStops = temperatureGradientStops
     )
 }
@@ -212,6 +220,7 @@ fun TemperatureRangeLinePreview() {
             min = 0f,
             current = 23f,
             max = 33f,
+            temperatureUnit = TemperatureUnit.Celsius
         )
     }
 }

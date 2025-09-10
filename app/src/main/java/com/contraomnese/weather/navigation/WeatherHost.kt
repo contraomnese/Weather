@@ -14,6 +14,7 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.contraomnese.weather.appsettings.navigation.appSettings
 import com.contraomnese.weather.core.ui.widgets.NotificationSnackBar
 import com.contraomnese.weather.design.theme.padding20
 import com.contraomnese.weather.design.theme.padding8
@@ -58,6 +59,7 @@ internal fun WeatherHost(
                 startDestination = HomeDestination
             ) {
                 home(externalNavigator = navController.homeNavigator())
+                appSettings(externalNavigator = navController.appSettingsNavigator())
                 weatherByLocation(externalNavigator = navController.weatherByLocationNavigator())
             }
         }

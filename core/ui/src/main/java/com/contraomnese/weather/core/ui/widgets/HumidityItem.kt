@@ -20,12 +20,15 @@ import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight160
 import com.contraomnese.weather.design.theme.padding8
+import com.contraomnese.weather.domain.app.model.TemperatureUnit
+import kotlin.math.roundToInt
 
 @Composable
 fun HumidityItem(
     modifier: Modifier = Modifier,
     humidity: Int,
-    dewPoint: Int,
+    dewPoint: Float,
+    temperatureUnit: TemperatureUnit,
 ) {
 
     Row(
@@ -48,7 +51,7 @@ fun HumidityItem(
             )
             HorizontalDivider()
             Text(
-                text = stringResource(R.string.dew_point, dewPoint),
+                text = stringResource(R.string.dew_point, dewPoint.roundToInt()),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -57,7 +60,7 @@ fun HumidityItem(
             modifier = Modifier
                 .height(itemHeight160)
                 .weight(1f),
-            dewPointFraction = DewPointFractions.from(dewPoint)
+            dewPointFraction = DewPointFractions.from(dewPoint, temperatureUnit)
         )
     }
 }
@@ -69,7 +72,8 @@ private fun HumidityItemPreview(modifier: Modifier = Modifier) {
         HumidityItem(
             modifier = modifier,
             humidity = 45,
-            dewPoint = 16
+            dewPoint = 16f,
+            temperatureUnit = TemperatureUnit.Celsius
         )
     }
 }

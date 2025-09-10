@@ -41,7 +41,7 @@
     <string name="cardinal_point_e">E</string>
     <string name="cardinal_point_w">W</string>
     <string name="cardinal_point_s">S</string>
-    <string name="wind_speed_title">%1$d m/s</string>
+    <string name="speed_value">%1$d m/s</string>
     <string name="wind_body">Wind</string>
     <string name="gust_of_wind_body">Gust of wind</string>
 
@@ -82,6 +82,35 @@
     <string name="units_mm">mm</string>
     <string name="units_inch_hg">inches Hg</string>
     <string name="units_degree" translatable="false">°</string>
+
+    <!-- Screen titles -->
+    <string name="settings_title">Settings</string>
+
+    <!-- Temperature -->
+    <string name="temperature_title">Temperature</string>
+    <string name="temperature_celsius">Celsius (°C)</string>
+    <string name="temperature_fahrenheit">Fahrenheit (°F)</string>
+
+    <!-- Wind speed -->
+    <string name="speed_title">Wind speed</string>
+    <string name="speed_kph">Kilometers per hour (kph)</string>
+    <string name="speed_mph">Miles per hour (mph)</string>
+    <string name="speed_ms">Meters per second (m/s)</string>
+
+    <!-- Precipitation -->
+    <string name="precipitation_title">Precipitation</string>
+    <string name="precipitation_mm">Millimeters (mm)</string>
+    <string name="precipitation_in">Inches (in)</string>
+
+    <!-- Visibility -->
+    <string name="visibility_title">Visibility</string>
+    <string name="visibility_km">Kilometers (km)</string>
+    <string name="visibility_miles">Miles (mi)</string>
+
+    <!-- Pressure -->
+    <string name="atm_pressure_title">Atmospheric pressure</string>
+    <string name="pressure_mmhg">Millimeters of mercury (mmHg)</string>
+    <string name="pressure_inhg">Inches of mercury (mmHg)</string>
 
     <string name="empty" translatable="false"></string>
 </resources>

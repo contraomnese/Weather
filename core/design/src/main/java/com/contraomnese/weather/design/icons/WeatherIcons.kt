@@ -10,6 +10,7 @@ import androidx.compose.material.icons.outlined.DisabledByDefault
 import androidx.compose.material.icons.outlined.Equalizer
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Water
 import androidx.compose.material.icons.outlined.WaterDrop
 import androidx.compose.material.icons.outlined.WbSunny
@@ -30,4 +31,5 @@ object WeatherIcons {
     val Rainfall = Icons.Outlined.WaterDrop
     val Wind = Icons.Outlined.Air
     val Pressure = Icons.Outlined.Compress
+    val Settings = Icons.Outlined.Settings
 }

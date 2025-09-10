@@ -45,9 +45,9 @@ data class CurrentWeatherNetwork(
     @SerializedName("heatindex_f")
     val heatIndexF: Double,
     @SerializedName("dewpoint_c")
-    val dewPointC: Double,
+    val dewPointC: Float,
     @SerializedName("dewpoint_f")
-    val dewPointF: Double,
+    val dewPointF: Float,
     @SerializedName("vis_km")
     val visibilityKm: Double,
     @SerializedName("vis_miles")

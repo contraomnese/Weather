@@ -15,6 +15,7 @@ internal val weatherModule = module {
             notificationMonitor = get(),
             getGeoLocationUseCase = get(),
             getForecastWeatherUseCase = get(),
+            getAppSettingsUseCase = get(),
             locationId = id
         )
     }
