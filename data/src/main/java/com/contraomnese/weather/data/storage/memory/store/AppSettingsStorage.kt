@@ -6,7 +6,6 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.contraomnese.weather.data.storage.memory.api.AppSettingsStorage
 import com.contraomnese.weather.data.storage.memory.models.AppSettingsEntity
-import com.contraomnese.weather.domain.app.model.Language
 import com.contraomnese.weather.domain.app.model.PrecipitationUnit
 import com.contraomnese.weather.domain.app.model.PressureUnit
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
@@ -36,7 +35,7 @@ class AppSettingsStorageImpl(private val context: Context) : AppSettingsStorage 
                 ?: Locale.getDefault().language
 
             AppSettingsEntity(
-                language = Language.fromLocaleCode(languageValue).name,
+                language = languageValue,
                 speedUnit = prefs[Keys.SPEED_UNIT] ?: WindSpeedUnit.Kph.name,
                 precipitationUnit = prefs[Keys.PRECIPITATION_UNIT] ?: PrecipitationUnit.Millimeters.name,
                 temperatureUnit = prefs[Keys.TEMPERATURE_UNIT] ?: TemperatureUnit.Celsius.name,
