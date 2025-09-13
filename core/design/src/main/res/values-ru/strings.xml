@@ -27,22 +27,22 @@
     <string name="sunset_title">Закат</string>
     <string name="sunrise_time_title">Восход в %1$s</string>
     <string name="sunset_time_title">Закат в %1$s</string>
+    <string name="sunrise_title">Восход</string>
+
     <string name="cardinal_point_n">С</string>
     <string name="cardinal_point_e">В</string>
     <string name="cardinal_point_w">З</string>
     <string name="cardinal_point_s">Ю</string>
 
-    <string name="units_mm">мм</string>
-    <string name="units_inch_hg">дюйм рт.ст.</string>
-    <string name="sunrise_title">Восход</string>
 
-    <string name="rainfall_value">%.1f мм</string>
+    <string name="rainfall_value_mm">%.1f мм</string>
+    <string name="rainfall_value_inch">%.2f дюйм</string>
     <string name="in_last_24_hours">последние 24 ч.</string>
     <string name="in_next_1_hour">"в течении часа"</string>
     <string name="expected_in_next_24_hours">следующие 24 ч.</string>
     <string name="expected_raining">Скоро ожидается дождь</string>
     <string name="dew_point">Точка россы в данный момент %1$d°.</string>
-    <string name="units_meter_in_second">м/с</string>
+
     <string name="gust_of_wind_body">Порывы ветра</string>
     <string name="low_title">Низкий</string>
     <string name="moderate_title">Умеренный</string>
@@ -62,6 +62,14 @@
     <string name="uv_index_very_high_desc">Незащищенная кожа может быстро обгореть. Ищите тень и носите защитную одежду.</string>
     <string name="uv_index_extreme_desc">Солнечные лучи чрезвычайно опасны. Избегайте прямого солнечного света; требуется полная защита.</string>
     <string name="wind_body">Ветер</string>
+
+    <!--  Units -->
+    <string name="units_mm">мм</string>
+    <string name="units_inches">дюйм</string>
+    <string name="units_meter_in_second">м/с</string>
+    <string name="units_killometer_per_hour">км/ч</string>
+    <string name="units_mile_per_hour">мили/ч</string>
+    <string name="units_gpa">гПа</string>
     <string name="units_mm_hg">мм рт. ст.</string>
     <string name="units_mbar">миллибар</string>
 
@@ -84,14 +92,9 @@
     <string name="precipitation_mm">Миллиметры (мм)</string>
     <string name="precipitation_in">Дюймы (дюйм)</string>
 
-    <!-- Visibility -->
-    <string name="visibility_title">Видимость</string>
-    <string name="visibility_km">Километры (км)</string>
-    <string name="visibility_miles">Мили (ми)</string>
-
     <!-- Pressure -->
     <string name="atm_pressure_title">Атмосферное давление</string>
     <string name="pressure_mmhg">Миллиметры ртутного столба (мм рт. ст.)</string>
-    <string name="pressure_inhg">Дюйм ртутного столба (дюйм рт. ст.)</string>
+    <string name="pressure_gpa">Гекто паскаль (гПа)</string>
 
 </resources>

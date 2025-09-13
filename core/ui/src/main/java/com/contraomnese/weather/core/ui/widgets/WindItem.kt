@@ -21,6 +21,7 @@ import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight160
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding8
+import com.contraomnese.weather.domain.app.model.WindSpeedUnit
 
 
 @Composable
@@ -30,7 +31,14 @@ fun WindItem(
     gustSpeed: String,
     degree: Int,
     direction: String,
+    windSpeedUnit: WindSpeedUnit,
 ) {
+
+    val windSpeedUnitTitle = when (windSpeedUnit) {
+        WindSpeedUnit.Kph -> R.string.units_killometer_per_hour
+        WindSpeedUnit.Mph -> R.string.units_mile_per_hour
+        WindSpeedUnit.Ms -> R.string.units_meter_in_second
+    }
 
     Row(
         modifier = modifier
@@ -59,7 +67,7 @@ fun WindItem(
                 )
                 Column {
                     Text(
-                        text = stringResource(R.string.units_meter_in_second),
+                        text = stringResource(windSpeedUnitTitle),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
@@ -82,7 +90,7 @@ fun WindItem(
                 )
                 Column {
                     Text(
-                        text = stringResource(R.string.units_meter_in_second),
+                        text = stringResource(windSpeedUnitTitle),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
@@ -102,8 +110,12 @@ fun WindItem(
 private fun WindItemPreview(modifier: Modifier = Modifier) {
     WeatherTheme {
         WindItem(
-            modifier = modifier, windSpeed = "5", gustSpeed = "13", degree = 34, direction = "NW",
-
+            modifier = modifier,
+            windSpeed = "5",
+            gustSpeed = "13",
+            degree = 34,
+            direction = "NW",
+            windSpeedUnit = WindSpeedUnit.Ms
             )
     }
 }

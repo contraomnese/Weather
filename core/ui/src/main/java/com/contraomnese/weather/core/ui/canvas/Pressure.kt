@@ -28,21 +28,29 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
+import com.contraomnese.weather.domain.app.model.PressureUnit
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-private const val atmosphericPressure = 760
+private const val atmosphericPressureMmHg = 760
+private const val atmosphericPressureGPa = 1013
 
 @Composable
 fun Pressure(
     modifier: Modifier = Modifier,
     pressure: Int,
+    pressureUnit: PressureUnit,
 ) {
     val density = LocalDensity.current
     var width by remember(pressure) { mutableIntStateOf(0) }
     val textMeasurer = rememberTextMeasurer()
-    val degree = remember { pressure - atmosphericPressure }
+    val degree = remember(pressureUnit) {
+        when (pressureUnit) {
+            PressureUnit.GPa -> pressure - atmosphericPressureGPa
+            PressureUnit.MmHg -> pressure - atmosphericPressureMmHg
+        }
+    }
 
     val pressureTextLayout = textMeasurer.measure(
         text = AnnotatedString(pressure.toString()),
@@ -57,7 +65,14 @@ fun Pressure(
     )
 
     val pressureUnitsTextLayout = textMeasurer.measure(
-        text = AnnotatedString(stringResource(R.string.units_mm_hg)),
+        text = AnnotatedString(
+            stringResource(
+                when (pressureUnit) {
+                    PressureUnit.GPa -> R.string.units_gpa
+                    PressureUnit.MmHg -> R.string.units_mm_hg
+                }
+            )
+        ),
         style = MaterialTheme.typography.headlineMedium.copy(
             color = Color.White,
             fontSize = with(density) { (width / 10).toSp() },
@@ -214,7 +229,8 @@ private fun WindItemPreview() {
     WeatherTheme {
         Pressure(
             modifier = Modifier.size(400.dp),
-            pressure = 759
+            pressure = 1014,
+            pressureUnit = PressureUnit.GPa
         )
     }
 }

@@ -14,10 +14,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
-import com.contraomnese.weather.core.ui.utils.toCelsius
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight160
-import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import kotlinx.collections.immutable.persistentMapOf
 import kotlin.math.roundToInt
 
@@ -32,8 +30,8 @@ sealed interface DewPointFractions {
     data object Dangerous : DewPointFractions
 
     companion object {
-        fun from(dewPoint: Float, unit: TemperatureUnit): DewPointFractions {
-            return when (dewPoint.toCelsius(unit).roundToInt()) {
+        fun fromC(dewPoint: Int): DewPointFractions {
+            return when (dewPoint) {
                 in 0..10 -> Dry
                 in 11..12 -> VeryComfortable
                 in 13..15 -> Comfortable
@@ -41,6 +39,19 @@ sealed interface DewPointFractions {
                 in 18..20 -> Unpleasant
                 in 21..23 -> Uncomfortable
                 in 24..26 -> ExtremelyUncomfortable
+                else -> Dangerous
+            }
+        }
+
+        fun fromF(dewPoint: Int): DewPointFractions {
+            return when (dewPoint) {
+                in 0..50 -> Dry
+                in 51..54 -> VeryComfortable
+                in 55..59 -> Comfortable
+                in 60..63 -> ComfortableForMost
+                in 64..68 -> Unpleasant
+                in 69..74 -> Uncomfortable
+                in 75..79 -> ExtremelyUncomfortable
                 else -> Dangerous
             }
         }
@@ -194,7 +205,7 @@ private fun DewPointPreview() {
     WeatherTheme {
         DewPoint(
             modifier = Modifier.size(itemHeight160),
-            dewPointFraction = DewPointFractions.from(11f, TemperatureUnit.Celsius),
+            dewPointFraction = DewPointFractions.fromC(11),
         )
     }
 }

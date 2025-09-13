@@ -5,6 +5,5 @@ data class AppSettingsEntity(
     val speedUnit: String,
     val precipitationUnit: String,
     val temperatureUnit: String,
-    val visibilityUnit: String,
     val pressureUnit: String,
 )

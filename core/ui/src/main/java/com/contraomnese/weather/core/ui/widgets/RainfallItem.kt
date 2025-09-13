@@ -1,5 +1,6 @@
 package com.contraomnese.weather.core.ui.widgets
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -26,6 +28,7 @@ import com.contraomnese.weather.design.theme.itemHeight140
 import com.contraomnese.weather.design.theme.padding4
 import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.design.theme.space8
+import com.contraomnese.weather.domain.app.model.PrecipitationUnit
 import kotlin.math.roundToInt
 
 @Composable
@@ -35,7 +38,15 @@ fun RainfallItem(
     next24hoursAmount: Double,
     nextOneHourAmount: Double,
     isRainingExpected: Boolean = false,
+    precipitationUnit: PrecipitationUnit,
 ) {
+
+    val precipitationRes = remember(precipitationUnit) {
+        when (precipitationUnit) {
+            PrecipitationUnit.Millimeters -> R.string.rainfall_value_mm
+            PrecipitationUnit.Inches -> R.string.rainfall_value_inch
+        }
+    }
 
     Row(
         modifier = modifier
@@ -47,21 +58,26 @@ fun RainfallItem(
             modifier = Modifier
                 .height(itemHeight140)
                 .weight(1f),
-            rainfallFraction = RainfallFractions.from(next24hoursAmount.roundToInt())
+            rainfallFraction = when (precipitationUnit) {
+                PrecipitationUnit.Millimeters -> RainfallFractions.fromMm(last24hoursAmount.roundToInt() + next24hoursAmount.roundToInt())
+                PrecipitationUnit.Inches -> RainfallFractions.fromInches(last24hoursAmount.toFloat() + next24hoursAmount.toFloat())
+            }
         )
 
-        if (isRainingExpected) ExpectedRaining(last24hoursAmount, next24hoursAmount, nextOneHourAmount)
+        if (isRainingExpected) ExpectedRaining(last24hoursAmount, next24hoursAmount, nextOneHourAmount, precipitationRes)
         else
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(2f),
                 verticalArrangement = Arrangement.spacedBy(padding4),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.End
             ) {
-                Column {
+                Column(
+                    horizontalAlignment = Alignment.End
+                ) {
                     Text(
-                        text = stringResource(R.string.rainfall_value, last24hoursAmount),
+                        text = stringResource(precipitationRes, last24hoursAmount),
                         style = MaterialTheme.typography.displaySmall,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -72,9 +88,11 @@ fun RainfallItem(
                     )
                 }
                 HorizontalDivider()
-                Column {
+                Column(
+                    horizontalAlignment = Alignment.End
+                ) {
                     Text(
-                        text = stringResource(R.string.rainfall_value, next24hoursAmount),
+                        text = stringResource(precipitationRes, next24hoursAmount),
                         style = MaterialTheme.typography.displaySmall,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -93,6 +111,7 @@ private fun RowScope.ExpectedRaining(
     last24hoursAmount: Double,
     next24hoursAmount: Double,
     nextOneHourAmount: Double,
+    @StringRes precipitationRes: Int,
 ) {
     Column(
         modifier = Modifier
@@ -114,8 +133,8 @@ private fun RowScope.ExpectedRaining(
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = stringResource(R.string.rainfall_value, last24hoursAmount),
-                    style = MaterialTheme.typography.titleLarge,
+                    text = stringResource(precipitationRes, last24hoursAmount),
+                    style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
@@ -124,8 +143,8 @@ private fun RowScope.ExpectedRaining(
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = stringResource(R.string.rainfall_value, next24hoursAmount),
-                    style = MaterialTheme.typography.titleLarge,
+                    text = stringResource(precipitationRes, next24hoursAmount),
+                    style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
@@ -150,7 +169,7 @@ private fun RowScope.ExpectedRaining(
             horizontalArrangement = Arrangement.spacedBy(space = space8)
         ) {
             Text(
-                text = stringResource(R.string.rainfall_value, nextOneHourAmount),
+                text = stringResource(precipitationRes, nextOneHourAmount),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 2,
@@ -171,10 +190,11 @@ private fun RowScope.ExpectedRaining(
 private fun RainfallItemPreview() {
     WeatherTheme {
         RainfallItem(
-            last24hoursAmount = 0.7,
-            next24hoursAmount = 2.4,
+            last24hoursAmount = 0.050,
+            next24hoursAmount = 0.260,
             nextOneHourAmount = 0.2,
-            isRainingExpected = true
+            isRainingExpected = false,
+            precipitationUnit = PrecipitationUnit.Inches
         )
     }
 }

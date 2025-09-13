@@ -5,7 +5,6 @@ import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.model.PrecipitationUnit
 import com.contraomnese.weather.domain.app.model.PressureUnit
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
-import com.contraomnese.weather.domain.app.model.VisibilityUnit
 import com.contraomnese.weather.domain.app.model.WindSpeedUnit
 import com.contraomnese.weather.domain.app.usecase.GetAppSettingsUseCase
 import com.contraomnese.weather.domain.app.usecase.UpdateAppSettingsUseCase
@@ -27,7 +26,6 @@ internal sealed interface AppSettingsEvent {
     data class TemperatureUnitChanged(val newTemperatureUnit: TemperatureUnit) : AppSettingsEvent
     data class PressureUnitChanged(val newPressureUnit: PressureUnit) : AppSettingsEvent
     data class PrecipitationUnitChanged(val newPrecipitationUnit: PrecipitationUnit) : AppSettingsEvent
-    data class VisibilityUnitChanged(val newVisibilityUnit: VisibilityUnit) : AppSettingsEvent
     data class WindSpeedUnitChanged(val newWindSpeedUnit: WindSpeedUnit) : AppSettingsEvent
 }
 
@@ -49,7 +47,6 @@ internal class AppSettingsViewModel(
             is AppSettingsEvent.TemperatureUnitChanged -> onTemperatureUnitChanged(event.newTemperatureUnit)
             is AppSettingsEvent.PressureUnitChanged -> onPressureUnitChanged(event.newPressureUnit)
             is AppSettingsEvent.PrecipitationUnitChanged -> onPrecipitationUnitChanged(event.newPrecipitationUnit)
-            is AppSettingsEvent.VisibilityUnitChanged -> onVisibilityUnitChanged(event.newVisibilityUnit)
             is AppSettingsEvent.WindSpeedUnitChanged -> onWindSpeedUnitChanged(event.newWindSpeedUnit)
         }
     }
@@ -77,10 +74,6 @@ internal class AppSettingsViewModel(
 
     private fun onPrecipitationUnitChanged(newPrecipitationUnit: PrecipitationUnit) {
         updateAppSettings(uiState.value.appSettings.copy(precipitationUnit = newPrecipitationUnit))
-    }
-
-    private fun onVisibilityUnitChanged(newVisibilityUnit: VisibilityUnit) {
-        updateAppSettings(uiState.value.appSettings.copy(visibilityUnit = newVisibilityUnit))
     }
 
     private fun onWindSpeedUnitChanged(newWindSpeedUnit: WindSpeedUnit) {

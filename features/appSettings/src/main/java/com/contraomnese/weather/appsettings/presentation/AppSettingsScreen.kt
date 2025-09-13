@@ -29,7 +29,6 @@ import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.model.PrecipitationUnit
 import com.contraomnese.weather.domain.app.model.PressureUnit
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
-import com.contraomnese.weather.domain.app.model.VisibilityUnit
 import com.contraomnese.weather.domain.app.model.WindSpeedUnit
 
 @Composable
@@ -85,15 +84,6 @@ private fun AppSettingsScreen(
             selected = uiState.appSettings.precipitationUnit,
             onSelected = {
                 onEvent(AppSettingsEvent.PrecipitationUnitChanged(it))
-            }
-        )
-
-        RadioGroup(
-            title = stringResource(R.string.visibility_title),
-            options = VisibilityUnit.entries.toList(),
-            selected = uiState.appSettings.visibilityUnit,
-            onSelected = {
-                onEvent(AppSettingsEvent.VisibilityUnitChanged(it))
             }
         )
 
@@ -169,14 +159,9 @@ inline fun <reified T : Enum<T>> T.toTextRes(): Int = when (this) {
         PrecipitationUnit.Inches -> R.string.precipitation_in
     }
 
-    is VisibilityUnit -> when (this) {
-        VisibilityUnit.Kilometers -> R.string.visibility_km
-        VisibilityUnit.Miles -> R.string.visibility_miles
-    }
-
     is PressureUnit -> when (this) {
         PressureUnit.MmHg -> R.string.pressure_mmhg
-        PressureUnit.InchHg -> R.string.pressure_inhg
+        PressureUnit.GPa -> R.string.pressure_gpa
     }
 
     else -> error("Unsupported enum type: ${T::class.simpleName}")

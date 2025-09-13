@@ -1,6 +1,6 @@
 package com.contraomnese.weather.data.mappers
 
-import com.contraomnese.weather.data.network.models.ForecastDayNetwork
+import com.contraomnese.weather.data.network.models.CurrentWeatherNetwork
 import com.contraomnese.weather.data.network.models.ForecastWeatherResponse
 import com.contraomnese.weather.data.network.models.HourNetwork
 import com.contraomnese.weather.data.parsers.DateTimeParser
@@ -11,10 +11,7 @@ import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import com.contraomnese.weather.domain.app.model.WindSpeedUnit
 import com.contraomnese.weather.domain.weatherByLocation.model.AlertsInfo
 import com.contraomnese.weather.domain.weatherByLocation.model.CurrentInfo
-import com.contraomnese.weather.domain.weatherByLocation.model.ForecastDay
-import com.contraomnese.weather.domain.weatherByLocation.model.ForecastHour
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastInfo
-import com.contraomnese.weather.domain.weatherByLocation.model.ForecastToday
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeatherDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.LocationInfo
 import com.contraomnese.weather.domain.weatherByLocation.model.UvIndex
@@ -52,10 +49,7 @@ fun ForecastWeatherResponse.toDomain(appSettings: AppSettings): ForecastWeatherD
             isAfterMidDay = isAfterMidDay
         ),
         currentInfo = CurrentInfo(
-            temperature = when (appSettings.temperatureUnit) {
-                TemperatureUnit.Celsius -> current.tempC.roundToInt().toString()
-                TemperatureUnit.Fahrenheit -> current.tempF.roundToInt().toString()
-            },
+            temperature = current.toTemperatureDomain(appSettings.temperatureUnit),
             feelsLike = when (appSettings.temperatureUnit) {
                 TemperatureUnit.Celsius -> current.feelsLikeC.roundToInt().toString()
                 TemperatureUnit.Fahrenheit -> current.feelsLikeF.roundToInt().toString()
@@ -63,35 +57,30 @@ fun ForecastWeatherResponse.toDomain(appSettings: AppSettings): ForecastWeatherD
             isDay = current.isDay == IS_DAY,
             conditionCode = current.condition.code,
             conditionText = current.condition.text,
-            windSpeed = when (appSettings.windSpeedUnit) {
-                WindSpeedUnit.Kph -> current.windKph.roundToInt().toString()
-                WindSpeedUnit.Mph -> current.windMph.roundToInt().toString()
-                WindSpeedUnit.Ms -> current.windKph.toMs().roundToInt().toString()
-            },
-            gustSpeed = when (appSettings.windSpeedUnit) {
-                WindSpeedUnit.Kph -> current.gustKph.roundToInt().toString()
-                WindSpeedUnit.Mph -> current.gustMph.roundToInt().toString()
-                WindSpeedUnit.Ms -> current.gustKph.toMs().roundToInt().toString()
-            },
+            windSpeed = current.toWindDomain(appSettings.windSpeedUnit),
+            gustSpeed = current.toGustDomain(appSettings.windSpeedUnit),
             windDirection = current.windDir.translateDirection(),
             windDegree = current.windDegree,
-            pressure = when (appSettings.pressureUnit) {
-                PressureUnit.MmHg -> (current.pressureIn * MM_IN_INCH).roundToInt()
-                PressureUnit.InchHg -> current.pressureIn.roundToInt()
-            },
+            pressure = current.toPressureDomain(appSettings.pressureUnit),
             isRainingExpected = forecast.forecastDay.first().day.dailyWillItRain == DAILY_WILL_RAIN,
-            rainfallLast24Hours = forecast.forecastDay[0].hour.sumOf { hour -> if (hour.timeEpoch < location.localtimeEpoch) hour.precipMm else DEFAULT_RAINFALL },
-            rainfallNext24Hours = forecast.forecastDay[0].hour.sumOf { hour -> if (hour.timeEpoch >= location.localtimeEpoch) hour.precipMm else DEFAULT_RAINFALL } +
-                    forecast.forecastDay[1].hour.sumOf { hour -> if (hour.timeEpoch < nextDayHourLimit) hour.precipMm else DEFAULT_RAINFALL },
-            rainfallNextHour = when (appSettings.precipitationUnit) {
-                PrecipitationUnit.Millimeters -> current.precipMm
-                PrecipitationUnit.Inches -> current.precipIn
+            rainfallLast24Hours = forecast.forecastDay[0].hour.sumOf { hour ->
+                if (hour.timeEpoch < location.localtimeEpoch) hour.toPrecipitationDomain(
+                    appSettings.precipitationUnit
+                ) else DEFAULT_RAINFALL
             },
+            rainfallNext24Hours = forecast.forecastDay[0].hour.sumOf { hour ->
+                if (hour.timeEpoch >= location.localtimeEpoch) hour.toPrecipitationDomain(
+                    appSettings.precipitationUnit
+                ) else DEFAULT_RAINFALL
+            } +
+                    forecast.forecastDay[1].hour.sumOf { hour ->
+                        if (hour.timeEpoch < nextDayHourLimit) hour.toPrecipitationDomain(
+                            appSettings.precipitationUnit
+                        ) else DEFAULT_RAINFALL
+                    },
+            rainfallNextHour = current.toPrecipitationDomain(appSettings.precipitationUnit),
             humidity = current.humidity,
-            dewPoint = when (appSettings.temperatureUnit) {
-                TemperatureUnit.Celsius -> current.dewPointC
-                TemperatureUnit.Fahrenheit -> current.dewPointF
-            },
+            dewPoint = current.toDewPoint(appSettings.temperatureUnit),
             uvIndex = UvIndex(current.uv.roundToInt()),
             airQualityIndex = current.airQuality.toDomain()
         ),
@@ -106,59 +95,55 @@ fun ForecastWeatherResponse.toDomain(appSettings: AppSettings): ForecastWeatherD
     )
 }
 
-fun ForecastDayNetwork.toForecastTodayDomain(appSettings: AppSettings): ForecastToday {
-
-    return ForecastToday(
-        maxTemperature = when (appSettings.temperatureUnit) {
-            TemperatureUnit.Celsius -> day.maxTempC.roundToInt().toString()
-            TemperatureUnit.Fahrenheit -> day.maxTempF.roundToInt().toString()
-        },
-        minTemperature = when (appSettings.temperatureUnit) {
-            TemperatureUnit.Celsius -> day.minTempC.roundToInt().toString()
-            TemperatureUnit.Fahrenheit -> day.minTempF.roundToInt().toString()
-        },
-        conditionCode = day.condition.code,
-        conditionText = day.condition.text,
-        totalUvIndex = day.uv.toString(),
-        rainChance = day.dailyChanceOfRain.toString(),
-        totalRainFull = when (appSettings.precipitationUnit) {
-            PrecipitationUnit.Millimeters -> day.totalPrecipMm.roundToInt().toString()
-            PrecipitationUnit.Inches -> day.totalPrecipIn.roundToInt().toString()
-        },
-        sunrise = DateTimeParser.parseAmPmTime(astro.sunrise),
-        sunset = DateTimeParser.parseAmPmTime(astro.sunset),
-    )
+private fun CurrentWeatherNetwork.toTemperatureDomain(temperatureUnit: TemperatureUnit): String {
+    return when (temperatureUnit) {
+        TemperatureUnit.Celsius -> this.feelsLikeC.roundToInt().toString()
+        TemperatureUnit.Fahrenheit -> this.feelsLikeF.roundToInt().toString()
+    }
 }
 
-fun ForecastDayNetwork.toForecastDayDomain(appSettings: AppSettings): ForecastDay {
-    return ForecastDay(
-        dayName = getDayOfWeek(dateEpoch),
-        maxTemperature = when (appSettings.temperatureUnit) {
-            TemperatureUnit.Celsius -> day.maxTempC.roundToInt()
-            TemperatureUnit.Fahrenheit -> day.maxTempF.roundToInt()
-        },
-        minTemperature = when (appSettings.temperatureUnit) {
-            TemperatureUnit.Celsius -> day.minTempC.roundToInt()
-            TemperatureUnit.Fahrenheit -> day.minTempF.roundToInt()
-        },
-        conditionCode = day.condition.code,
-        totalRainFull = when (appSettings.precipitationUnit) {
-            PrecipitationUnit.Millimeters -> day.totalPrecipMm.roundToInt()
-            PrecipitationUnit.Inches -> day.totalPrecipIn.roundToInt()
-        },
-    )
+private fun CurrentWeatherNetwork.toWindDomain(windSpeedUnit: WindSpeedUnit): String {
+    return when (windSpeedUnit) {
+        WindSpeedUnit.Kph -> this.windKph.roundToInt().toString()
+        WindSpeedUnit.Mph -> this.windMph.roundToInt().toString()
+        WindSpeedUnit.Ms -> this.windKph.toMs().roundToInt().toString()
+    }
 }
 
-fun HourNetwork.toDomain(appSettings: AppSettings): ForecastHour {
-    return ForecastHour(
-        temperature = when (appSettings.temperatureUnit) {
-            TemperatureUnit.Celsius -> tempC.roundToInt().toString()
-            TemperatureUnit.Fahrenheit -> tempF.roundToInt().toString()
-        },
-        conditionCode = condition.code,
-        time = time.split(" ")[1],
-        isDay = isDay == IS_DAY
-    )
+private fun CurrentWeatherNetwork.toGustDomain(windSpeedUnit: WindSpeedUnit): String {
+    return when (windSpeedUnit) {
+        WindSpeedUnit.Kph -> this.gustKph.roundToInt().toString()
+        WindSpeedUnit.Mph -> this.gustMph.roundToInt().toString()
+        WindSpeedUnit.Ms -> this.gustKph.toMs().roundToInt().toString()
+    }
+}
+
+private fun CurrentWeatherNetwork.toPressureDomain(pressureUnit: PressureUnit): Int {
+    return when (pressureUnit) {
+        PressureUnit.MmHg -> (this.pressureIn * MM_IN_INCH).roundToInt()
+        PressureUnit.GPa -> this.pressureMb.roundToInt()
+    }
+}
+
+private fun CurrentWeatherNetwork.toDewPoint(temperatureUnit: TemperatureUnit): Int {
+    return when (temperatureUnit) {
+        TemperatureUnit.Celsius -> this.dewPointC.roundToInt()
+        TemperatureUnit.Fahrenheit -> this.dewPointF.roundToInt()
+    }
+}
+
+private fun CurrentWeatherNetwork.toPrecipitationDomain(precipitationUnit: PrecipitationUnit): Double {
+    return when (precipitationUnit) {
+        PrecipitationUnit.Millimeters -> this.precipMm
+        PrecipitationUnit.Inches -> this.precipIn
+    }
+}
+
+private fun HourNetwork.toPrecipitationDomain(precipitationUnit: PrecipitationUnit): Double {
+    return when (precipitationUnit) {
+        PrecipitationUnit.Millimeters -> this.precipMm
+        PrecipitationUnit.Inches -> this.precipIn
+    }
 }
 
 

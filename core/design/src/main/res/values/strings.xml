@@ -65,7 +65,8 @@
     <string name="pressure_is_high">The atmospheric pressure is much higher than normal. The air can seem heavy. People with hypertension may feel a headache, tension or increased heartbeat.</string>
 
     <!--  Rainfall section -->
-    <string name="rainfall_value">%.1f mm</string>
+    <string name="rainfall_value_mm">%.1f mm</string>
+    <string name="rainfall_value_inch">%.2f inch</string>
     <string name="in_last_24_hours">in the last 24h</string>
     <string name="in_next_1_hour">in the next 1h</string>
     <string name="expected_in_next_24_hours">in the next 24h</string>
@@ -76,12 +77,15 @@
     <string name="humidity_value" translatable="false">%1$s%%</string>
 
     <!--  Units -->
+    <string name="units_degree" translatable="false">°</string>
+    <string name="units_killometer_per_hour">kph</string>
+    <string name="units_mile_per_hour">mph</string>
     <string name="units_meter_in_second">m/s</string>
-    <string name="units_mm_hg">mm Hg</string>
     <string name="units_mbar">mbar</string>
     <string name="units_mm">mm</string>
-    <string name="units_inch_hg">inches Hg</string>
-    <string name="units_degree" translatable="false">°</string>
+    <string name="units_inches">in</string>
+    <string name="units_mm_hg">mm Hg</string>
+    <string name="units_gpa">gPa</string>
 
     <!-- Screen titles -->
     <string name="settings_title">Settings</string>
@@ -102,15 +106,10 @@
     <string name="precipitation_mm">Millimeters (mm)</string>
     <string name="precipitation_in">Inches (in)</string>
 
-    <!-- Visibility -->
-    <string name="visibility_title">Visibility</string>
-    <string name="visibility_km">Kilometers (km)</string>
-    <string name="visibility_miles">Miles (mi)</string>
-
     <!-- Pressure -->
     <string name="atm_pressure_title">Atmospheric pressure</string>
     <string name="pressure_mmhg">Millimeters of mercury (mmHg)</string>
-    <string name="pressure_inhg">Inches of mercury (mmHg)</string>
+    <string name="pressure_gpa">Gekko pascal (gPa)</string>
 
     <string name="empty" translatable="false"></string>
 </resources>

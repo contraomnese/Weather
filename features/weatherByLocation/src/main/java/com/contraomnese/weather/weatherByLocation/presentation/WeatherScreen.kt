@@ -51,7 +51,10 @@ import com.contraomnese.weather.design.theme.itemHeight64
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.design.theme.space32
+import com.contraomnese.weather.domain.app.model.PrecipitationUnit
+import com.contraomnese.weather.domain.app.model.PressureUnit
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
+import com.contraomnese.weather.domain.app.model.WindSpeedUnit
 import com.contraomnese.weather.domain.weatherByLocation.model.CoordinatesDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeatherDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.GeoLocationDomainModel
@@ -335,7 +338,13 @@ internal fun WeatherScreen(
                         -> UvIndexSection(headerSectionHeight, section, measureContainerHeight, uiState.weather)
 
                     is WindSection,
-                        -> WindSection(headerSectionHeight, section, measureContainerHeight, uiState.weather)
+                        -> WindSection(
+                        headerSectionHeight,
+                        section,
+                        measureContainerHeight,
+                        uiState.weather,
+                        uiState.appSettings.windSpeedUnit
+                    )
 
                     is HumiditySection,
                         -> HumiditySection(
@@ -347,10 +356,22 @@ internal fun WeatherScreen(
                     )
 
                     is RainfallSection,
-                        -> RainfallSection(headerSectionHeight, section, measureContainerHeight, uiState.weather)
+                        -> RainfallSection(
+                        headerSectionHeight,
+                        section,
+                        measureContainerHeight,
+                        uiState.weather,
+                        uiState.appSettings.precipitationUnit
+                    )
 
                     is PressureSection,
-                        -> PressureSection(headerSectionHeight, section, measureContainerHeight, uiState.weather)
+                        -> PressureSection(
+                        headerSectionHeight,
+                        section,
+                        measureContainerHeight,
+                        uiState.weather,
+                        uiState.appSettings.pressureUnit
+                    )
                 }
             }
             item {
@@ -502,6 +523,7 @@ private fun WindSection(
     section: WindSection,
     measureContainerHeight: (Int) -> Unit,
     weather: ForecastWeatherDomainModel,
+    windSpeedUnit: WindSpeedUnit,
 ) {
     val today = weather.currentInfo
 
@@ -517,7 +539,8 @@ private fun WindSection(
             windSpeed = today.windSpeed,
             gustSpeed = today.gustSpeed,
             degree = today.windDegree,
-            direction = today.windDirection
+            direction = today.windDirection,
+            windSpeedUnit = windSpeedUnit
         )
     }
 }
@@ -554,6 +577,7 @@ private fun RainfallSection(
     section: RainfallSection,
     measureContainerHeight: (Int) -> Unit,
     weather: ForecastWeatherDomainModel,
+    precipitationUnit: PrecipitationUnit,
 ) {
     val today = weather.currentInfo
 
@@ -569,7 +593,8 @@ private fun RainfallSection(
             last24hoursAmount = today.rainfallLast24Hours,
             next24hoursAmount = today.rainfallNext24Hours,
             nextOneHourAmount = today.rainfallNextHour,
-            isRainingExpected = today.isRainingExpected
+            isRainingExpected = today.isRainingExpected,
+            precipitationUnit = precipitationUnit
         )
     }
 }
@@ -580,6 +605,7 @@ private fun PressureSection(
     section: PressureSection,
     measureContainerHeight: (Int) -> Unit,
     weather: ForecastWeatherDomainModel,
+    pressureUnit: PressureUnit,
 ) {
     val today = weather.currentInfo
 
@@ -592,7 +618,8 @@ private fun PressureSection(
     ) {
         PressureItem(
             modifier = Modifier.padding(horizontal = padding16),
-            value = today.pressure
+            value = today.pressure,
+            pressureUnit = pressureUnit
         )
     }
 }

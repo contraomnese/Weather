@@ -6,7 +6,6 @@ import com.contraomnese.weather.domain.app.model.Language
 import com.contraomnese.weather.domain.app.model.PrecipitationUnit
 import com.contraomnese.weather.domain.app.model.PressureUnit
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
-import com.contraomnese.weather.domain.app.model.VisibilityUnit
 import com.contraomnese.weather.domain.app.model.WindSpeedUnit
 
 fun AppSettingsEntity.toDomain(): AppSettings =
@@ -15,7 +14,6 @@ fun AppSettingsEntity.toDomain(): AppSettings =
         windSpeedUnit = WindSpeedUnit.entries.firstOrNull { it.name == speedUnit } ?: WindSpeedUnit.Kph,
         precipitationUnit = PrecipitationUnit.entries.firstOrNull { it.name == precipitationUnit } ?: PrecipitationUnit.Millimeters,
         temperatureUnit = TemperatureUnit.entries.firstOrNull { it.name == temperatureUnit } ?: TemperatureUnit.Celsius,
-        visibilityUnit = VisibilityUnit.entries.firstOrNull { it.name == visibilityUnit } ?: VisibilityUnit.Kilometers,
         pressureUnit = PressureUnit.entries.firstOrNull { it.name == pressureUnit } ?: PressureUnit.MmHg
     )
 
@@ -25,6 +23,5 @@ fun AppSettings.toEntity(): AppSettingsEntity =
         speedUnit = windSpeedUnit.name,
         precipitationUnit = precipitationUnit.name,
         temperatureUnit = temperatureUnit.name,
-        visibilityUnit = visibilityUnit.name,
         pressureUnit = pressureUnit.name
     )

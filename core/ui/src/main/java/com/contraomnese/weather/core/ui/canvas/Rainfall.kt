@@ -25,7 +25,7 @@ sealed interface RainfallFractions {
     data object Extreme : RainfallFractions
 
     companion object {
-        fun from(rainfall: Int): RainfallFractions {
+        fun fromMm(rainfall: Int): RainfallFractions {
             return when (rainfall) {
                 in 0..2 -> None
                 in 3..4 -> Light
@@ -33,6 +33,18 @@ sealed interface RainfallFractions {
                 in 12..15 -> Heavy
                 in 16..25 -> VeryHeavy
                 else -> Extreme
+            }
+        }
+
+        fun fromInches(rainfall: Float): RainfallFractions {
+            return when (rainfall) {
+                in 0f..0.08f -> None
+                in 0.08f..0.16f -> Light
+                in 0.16f..0.39f -> Moderate
+                in 0.39f..0.59f -> Heavy
+                in 0.59f..0.98f -> VeryHeavy
+                else -> Extreme
+
             }
         }
     }

@@ -19,6 +19,7 @@ import com.contraomnese.weather.core.ui.canvas.Pressure
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight180
+import com.contraomnese.weather.domain.app.model.PressureUnit
 import kotlinx.collections.immutable.persistentMapOf
 
 private sealed interface PressureFractions {
@@ -28,11 +29,20 @@ private sealed interface PressureFractions {
     data object Low : PressureFractions
 
     companion object {
-        fun from(value: Int): PressureFractions {
+        fun fromMmHg(value: Int): PressureFractions {
             return when (value) {
                 in 755..759 -> Moderate
-                in 740..754 -> Low
-                in 762..780 -> High
+                in 600..754 -> Low
+                in 762..900 -> High
+                else -> Normal
+            }
+        }
+
+        fun fromGekkoPa(value: Int): PressureFractions {
+            return when (value) {
+                in 1006..1012 -> Moderate
+                in 800..1005 -> Low
+                in 1016..1200 -> High
                 else -> Normal
             }
         }
@@ -50,9 +60,17 @@ private val pressureDescriptions = persistentMapOf(
 fun PressureItem(
     modifier: Modifier = Modifier,
     value: Int,
+    pressureUnit: PressureUnit,
 ) {
 
-    val fractionDescription = remember { pressureDescriptions.getValue(PressureFractions.from(value)) }
+    val fractionDescription = remember(pressureUnit) {
+        pressureDescriptions.getValue(
+            when (pressureUnit) {
+                PressureUnit.MmHg -> PressureFractions.fromMmHg(value)
+                PressureUnit.GPa -> PressureFractions.fromGekkoPa(value)
+            }
+        )
+    }
 
     Row(
         modifier = modifier
@@ -73,7 +91,8 @@ fun PressureItem(
         )
         Pressure(
             modifier = Modifier.size(itemHeight180),
-            pressure = value
+            pressure = value,
+            pressureUnit = pressureUnit
         )
     }
 }
@@ -84,7 +103,8 @@ private fun PressureItemPreview(modifier: Modifier = Modifier) {
     WeatherTheme {
         PressureItem(
             modifier = modifier,
-            value = 758
+            value = 1124,
+            pressureUnit = PressureUnit.GPa
         )
     }
 }
