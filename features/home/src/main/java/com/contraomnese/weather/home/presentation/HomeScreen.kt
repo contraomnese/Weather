@@ -21,10 +21,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
 import com.contraomnese.weather.core.ui.widgets.SearchTextField
+import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.icons.WeatherIcons
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.cornerRadius1
@@ -32,6 +34,7 @@ import com.contraomnese.weather.design.theme.itemHeight20
 import com.contraomnese.weather.design.theme.itemHeight40
 import com.contraomnese.weather.design.theme.itemThickness2
 import com.contraomnese.weather.design.theme.padding16
+import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.domain.home.model.LocationDomainModel
 import kotlinx.collections.immutable.toPersistentList
 
@@ -61,97 +64,117 @@ internal fun HomeScreen(
 ) {
 
     Column {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            SearchTextField(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(padding16),
-                searchQuery = uiState.location.value,
-                onSearchQueryChanged = { onEvent(HomeEvent.LocationChanged(it)) },
-                isError = !uiState.location.isValidLocation(),
-                leadingIcon = if (uiState.isLoading) {
-                    {
-                        LoadingIndicator(
-                            modifier =
-                                Modifier
-                                    .height(itemHeight20)
-                                    .aspectRatio(1f)
-                        )
-                    }
-                } else null,
-                trailingIcon = if (uiState.location.value.isEmpty()) {
-                    {
-                        IconButton(
-                            onClick = { },
-                        ) {
-                            Icon(
-                                imageVector = WeatherIcons.Map,
-                                contentDescription = null
-                            )
-                        }
-                    }
-                } else null
-            )
-            IconButton(
-                onClick = onNavigateToAppSettings,
-            ) {
-                Icon(
-                    imageVector = WeatherIcons.Settings,
-                    contentDescription = null
-                )
-            }
-        }
+        TopBar(uiState, onEvent, onNavigateToAppSettings)
+        FoundedLocations(uiState, onNavigateToWeatherByLocation)
+    }
+}
 
-
-        Column(
+@Composable
+private fun TopBar(
+    uiState: HomeUiState,
+    onEvent: (HomeEvent) -> Unit,
+    onNavigateToAppSettings: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .padding(padding16)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        SearchTextField(
             modifier = Modifier
-                .padding(horizontal = padding16)
-        ) {
-            uiState.locations.forEach { location ->
-                Row(
-                    modifier = Modifier
-                        .clickable { onNavigateToWeatherByLocation(location.id) }
-                        .fillMaxWidth()
-                        .height(itemHeight40),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = location.name,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onBackground
+                .weight(1f),
+            searchQuery = uiState.location.value,
+            onSearchQueryChanged = { onEvent(HomeEvent.LocationChanged(it)) },
+            isError = !uiState.location.isValidLocation(),
+            placeholder = stringResource(R.string.search_city),
+            leadingIcon = if (uiState.isLoading) {
+                {
+                    LoadingIndicator(
+                        modifier =
+                            Modifier
+                                .height(itemHeight20)
+                                .aspectRatio(1f)
                     )
-                    Spacer(
-                        modifier = Modifier.weight(1f)
-                    )
-                    Text(
-                        text = location.countryName,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-
                 }
-
-                Spacer(
-                    modifier = Modifier
-                        .height(itemThickness2)
-                        .background(
-                            MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f),
-                            RoundedCornerShape(cornerRadius1)
+            } else null,
+            trailingIcon = if (uiState.location.value.isEmpty()) {
+                {
+                    IconButton(
+                        onClick = { },
+                    ) {
+                        Icon(
+                            imageVector = WeatherIcons.Map,
+                            contentDescription = null
                         )
-                        .fillMaxWidth()
+                    }
+                }
+            } else null
+        )
+
+        Icon(
+            modifier = Modifier
+                .padding(start = padding8)
+                .clickable { onNavigateToAppSettings() },
+            imageVector = WeatherIcons.Settings,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+        )
+    }
+}
+
+
+@Composable
+private fun FoundedLocations(
+    uiState: HomeUiState,
+    onNavigateToWeatherByLocation: (Int) -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .padding(horizontal = padding16)
+    ) {
+        uiState.locations.forEach { location ->
+            Row(
+                modifier = Modifier
+                    .clickable { onNavigateToWeatherByLocation(location.id) }
+                    .fillMaxWidth()
+                    .height(itemHeight40),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = location.name,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
+                Spacer(
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = location.countryName,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+
             }
+
+            Spacer(
+                modifier = Modifier
+                    .height(itemThickness2)
+                    .background(
+                        MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f),
+                        RoundedCornerShape(cornerRadius1)
+                    )
+                    .fillMaxWidth()
+            )
         }
     }
 }
 
 @Preview
 @Composable
-fun HomeScreenPreview(modifier: Modifier = Modifier) {
+private fun HomeScreenPreview(modifier: Modifier = Modifier) {
     WeatherTheme {
         Box(
             modifier = Modifier
@@ -180,7 +203,7 @@ fun HomeScreenPreview(modifier: Modifier = Modifier) {
 
 @Preview
 @Composable
-fun HomeScreenLoadingPreview(modifier: Modifier = Modifier) {
+private fun HomeScreenLoadingPreview(modifier: Modifier = Modifier) {
     WeatherTheme {
         Box(
             modifier = Modifier
