@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,19 +26,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.contraomnese.weather.core.ui.widgets.FavoriteItem
 import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
 import com.contraomnese.weather.core.ui.widgets.SearchTextField
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.icons.WeatherIcons
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.cornerRadius1
+import com.contraomnese.weather.design.theme.itemHeight140
 import com.contraomnese.weather.design.theme.itemHeight20
 import com.contraomnese.weather.design.theme.itemHeight40
 import com.contraomnese.weather.design.theme.itemThickness2
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding8
-import com.contraomnese.weather.domain.home.model.LocationDomainModel
+import com.contraomnese.weather.design.theme.space16
+import com.contraomnese.weather.domain.home.model.MatchingLocationDomainModel
+import com.contraomnese.weather.domain.weatherByLocation.model.CoordinatesDomainModel
+import com.contraomnese.weather.domain.weatherByLocation.model.DetailsLocationDomainModel
+import com.contraomnese.weather.domain.weatherByLocation.model.LatitudeDomainModel
+import com.contraomnese.weather.domain.weatherByLocation.model.LongitudeDomainModel
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
+import kotlin.random.Random
 
 @Composable
 internal fun HomeRoute(
@@ -65,7 +76,10 @@ internal fun HomeScreen(
 
     Column {
         TopBar(uiState, onEvent, onNavigateToAppSettings)
-        FoundedLocations(uiState, onNavigateToWeatherByLocation)
+        MatchingLocations(uiState, onEvent, onNavigateToWeatherByLocation)
+        if (uiState.inputLocation.value.isEmpty()) {
+            FavoritesLocations(uiState, onEvent, onNavigateToWeatherByLocation)
+        }
     }
 }
 
@@ -85,9 +99,9 @@ private fun TopBar(
         SearchTextField(
             modifier = Modifier
                 .weight(1f),
-            searchQuery = uiState.location.value,
+            searchQuery = uiState.inputLocation.value,
             onSearchQueryChanged = { onEvent(HomeEvent.LocationChanged(it)) },
-            isError = !uiState.location.isValidLocation(),
+            isError = !uiState.inputLocation.isValidLocation(),
             placeholder = stringResource(R.string.search_city),
             leadingIcon = if (uiState.isLoading) {
                 {
@@ -99,7 +113,7 @@ private fun TopBar(
                     )
                 }
             } else null,
-            trailingIcon = if (uiState.location.value.isEmpty()) {
+            trailingIcon = if (uiState.inputLocation.value.isEmpty()) {
                 {
                     IconButton(
                         onClick = { },
@@ -126,15 +140,16 @@ private fun TopBar(
 
 
 @Composable
-private fun FoundedLocations(
+private fun MatchingLocations(
     uiState: HomeUiState,
+    onEvent: (HomeEvent) -> Unit,
     onNavigateToWeatherByLocation: (Int) -> Unit,
 ) {
     Column(
         modifier = Modifier
             .padding(horizontal = padding16)
     ) {
-        uiState.locations.forEach { location ->
+        uiState.matchingLocations.forEach { location ->
             Row(
                 modifier = Modifier
                     .clickable { onNavigateToWeatherByLocation(location.id) }
@@ -148,15 +163,30 @@ private fun FoundedLocations(
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onBackground
                 )
+                Text(
+                    modifier = Modifier.padding(horizontal = padding16),
+                    text = location.countryName,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f)
+                )
                 Spacer(
                     modifier = Modifier.weight(1f)
                 )
-                Text(
-                    text = location.countryName,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-
+                IconButton(
+                    onClick = {
+                        if (location.isFavorite || uiState.favorites.any { it.id == location.id }) {
+                            onEvent(HomeEvent.RemoveFavorite(location.id))
+                        } else {
+                            onEvent(HomeEvent.AddFavorite(location.id))
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = if (location.isFavorite || uiState.favorites.any { it.id == location.id }) WeatherIcons.RemoveFavorite else WeatherIcons.AddFavorite,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                    )
+                }
             }
 
             Spacer(
@@ -172,6 +202,40 @@ private fun FoundedLocations(
     }
 }
 
+@Composable
+private fun FavoritesLocations(
+    uiState: HomeUiState,
+    onEvent: (HomeEvent) -> Unit,
+    onNavigateToWeatherByLocation: (Int) -> Unit,
+) {
+    LazyColumn(
+        modifier = Modifier
+            .padding(padding16),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(space16),
+    ) {
+        items(uiState.favorites) { location ->
+            val favoriteForecast = uiState.favoritesForecast[location.id]
+
+            if (favoriteForecast != null) {
+                FavoriteItem(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(itemHeight140),
+                    locationName = location.name,
+                    locationTime = favoriteForecast.locationInfo.locationTime?.toLocalTime() ?: "00:00",
+                    temperature = favoriteForecast.currentInfo.temperature,
+                    maxTemperature = favoriteForecast.forecastInfo.today.maxTemperature,
+                    minTemperature = favoriteForecast.forecastInfo.today.minTemperature,
+                    condition = favoriteForecast.currentInfo.conditionText,
+                    onTapClicked = { onNavigateToWeatherByLocation(location.id) },
+                    onDeleteClicked = { onEvent(HomeEvent.RemoveFavorite(location.id)) }
+                )
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
 private fun HomeScreenPreview(modifier: Modifier = Modifier) {
@@ -181,10 +245,11 @@ private fun HomeScreenPreview(modifier: Modifier = Modifier) {
                 .background(MaterialTheme.colorScheme.background)
                 .fillMaxSize()
         )
-        val original = LocationDomainModel(
+        val original = MatchingLocationDomainModel(
             id = 1,
             name = "",
             countryName = "",
+            isFavorite = Random.nextBoolean()
         )
         val cities = List(10) { index ->
             original.copy(
@@ -195,7 +260,7 @@ private fun HomeScreenPreview(modifier: Modifier = Modifier) {
         }
 
         HomeScreen(
-            uiState = HomeUiState(locations = cities.toPersistentList()),
+            uiState = HomeUiState(matchingLocations = cities.toPersistentList()),
             onEvent = {}
         )
     }
@@ -212,8 +277,28 @@ private fun HomeScreenLoadingPreview(modifier: Modifier = Modifier) {
         )
 
         HomeScreen(
-            uiState = HomeUiState(isLoading = true),
-            onEvent = {}
+            uiState = HomeUiState(
+                isLoading = false,
+                favorites = persistentListOf(
+                    DetailsLocationDomainModel(
+                        id = 1, name = "New York",
+                        point = CoordinatesDomainModel(
+                            latitude = LatitudeDomainModel(
+                                value = 4.5
+                            ), longitude = LongitudeDomainModel(value = 6.7)
+                        ),
+                    ),
+                    DetailsLocationDomainModel(
+                        id = 2, name = "Moscow",
+                        point = CoordinatesDomainModel(
+                            latitude = LatitudeDomainModel(
+                                value = 4.5
+                            ), longitude = LongitudeDomainModel(value = 6.7)
+                        ),
+                    ),
+                )
+            ),
+            onEvent = {}, onNavigateToWeatherByLocation = {}, onNavigateToAppSettings = {}
         )
     }
 }

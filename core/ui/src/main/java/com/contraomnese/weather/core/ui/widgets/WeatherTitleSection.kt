@@ -83,7 +83,7 @@ fun TitleSection(
                     horizontalArrangement = Arrangement.spacedBy(padding8)
                 ) {
                     Text(
-                        text = stringResource(R.string.degree, currentTemp),
+                        text = stringResource(R.string.temperature, currentTemp),
                         style = MaterialTheme.typography.headlineMedium.copy(
                             lineBreak = LineBreak.Simple
                         ),

@@ -1,12 +1,46 @@
 package com.contraomnese.weather.data.mappers
 
-import com.contraomnese.weather.data.network.models.CurrentWeatherResponse
-import com.contraomnese.weather.domain.weatherByLocation.model.WeatherDomainModel
-import kotlin.math.roundToInt
+import com.contraomnese.weather.data.network.models.ForecastCurrentNetwork
+import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastCurrentEntity
 
-fun CurrentWeatherResponse.toDomain(): WeatherDomainModel {
-    return WeatherDomainModel(
-        currentTemperature = current.tempC.roundToInt().toString(),
-        condition = current.condition.text,
-    )
-}
+
+fun ForecastCurrentNetwork.toEntity(forecastLocationId: Int) = ForecastCurrentEntity(
+    forecastLocationId = forecastLocationId,
+    tempC = tempC,
+    tempF = tempF,
+    isDay = isDay,
+    conditionText = condition.text,
+    conditionCode = condition.code,
+    windMph = windMph,
+    windKph = windKph,
+    windDegree = windDegree,
+    windDir = windDir,
+    pressureMb = pressureMb,
+    pressureIn = pressureIn,
+    precipMm = precipMm,
+    precipIn = precipIn,
+    humidity = humidity,
+    cloud = cloud,
+    feelsLikeC = feelsLikeC,
+    feelsLikeF = feelsLikeF,
+    windChillC = windChillC,
+    windChillF = windChillF,
+    heatIndexC = heatIndexC,
+    heatIndexF = heatIndexF,
+    dewPointC = dewPointC,
+    dewPointF = dewPointF,
+    visibilityKm = visibilityKm,
+    visibilityMiles = visibilityMiles,
+    uv = uv,
+    gustMph = gustMph,
+    gustKph = gustKph,
+    airQualityCo = forecastAirQuality.co,
+    airQualityPm10 = forecastAirQuality.pm10,
+    airQualityPm25 = forecastAirQuality.pm25,
+    airQualitySo2 = forecastAirQuality.so2,
+    airQualityO3 = forecastAirQuality.o3,
+    airQualityNo2 = forecastAirQuality.no2,
+    airQualityUsEpaIndex = forecastAirQuality.usEpaIndex,
+    airQualityGbDefraIndex = forecastAirQuality.gbDefraIndex,
+    lastUpdatedEpoch = lastUpdatedEpoch,
+)

@@ -60,6 +60,7 @@ val itemHeight40 = 40.dp
 val itemHeight48 = 48.dp
 val itemHeight56 = 56.dp
 val itemHeight64 = 64.dp
+val itemHeight120 = 120.dp
 val itemHeight140 = 140.dp
 val itemHeight160 = 160.dp
 val itemHeight180 = 180.dp

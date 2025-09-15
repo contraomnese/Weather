@@ -13,3 +13,7 @@ fun interface UseCaseWithRequest<REQUEST, RESULT> {
 fun interface StreamingUseCase<RESULT> {
     operator fun invoke(): Flow<RESULT>
 }
+
+fun interface StreamingUseCaseWithRequest<REQUEST, RESULT> {
+    operator fun invoke(input: REQUEST): Flow<RESULT>
+}

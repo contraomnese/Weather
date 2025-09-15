@@ -14,7 +14,8 @@ internal val weatherModule = module {
             useCaseExecutorProvider = get(),
             notificationMonitor = get(),
             getGeoLocationUseCase = get(),
-            getForecastWeatherUseCase = get(),
+            updateForecastWeatherUseCase = get(),
+            observeForecastWeatherUseCase = get(),
             getAppSettingsUseCase = get(),
             locationId = id
         )

@@ -1,7 +1,7 @@
 package com.contraomnese.weather.domain.home.usecase
 
 import com.contraomnese.weather.domain.cleanarchitecture.coroutine.CoroutineContextProvider
-import com.contraomnese.weather.domain.home.model.LocationDomainModel
+import com.contraomnese.weather.domain.home.model.MatchingLocationDomainModel
 import com.contraomnese.weather.domain.home.repository.LocationsRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -28,18 +28,18 @@ class GetLocationsUseCaseTest {
     private val repositoryMock = mockk<LocationsRepository>()
     private lateinit var coroutineContextProvider: CoroutineContextProvider
     private val expectedLocations = listOf(
-        LocationDomainModel(
+        MatchingLocationDomainModel(
             id = FIRST_LOCATION_ID,
             name = FIRST_LOCATION_NAME,
             countryName = FIRST_LOCATION_COUNTRY_NAME
         ),
-        LocationDomainModel(
+        MatchingLocationDomainModel(
             id = SECOND_LOCATION_ID,
             name = SECOND_LOCATION_NAME,
             countryName = SECOND_LOCATION_COUNTRY_NAME
         )
     )
-    private val expectedEmptyLocations = emptyList<LocationDomainModel>()
+    private val expectedEmptyLocations = emptyList<MatchingLocationDomainModel>()
 
     @BeforeEach
     fun setUp() {

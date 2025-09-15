@@ -5,8 +5,9 @@
     <string name="current_temperature_title" translatable="false">%1$s°</string>
     <string name="max_min_temperature_title">Max.:%1$s°, Min.:%2$s°</string>
     <string name="temperature_and_condition_title" translatable="false">%1$s° | %2$s</string>
-    <string name="degree" translatable="false">%1$s°</string>
-    <string name="degree_with_separator" translatable="false">%1$s° | </string>
+    <string name="temperature" translatable="false">%1$s°</string>
+    <string name="temperature_with_separator" translatable="false">%1$s° | </string>
+    <string name="temperature_high_low">H:%1$s° L:%2$s°</string>
     <string name="now">Now</string>
 
     <!--  Titles -->

@@ -10,6 +10,7 @@ import com.contraomnese.weather.domain.cleanarchitecture.exception.RequestDomain
 import com.contraomnese.weather.domain.cleanarchitecture.exception.UnknownDomainException
 import com.contraomnese.weather.domain.cleanarchitecture.exception.WeatherApiUnavailableDomainException
 import com.contraomnese.weather.domain.cleanarchitecture.usecase.StreamingUseCase
+import com.contraomnese.weather.domain.cleanarchitecture.usecase.StreamingUseCaseWithRequest
 import com.contraomnese.weather.domain.cleanarchitecture.usecase.UseCase
 import com.contraomnese.weather.domain.cleanarchitecture.usecase.UseCaseWithRequest
 import com.contraomnese.weather.presentation.R
@@ -59,6 +60,15 @@ abstract class BaseViewModel<ViewState : UiState, Event : Any>(
         onException: (DomainException) -> Unit = {},
     ) {
         useCaseExecutor.observe(useCase, onEach, onException)
+    }
+
+    protected fun <INPUT, OUTPUT> observe(
+        useCaseWithRequest: StreamingUseCaseWithRequest<INPUT, OUTPUT>,
+        value: INPUT,
+        onEach: (OUTPUT) -> Unit,
+        onException: (DomainException) -> Unit = {},
+    ) {
+        useCaseExecutor.observe(useCaseWithRequest, value, onEach, onException)
     }
 
     abstract fun onEvent(event: Event)

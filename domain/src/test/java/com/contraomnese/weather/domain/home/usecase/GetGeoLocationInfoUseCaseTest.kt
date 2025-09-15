@@ -3,10 +3,10 @@ package com.contraomnese.weather.domain.home.usecase
 import com.contraomnese.weather.domain.cleanarchitecture.coroutine.CoroutineContextProvider
 import com.contraomnese.weather.domain.home.repository.LocationsRepository
 import com.contraomnese.weather.domain.weatherByLocation.model.CoordinatesDomainModel
-import com.contraomnese.weather.domain.weatherByLocation.model.GeoLocationDomainModel
+import com.contraomnese.weather.domain.weatherByLocation.model.DetailsLocationDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.LatitudeDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.LongitudeDomainModel
-import com.contraomnese.weather.domain.weatherByLocation.usecase.GetGeoLocationUseCase
+import com.contraomnese.weather.domain.weatherByLocation.usecase.GetDetailsLocationUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.confirmVerified
@@ -27,7 +27,7 @@ private const val BAD_GEO_LOCATION_ID = 0
 
 class GetGeoLocationInfoUseCaseTest {
 
-    private lateinit var useCase: GetGeoLocationUseCase
+    private lateinit var useCase: GetDetailsLocationUseCase
     private val repositoryMock = mockk<LocationsRepository>()
     private lateinit var coroutineContextProvider: CoroutineContextProvider
     private val expectedPoint = CoordinatesDomainModel(
@@ -35,14 +35,14 @@ class GetGeoLocationInfoUseCaseTest {
         longitude = LongitudeDomainModel(GEO_LOCATION_LONGITUDE)
     )
     private val expectedLocation =
-        GeoLocationDomainModel(id = GEO_LOCATION_ID, name = GEO_LOCATION_NAME, point = expectedPoint)
+        DetailsLocationDomainModel(id = GEO_LOCATION_ID, name = GEO_LOCATION_NAME, point = expectedPoint)
 
     private val expectedException = Exception("Location not found")
 
     @BeforeEach
     fun setUp() {
         coroutineContextProvider = FakeCoroutineContextProvider
-        useCase = GetGeoLocationUseCase(
+        useCase = GetDetailsLocationUseCase(
             repository = repositoryMock,
             coroutineContextProvider = coroutineContextProvider
         )

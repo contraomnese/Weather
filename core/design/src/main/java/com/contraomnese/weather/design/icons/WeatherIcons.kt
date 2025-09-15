@@ -6,8 +6,11 @@ import androidx.compose.material.icons.outlined.Air
 import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Compress
+import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.DisabledByDefault
 import androidx.compose.material.icons.outlined.Equalizer
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
@@ -24,6 +27,9 @@ object WeatherIcons {
     val Daily = Icons.Outlined.CalendarToday
     val Aqi = Icons.Outlined.Equalizer
     val Close = Icons.Outlined.Close
+    val AddFavorite = Icons.Outlined.FavoriteBorder
+    val RemoveFavorite = Icons.Outlined.Favorite
+    val Delete = Icons.Outlined.DeleteOutline
     val Map = Icons.Outlined.Map
     val Sunrise = Icons.Outlined.WbTwilight
     val UvIndex = Icons.Outlined.WbSunny

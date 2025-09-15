@@ -66,6 +66,27 @@ class UseCaseExecutor(
         }
     }
 
+    fun <INPUT, OUTPUT> observe(
+        useCase: StreamingUseCaseWithRequest<INPUT, OUTPUT>,
+        value: INPUT,
+        onEach: (OUTPUT) -> Unit,
+        onException: (DomainException) -> Unit = {},
+    ) {
+        coroutineScope.launch {
+            try {
+                useCase(value)
+                    .collect {
+                        onEach(it)
+                    }
+            } catch (ignore: CancellationException) {
+            } catch (throwable: Throwable) {
+                onException(
+                    handleException(throwable)
+                )
+            }
+        }
+    }
+
     private fun handleException(throwable: Throwable): DomainException =
         (throwable as? DomainException) ?: UnknownDomainException(throwable)
 }

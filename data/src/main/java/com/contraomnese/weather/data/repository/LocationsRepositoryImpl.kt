@@ -1,26 +1,56 @@
 package com.contraomnese.weather.data.repository
 
 import com.contraomnese.weather.data.mappers.toDomain
-import com.contraomnese.weather.data.storage.db.locations.LocationsDatabase
-import com.contraomnese.weather.domain.home.model.LocationDomainModel
+import com.contraomnese.weather.data.storage.db.WeatherDatabase
+import com.contraomnese.weather.data.storage.db.locations.entities.FavoriteEntity
+import com.contraomnese.weather.domain.home.model.MatchingLocationDomainModel
 import com.contraomnese.weather.domain.home.repository.LocationsRepository
-import com.contraomnese.weather.domain.weatherByLocation.model.GeoLocationDomainModel
+import com.contraomnese.weather.domain.weatherByLocation.model.DetailsLocationDomainModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class LocationsRepositoryImpl(
-    private val database: LocationsDatabase,
+    private val weatherDatabase: WeatherDatabase,
 ) : LocationsRepository {
 
-    override fun getLocationsBy(name: String): List<LocationDomainModel> {
+    override fun getFavorites(): List<DetailsLocationDomainModel> {
         return try {
-            database.locationsDao().getLocationsBy("$name%").map { it.toDomain() }
+            weatherDatabase.favoritesDao().getFavorites().map { it.toDomain() }
         } catch (throwable: Throwable) {
             throw throwable
         }
     }
 
-    override fun getLocationBy(id: Int): GeoLocationDomainModel {
+    override fun observeFavorites(): Flow<List<DetailsLocationDomainModel>> =
+        weatherDatabase.favoritesDao().observeFavorites().map { list -> list.map { it.toDomain() } }
+
+    override fun addFavorite(id: Int) {
+        try {
+            weatherDatabase.favoritesDao().addFavorite(FavoriteEntity(cityId = id))
+        } catch (throwable: Throwable) {
+            throw throwable
+        }
+    }
+
+    override fun deleteFavorite(id: Int) {
+        try {
+            weatherDatabase.favoritesDao().removeFavorite(id)
+        } catch (throwable: Throwable) {
+            throw throwable
+        }
+    }
+
+    override fun getLocationsBy(name: String): List<MatchingLocationDomainModel> {
         return try {
-            database.locationsDao().getLocationBy(id).toDomain()
+            weatherDatabase.locationsDao().getLocationsBy("$name%").map { it.toDomain() }
+        } catch (throwable: Throwable) {
+            throw throwable
+        }
+    }
+
+    override fun getLocationBy(id: Int): DetailsLocationDomainModel {
+        return try {
+            weatherDatabase.locationsDao().getLocationBy(id).toDomain()
         } catch (throwable: Throwable) {
             throw throwable
         }

@@ -56,8 +56,8 @@ import com.contraomnese.weather.domain.app.model.PressureUnit
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import com.contraomnese.weather.domain.app.model.WindSpeedUnit
 import com.contraomnese.weather.domain.weatherByLocation.model.CoordinatesDomainModel
+import com.contraomnese.weather.domain.weatherByLocation.model.DetailsLocationDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeatherDomainModel
-import com.contraomnese.weather.domain.weatherByLocation.model.GeoLocationDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.LatitudeDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.LongitudeDomainModel
 import com.contraomnese.weather.weatherByLocation.presentation.data.AqiSection
@@ -630,7 +630,7 @@ fun MainScreenPreview() {
     WeatherTheme {
         WeatherScreen(
             uiState = WeatherUiState(
-                isLoading = false, location = GeoLocationDomainModel(
+                isLoading = false, location = DetailsLocationDomainModel(
                     id = 7940,
                     name = "Maura Wilcox",
                     point = CoordinatesDomainModel(
