@@ -21,11 +21,17 @@ android {
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
-        android.buildFeatures.buildConfig = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    buildFeatures.buildConfig = true
+    signingConfigs {
+        create("release") {
+            keyAlias = gradleLocalProperties(rootDir, providers).getProperty("KEY_ALIAS")
+            keyPassword = gradleLocalProperties(rootDir, providers).getProperty("KEY_PASSWORD")
+            storeFile = file(gradleLocalProperties(rootDir, providers).getProperty("STORE_FILE"))
+            storePassword = gradleLocalProperties(rootDir, providers).getProperty("STORE_PASSWORD")
+        }
+    }
 
     buildTypes {
         debug {
@@ -33,6 +39,7 @@ android {
             buildConfigField("String", "WEATHER_API_BASE_URL", "\"${WEATHER_API_BASE_URL}\"")
         }
         release {
+            signingConfig = signingConfigs.getByName("release")
             buildConfigField("String", "WEATHER_API_KEY", "\"${WEATHER_API_KEY}\"")
             buildConfigField("String", "WEATHER_API_BASE_URL", "\"${WEATHER_API_BASE_URL}\"")
             isMinifyEnabled = false
@@ -44,6 +51,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
     composeOptions {

@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.shareIn
 import okhttp3.ResponseBody
 import retrofit2.Converter
@@ -41,7 +42,7 @@ class ForecastWeatherRepositoryImpl(
             } else {
                 entity.toDomain(settings)
             }
-        }
+        }.flowOn(Dispatchers.IO)
     }
 
     override suspend fun updateBy(location: DetailsLocationDomainModel) {

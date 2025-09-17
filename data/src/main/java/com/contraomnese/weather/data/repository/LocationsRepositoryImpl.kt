@@ -6,7 +6,9 @@ import com.contraomnese.weather.data.storage.db.locations.entities.FavoriteEntit
 import com.contraomnese.weather.domain.home.model.MatchingLocationDomainModel
 import com.contraomnese.weather.domain.home.repository.LocationsRepository
 import com.contraomnese.weather.domain.weatherByLocation.model.DetailsLocationDomainModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 
 class LocationsRepositoryImpl(
@@ -22,7 +24,7 @@ class LocationsRepositoryImpl(
     }
 
     override fun observeFavorites(): Flow<List<DetailsLocationDomainModel>> =
-        weatherDatabase.favoritesDao().observeFavorites().map { list -> list.map { it.toDomain() } }
+        weatherDatabase.favoritesDao().observeFavorites().map { list -> list.map { it.toDomain() } }.flowOn(Dispatchers.IO)
 
     override fun addFavorite(id: Int) {
         try {

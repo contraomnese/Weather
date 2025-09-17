@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.contraomnese.weather.core.ui.canvas.TemperatureRangeLine
-import com.contraomnese.weather.core.ui.icons.WeatherIcon
+import com.contraomnese.weather.core.ui.icons.ConditionsIcon
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight26
@@ -50,7 +50,7 @@ fun ForecastDailyItem(
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurface
         )
-        WeatherIcon(code = conditionCode, modifier = Modifier.size(itemWidth40))
+        ConditionsIcon(code = conditionCode, modifier = Modifier.size(itemWidth40))
         Text(
             modifier = Modifier.height(itemHeight26),
             text = stringResource(R.string.current_temperature_title, minTemperature.toString()),

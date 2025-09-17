@@ -22,6 +22,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.collections.immutable.toPersistentMap
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -58,7 +59,7 @@ internal class HomeViewModel(
 
     init {
         observe(observeFavoritesUseCase, ::onFavoritesUpdate, ::provideException)
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             uiState.collect {
                 it.favorites.forEach { favorite ->
                     observe(

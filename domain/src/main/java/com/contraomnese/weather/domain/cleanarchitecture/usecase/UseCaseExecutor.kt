@@ -57,6 +57,7 @@ class UseCaseExecutor(
                     .collect {
                         onEach(it)
                     }
+
             } catch (ignore: CancellationException) {
             } catch (throwable: Throwable) {
                 onException(
