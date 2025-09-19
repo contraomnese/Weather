@@ -38,6 +38,7 @@ import com.contraomnese.weather.design.theme.itemHeight20
 import com.contraomnese.weather.design.theme.itemHeight40
 import com.contraomnese.weather.design.theme.itemThickness2
 import com.contraomnese.weather.design.theme.padding16
+import com.contraomnese.weather.design.theme.padding32
 import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.design.theme.space16
 import com.contraomnese.weather.domain.home.model.MatchingLocationDomainModel
@@ -74,7 +75,9 @@ internal fun HomeScreen(
     onNavigateToAppSettings: () -> Unit = {},
 ) {
 
-    Column {
+    Column(
+        modifier = Modifier.padding(top = padding32)
+    ) {
         TopBar(uiState, onEvent, onNavigateToAppSettings)
         MatchingLocations(uiState, onEvent, onNavigateToWeatherByLocation)
         if (uiState.inputLocation.value.isEmpty()) {

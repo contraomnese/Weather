@@ -1,6 +1,5 @@
 package com.contraomnese.weather.appsettings.presentation
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +22,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.padding16
+import com.contraomnese.weather.design.theme.padding32
 import com.contraomnese.weather.design.theme.padding4
 import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.domain.app.model.AppSettings
@@ -56,8 +56,7 @@ private fun AppSettingsScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(padding16)
-            .background(MaterialTheme.colorScheme.background),
+            .padding(start = padding16, end = padding16, top = padding32),
         verticalArrangement = Arrangement.spacedBy(padding8)
     ) {
         RadioGroup(
@@ -168,7 +167,7 @@ inline fun <reified T : Enum<T>> T.toTextRes(): Int = when (this) {
 }
 
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF3F6E74)
 @Composable
 private fun AppSettingsPreview() {
     WeatherTheme {

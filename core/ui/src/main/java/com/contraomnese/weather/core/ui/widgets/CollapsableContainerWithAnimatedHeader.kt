@@ -89,7 +89,7 @@ fun CollapsableContainerWithAnimatedHeader(
             .wrapContentHeight(Alignment.Top)
             .fillMaxWidth()
             .clip(RoundedCornerShape(cornerRadius16))
-            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.2f))
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
     ) {
         Box(
             modifier = Modifier
