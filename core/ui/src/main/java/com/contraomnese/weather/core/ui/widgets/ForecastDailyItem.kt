@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.contraomnese.weather.core.ui.canvas.TemperatureRangeLine
 import com.contraomnese.weather.core.ui.icons.ConditionsIcon
 import com.contraomnese.weather.design.R
@@ -20,7 +22,6 @@ import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight26
 import com.contraomnese.weather.design.theme.itemHeight6
 import com.contraomnese.weather.design.theme.itemHeight64
-import com.contraomnese.weather.design.theme.itemWidth112
 import com.contraomnese.weather.design.theme.itemWidth40
 import com.contraomnese.weather.design.theme.padding12
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
@@ -28,6 +29,7 @@ import com.contraomnese.weather.domain.app.model.TemperatureUnit
 @Composable
 fun ForecastDailyItem(
     modifier: Modifier = Modifier,
+    dayNumber: String,
     dayName: String,
     conditionCode: Int,
     minTemperature: Int,
@@ -44,9 +46,16 @@ fun ForecastDailyItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(padding12),
     ) {
+
         Text(
-            modifier = Modifier.width(itemWidth112),
-            text = if (currentTemperature != null) stringResource(R.string.today_forecast_title) else dayName,
+            modifier = Modifier.width(60.dp),
+            text = dayNumber,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+        )
+        Text(
+            modifier = Modifier.wrapContentWidth(),
+            text = dayName,
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurface
         )
@@ -82,7 +91,8 @@ fun ForecastDailyItem(
 private fun ForecastDailyItemPreview() {
     WeatherTheme {
         ForecastDailyItem(
-            dayName = "Mon",
+            dayNumber = "22.06",
+            dayName = "Чт",
             conditionCode = 1000,
             minTemperature = 19,
             maxTemperature = 23,

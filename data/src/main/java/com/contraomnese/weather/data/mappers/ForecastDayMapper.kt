@@ -35,6 +35,7 @@ fun ForecastDayWithDetails.toForecastTodayDomain(appSettings: AppSettings): Fore
 
 fun ForecastDayWithDetails.toForecastDayDomain(appSettings: AppSettings): ForecastDay {
     return ForecastDay(
+        dayNumber = getNumberOfMonth(forecast.dateEpoch),
         dayName = getDayOfWeek(forecast.dateEpoch),
         maxTemperature = when (appSettings.temperatureUnit) {
             TemperatureUnit.Celsius -> day.maxTempC.roundToInt()

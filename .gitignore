@@ -15,4 +15,5 @@
 .externalNativeBuild
 .cxx
 app/keystore
+app/release
 local.properties

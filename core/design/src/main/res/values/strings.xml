@@ -4,11 +4,13 @@
     <string name="clear_search_field">Clear search field</string>
     <string name="current_temperature_title" translatable="false">%1$s°</string>
     <string name="max_min_temperature_title">Max.:%1$s°, Min.:%2$s°</string>
+    <string name="feels_like_temperature_title">%2$s°/%3$s° Feels like %1$s°</string>
     <string name="temperature_and_condition_title" translatable="false">%1$s° | %2$s</string>
     <string name="temperature" translatable="false">%1$s°</string>
     <string name="temperature_with_separator" translatable="false">%1$s° | </string>
     <string name="temperature_high_low">H:%1$s° L:%2$s°</string>
     <string name="now">Now</string>
+    <string name="local_time_title">Local time</string>
 
     <!--  Titles -->
     <string name="today_forecast_title">TODAY</string>
@@ -33,6 +35,8 @@
     <!--  Sunrise section -->
     <string name="sunrise_title">Sunrise</string>
     <string name="sunset_title">Sunset</string>
+    <string name="day_title">Day</string>
+    <string name="night_title">Night</string>
 
     <string name="sunrise_time_title">Sunrise in %1$s</string>
     <string name="sunset_time_title">Sunset in %1$s</string>
@@ -66,7 +70,7 @@
     <string name="pressure_is_high">The atmospheric pressure is much higher than normal. The air can seem heavy. People with hypertension may feel a headache, tension or increased heartbeat.</string>
 
     <!--  Rainfall section -->
-    <string name="rainfall_value_mm">%.1f mm</string>
+    <string name="rainfall_value_mm">%.2f mm</string>
     <string name="rainfall_value_inch">%.2f inch</string>
     <string name="in_last_24_hours">in the last 24h</string>
     <string name="in_next_1_hour">in the next 1h</string>
@@ -75,6 +79,9 @@
 
     <!--  Humidity section -->
     <string name="dew_point">The dew point is %1$d° right now.</string>
+    <string name="dew_point_happy">Comfortable</string>
+    <string name="dew_point_neutral">Moderate</string>
+    <string name="dew_point_sad">Stuffy</string>
     <string name="humidity_value" translatable="false">%1$s%%</string>
 
     <!--  Units -->

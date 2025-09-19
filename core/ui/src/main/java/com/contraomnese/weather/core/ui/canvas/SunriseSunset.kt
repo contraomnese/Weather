@@ -57,8 +57,8 @@ fun SunriseSunset(
         val horizonY = h * 0.5f
         val arcWidth = w * 0.5f
         val arcHeight = h * 0.7f
-        val strokeWidthArcPath = min(w, h) * 0.03f
-        val thicknessHorizon = min(w, h) * 0.008f
+        val strokeWidthArcPath = size.minDimension * 0.04f
+        val thicknessHorizon = size.minDimension * 0.008f
 
         val leftP0 = PointF(0f - arcWidth / 2, horizonY)
         val leftP1 = PointF(0f, horizonY + arcHeight)
@@ -72,7 +72,7 @@ fun SunriseSunset(
         drawContext.canvas.nativeCanvas.apply {
             // MOON PATH
             val moonPaintPath = Paint().apply {
-                color = Color.rgb(75, 77, 94)
+                color = Color.argb(150, 30, 50, 50)
                 style = Paint.Style.STROKE
                 strokeCap = Paint.Cap.ROUND
                 strokeWidth = strokeWidthArcPath
@@ -136,7 +136,7 @@ fun SunriseSunset(
                         2 * (1 - progress) * progress * (horizonY - arcHeight) +
                         progress.pow(2) * horizonY
 
-                val sunRadius = min(w, h) * 0.04f
+                val sunRadius = size.minDimension * 0.05f
                 val sunPaint = Paint().apply {
                     shader = RadialGradient(
                         sunX, sunY, sunRadius,
@@ -149,8 +149,7 @@ fun SunriseSunset(
 
                 val glowPaint = Paint().apply {
                     color = Color.WHITE
-                    alpha = 190
-                    maskFilter = BlurMaskFilter(sunRadius, BlurMaskFilter.Blur.NORMAL)
+                    maskFilter = BlurMaskFilter(sunRadius * 2, BlurMaskFilter.Blur.SOLID)
                 }
                 drawCircle(sunX, sunY, sunRadius, glowPaint)
             }
@@ -174,13 +173,20 @@ fun SunriseSunset(
                         intArrayOf(
                             Color.BLACK,
                             Color.BLACK,
-                            Color.rgb(255, 255, 255)
+                            Color.WHITE
                         ),
-                        floatArrayOf(0f, 0.7f, 1f), Shader.TileMode.CLAMP
+                        floatArrayOf(0f, 0.8f, 1f), Shader.TileMode.CLAMP
                     )
                     isAntiAlias = true
                 }
                 drawCircle(moonX, moonY, moonRadius, moonPaint)
+
+                val glowPaint = Paint().apply {
+                    color = Color.WHITE
+                    alpha = 150
+                    maskFilter = BlurMaskFilter(moonRadius, BlurMaskFilter.Blur.OUTER)
+                }
+                drawCircle(moonX, moonY, moonRadius, glowPaint)
             }
 
             // DRAW MOON ON LEFT SIDE
@@ -204,11 +210,18 @@ fun SunriseSunset(
                             Color.BLACK,
                             Color.rgb(255, 255, 255)
                         ),
-                        floatArrayOf(0f, 0.7f, 1f), Shader.TileMode.CLAMP
+                        floatArrayOf(0f, 0.8f, 1f), Shader.TileMode.CLAMP
                     )
                     isAntiAlias = true
                 }
                 drawCircle(moonX, moonY, moonRadius, moonPaint)
+
+                val glowPaint = Paint().apply {
+                    color = Color.WHITE
+                    alpha = 150
+                    maskFilter = BlurMaskFilter(moonRadius, BlurMaskFilter.Blur.OUTER)
+                }
+                drawCircle(moonX, moonY, moonRadius, glowPaint)
             }
         }
     }

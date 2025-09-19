@@ -14,6 +14,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -43,7 +46,7 @@ fun Wind(
     var width by remember(key1 = degree, key2 = direction) { mutableIntStateOf(0) }
     val textMeasurer = rememberTextMeasurer()
 
-    val windSpeedTextLayout = textMeasurer.measure(
+    val windDirectionTextLayout = textMeasurer.measure(
         text = AnnotatedString(direction),
         style = MaterialTheme.typography.headlineMedium.copy(
             color = ComposeColor.White,
@@ -51,13 +54,13 @@ fun Wind(
             lineBreak = LineBreak.Heading,
             textAlign = TextAlign.Center
         ),
-        maxLines = 2,
-        constraints = Constraints(maxWidth = width / 3)
+        maxLines = 1,
+        constraints = Constraints(maxWidth = width / 2)
     )
 
     val lettersStyle = MaterialTheme.typography.headlineMedium.copy(
-        color = ComposeColor.White.copy(alpha = 0.3f),
-        fontSize = with(density) { (width / 8).toSp() },
+        color = ComposeColor.White.copy(alpha = 0.5f),
+        fontSize = with(density) { (width / 12).toSp() },
     )
 
     val northTextLayout = textMeasurer.measure(
@@ -80,51 +83,44 @@ fun Wind(
         style = lettersStyle
     )
 
-    Canvas(modifier = modifier.onSizeChanged {
-        width = it.width
-    }) {
-        val w = size.width
-        val h = size.height
-        val center = Offset(x = w / 2f, y = h / 2f)
-        val radius = minOf(w, h) / 3f
+    Canvas(
+        modifier = modifier
+            .onSizeChanged {
+                width = it.width
+            }
+            .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
+    ) {
+        val radius = size.minDimension / 2.1f
         val shortLineRadius = radius * 0.9f
         val longLineRadius = radius * 0.8f
-        val endArrowSize = w / 20
-        val strokeLinePath = w / 250
-        val strokeArrowPath = w / 100
-
-        drawText(
-            windSpeedTextLayout,
-            topLeft = Offset(
-                (size.width - windSpeedTextLayout.size.width) / 2,
-                (size.height - windSpeedTextLayout.size.height) / 2
-            )
-        )
+        val endArrowSize = size.minDimension / 10
+        val strokeLinePath = size.minDimension / 100
+        val strokeArrowPath = size.minDimension / 40
 
         drawText(
             northTextLayout, topLeft = Offset(
                 center.x - northTextLayout.size.width / 2,
-                (center.y - radius) - northTextLayout.size.height
+                (center.y - longLineRadius)
             )
         )
 
         drawText(
             southTextLayout, topLeft = Offset(
                 center.x - southTextLayout.size.width / 2,
-                (center.y + radius)
+                (center.y + longLineRadius) - southTextLayout.size.height
             )
         )
 
         drawText(
             eastTextLayout, topLeft = Offset(
-                (center.x + radius) + eastTextLayout.size.width / 2,
+                (center.x + longLineRadius * 0.85f),
                 (center.y) - eastTextLayout.size.height / 2
             )
         )
 
         drawText(
             westTextLayout, topLeft = Offset(
-                (center.x - radius) - westTextLayout.size.width - eastTextLayout.size.width / 2,
+                (center.x - longLineRadius * 0.95f),
                 (center.y) - westTextLayout.size.height / 2
             )
         )
@@ -215,8 +211,8 @@ fun Wind(
                     (center.y + shortLineRadius * sin(startArrowWindRad)).toFloat()
                 )
                 val endArrowPoint = PointF(
-                    (center.x + shortLineRadius / 2 * cos(startArrowWindRad)).toFloat(),
-                    (center.y + shortLineRadius / 2 * sin(startArrowWindRad)).toFloat()
+                    (center.x + shortLineRadius / 3 * cos(startArrowWindRad)).toFloat(),
+                    (center.y + shortLineRadius / 3 * sin(startArrowWindRad)).toFloat()
                 )
 
                 moveTo(startArrowPoint.x, startArrowPoint.y)
@@ -230,8 +226,8 @@ fun Wind(
                     (center.y + radius * sin(endArrowWindRad)).toFloat()
                 )
                 val endArrowPoint = PointF(
-                    (center.x + shortLineRadius / 2 * cos(endArrowWindRad)).toFloat(),
-                    (center.y + shortLineRadius / 2 * sin(endArrowWindRad)).toFloat()
+                    (center.x + shortLineRadius / 3 * cos(endArrowWindRad)).toFloat(),
+                    (center.y + shortLineRadius / 3 * sin(endArrowWindRad)).toFloat()
                 )
 
                 moveTo(startArrowPoint.x, startArrowPoint.y)
@@ -266,6 +262,49 @@ fun Wind(
             }
             drawPath(endArrowPath, arrowPathPaint)
         }
+
+        drawIntoCanvas { canvas ->
+            val paint = android.graphics.Paint().apply {
+                isAntiAlias = true
+                color = Color.TRANSPARENT
+                setShadowLayer(
+                    20f,
+                    2f,
+                    4f,
+                    Color.argb(150, 0, 0, 0)
+                )
+            }
+
+            canvas.nativeCanvas.drawCircle(
+                center.x,
+                center.y,
+                radius * 0.4f,
+                paint
+            )
+
+            val clearPaint = Paint().apply {
+                isAntiAlias = true
+                xfermode = android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.CLEAR)
+            }
+
+            canvas.nativeCanvas.drawCircle(
+                center.x,
+                center.y,
+                radius * 0.4f,
+                clearPaint
+            )
+        }
+
+        drawContext.canvas.nativeCanvas.apply {
+
+            drawText(
+                windDirectionTextLayout,
+                topLeft = Offset(
+                    (size.width - windDirectionTextLayout.size.width) / 2,
+                    (size.height - windDirectionTextLayout.size.height) / 2
+                )
+            )
+        }
     }
 }
 
@@ -276,7 +315,7 @@ private fun WindItemPreview() {
         Wind(
             modifier = Modifier.size(400.dp),
             degree = 54,
-            direction = "NW"
+            direction = "ЮЮЗ"
         )
     }
 }

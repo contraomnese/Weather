@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemThickness1
-import com.contraomnese.weather.design.theme.padding8
+import com.contraomnese.weather.design.theme.padding4
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastDay
 
@@ -27,11 +27,12 @@ fun ForecastDailyColumn(
 
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(padding8)
+        verticalArrangement = Arrangement.spacedBy(padding4)
     ) {
         items.forEachIndexed { index, it ->
             ForecastDailyItem(
                 dayName = it.dayName,
+                dayNumber = it.dayNumber,
                 conditionCode = it.conditionCode,
                 minTemperature = it.minTemperature,
                 maxTemperature = it.maxTemperature,
@@ -62,6 +63,7 @@ private fun ForecastHourlyLazyRowPreview() {
         ForecastDailyColumn(
             items = List(10) { index ->
                 ForecastDay(
+                    dayNumber = "33.03",
                     dayName = "Mon",
                     conditionCode = codes.random(),
                     maxTemperature = maxTemperature.random(),

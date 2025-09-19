@@ -21,6 +21,7 @@ data class ForecastLocationEntity(
     @ColumnInfo(name = LOCATION_ID) val locationId: Int = 0,
     @ColumnInfo(name = LOCALTIME) val localtime: String,
     @ColumnInfo(name = LOCALTIME_EPOCH) val localtimeEpoch: Long,
+    @ColumnInfo(name = TIME_ZONE_ID) val timeZoneId: String,
     @ColumnInfo(name = LAST_UPDATED) val lastUpdated: Long,
 ) {
     companion object {
@@ -29,6 +30,7 @@ data class ForecastLocationEntity(
         const val LOCATION_ID = "location_id"
         const val LOCALTIME = "localtime"
         const val LOCALTIME_EPOCH = "localtime_epoch"
+        const val TIME_ZONE_ID = "time_zone_id"
         const val LAST_UPDATED = "last_updated"
     }
 }

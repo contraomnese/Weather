@@ -3,8 +3,10 @@ package com.contraomnese.weather.domain.weatherByLocation.model
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.char
+
 
 data class ForecastWeatherDomainModel(
     val locationInfo: LocationInfo,
@@ -16,7 +18,8 @@ data class ForecastWeatherDomainModel(
 data class LocationInfo(
     val locationTimeEpoch: Long,
     val locationTime: LocationDateTime?,
-    val isAfterMidDay: Boolean?,
+    val timeZone: TimeZone,
+    val isSunUp: Boolean,
 )
 
 data class LocationDateTime(
@@ -57,7 +60,7 @@ data class LocationTime(
 
 data class CurrentInfo(
     val temperature: String,
-    val feelsLike: String,
+    val feelsLikeTemperature: String,
     val isDay: Boolean,
     val conditionCode: Int,
     val conditionText: String,
@@ -71,9 +74,10 @@ data class CurrentInfo(
     val dewPoint: Int,
     val pressure: Int,
     val isRainingExpected: Boolean,
-    val rainfallLast24Hours: Double,
-    val rainfallNext24Hours: Double,
-    val rainfallNextHour: Double,
+    val rainfallBeforeNow: List<Double>,
+    val rainfallAfterNow: List<Double>,
+    val rainfallNow: Double,
+    val maxRainfall: Double,
 )
 
 @JvmInline
@@ -105,6 +109,7 @@ data class ForecastHour(
 )
 
 data class ForecastDay(
+    val dayNumber: String,
     val dayName: String,
     val maxTemperature: Int,
     val minTemperature: Int,

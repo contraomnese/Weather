@@ -58,7 +58,11 @@ data class SunriseSection(
     override val bodyHeight: Float? = null,
     override val bodyMaxHeight: Float? = bodyHeight,
     override val icon: ImageVector = WeatherIcons.Sunrise,
-    override val title: Int = R.string.sunrise_title,
+    val isSunUp: Boolean,
+    override val title: Int = when (isSunUp) {
+        true -> R.string.day_title
+        false -> R.string.night_title
+    },
 ) :
     WeatherSection {
     override fun copyWithBodyHeight(newHeight: Float) =

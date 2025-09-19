@@ -19,6 +19,7 @@ import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeatherDo
 import com.contraomnese.weather.domain.weatherByLocation.model.LocationInfo
 import com.contraomnese.weather.domain.weatherByLocation.model.UvIndex
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.datetime.TimeZone
 import kotlin.math.roundToInt
 
 private const val HOURS = 24
@@ -26,6 +27,7 @@ private const val MINUTES = 60
 private const val SECONDS = 60
 private const val MM_IN_INCH = 25.4
 private const val IS_DAY = 1
+private const val IS_SUN_UP = 1
 private const val DAILY_WILL_RAIN = 1
 private const val DEFAULT_RAINFALL = 0.0
 
@@ -71,23 +73,29 @@ fun LocationWithForecasts.toDomain(appSettings: AppSettings): ForecastWeatherDom
     forecastHours.addAll(forecastDays.first().hour.filter { it.timeEpoch > location.localtimeEpoch })
     forecastHours.addAll(forecastDays.drop(1).first().hour.filter { it.timeEpoch <= nextDayHourLimit })
 
+    val rainfallBeforeNow = forecastDays[0].hour.filter { hour -> hour.timeEpoch < location.localtimeEpoch }
+        .map { it.toPrecipitationDomain(precipitationUnit = appSettings.precipitationUnit) }
+
+    val rainfallAfterNow = forecastDays[0].hour.filter { hour -> hour.timeEpoch > location.localtimeEpoch }
+        .map { it.toPrecipitationDomain(precipitationUnit = appSettings.precipitationUnit) } +
+            forecastDays[1].hour.filter { hour -> hour.timeEpoch < nextDayHourLimit }
+                .map { it.toPrecipitationDomain(precipitationUnit = appSettings.precipitationUnit) }
+
+    val rainfallNow = forecastDays[0].hour.first { hour -> hour.timeEpoch > location.localtimeEpoch }
+        .toPrecipitationDomain(precipitationUnit = appSettings.precipitationUnit)
+
     val locationTime = DateTimeParser.parseIso(location.localtime)
-    val isAfterMidDay = locationTime?.let { locTime ->
-        val sunrise = DateTimeParser.parseAmPmTime(forecastDays.first().astro.sunrise)
-        val sunset = DateTimeParser.parseAmPmTime(forecastDays.first().astro.sunset)
-        if (sunrise != null && sunset != null) locTime.toMinutes() >= sunset.toMinutes() - sunrise.toMinutes()
-        else null
-    }
 
     return ForecastWeatherDomainModel(
         locationInfo = LocationInfo(
             locationTimeEpoch = location.localtimeEpoch,
-            locationTime = DateTimeParser.parseIso(location.localtime),
-            isAfterMidDay = isAfterMidDay
+            locationTime = locationTime,
+            timeZone = TimeZone.of(location.timeZoneId),
+            isSunUp = forecastDays.first().astro.isSunUp == IS_SUN_UP
         ),
         currentInfo = CurrentInfo(
             temperature = forecastCurrent.toTemperatureDomain(appSettings.temperatureUnit),
-            feelsLike = when (appSettings.temperatureUnit) {
+            feelsLikeTemperature = when (appSettings.temperatureUnit) {
                 TemperatureUnit.Celsius -> forecastCurrent.feelsLikeC.roundToInt().toString()
                 TemperatureUnit.Fahrenheit -> forecastCurrent.feelsLikeF.roundToInt().toString()
             },
@@ -100,22 +108,10 @@ fun LocationWithForecasts.toDomain(appSettings: AppSettings): ForecastWeatherDom
             windDegree = forecastCurrent.windDegree,
             pressure = forecastCurrent.toPressureDomain(appSettings.pressureUnit),
             isRainingExpected = forecastDays.first().day.dayWillItRain == DAILY_WILL_RAIN,
-            rainfallLast24Hours = forecastDays[0].hour.sumOf { hour ->
-                if (hour.timeEpoch < location.localtimeEpoch) hour.toPrecipitationDomain(
-                    appSettings.precipitationUnit
-                ) else DEFAULT_RAINFALL
-            },
-            rainfallNext24Hours = forecastDays[0].hour.sumOf { hour ->
-                if (hour.timeEpoch >= location.localtimeEpoch) hour.toPrecipitationDomain(
-                    appSettings.precipitationUnit
-                ) else DEFAULT_RAINFALL
-            } +
-                    forecastDays[1].hour.sumOf { hour ->
-                        if (hour.timeEpoch < nextDayHourLimit) hour.toPrecipitationDomain(
-                            appSettings.precipitationUnit
-                        ) else DEFAULT_RAINFALL
-                    },
-            rainfallNextHour = forecastCurrent.toPrecipitationDomain(appSettings.precipitationUnit),
+            rainfallBeforeNow = rainfallBeforeNow,
+            rainfallAfterNow = rainfallAfterNow,
+            rainfallNow = rainfallNow,
+            maxRainfall = rainfallBeforeNow.plus(rainfallNow).plus(rainfallAfterNow).maxOrNull() ?: DEFAULT_RAINFALL,
             humidity = forecastCurrent.humidity,
             dewPoint = forecastCurrent.toDewPoint(appSettings.temperatureUnit),
             uvIndex = UvIndex(forecastCurrent.uv.roundToInt()),

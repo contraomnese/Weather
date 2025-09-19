@@ -30,5 +30,6 @@ fun ForecastLocationNetwork.toEntity(locationId: Int) = ForecastLocationEntity(
     locationId = locationId,
     localtimeEpoch = localtimeEpoch,
     localtime = localtime,
+    timeZoneId = timeZoneId,
     lastUpdated = System.currentTimeMillis()
 )

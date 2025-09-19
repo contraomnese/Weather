@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,6 +22,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
+import com.contraomnese.weather.design.theme.itemHeight26
+import com.contraomnese.weather.design.theme.itemThickness2
 import com.contraomnese.weather.design.theme.padding8
 
 @Composable
@@ -30,6 +33,7 @@ fun TitleSection(
     currentTemp: String,
     maxTemp: String,
     minTemp: String,
+    feelsLikeTemp: String,
     condition: String,
 ) {
 
@@ -64,7 +68,7 @@ fun TitleSection(
                     textAlign = TextAlign.Center
                 )
                 Text(
-                    stringResource(R.string.max_min_temperature_title, maxTemp, minTemp),
+                    stringResource(R.string.feels_like_temperature_title, feelsLikeTemp, maxTemp, minTemp),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -89,6 +93,11 @@ fun TitleSection(
                         ),
                         color = MaterialTheme.colorScheme.onSurface,
                     )
+                    VerticalDivider(
+                        modifier = Modifier.height(itemHeight26),
+                        thickness = itemThickness2,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                     Text(
                         text = condition,
                         style = MaterialTheme.typography.headlineMedium,
@@ -100,14 +109,31 @@ fun TitleSection(
     }
 }
 
-@Preview(locale = "ru")
+@Preview
 @Composable
-fun TitleSectionPreview() {
+private fun TitleSectionFullPreview() {
+    WeatherTheme {
+        TitleSection(
+            height = 800f,
+            location = "Moscow",
+            currentTemp = "23",
+            feelsLikeTemp = "26",
+            maxTemp = "26",
+            minTemp = "20",
+            condition = "Clear"
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun TitleSectionPreview() {
     WeatherTheme {
         TitleSection(
             height = 400f,
-            location = "pertinax",
+            location = "Moscow",
             currentTemp = "23",
+            feelsLikeTemp = "26",
             maxTemp = "26",
             minTemp = "20",
             condition = "Clear"

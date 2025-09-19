@@ -30,7 +30,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contraomnese.weather.core.ui.utils.toPx
 import com.contraomnese.weather.core.ui.widgets.AirQualityItem
@@ -47,10 +46,14 @@ import com.contraomnese.weather.core.ui.widgets.TitleSection
 import com.contraomnese.weather.core.ui.widgets.UvIndexItem
 import com.contraomnese.weather.core.ui.widgets.WindItem
 import com.contraomnese.weather.design.theme.WeatherTheme
+import com.contraomnese.weather.design.theme.itemHeight150
+import com.contraomnese.weather.design.theme.itemHeight300
+import com.contraomnese.weather.design.theme.itemHeight32
 import com.contraomnese.weather.design.theme.itemHeight64
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.design.theme.space32
+import com.contraomnese.weather.design.theme.space8
 import com.contraomnese.weather.domain.app.model.PrecipitationUnit
 import com.contraomnese.weather.domain.app.model.PressureUnit
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
@@ -107,8 +110,8 @@ internal fun WeatherScreen(
 
     val lazyListState = rememberLazyListState()
 
-    val minTitleBoxHeightPx = 150.dp.toPx()
-    val maxTitleBoxHeightPx = 300.dp.toPx()
+    val minTitleBoxHeightPx = itemHeight150.toPx()
+    val maxTitleBoxHeightPx = itemHeight300.toPx()
     var currentTitleBoxHeight by remember { mutableFloatStateOf(maxTitleBoxHeightPx) }
 
     val progress by remember(currentTitleBoxHeight, minTitleBoxHeightPx, maxTitleBoxHeightPx) {
@@ -118,8 +121,8 @@ internal fun WeatherScreen(
         }
     }
 
-    val sectionVerticalSpacing = 10.dp
-    val headerSectionHeight = 46.dp
+    val sectionVerticalSpacing = space8
+    val headerSectionHeight = itemHeight32
 
     val maxVisibleSectionOffset = headerSectionHeight.toPx() + sectionVerticalSpacing.toPx()
     var currentVisibleSectionIndex by remember { mutableIntStateOf(0) }
@@ -130,7 +133,7 @@ internal fun WeatherScreen(
                 HourlyForecastSection(),
                 DailyForecastSection(),
                 AqiSection(),
-                SunriseSection(),
+                SunriseSection(isSunUp = uiState.weather.locationInfo.isSunUp),
                 UVIndexSection(),
                 WindSection(),
                 HumiditySection(),
@@ -293,9 +296,10 @@ internal fun WeatherScreen(
             currentTitleBoxHeight,
             location = uiState.location.name,
             currentTemp = uiState.weather.currentInfo.temperature,
+            feelsLikeTemp = uiState.weather.currentInfo.feelsLikeTemperature,
             maxTemp = uiState.weather.forecastInfo.today.maxTemperature,
             minTemp = uiState.weather.forecastInfo.today.minTemperature,
-            condition = uiState.weather.forecastInfo.today.conditionText
+            condition = uiState.weather.forecastInfo.today.conditionText,
         )
         LazyColumn(
             modifier = Modifier
@@ -403,7 +407,7 @@ private fun HourlyForecastSection(
         onContentMeasured = measureContainerHeight
     ) {
         ForecastHourlyLazyRow(
-            modifier = Modifier.padding(horizontal = padding16),
+            modifier = Modifier.padding(horizontal = padding16, vertical = padding8),
             items = weather.forecastInfo.forecastHours
         )
     }
@@ -448,7 +452,7 @@ private fun AqiSection(
         onContentMeasured = measureContainerHeight
     ) {
         AirQualityItem(
-            modifier = Modifier.padding(horizontal = padding16),
+            modifier = Modifier.padding(horizontal = padding16, vertical = padding8),
             aqiIndex = weather.currentInfo.airQualityIndex.aqiIndex,
             coLevel = weather.currentInfo.airQualityIndex.coLevel,
             no2Level = weather.currentInfo.airQualityIndex.no2Level,
@@ -473,9 +477,9 @@ private fun SunriseSection(
     val sunrise = today.sunrise
     val sunset = today.sunset
     val currentTime = location.locationTime
-    val isMidDay = location.isAfterMidDay
+    val isSunUp = location.isSunUp
 
-    if (sunrise != null && sunset != null && currentTime != null && isMidDay != null) {
+    if (sunrise != null && sunset != null && currentTime != null) {
         CollapsableContainer(
             headerHeight = headerSectionHeight,
             headerTitle = stringResource(section.title),
@@ -484,11 +488,12 @@ private fun SunriseSection(
             onContentMeasured = measureContainerHeight
         ) {
             SunriseItem(
-                modifier = Modifier.padding(horizontal = padding16),
+                modifier = Modifier.padding(horizontal = padding16, vertical = padding8),
                 sunriseTime = sunrise,
                 sunsetTime = sunset,
-                currentTime = currentTime,
-                isMidDay = isMidDay
+                localDateTime = currentTime,
+                timeZone = location.timeZone,
+                isSunUp = isSunUp
             )
         }
     }
@@ -511,7 +516,7 @@ private fun UvIndexSection(
         onContentMeasured = measureContainerHeight
     ) {
         UvIndexItem(
-            modifier = Modifier.padding(horizontal = padding16),
+            modifier = Modifier.padding(horizontal = padding16, vertical = padding8),
             index = today.uvIndex.value
         )
     }
@@ -535,7 +540,7 @@ private fun WindSection(
         onContentMeasured = measureContainerHeight
     ) {
         WindItem(
-            modifier = Modifier.padding(horizontal = padding16),
+            modifier = Modifier.padding(horizontal = padding16, vertical = padding8),
             windSpeed = today.windSpeed,
             gustSpeed = today.gustSpeed,
             degree = today.windDegree,
@@ -563,7 +568,7 @@ private fun HumiditySection(
         onContentMeasured = measureContainerHeight
     ) {
         HumidityItem(
-            modifier = Modifier.padding(horizontal = padding16),
+            modifier = Modifier.padding(horizontal = padding16, vertical = padding8),
             humidity = today.humidity,
             dewPoint = today.dewPoint,
             temperatureUnit = temperatureUnit
@@ -589,11 +594,12 @@ private fun RainfallSection(
         onContentMeasured = measureContainerHeight
     ) {
         RainfallItem(
-            modifier = Modifier.padding(horizontal = padding16),
-            last24hoursAmount = today.rainfallLast24Hours,
-            next24hoursAmount = today.rainfallNext24Hours,
-            nextOneHourAmount = today.rainfallNextHour,
+            modifier = Modifier.padding(horizontal = padding16, vertical = padding8),
+            rainfallBeforeNow = today.rainfallBeforeNow,
+            rainfallAfterNow = today.rainfallAfterNow,
+            rainfallNow = today.rainfallNow,
             isRainingExpected = today.isRainingExpected,
+            maxRainfall = today.maxRainfall,
             precipitationUnit = precipitationUnit
         )
     }
@@ -617,7 +623,7 @@ private fun PressureSection(
         onContentMeasured = measureContainerHeight
     ) {
         PressureItem(
-            modifier = Modifier.padding(horizontal = padding16),
+            modifier = Modifier.padding(horizontal = padding16, vertical = padding8),
             value = today.pressure,
             pressureUnit = pressureUnit
         )

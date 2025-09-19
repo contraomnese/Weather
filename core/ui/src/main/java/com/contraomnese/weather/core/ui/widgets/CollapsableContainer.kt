@@ -74,7 +74,6 @@ fun CollapsableContainer(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = padding4)
                 .clipToBounds()
                 .layout { measurable, constraints ->
                     val placeable = measurable.measure(constraints)

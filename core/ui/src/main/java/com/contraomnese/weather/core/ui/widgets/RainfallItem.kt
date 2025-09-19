@@ -1,45 +1,48 @@
 package com.contraomnese.weather.core.ui.widgets
 
-import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.style.LineBreak
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.contraomnese.weather.core.ui.canvas.Rainfall
-import com.contraomnese.weather.core.ui.canvas.RainfallFractions
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight140
-import com.contraomnese.weather.design.theme.padding4
-import com.contraomnese.weather.design.theme.padding8
+import com.contraomnese.weather.design.theme.itemHeight160
+import com.contraomnese.weather.design.theme.itemHeight32
 import com.contraomnese.weather.design.theme.space8
 import com.contraomnese.weather.domain.app.model.PrecipitationUnit
-import kotlin.math.roundToInt
+import kotlin.random.Random
 
 @Composable
 fun RainfallItem(
     modifier: Modifier = Modifier,
-    last24hoursAmount: Double,
-    next24hoursAmount: Double,
-    nextOneHourAmount: Double,
+    rainfallBeforeNow: List<Double>,
+    rainfallAfterNow: List<Double>,
+    rainfallNow: Double,
+    maxRainfall: Double,
     isRainingExpected: Boolean = false,
     precipitationUnit: PrecipitationUnit,
 ) {
+    var displayValue by remember { mutableStateOf<Float?>(null) }
 
     val precipitationRes = remember(precipitationUnit) {
         when (precipitationUnit) {
@@ -48,141 +51,118 @@ fun RainfallItem(
         }
     }
 
-    Row(
+    val rainFallBeforeNowBySixHours = remember(rainfallBeforeNow) {
+        val cutoff = rainfallBeforeNow.size - rainfallBeforeNow.size % 6
+        rainfallBeforeNow.takeLast(cutoff).chunked(6) { it.sum() }
+    }
+
+    val rainFallAfterNowByThreeHours = remember(rainfallAfterNow) {
+        val cutoff = rainfallAfterNow.size - rainfallAfterNow.size % 3
+        rainfallAfterNow.take(cutoff.coerceAtMost(12)).chunked(3) { it.sum() }
+    }
+
+    val maxRainfallByThreeHours = remember(maxRainfall) {
+        (maxRainfall * 3).toFloat()
+    }
+
+    Column(
         modifier = modifier
             .fillMaxWidth()
-            .height(itemHeight140),
-        verticalAlignment = Alignment.CenterVertically
+            .height(itemHeight160),
     ) {
-        Rainfall(
-            modifier = Modifier
-                .height(itemHeight140)
-                .weight(1f),
-            rainfallFraction = when (precipitationUnit) {
-                PrecipitationUnit.Millimeters -> RainfallFractions.fromMm(last24hoursAmount.roundToInt() + next24hoursAmount.roundToInt())
-                PrecipitationUnit.Inches -> RainfallFractions.fromInches(last24hoursAmount.toFloat() + next24hoursAmount.toFloat())
-            }
-        )
+        if (isRainingExpected) {
+            Text(
+                text = stringResource(R.string.expected_raining),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+        if (displayValue != null) {
+            Text(
+                modifier = Modifier.height(itemHeight32),
+                text = AnnotatedString(stringResource(precipitationRes, displayValue!!)),
+                style = MaterialTheme.typography.titleLarge.copy(
+                    color = MaterialTheme.colorScheme.onSurface,
+                    lineBreak = LineBreak.Heading,
+                    textAlign = TextAlign.Center
+                ),
+                maxLines = 1
+            )
+        } else {
+            Spacer(Modifier.height(itemHeight32))
+        }
 
-        if (isRainingExpected) ExpectedRaining(last24hoursAmount, next24hoursAmount, nextOneHourAmount, precipitationRes)
-        else
-            Column(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(2f),
-                verticalArrangement = Arrangement.spacedBy(padding4),
-                horizontalAlignment = Alignment.End
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.End
-                ) {
-                    Text(
-                        text = stringResource(precipitationRes, last24hoursAmount),
-                        style = MaterialTheme.typography.displaySmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Text(
-                        text = stringResource(R.string.in_last_24_hours),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                    )
-                }
-                HorizontalDivider()
-                Column(
-                    horizontalAlignment = Alignment.End
-                ) {
-                    Text(
-                        text = stringResource(precipitationRes, next24hoursAmount),
-                        style = MaterialTheme.typography.displaySmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Text(
-                        text = stringResource(R.string.expected_in_next_24_hours),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                    )
-                }
-            }
-    }
-}
-
-@Composable
-private fun RowScope.ExpectedRaining(
-    last24hoursAmount: Double,
-    next24hoursAmount: Double,
-    nextOneHourAmount: Double,
-    @StringRes precipitationRes: Int,
-) {
-    Column(
-        modifier = Modifier
-            .wrapContentHeight()
-            .weight(3f)
-            .padding(vertical = padding4),
-        verticalArrangement = Arrangement.spacedBy(padding8),
-    ) {
         Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.height(itemHeight140),
+            horizontalArrangement = Arrangement.spacedBy(space8)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(R.string.in_last_24_hours),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = stringResource(precipitationRes, last24hoursAmount),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+            rainFallBeforeNowBySixHours.forEachIndexed { index, value ->
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Rainfall(
+                        modifier = Modifier
+                            .clickable {
+                                displayValue = value.toFloat()
+                            }
+                            .fillMaxSize()
+                            .weight(1f),
+                        value = value.toFloat(),
+                        maxValue = maxRainfallByThreeHours
+                    )
+                    Text(
+                        text = "-${(rainFallBeforeNowBySixHours.size - index) * 6}",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
             Column(
                 modifier = Modifier.weight(1f),
-                horizontalAlignment = Alignment.End
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Rainfall(
+                    modifier = Modifier
+                        .clickable {
+                            displayValue = rainfallNow.toFloat()
+                        }
+                        .fillMaxSize()
+                        .weight(1f),
+                    value = rainfallNow.toFloat(),
+                    maxValue = maxRainfallByThreeHours
+                )
                 Text(
-                    text = stringResource(precipitationRes, next24hoursAmount),
+                    text = "0",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Text(
-                    text = stringResource(R.string.expected_in_next_24_hours),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+            }
+
+            rainFallAfterNowByThreeHours.forEachIndexed { index, value ->
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Rainfall(
+                        modifier = Modifier
+                            .clickable {
+                                displayValue = value.toFloat()
+                            }
+                            .fillMaxSize()
+                            .weight(1f),
+                        value = value.toFloat(),
+                        maxValue = maxRainfallByThreeHours
+                    )
+                    Text(
+                        text = "+${(index + 1) * 3}",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
         }
-        HorizontalDivider()
-
-        Text(
-            text = stringResource(R.string.expected_raining),
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(space = space8)
-        ) {
-            Text(
-                text = stringResource(precipitationRes, nextOneHourAmount),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(
-                text = stringResource(R.string.in_next_1_hour, next24hoursAmount),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-            )
-        }
     }
-
 }
 
 @Preview(showBackground = true, backgroundColor = 0x79397E93, locale = "ru")
@@ -190,11 +170,12 @@ private fun RowScope.ExpectedRaining(
 private fun RainfallItemPreview() {
     WeatherTheme {
         RainfallItem(
-            last24hoursAmount = 0.050,
-            next24hoursAmount = 0.260,
-            nextOneHourAmount = 0.2,
+            rainfallBeforeNow = List(12) { Random.nextDouble(0.3, 1.2) },
+            rainfallAfterNow = List(12) { Random.nextDouble(0.1, 1.8) },
+            rainfallNow = 2.2,
             isRainingExpected = false,
-            precipitationUnit = PrecipitationUnit.Inches
+            maxRainfall = 2.5,
+            precipitationUnit = PrecipitationUnit.Millimeters
         )
     }
 }

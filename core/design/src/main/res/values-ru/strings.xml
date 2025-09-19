@@ -6,6 +6,7 @@
     <string name="speed_value">%1$d м/с</string>
     <string name="temperature_high_low">Макс:%1$s° Мин:%2$s°</string>
     <string name="now">Сейчас</string>
+    <string name="local_time_title">Местное время</string>
     <string name="today_forecast_title">СЕГОДНЯ</string>
     <string name="daily_forecast_title">ПРОГНОЗ НА 3 ДНЯ</string>
 
@@ -26,6 +27,7 @@
     <string name="aqi_very_bad_desc">Качество воздуха очень плохое. Негативное воздействие возможно для всех — избегайте физических нагрузок на улице и по возможности оставайтесь в помещении.</string>
 
     <string name="sunset_title">Закат</string>
+    <string name="night_title">Ночь</string>
     <string name="sunrise_time_title">Восход в %1$s</string>
     <string name="sunset_time_title">Закат в %1$s</string>
     <string name="sunrise_title">Восход</string>
@@ -36,7 +38,7 @@
     <string name="cardinal_point_s">Ю</string>
 
 
-    <string name="rainfall_value_mm">%.1f мм</string>
+    <string name="rainfall_value_mm">%.2f мм</string>
     <string name="rainfall_value_inch">%.2f дюйм</string>
     <string name="in_last_24_hours">последние 24 ч.</string>
     <string name="in_next_1_hour">"в течении часа"</string>
@@ -97,5 +99,10 @@
     <string name="atm_pressure_title">Атмосферное давление</string>
     <string name="pressure_mmhg">Миллиметры ртутного столба (мм рт. ст.)</string>
     <string name="pressure_gpa">Гекто паскаль (гПа)</string>
+    <string name="feels_like_temperature_title">%2$s°/%3$s° Ощущается как %1$s°</string>
+    <string name="day_title">День</string>
+    <string name="dew_point_happy">Комфортно</string>
+    <string name="dew_point_neutral">Умеренно</string>
+    <string name="dew_point_sad">Душно</string>
 
 </resources>

@@ -28,7 +28,6 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -38,15 +37,15 @@ import androidx.compose.ui.unit.sp
 import com.contraomnese.weather.design.icons.WeatherIcons
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.cornerRadius16
+import com.contraomnese.weather.design.theme.itemHeight32
 import com.contraomnese.weather.design.theme.padding16
-import com.contraomnese.weather.design.theme.padding32
 import com.contraomnese.weather.design.theme.padding4
 import com.contraomnese.weather.design.theme.padding8
 
 @Composable
 fun CollapsableContainerWithAnimatedHeader(
     modifier: Modifier = Modifier,
-    minHeaderHeight: Dp,
+    minHeaderHeight: Dp = itemHeight32,
     headerTitle: String = "Header",
     headerIcon: ImageVector = WeatherIcons.Default,
     alertTitle: String? = null,
@@ -67,10 +66,9 @@ fun CollapsableContainerWithAnimatedHeader(
                 text = alertTitle,
                 style = textStyleHeader,
                 constraints = Constraints.fixedWidth(with(density) { screenWidth.toPx().toInt() }),
-                maxLines = 5,
-                overflow = TextOverflow.Ellipsis
+                maxLines = 5
             )
-            with(density) { result.size.height.toDp() } + padding32
+            with(density) { result.size.height.toDp() } + padding8
         } else {
             minHeaderHeight
         }
@@ -105,6 +103,7 @@ fun CollapsableContainerWithAnimatedHeader(
                     text = alertTitle,
                     style = textStyleHeader,
                     color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 5,
                     modifier = Modifier.graphicsLayer {
                         alpha = progress
                         translationY = -(1f - progress) * 5f
@@ -157,7 +156,6 @@ fun CollapsableContainerWithAnimatedHeader(
 private fun CollapsableContainerWithAnimatedHeaderPreview() {
     WeatherTheme {
         CollapsableContainerWithAnimatedHeader(
-            minHeaderHeight = 46.dp,
             currentBodyHeight = 0f,
             alertTitle = "Alert",
             progress = 1f
@@ -170,7 +168,6 @@ private fun CollapsableContainerWithAnimatedHeaderPreview() {
 private fun CollapsableContainerWithAnimatedHeaderEmptyAlertTitlePreview() {
     WeatherTheme {
         CollapsableContainerWithAnimatedHeader(
-            minHeaderHeight = 46.dp,
             currentBodyHeight = 0f,
             alertTitle = null,
             progress = 1f

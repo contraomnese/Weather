@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.contraomnese.weather.core.ui.icons.ConditionsIcon
 import com.contraomnese.weather.design.R
@@ -18,7 +19,7 @@ import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight20
 import com.contraomnese.weather.design.theme.itemHeight26
 import com.contraomnese.weather.design.theme.itemWidth40
-import com.contraomnese.weather.design.theme.padding24
+import com.contraomnese.weather.design.theme.padding16
 
 @Composable
 fun ForecastHourlyItem(
@@ -31,13 +32,13 @@ fun ForecastHourlyItem(
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(padding24),
+        verticalArrangement = Arrangement.spacedBy(padding16),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             modifier = Modifier.height(itemHeight20),
-            text = if (isNow) stringResource(R.string.now) else time,
-            style = MaterialTheme.typography.bodySmall,
+            text = if (isNow) stringResource(R.string.now) else time.substring(0, 2),
+            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
             color = MaterialTheme.colorScheme.onSurface
         )
         ConditionsIcon(code = conditionCode, isNight = !isDay, modifier = Modifier.size(itemWidth40))
@@ -55,7 +56,7 @@ fun ForecastHourlyItem(
 private fun ForecastHourlyItemPreview(modifier: Modifier = Modifier) {
     WeatherTheme {
         ForecastHourlyItem(
-            time = "00:00",
+            time = "02:00",
             conditionCode = 1063,
             temperature = "19"
         )
@@ -67,7 +68,7 @@ private fun ForecastHourlyItemPreview(modifier: Modifier = Modifier) {
 private fun ForecastHourlyItemNowPreview(modifier: Modifier = Modifier) {
     WeatherTheme {
         ForecastHourlyItem(
-            time = "00:00",
+            time = "03:00",
             conditionCode = 1063,
             temperature = "19",
             isNow = true

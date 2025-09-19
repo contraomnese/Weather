@@ -59,9 +59,9 @@ private fun ForecastHourlyLazyRowPreview() {
         val codes = (1000..1200 step 3).toList()
 
         ForecastHourlyLazyRow(
-            items = List(24) { index ->
+            items = List(9) { index ->
                 ForecastHour(
-                    time = "$index:00",
+                    time = "0${index}:00",
                     conditionCode = codes.random(),
                     temperature = "${index + index}",
                     isDay = Random.nextBoolean()
