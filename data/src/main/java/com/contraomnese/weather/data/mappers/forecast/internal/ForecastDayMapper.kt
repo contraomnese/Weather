@@ -10,9 +10,9 @@ import com.contraomnese.weather.data.utils.getNumberOfMonth
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.model.PrecipitationUnit
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
-import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
-import com.contraomnese.weather.domain.weatherByLocation.model.ForecastDay
-import com.contraomnese.weather.domain.weatherByLocation.model.ForecastToday
+import com.contraomnese.weather.domain.weatherByLocation.model.internal.CompactWeatherCondition
+import com.contraomnese.weather.domain.weatherByLocation.model.internal.ForecastDay
+import com.contraomnese.weather.domain.weatherByLocation.model.internal.ForecastToday
 import kotlin.math.roundToInt
 
 internal fun ForecastDayWithDetails.toForecastTodayDomain(appSettings: AppSettings): ForecastToday {

@@ -16,12 +16,13 @@ import com.contraomnese.weather.data.storage.db.forecast.dao.LocationWithForecas
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import com.contraomnese.weather.domain.weatherByLocation.model.AlertsInfo
-import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
 import com.contraomnese.weather.domain.weatherByLocation.model.CurrentInfo
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastInfo
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeatherDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.LocationInfo
-import com.contraomnese.weather.domain.weatherByLocation.model.UvIndex
+import com.contraomnese.weather.domain.weatherByLocation.model.internal.CompactWeatherCondition
+import com.contraomnese.weather.domain.weatherByLocation.model.internal.UvIndex
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.datetime.TimeZone
 import kotlin.math.roundToInt
@@ -77,14 +78,14 @@ fun LocationWithForecasts.toDomain(appSettings: AppSettings): ForecastWeatherDom
             windDegree = forecastCurrent.windDegree,
             pressure = forecastCurrent.toPressureDomain(appSettings.pressureUnit),
             isRainingExpected = forecastDays.first().day.dayWillItRain == DAILY_WILL_RAIN,
-            rainfallBeforeNow = rainfallBeforeNow,
-            rainfallAfterNow = rainfallAfterNow,
+            rainfallBeforeNow = rainfallBeforeNow.toImmutableList(),
+            rainfallAfterNow = rainfallAfterNow.toImmutableList(),
             rainfallNow = rainfallNow,
             maxRainfall = rainfallBeforeNow.plus(rainfallNow).plus(rainfallAfterNow).maxOrNull() ?: DEFAULT_RAINFALL,
             humidity = forecastCurrent.humidity,
             dewPoint = forecastCurrent.toDewPoint(appSettings.temperatureUnit),
             uvIndex = UvIndex(forecastCurrent.uv.roundToInt()),
-            airQualityIndex = forecastCurrent.toAirQualityInfo()
+            airQuality = forecastCurrent.toAirQualityInfo()
         ),
         forecastInfo = ForecastInfo(
             today = forecastDays.first().toForecastTodayDomain(appSettings),

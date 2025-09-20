@@ -40,6 +40,7 @@ import com.contraomnese.weather.design.theme.padding8
 
 @Composable
 fun FavoriteItem(
+    modifier: Modifier = Modifier,
     locationName: String,
     locationCountry: String = "Russia",
     locationTime: String = "12:12",
@@ -49,7 +50,6 @@ fun FavoriteItem(
     minTemperature: String = "16",
     onTapClicked: () -> Unit,
     onDeleteClicked: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
 
     var showDelete by remember { mutableStateOf(false) }

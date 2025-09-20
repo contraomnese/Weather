@@ -25,7 +25,7 @@ import androidx.core.graphics.drawable.toBitmap
 import com.contraomnese.weather.core.ui.utils.extractBottomColor
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
-import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
+import com.contraomnese.weather.domain.weatherByLocation.model.internal.CompactWeatherCondition
 
 @Composable
 fun ImageBackground(

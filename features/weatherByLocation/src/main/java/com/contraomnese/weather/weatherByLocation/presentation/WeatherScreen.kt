@@ -456,13 +456,13 @@ private fun AqiSection(
     ) {
         AirQualityItem(
             modifier = Modifier.padding(horizontal = padding16, vertical = padding8),
-            aqiIndex = weather.currentInfo.airQualityIndex.aqiIndex,
-            coLevel = weather.currentInfo.airQualityIndex.coLevel,
-            no2Level = weather.currentInfo.airQualityIndex.no2Level,
-            o3Level = weather.currentInfo.airQualityIndex.o3Level,
-            so2Level = weather.currentInfo.airQualityIndex.so2Level,
-            pm25Level = weather.currentInfo.airQualityIndex.pm25Level,
-            pm10Level = weather.currentInfo.airQualityIndex.pm10Level,
+            aqiIndex = weather.currentInfo.airQuality.aqiIndex,
+            coLevel = weather.currentInfo.airQuality.coLevel,
+            no2Level = weather.currentInfo.airQuality.no2Level,
+            o3Level = weather.currentInfo.airQuality.o3Level,
+            so2Level = weather.currentInfo.airQuality.so2Level,
+            pm25Level = weather.currentInfo.airQuality.pm25Level,
+            pm10Level = weather.currentInfo.airQuality.pm10Level,
         )
     }
 }

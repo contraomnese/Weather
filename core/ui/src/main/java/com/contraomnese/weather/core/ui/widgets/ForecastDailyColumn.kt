@@ -11,8 +11,8 @@ import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemThickness1
 import com.contraomnese.weather.design.theme.padding4
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
-import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
-import com.contraomnese.weather.domain.weatherByLocation.model.ForecastDay
+import com.contraomnese.weather.domain.weatherByLocation.model.internal.CompactWeatherCondition
+import com.contraomnese.weather.domain.weatherByLocation.model.internal.ForecastDay
 
 
 @Composable
@@ -57,12 +57,11 @@ fun ForecastDailyColumn(
 private fun ForecastHourlyLazyRowPreview() {
     WeatherTheme {
 
-        val codes = (1000..1200 step 3).toList()
         val minTemperature = (0..10)
         val maxTemperature = (16..25)
 
         ForecastDailyColumn(
-            items = List(10) { index ->
+            items = List(10) {
                 ForecastDay(
                     dayNumber = "33.03",
                     dayName = "Mon",

@@ -27,8 +27,8 @@ import com.contraomnese.weather.design.theme.itemHeight140
 import com.contraomnese.weather.design.theme.itemHeight160
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding8
-import com.contraomnese.weather.domain.weatherByLocation.model.LocationDateTime
-import com.contraomnese.weather.domain.weatherByLocation.model.LocationTime
+import com.contraomnese.weather.domain.weatherByLocation.model.internal.LocationDateTime
+import com.contraomnese.weather.domain.weatherByLocation.model.internal.LocationTime
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalTime

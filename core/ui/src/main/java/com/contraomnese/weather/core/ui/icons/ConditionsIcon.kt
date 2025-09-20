@@ -16,7 +16,7 @@ import com.contraomnese.weather.core.ui.canvas.SunIcon
 import com.contraomnese.weather.core.ui.canvas.ThunderCloudIcon
 import com.contraomnese.weather.core.ui.canvas.TwoCloudIcon
 import com.contraomnese.weather.design.theme.WeatherTheme
-import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
+import com.contraomnese.weather.domain.weatherByLocation.model.internal.CompactWeatherCondition
 
 @Composable
 fun ConditionsIcon(condition: CompactWeatherCondition, modifier: Modifier = Modifier, isNight: Boolean = false) {

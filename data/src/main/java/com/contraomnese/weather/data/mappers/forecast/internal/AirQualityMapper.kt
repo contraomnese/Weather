@@ -1,8 +1,8 @@
 package com.contraomnese.weather.data.mappers.forecast.internal
 
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastCurrentEntity
-import com.contraomnese.weather.domain.weatherByLocation.model.AirQualityInfo
-import com.contraomnese.weather.domain.weatherByLocation.model.PollutantLevel
+import com.contraomnese.weather.domain.weatherByLocation.model.internal.AirQualityInfo
+import com.contraomnese.weather.domain.weatherByLocation.model.internal.PollutantLevel
 
 internal fun ForecastCurrentEntity.toAirQualityInfo(): AirQualityInfo {
     return AirQualityInfo(

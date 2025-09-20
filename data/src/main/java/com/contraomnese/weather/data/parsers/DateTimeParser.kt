@@ -1,8 +1,8 @@
 package com.contraomnese.weather.data.parsers
 
 import android.util.Log
-import com.contraomnese.weather.domain.weatherByLocation.model.LocationDateTime
-import com.contraomnese.weather.domain.weatherByLocation.model.LocationTime
+import com.contraomnese.weather.domain.weatherByLocation.model.internal.LocationDateTime
+import com.contraomnese.weather.domain.weatherByLocation.model.internal.LocationTime
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime

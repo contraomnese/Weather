@@ -20,7 +20,7 @@ import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight6
 import com.contraomnese.weather.design.theme.padding8
-import com.contraomnese.weather.domain.weatherByLocation.model.PollutantLevel
+import com.contraomnese.weather.domain.weatherByLocation.model.internal.PollutantLevel
 
 
 @Composable
