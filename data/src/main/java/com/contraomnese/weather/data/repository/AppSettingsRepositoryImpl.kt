@@ -1,7 +1,7 @@
 package com.contraomnese.weather.data.repository
 
-import com.contraomnese.weather.data.mappers.toDomain
-import com.contraomnese.weather.data.mappers.toEntity
+import com.contraomnese.weather.data.mappers.appSettings.toDomain
+import com.contraomnese.weather.data.mappers.appSettings.toEntity
 import com.contraomnese.weather.data.storage.memory.api.AppSettingsStorage
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository

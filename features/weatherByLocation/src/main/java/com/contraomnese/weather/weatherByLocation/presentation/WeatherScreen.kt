@@ -1,6 +1,5 @@
 package com.contraomnese.weather.weatherByLocation.presentation
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,7 +14,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -26,23 +24,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.contraomnese.weather.core.ui.utils.extractBottomColor
 import com.contraomnese.weather.core.ui.utils.toPx
 import com.contraomnese.weather.core.ui.widgets.AirQualityItem
 import com.contraomnese.weather.core.ui.widgets.CollapsableContainer
@@ -50,6 +37,7 @@ import com.contraomnese.weather.core.ui.widgets.CollapsableContainerWithAnimated
 import com.contraomnese.weather.core.ui.widgets.ForecastDailyColumn
 import com.contraomnese.weather.core.ui.widgets.ForecastHourlyLazyRow
 import com.contraomnese.weather.core.ui.widgets.HumidityItem
+import com.contraomnese.weather.core.ui.widgets.ImageBackground
 import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
 import com.contraomnese.weather.core.ui.widgets.PressureItem
 import com.contraomnese.weather.core.ui.widgets.RainfallItem
@@ -57,7 +45,6 @@ import com.contraomnese.weather.core.ui.widgets.SunriseItem
 import com.contraomnese.weather.core.ui.widgets.TitleSection
 import com.contraomnese.weather.core.ui.widgets.UvIndexItem
 import com.contraomnese.weather.core.ui.widgets.WindItem
-import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.itemHeight150
 import com.contraomnese.weather.design.theme.itemHeight300
 import com.contraomnese.weather.design.theme.itemHeight32
@@ -95,76 +82,11 @@ internal fun WeatherRoute(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val context = LocalContext.current
+    val backgroundModifier = if (uiState.isLoading) Modifier.background(MaterialTheme.colorScheme.background) else Modifier
 
-    var extractedColor by remember { mutableStateOf(Color.Black) }
-
-    var drawableBackgroundRes by remember { mutableStateOf<Int>(R.drawable.moderate) }
-
-    LaunchedEffect(uiState.isLoading) {
-        if (!uiState.isLoading) {
-            requireNotNull(uiState.weather)
-
-            drawableBackgroundRes = when (uiState.weather!!.currentInfo.conditionCode) {
-                1000 -> R.drawable.sun_large
-
-                1003 -> R.drawable.partly_cloud
-
-                1006, 1009 -> R.drawable.overcast
-
-                1030, 1135, 1147 -> R.drawable.fog
-
-                1063, 1150, 1153, 1180, 1183, 1186, 1189, 1192, 1195,
-                1240, 1243, 1246, 1273, 1276,
-                    -> R.drawable.rain
-
-                1066, 1114, 1117, 1210, 1213, 1216, 1219, 1222, 1225,
-                1255, 1258, 1279, 1282,
-                    -> R.drawable.snow
-
-                1087 -> R.drawable.thunder
-
-                1069, 1072, 1168, 1171, 1198, 1201, 1204, 1207,
-                1237, 1249, 1252, 1261, 1264,
-                    -> R.drawable.sleet
-
-                else -> R.drawable.moderate
-            }
-            val bitmap = ResourcesCompat.getDrawable(context.resources, drawableBackgroundRes, context.theme)?.current?.toBitmap()
-            if (bitmap != null) {
-                extractedColor = extractBottomColor(bitmap)
-            }
-        }
-    }
-
-    Box(modifier = modifier.fillMaxSize()) {
-
-        Image(
-            painter = painterResource(id = drawableBackgroundRes),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxSize()
-                .graphicsLayer {
-                    translationY = -600f
-                },
-        )
-
-        Box(
-            modifier = Modifier
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color.Transparent,
-                            extractedColor,
-                            extractedColor
-                        ),
-                        startY = with(LocalDensity.current) { (400.dp).toPx() },
-                        endY = Float.POSITIVE_INFINITY
-                    ),
-                )
-                .fillMaxSize()
-        )
+    Box(modifier = modifier
+        .fillMaxSize()
+        .then(backgroundModifier)) {
 
         when {
             uiState.isLoading -> LoadingIndicator(
@@ -184,7 +106,6 @@ internal fun WeatherRoute(
 internal fun WeatherScreen(
     uiState: WeatherUiState,
 ) {
-
     requireNotNull(uiState.weather)
     requireNotNull(uiState.appSettings)
 
@@ -365,6 +286,8 @@ internal fun WeatherScreen(
             }
         }
     }
+
+    ImageBackground(condition = uiState.weather.currentInfo.condition)
 
     Column(
         modifier = Modifier

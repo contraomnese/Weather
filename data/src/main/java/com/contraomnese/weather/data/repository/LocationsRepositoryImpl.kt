@@ -1,6 +1,7 @@
 package com.contraomnese.weather.data.repository
 
-import com.contraomnese.weather.data.mappers.toDomain
+import com.contraomnese.weather.data.mappers.favorite.toDomain
+import com.contraomnese.weather.data.mappers.location.toDomain
 import com.contraomnese.weather.data.storage.db.WeatherDatabase
 import com.contraomnese.weather.data.storage.db.locations.entities.FavoriteEntity
 import com.contraomnese.weather.domain.home.model.MatchingLocationDomainModel

@@ -1,4 +1,4 @@
-package com.contraomnese.weather.data.mappers
+package com.contraomnese.weather.data.mappers.forecast.internal
 
 private val directions = mapOf(
     "N" to "С",

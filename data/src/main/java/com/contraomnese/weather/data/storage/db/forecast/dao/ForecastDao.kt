@@ -7,8 +7,9 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Relation
 import androidx.room.Transaction
-import com.contraomnese.weather.data.mappers.toEntity
-import com.contraomnese.weather.data.mappers.toForecastDayEntity
+import com.contraomnese.weather.data.mappers.forecast.internal.toEntity
+import com.contraomnese.weather.data.mappers.forecast.internal.toForecastDayEntity
+import com.contraomnese.weather.data.mappers.location.toEntity
 import com.contraomnese.weather.data.network.models.ForecastResponse
 import com.contraomnese.weather.data.storage.db.forecast.entities.DayEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastAlertEntity

@@ -1,18 +1,22 @@
-package com.contraomnese.weather.data.mappers
+package com.contraomnese.weather.data.mappers.forecast
 
-import com.contraomnese.weather.data.network.models.ForecastDayNetwork
+import com.contraomnese.weather.data.mappers.forecast.internal.toAirQualityInfo
+import com.contraomnese.weather.data.mappers.forecast.internal.toDewPoint
+import com.contraomnese.weather.data.mappers.forecast.internal.toDomain
+import com.contraomnese.weather.data.mappers.forecast.internal.toForecastDayDomain
+import com.contraomnese.weather.data.mappers.forecast.internal.toForecastTodayDomain
+import com.contraomnese.weather.data.mappers.forecast.internal.toGustDomain
+import com.contraomnese.weather.data.mappers.forecast.internal.toPrecipitationDomain
+import com.contraomnese.weather.data.mappers.forecast.internal.toPressureDomain
+import com.contraomnese.weather.data.mappers.forecast.internal.toTemperatureDomain
+import com.contraomnese.weather.data.mappers.forecast.internal.toWindDomain
+import com.contraomnese.weather.data.mappers.forecast.internal.translateDirection
 import com.contraomnese.weather.data.parsers.DateTimeParser
 import com.contraomnese.weather.data.storage.db.forecast.dao.LocationWithForecasts
-import com.contraomnese.weather.data.storage.db.forecast.entities.DayEntity
-import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastCurrentEntity
-import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDayEntity
-import com.contraomnese.weather.data.storage.db.forecast.entities.HourlyForecastEntity
 import com.contraomnese.weather.domain.app.model.AppSettings
-import com.contraomnese.weather.domain.app.model.PrecipitationUnit
-import com.contraomnese.weather.domain.app.model.PressureUnit
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
-import com.contraomnese.weather.domain.app.model.WindSpeedUnit
 import com.contraomnese.weather.domain.weatherByLocation.model.AlertsInfo
+import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
 import com.contraomnese.weather.domain.weatherByLocation.model.CurrentInfo
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastInfo
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeatherDomainModel
@@ -25,45 +29,10 @@ import kotlin.math.roundToInt
 private const val HOURS = 24
 private const val MINUTES = 60
 private const val SECONDS = 60
-private const val MM_IN_INCH = 25.4
 private const val IS_DAY = 1
 private const val IS_SUN_UP = 1
 private const val DAILY_WILL_RAIN = 1
 private const val DEFAULT_RAINFALL = 0.0
-
-fun ForecastDayNetwork.toForecastDayEntity(locationId: Int): ForecastDayEntity {
-
-    return ForecastDayEntity(
-        forecastLocationId = locationId,
-        date = date,
-        dateEpoch = dateEpoch,
-    )
-}
-
-fun ForecastDayNetwork.toEntity(forecastDayId: Int) = DayEntity(
-    forecastDayId = forecastDayId,
-    maxTempC = day.maxTempC,
-    minTempC = day.minTempC,
-    maxTempF = day.maxTempF,
-    minTempF = day.minTempF,
-    avgTempC = day.avgTempC,
-    avgTempF = day.avgTempF,
-    maxWindMph = day.maxWindMph,
-    maxWindKph = day.maxWindKph,
-    totalPrecipMm = day.totalPrecipMm,
-    totalPrecipIn = day.totalPrecipIn,
-    totalSnowCm = day.totalSnowCm,
-    avgVisKm = day.avgVisKm,
-    avgVisMiles = day.avgVisMiles,
-    avgHumidity = day.avgHumidity,
-    conditionText = day.condition.text,
-    conditionCode = day.condition.code,
-    uv = day.uv,
-    dayWillItRain = day.dailyWillItRain,
-    dayChanceOfRain = day.dailyChanceOfRain,
-    dayWillItSnow = day.dailyWillItSnow,
-    dayChanceOfSnow = day.dailyChanceOfSnow,
-)
 
 fun LocationWithForecasts.toDomain(appSettings: AppSettings): ForecastWeatherDomainModel {
 
@@ -100,7 +69,7 @@ fun LocationWithForecasts.toDomain(appSettings: AppSettings): ForecastWeatherDom
                 TemperatureUnit.Fahrenheit -> forecastCurrent.feelsLikeF.roundToInt().toString()
             },
             isDay = forecastCurrent.isDay == IS_DAY,
-            conditionCode = forecastCurrent.conditionCode,
+            condition = CompactWeatherCondition.fromConditionCode(forecastCurrent.conditionCode),
             conditionText = forecastCurrent.conditionText,
             windSpeed = forecastCurrent.toWindDomain(appSettings.windSpeedUnit),
             gustSpeed = forecastCurrent.toGustDomain(appSettings.windSpeedUnit),
@@ -126,57 +95,6 @@ fun LocationWithForecasts.toDomain(appSettings: AppSettings): ForecastWeatherDom
             alerts = forecastAlert.map { it.desc }.toPersistentList()
         )
     )
-}
-
-private fun ForecastCurrentEntity.toTemperatureDomain(temperatureUnit: TemperatureUnit): String {
-    return when (temperatureUnit) {
-        TemperatureUnit.Celsius -> this.tempC.roundToInt().toString()
-        TemperatureUnit.Fahrenheit -> this.tempF.roundToInt().toString()
-    }
-}
-
-private fun ForecastCurrentEntity.toWindDomain(windSpeedUnit: WindSpeedUnit): String {
-    return when (windSpeedUnit) {
-        WindSpeedUnit.Kph -> this.windKph.roundToInt().toString()
-        WindSpeedUnit.Mph -> this.windMph.roundToInt().toString()
-        WindSpeedUnit.Ms -> this.windKph.toMs().roundToInt().toString()
-    }
-}
-
-private fun ForecastCurrentEntity.toGustDomain(windSpeedUnit: WindSpeedUnit): String {
-    return when (windSpeedUnit) {
-        WindSpeedUnit.Kph -> this.gustKph.roundToInt().toString()
-        WindSpeedUnit.Mph -> this.gustMph.roundToInt().toString()
-        WindSpeedUnit.Ms -> this.gustKph.toMs().roundToInt().toString()
-    }
-}
-
-private fun ForecastCurrentEntity.toPressureDomain(pressureUnit: PressureUnit): Int {
-    return when (pressureUnit) {
-        PressureUnit.MmHg -> (this.pressureIn * MM_IN_INCH).roundToInt()
-        PressureUnit.GPa -> this.pressureMb.roundToInt()
-    }
-}
-
-private fun ForecastCurrentEntity.toDewPoint(temperatureUnit: TemperatureUnit): Int {
-    return when (temperatureUnit) {
-        TemperatureUnit.Celsius -> this.dewPointC.roundToInt()
-        TemperatureUnit.Fahrenheit -> this.dewPointF.roundToInt()
-    }
-}
-
-private fun ForecastCurrentEntity.toPrecipitationDomain(precipitationUnit: PrecipitationUnit): Double {
-    return when (precipitationUnit) {
-        PrecipitationUnit.Millimeters -> this.precipMm
-        PrecipitationUnit.Inches -> this.precipIn
-    }
-}
-
-private fun HourlyForecastEntity.toPrecipitationDomain(precipitationUnit: PrecipitationUnit): Double {
-    return when (precipitationUnit) {
-        PrecipitationUnit.Millimeters -> this.precipMm
-        PrecipitationUnit.Inches -> this.precipIn
-    }
 }
 
 

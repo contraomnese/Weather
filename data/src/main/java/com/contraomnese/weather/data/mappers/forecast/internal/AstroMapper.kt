@@ -1,9 +1,9 @@
-package com.contraomnese.weather.data.mappers
+package com.contraomnese.weather.data.mappers.forecast.internal
 
 import com.contraomnese.weather.data.network.models.AstroNetwork
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastAstroEntity
 
-fun AstroNetwork.toEntity(forecastDayId: Int) = ForecastAstroEntity(
+internal fun AstroNetwork.toEntity(forecastDayId: Int) = ForecastAstroEntity(
     forecastDayId = forecastDayId,
     sunrise = this.sunrise,
     sunset = this.sunset,

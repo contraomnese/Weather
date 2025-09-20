@@ -1,10 +1,10 @@
-package com.contraomnese.weather.data.mappers
+package com.contraomnese.weather.data.mappers.forecast.internal
 
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastCurrentEntity
 import com.contraomnese.weather.domain.weatherByLocation.model.AirQualityInfo
 import com.contraomnese.weather.domain.weatherByLocation.model.PollutantLevel
 
-fun ForecastCurrentEntity.toAirQualityInfo(): AirQualityInfo {
+internal fun ForecastCurrentEntity.toAirQualityInfo(): AirQualityInfo {
     return AirQualityInfo(
         aqiIndex = airQualityGbDefraIndex,
         aqiText = when (airQualityGbDefraIndex) {

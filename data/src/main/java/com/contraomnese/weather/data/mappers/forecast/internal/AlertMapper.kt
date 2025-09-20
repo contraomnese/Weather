@@ -1,9 +1,9 @@
-package com.contraomnese.weather.data.mappers
+package com.contraomnese.weather.data.mappers.forecast.internal
 
 import com.contraomnese.weather.data.network.models.AlertNetwork
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastAlertEntity
 
-fun AlertNetwork.toEntity(forecastLocationId: Int) = ForecastAlertEntity(
+internal fun AlertNetwork.toEntity(forecastLocationId: Int) = ForecastAlertEntity(
     forecastLocationId = forecastLocationId,
     headline = headline,
     msgType = msgType,

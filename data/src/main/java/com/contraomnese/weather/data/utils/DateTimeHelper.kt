@@ -1,4 +1,4 @@
-package com.contraomnese.weather.data.mappers
+package com.contraomnese.weather.data.utils
 
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone

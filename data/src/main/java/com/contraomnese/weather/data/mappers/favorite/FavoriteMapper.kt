@@ -1,4 +1,4 @@
-package com.contraomnese.weather.data.mappers
+package com.contraomnese.weather.data.mappers.favorite
 
 import com.contraomnese.weather.data.storage.db.locations.dto.FavoriteDto
 import com.contraomnese.weather.data.storage.db.locations.entities.FavoriteEntity

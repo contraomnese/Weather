@@ -20,12 +20,13 @@ import com.contraomnese.weather.design.theme.itemHeight20
 import com.contraomnese.weather.design.theme.itemHeight26
 import com.contraomnese.weather.design.theme.itemWidth40
 import com.contraomnese.weather.design.theme.padding16
+import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
 
 @Composable
 fun ForecastHourlyItem(
     modifier: Modifier = Modifier,
     time: String,
-    conditionCode: Int,
+    condition: CompactWeatherCondition,
     temperature: String,
     isNow: Boolean = false,
     isDay: Boolean = false,
@@ -41,7 +42,7 @@ fun ForecastHourlyItem(
             style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
             color = MaterialTheme.colorScheme.onSurface
         )
-        ConditionsIcon(code = conditionCode, isNight = !isDay, modifier = Modifier.size(itemWidth40))
+        ConditionsIcon(condition = condition, isNight = !isDay, modifier = Modifier.size(itemWidth40))
         Text(
             modifier = Modifier.height(itemHeight26),
             text = stringResource(R.string.current_temperature_title, temperature),
@@ -57,7 +58,7 @@ private fun ForecastHourlyItemPreview(modifier: Modifier = Modifier) {
     WeatherTheme {
         ForecastHourlyItem(
             time = "02:00",
-            conditionCode = 1063,
+            condition = CompactWeatherCondition.CLEAR,
             temperature = "19"
         )
     }
@@ -69,7 +70,7 @@ private fun ForecastHourlyItemNowPreview(modifier: Modifier = Modifier) {
     WeatherTheme {
         ForecastHourlyItem(
             time = "03:00",
-            conditionCode = 1063,
+            condition = CompactWeatherCondition.CLEAR,
             temperature = "19",
             isNow = true
         )

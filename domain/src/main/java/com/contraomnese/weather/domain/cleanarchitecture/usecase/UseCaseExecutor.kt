@@ -1,5 +1,6 @@
 package com.contraomnese.weather.domain.cleanarchitecture.usecase
 
+import android.util.Log
 import com.contraomnese.weather.domain.cleanarchitecture.exception.DomainException
 import com.contraomnese.weather.domain.cleanarchitecture.exception.UnknownDomainException
 import kotlinx.coroutines.CancellationException
@@ -88,6 +89,9 @@ class UseCaseExecutor(
         }
     }
 
-    private fun handleException(throwable: Throwable): DomainException =
-        (throwable as? DomainException) ?: UnknownDomainException(throwable)
+    private fun handleException(throwable: Throwable): DomainException {
+        Log.e("UseCaseExecutor", "${throwable.cause?.message}")
+        return (throwable as? DomainException) ?: UnknownDomainException(throwable)
+    }
+
 }

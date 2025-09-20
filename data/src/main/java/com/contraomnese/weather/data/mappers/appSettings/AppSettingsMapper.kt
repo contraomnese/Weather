@@ -1,4 +1,4 @@
-package com.contraomnese.weather.data.mappers
+package com.contraomnese.weather.data.mappers.appSettings
 
 import com.contraomnese.weather.data.storage.memory.models.AppSettingsEntity
 import com.contraomnese.weather.domain.app.model.AppSettings

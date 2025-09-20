@@ -1,4 +1,4 @@
-package com.contraomnese.weather.data.mappers
+package com.contraomnese.weather.data.mappers.location
 
 import com.contraomnese.weather.data.network.models.ForecastLocationNetwork
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastLocationEntity

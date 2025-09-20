@@ -1,6 +1,6 @@
 package com.contraomnese.weather.data.repository
 
-import com.contraomnese.weather.data.mappers.toDomain
+import com.contraomnese.weather.data.mappers.forecast.toDomain
 import com.contraomnese.weather.data.network.api.WeatherApi
 import com.contraomnese.weather.data.network.models.ErrorResponse
 import com.contraomnese.weather.data.network.parsers.parseOrThrowError

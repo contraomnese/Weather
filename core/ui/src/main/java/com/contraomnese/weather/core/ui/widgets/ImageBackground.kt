@@ -4,14 +4,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -27,42 +25,27 @@ import androidx.core.graphics.drawable.toBitmap
 import com.contraomnese.weather.core.ui.utils.extractBottomColor
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
-import com.contraomnese.weather.design.theme.itemHeight64
+import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
 
 @Composable
-fun TrainingExample(
+fun ImageBackground(
     modifier: Modifier = Modifier,
-    code: Int = 1087,
+    condition: CompactWeatherCondition,
 ) {
 
     val context = LocalContext.current
 
     var extractedColor by remember { mutableStateOf(Color.Black) }
 
-    val drawableBackgroundRes = when (code) {
-        1000 -> R.drawable.sun_large
-
-        1003 -> R.drawable.partly_cloud
-
-        1006, 1009 -> R.drawable.overcast
-
-        1030, 1135, 1147 -> R.drawable.fog
-
-        1063, 1150, 1153, 1180, 1183, 1186, 1189, 1192, 1195,
-        1240, 1243, 1246, 1273, 1276,
-            -> R.drawable.rain
-
-        1066, 1114, 1117, 1210, 1213, 1216, 1219, 1222, 1225,
-        1255, 1258, 1279, 1282,
-            -> R.drawable.snow
-
-        1087 -> R.drawable.thunder
-
-        1069, 1072, 1168, 1171, 1198, 1201, 1204, 1207,
-        1237, 1249, 1252, 1261, 1264,
-            -> R.drawable.sleet
-
-        else -> R.drawable.moderate
+    val drawableBackgroundRes = when (condition) {
+        CompactWeatherCondition.CLEAR -> R.drawable.sun_large
+        CompactWeatherCondition.PARTLY_CLOUDY -> R.drawable.partly_cloud
+        CompactWeatherCondition.CLOUDY -> R.drawable.overcast
+        CompactWeatherCondition.FOG -> R.drawable.fog
+        CompactWeatherCondition.RAIN -> R.drawable.rain
+        CompactWeatherCondition.SNOW -> R.drawable.snow
+        CompactWeatherCondition.THUNDER -> R.drawable.thunder
+        CompactWeatherCondition.SLEET -> R.drawable.sleet
     }
 
     LaunchedEffect(drawableBackgroundRes) {
@@ -100,20 +83,14 @@ fun TrainingExample(
                 )
                 .fillMaxSize()
         )
-
-        LoadingIndicator(
-            modifier = Modifier
-                .height(itemHeight64)
-                .align(Alignment.Center)
-        )
     }
 }
 
 
 @Preview(showBackground = true)
 @Composable
-fun TrainingExamplePreview() {
+private fun TrainingExamplePreview() {
     WeatherTheme {
-        TrainingExample()
+        ImageBackground(condition = CompactWeatherCondition.CLEAR)
     }
 }
