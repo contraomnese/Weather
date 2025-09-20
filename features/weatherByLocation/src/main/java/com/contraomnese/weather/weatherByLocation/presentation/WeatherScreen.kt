@@ -37,7 +37,7 @@ import com.contraomnese.weather.core.ui.widgets.CollapsableContainerWithAnimated
 import com.contraomnese.weather.core.ui.widgets.ForecastDailyColumn
 import com.contraomnese.weather.core.ui.widgets.ForecastHourlyLazyRow
 import com.contraomnese.weather.core.ui.widgets.HumidityItem
-import com.contraomnese.weather.core.ui.widgets.ImageBackground
+import com.contraomnese.weather.core.ui.widgets.ImageBackgroundWithGradient
 import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
 import com.contraomnese.weather.core.ui.widgets.PressureItem
 import com.contraomnese.weather.core.ui.widgets.RainfallItem
@@ -134,7 +134,7 @@ internal fun WeatherScreen(
                 HourlyForecastSection(),
                 DailyForecastSection(),
                 AqiSection(),
-                SunriseSection(isSunUp = uiState.weather.locationInfo.isSunUp),
+                SunriseSection(isDay = uiState.weather.currentInfo.isDay),
                 UVIndexSection(),
                 WindSection(),
                 HumiditySection(),
@@ -287,7 +287,7 @@ internal fun WeatherScreen(
         }
     }
 
-    ImageBackground(condition = uiState.weather.currentInfo.condition)
+    ImageBackgroundWithGradient(condition = uiState.weather.currentInfo.condition)
 
     Column(
         modifier = Modifier
@@ -479,10 +479,9 @@ private fun SunriseSection(
 
     val sunrise = today.sunrise
     val sunset = today.sunset
-    val currentTime = location.locationTime
-    val isSunUp = location.isSunUp
+    val isDay = weather.currentInfo.isDay
 
-    if (sunrise != null && sunset != null && currentTime != null) {
+    if (sunrise != null && sunset != null) {
         CollapsableContainer(
             headerHeight = headerSectionHeight,
             headerTitle = stringResource(section.title),
@@ -494,9 +493,8 @@ private fun SunriseSection(
                 modifier = Modifier.padding(horizontal = padding16, vertical = padding8),
                 sunriseTime = sunrise,
                 sunsetTime = sunset,
-                localDateTime = currentTime,
                 timeZone = location.timeZone,
-                isSunUp = isSunUp
+                isDay = isDay
             )
         }
     }

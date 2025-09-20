@@ -90,7 +90,7 @@ class UseCaseExecutor(
     }
 
     private fun handleException(throwable: Throwable): DomainException {
-        Log.e("UseCaseExecutor", "${throwable.cause?.message}")
+        Log.e("UseCaseExecutor", "${throwable.message}")
         return (throwable as? DomainException) ?: UnknownDomainException(throwable)
     }
 

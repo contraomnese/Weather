@@ -2,12 +2,15 @@ package com.contraomnese.weather.core.ui.widgets
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -15,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,31 +32,54 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.icons.WeatherIcons
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.cornerRadius16
 import com.contraomnese.weather.design.theme.cornerRadius8
-import com.contraomnese.weather.design.theme.itemHeight140
+import com.contraomnese.weather.design.theme.itemHeight160
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding8
+import com.contraomnese.weather.design.theme.space16
+import com.contraomnese.weather.design.theme.space8
+import com.contraomnese.weather.domain.weatherByLocation.model.internal.CompactWeatherCondition
+import com.contraomnese.weather.domain.weatherByLocation.model.internal.LocationDateTime
+import kotlinx.coroutines.delay
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 @Composable
 fun FavoriteItem(
     modifier: Modifier = Modifier,
     locationName: String,
-    locationCountry: String = "Russia",
-    locationTime: String = "12:12",
-    condition: String = "Clear",
-    temperature: String = "21",
-    maxTemperature: String = "25",
-    minTemperature: String = "16",
+    locationCountry: String,
+    timeZone: TimeZone,
+    conditionText: String,
+    condition: CompactWeatherCondition,
+    temperature: String,
+    maxTemperature: String,
+    minTemperature: String,
     onTapClicked: () -> Unit,
     onDeleteClicked: () -> Unit,
 ) {
 
     var showDelete by remember { mutableStateOf(false) }
+
+    var localTime by remember { mutableStateOf("") }
+
+    LaunchedEffect(timeZone) {
+        while (true) {
+            val instant = Clock.System.now().toLocalDateTime(timeZone)
+            localTime = LocationDateTime(instant).toLocalTime()
+            val millisToNextMinute = 60_000L - instant.second * 1000
+            delay(millisToNextMinute)
+        }
+    }
+
     Box {
         Surface(
             modifier = modifier
@@ -78,47 +105,85 @@ fun FavoriteItem(
             shape = RoundedCornerShape(cornerRadius16),
             color = MaterialTheme.colorScheme.surface.copy(alpha = 1.0f)
         ) {
-            Box(
-                modifier = Modifier.padding(padding16)
-            ) {
-                Column(modifier = Modifier.align(Alignment.TopStart)) {
+            ImageBackground(condition = condition)
+            Box(modifier = Modifier.padding(padding16)) {
+
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.Top,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(
+                        modifier = Modifier.weight(2f),
+                        verticalArrangement = Arrangement.spacedBy(space16)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(space8)
+                        ) {
+                            Text(
+                                text = locationName,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            if (localTime != null) {
+                                Text(
+                                    modifier = Modifier.wrapContentWidth(),
+                                    text = localTime!!,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                        Text(
+                            text = locationCountry,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                        )
+                    }
                     Text(
-                        text = locationName,
-                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.weight(1f),
+                        text = stringResource(R.string.temperature, temperature),
+                        textAlign = TextAlign.End,
+                        style = MaterialTheme.typography.displayMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
+
+                }
+
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(space8)
+                ) {
                     Text(
-                        text = locationCountry,
-                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.weight(1f),
+                        text = conditionText,
+                        maxLines = 2,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
+
                     Text(
-                        text = locationTime,
+                        modifier = Modifier
+                            .weight(1.5f)
+                            .align(Alignment.Bottom),
+                        text = stringResource(R.string.temperature_high_low, maxTemperature, minTemperature),
+                        textAlign = TextAlign.End,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }
-                Text(
-                    modifier = Modifier.align(Alignment.BottomStart),
-                    text = condition,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    modifier = Modifier.align(Alignment.TopEnd),
-                    text = stringResource(R.string.temperature, temperature),
-                    style = MaterialTheme.typography.displayMedium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    modifier = Modifier.align(Alignment.BottomEnd),
-                    text = stringResource(R.string.temperature_high_low, maxTemperature, minTemperature),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
             }
-        }
 
+        }
         if (showDelete) {
             IconButton(
                 onClick = {
@@ -143,16 +208,23 @@ fun FavoriteItem(
     }
 }
 
-@Preview(showBackground = true)
+
+@Preview(showBackground = true, locale = "ru")
 @Composable
 fun FavoriteItemPreview() {
     WeatherTheme {
         FavoriteItem(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(itemHeight140),
+                .height(itemHeight160),
             locationName = "New York",
-            locationCountry = "USA",
+            locationCountry = "USA USA USA USA USA",
+            timeZone = TimeZone.of("Europe/Moscow"),
+            conditionText = "Ясно",
+            condition = CompactWeatherCondition.CLEAR,
+            temperature = "21",
+            maxTemperature = "25",
+            minTemperature = "16",
             onTapClicked = {},
             onDeleteClicked = {}
         )

@@ -58,8 +58,12 @@ fun LocationWithForecasts.toDomain(appSettings: AppSettings): ForecastWeatherDom
 
     return ForecastWeatherDomainModel(
         locationInfo = LocationInfo(
-            locationTimeEpoch = location.localtimeEpoch,
-            locationTime = locationTime,
+            name = location.name,
+            country = location.country,
+            latitude = location.latitude,
+            longitude = location.longitude,
+            localTimeEpoch = location.localtimeEpoch,
+            localTime = locationTime,
             timeZone = TimeZone.of(location.timeZoneId),
             isSunUp = forecastDays.first().astro.isSunUp == IS_SUN_UP
         ),

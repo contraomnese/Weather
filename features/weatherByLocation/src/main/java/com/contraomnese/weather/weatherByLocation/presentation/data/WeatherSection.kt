@@ -58,8 +58,8 @@ data class SunriseSection(
     override val bodyHeight: Float? = null,
     override val bodyMaxHeight: Float? = bodyHeight,
     override val icon: ImageVector = WeatherIcons.Sunrise,
-    val isSunUp: Boolean,
-    override val title: Int = when (isSunUp) {
+    val isDay: Boolean,
+    override val title: Int = when (isDay) {
         true -> R.string.day_title
         false -> R.string.night_title
     },

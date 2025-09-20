@@ -19,8 +19,12 @@ data class ForecastWeatherDomainModel(
 )
 
 data class LocationInfo(
-    val locationTimeEpoch: Long,
-    val locationTime: LocationDateTime?,
+    val name: String,
+    val country: String,
+    val latitude: Double,
+    val longitude: Double,
+    val localTimeEpoch: Long,
+    val localTime: LocationDateTime?,
     val timeZone: TimeZone,
     val isSunUp: Boolean,
 )

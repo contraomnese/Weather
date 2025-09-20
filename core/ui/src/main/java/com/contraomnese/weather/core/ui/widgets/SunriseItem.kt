@@ -41,16 +41,19 @@ fun SunriseItem(
     sunriseTime: LocationTime,
     sunsetTime: LocationTime,
     timeZone: TimeZone,
-    localDateTime: LocationDateTime,
-    isSunUp: Boolean,
+    isDay: Boolean,
 ) {
 
-    var localTime by remember { mutableStateOf(localDateTime.toLocalTime()) }
+    var localTime by remember {
+        mutableStateOf(
+            LocationDateTime(Clock.System.now().toLocalDateTime(timeZone))
+        )
+    }
 
     LaunchedEffect(timeZone) {
         while (true) {
             val instant = Clock.System.now().toLocalDateTime(timeZone)
-            localTime = LocationDateTime(instant).toLocalTime()
+            localTime = LocationDateTime(instant)
             val millisToNextMinute = 60_000L - instant.second * 1000
             delay(millisToNextMinute)
         }
@@ -76,13 +79,13 @@ fun SunriseItem(
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = localTime,
+                text = localTime.toLocalTime(),
                 style = MaterialTheme.typography.displayMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
 
             Text(
-                text = if (isSunUp) stringResource(
+                text = if (isDay) stringResource(
                     R.string.sunset_time_title, sunsetTime.toLocalTime()
                 ) else stringResource(R.string.sunrise_time_title, sunriseTime.toLocalTime()),
                 style = MaterialTheme.typography.headlineMedium,
@@ -97,7 +100,7 @@ fun SunriseItem(
                 .clipToBounds(),
             sunriseMinutes = sunriseTime.toMinutes(),
             sunsetMinutes = sunsetTime.toMinutes(),
-            currentMinutes = localDateTime.toMinutes()
+            currentMinutes = localTime.toMinutes()
         )
     }
 }
@@ -107,15 +110,12 @@ fun SunriseItem(
 fun SunriseItemPreview(modifier: Modifier = Modifier) {
     WeatherTheme {
 
-        val instant = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-
         SunriseItem(
             modifier = modifier,
             sunriseTime = LocationTime(LocalTime(7, 23, 0, 0)),
             sunsetTime = LocationTime(LocalTime(18, 15, 0, 0)),
-            localDateTime = LocationDateTime(instant),
             timeZone = TimeZone.of("Europe/Moscow"),
-            isSunUp = true
+            isDay = true
         )
     }
 }

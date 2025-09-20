@@ -33,7 +33,7 @@ import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.icons.WeatherIcons
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.cornerRadius1
-import com.contraomnese.weather.design.theme.itemHeight140
+import com.contraomnese.weather.design.theme.itemHeight160
 import com.contraomnese.weather.design.theme.itemHeight20
 import com.contraomnese.weather.design.theme.itemHeight40
 import com.contraomnese.weather.design.theme.itemThickness2
@@ -41,6 +41,7 @@ import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding32
 import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.design.theme.space16
+import com.contraomnese.weather.design.theme.space32
 import com.contraomnese.weather.domain.home.model.MatchingLocationDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.CoordinatesDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.DetailsLocationDomainModel
@@ -74,14 +75,19 @@ internal fun HomeScreen(
     onNavigateToWeatherByLocation: (Int) -> Unit = {},
     onNavigateToAppSettings: () -> Unit = {},
 ) {
-
-    Column(
-        modifier = Modifier.padding(top = padding32)
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        TopBar(uiState, onEvent, onNavigateToAppSettings)
-        MatchingLocations(uiState, onEvent, onNavigateToWeatherByLocation)
-        if (uiState.inputLocation.value.isEmpty()) {
-            FavoritesLocations(uiState, onEvent, onNavigateToWeatherByLocation)
+        Column(
+            modifier = Modifier.padding(top = padding32)
+        ) {
+            TopBar(uiState, onEvent, onNavigateToAppSettings)
+            MatchingLocations(uiState, onEvent, onNavigateToWeatherByLocation)
+            if (uiState.inputLocation.value.isEmpty()) {
+                FavoritesLocations(uiState, onEvent, onNavigateToWeatherByLocation)
+            }
         }
     }
 }
@@ -213,7 +219,8 @@ private fun FavoritesLocations(
 ) {
     LazyColumn(
         modifier = Modifier
-            .padding(padding16),
+            .padding(horizontal = padding16)
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(space16),
     ) {
@@ -224,17 +231,25 @@ private fun FavoritesLocations(
                 FavoriteItem(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(itemHeight140),
+                        .height(itemHeight160),
                     locationName = location.name,
-                    locationTime = favoriteForecast.locationInfo.locationTime?.toLocalTime() ?: "00:00",
+                    locationCountry = favoriteForecast.locationInfo.country,
+                    timeZone = favoriteForecast.locationInfo.timeZone,
                     temperature = favoriteForecast.currentInfo.temperature,
                     maxTemperature = favoriteForecast.forecastInfo.today.maxTemperature,
                     minTemperature = favoriteForecast.forecastInfo.today.minTemperature,
-                    condition = favoriteForecast.currentInfo.conditionText,
+                    conditionText = favoriteForecast.currentInfo.conditionText,
+                    condition = favoriteForecast.currentInfo.condition,
                     onTapClicked = { onNavigateToWeatherByLocation(location.id) },
                     onDeleteClicked = { onEvent(HomeEvent.RemoveFavorite(location.id)) }
                 )
             }
+        }
+        item {
+            Spacer(
+                modifier = Modifier
+                    .height(space32)
+            )
         }
     }
 }

@@ -28,6 +28,10 @@ fun ForecastLocationDto.toDomain() = DetailsLocationDomainModel(
 
 fun ForecastLocationNetwork.toEntity(locationId: Int) = ForecastLocationEntity(
     locationId = locationId,
+    name = name,
+    country = country,
+    latitude = lat,
+    longitude = lon,
     localtimeEpoch = localtimeEpoch,
     localtime = localtime,
     timeZoneId = timeZoneId,
