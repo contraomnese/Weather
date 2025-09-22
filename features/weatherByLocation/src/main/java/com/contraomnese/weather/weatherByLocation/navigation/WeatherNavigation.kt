@@ -16,7 +16,7 @@ import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.core.parameter.parametersOf
 
 @Serializable
-private data class WeatherByLocationDestination(val locationId: Int, val latitude: Double, val longitude: Double)
+data class WeatherByLocationDestination(val locationId: Int, val latitude: Double, val longitude: Double)
 
 fun NavController.navigateToWeatherByLocation(
     locationId: Int,

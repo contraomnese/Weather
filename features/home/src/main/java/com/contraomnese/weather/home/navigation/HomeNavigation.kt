@@ -40,5 +40,6 @@ fun NavGraphBuilder.home(
 }
 
 fun NavHostController.navigateToHome() {
+    popBackStack()
     navigate(HomeDestination)
 }

@@ -38,7 +38,7 @@ fun ImageBackgroundWithGradient(
     var extractedColor by remember { mutableStateOf(Color.Black) }
 
     val drawableBackgroundRes = when (condition) {
-        CompactWeatherCondition.CLEAR -> R.drawable.clear_small
+        CompactWeatherCondition.CLEAR -> R.drawable.clear
         CompactWeatherCondition.PARTLY_CLOUDY -> R.drawable.partly_cloud
         CompactWeatherCondition.CLOUDY -> R.drawable.overcast
         CompactWeatherCondition.FOG -> R.drawable.fog

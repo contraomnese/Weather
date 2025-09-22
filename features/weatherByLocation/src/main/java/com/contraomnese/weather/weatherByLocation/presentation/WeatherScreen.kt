@@ -38,7 +38,6 @@ import com.contraomnese.weather.core.ui.widgets.ForecastDailyColumn
 import com.contraomnese.weather.core.ui.widgets.ForecastHourlyLazyRow
 import com.contraomnese.weather.core.ui.widgets.HumidityItem
 import com.contraomnese.weather.core.ui.widgets.ImageBackgroundWithGradient
-import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
 import com.contraomnese.weather.core.ui.widgets.PressureItem
 import com.contraomnese.weather.core.ui.widgets.RainfallItem
 import com.contraomnese.weather.core.ui.widgets.SunriseItem
@@ -48,7 +47,6 @@ import com.contraomnese.weather.core.ui.widgets.WindItem
 import com.contraomnese.weather.design.theme.itemHeight150
 import com.contraomnese.weather.design.theme.itemHeight300
 import com.contraomnese.weather.design.theme.itemHeight32
-import com.contraomnese.weather.design.theme.itemHeight64
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding32
 import com.contraomnese.weather.design.theme.padding8
@@ -88,17 +86,7 @@ internal fun WeatherRoute(
         .fillMaxSize()
         .then(backgroundModifier)) {
 
-        when {
-            uiState.isLoading -> LoadingIndicator(
-                modifier = Modifier
-                    .height(itemHeight64)
-                    .align(Alignment.Center)
-            )
-
-            else -> WeatherScreen(
-                uiState = uiState
-            )
-        }
+        if (!uiState.isLoading) WeatherScreen(uiState = uiState)
     }
 }
 

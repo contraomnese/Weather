@@ -1,7 +1,10 @@
 package com.contraomnese.weather.core.ui.widgets
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,10 +47,8 @@ import com.contraomnese.weather.design.icons.WeatherIcons
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.cornerRadius16
 import com.contraomnese.weather.design.theme.itemHeight160
-import com.contraomnese.weather.design.theme.itemThickness2
 import com.contraomnese.weather.design.theme.itemWidth160
 import com.contraomnese.weather.design.theme.itemWidth56
-import com.contraomnese.weather.design.theme.itemWidth96
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.space8
 import com.contraomnese.weather.domain.weatherByLocation.model.internal.CompactWeatherCondition
@@ -107,7 +109,7 @@ fun FavoriteItem(
                     val shadowColor = Color.Black.copy(alpha = 0.25f)
                     drawRoundRect(
                         color = shadowColor,
-                        topLeft = Offset(10f, 10f),
+                        topLeft = Offset(4f, 8f),
                         size = Size(size.width, size.height),
                         cornerRadius = CornerRadius(cornerRadius16.toPx(), cornerRadius16.toPx())
                     )
@@ -119,14 +121,28 @@ fun FavoriteItem(
             BodySection(locationName, localTime, locationCountry, temperature, conditionText, maxTemperature, minTemperature)
         }
         AnimatedVisibility(
-            visible = deleteVisible
+            visible = deleteVisible,
+            enter = slideInHorizontally(
+                animationSpec = tween(durationMillis = 600, easing = LinearOutSlowInEasing),
+                initialOffsetX = { fullWidth -> fullWidth / 2 }),
+            exit = slideOutHorizontally(
+                animationSpec = tween(durationMillis = 600, easing = LinearOutSlowInEasing),
+                targetOffsetX = { fullWidth -> fullWidth / 2 }),
         ) {
             Surface(
                 modifier = Modifier
                     .width(itemWidth56)
-                    .fillMaxHeight(),
+                    .fillMaxHeight()
+                    .drawBehind {
+                        val shadowColor = Color.Black.copy(alpha = 0.25f)
+                        drawRoundRect(
+                            color = shadowColor,
+                            topLeft = Offset(4f, 8f),
+                            size = Size(size.width, size.height),
+                            cornerRadius = CornerRadius(cornerRadius16.toPx(), cornerRadius16.toPx())
+                        )
+                    },
                 shape = RoundedCornerShape(cornerRadius16),
-                border = BorderStroke(itemThickness2, MaterialTheme.colorScheme.onSurface),
             ) {
                 IconButton(
                     onClick = {
@@ -137,7 +153,7 @@ fun FavoriteItem(
                     Icon(
                         imageVector = WeatherIcons.Delete,
                         contentDescription = "Delete",
-                        tint = Color.White
+                        tint = Color.Red
                     )
                 }
             }
@@ -163,7 +179,7 @@ private fun BodySection(
                 .align(Alignment.TopStart)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.spacedBy(padding16)
         ) {
             Column(
                 modifier = Modifier.weight(2f),
@@ -198,7 +214,7 @@ private fun BodySection(
                 )
             }
             Text(
-                modifier = Modifier.width(itemWidth96),
+                modifier = Modifier.wrapContentWidth(),
                 text = stringResource(R.string.temperature, temperature),
                 textAlign = TextAlign.End,
                 style = MaterialTheme.typography.displayMedium,

@@ -1,9 +1,12 @@
 package com.contraomnese.weather.design.icons
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.FormatListBulleted
+import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material.icons.outlined.Air
 import androidx.compose.material.icons.outlined.CalendarToday
+import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Compress
 import androidx.compose.material.icons.outlined.DeleteOutline
@@ -38,4 +41,7 @@ object WeatherIcons {
     val Wind = Icons.Outlined.Air
     val Pressure = Icons.Outlined.Compress
     val Settings = Icons.Outlined.Settings
+    val Menu = Icons.AutoMirrored.Outlined.FormatListBulleted
+    val Circle = Icons.Outlined.Circle
+    val CircleFilled = Icons.Filled.Circle
 }

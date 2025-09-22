@@ -22,8 +22,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.padding16
-import com.contraomnese.weather.design.theme.padding32
 import com.contraomnese.weather.design.theme.padding4
+import com.contraomnese.weather.design.theme.padding40
 import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.model.PrecipitationUnit
@@ -56,7 +56,7 @@ private fun AppSettingsScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(start = padding16, end = padding16, top = padding32),
+            .padding(start = padding16, end = padding16, top = padding40),
         verticalArrangement = Arrangement.spacedBy(padding8)
     ) {
         RadioGroup(
