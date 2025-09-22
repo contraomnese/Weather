@@ -1,8 +1,10 @@
 package com.contraomnese.weather.di
 
 import com.contraomnese.weather.BuildConfig
+import com.contraomnese.weather.data.network.api.LocationsApi
 import com.contraomnese.weather.data.network.api.WeatherApi
-import com.contraomnese.weather.data.network.interceptors.ApiInterceptor
+import com.contraomnese.weather.data.network.interceptors.LocationsInterceptor
+import com.contraomnese.weather.data.network.interceptors.WeatherInterceptor
 import com.contraomnese.weather.data.network.models.ErrorResponse
 import com.contraomnese.weather.data.repository.AppSettingsRepositoryImpl
 import com.contraomnese.weather.data.repository.ForecastWeatherRepositoryImpl
@@ -18,11 +20,15 @@ import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+
+private const val WEATHER = "WeatherApi"
+private const val LOCATIONS = "LocationsApi"
 
 val dataModule = module {
 
@@ -31,32 +37,53 @@ val dataModule = module {
         GsonBuilder().create()
     }
 
-    single<Retrofit> {
-        Retrofit.Builder()
-            .baseUrl(BuildConfig.WEATHER_API_BASE_URL)
-            .client(get<OkHttpClient>())
-            .addConverterFactory(GsonConverterFactory.create(get()))
-            .build()
-    }
-
-    factory<Converter<ResponseBody, ErrorResponse>> {
-        get<Retrofit>().responseBodyConverter(ErrorResponse::class.java, emptyArray())
-    }
-
-    factory<OkHttpClient> {
+    factory<OkHttpClient>(named(WEATHER)) {
         OkHttpClient.Builder()
             .connectTimeout(15, TimeUnit.SECONDS)
             .readTimeout(20, TimeUnit.SECONDS)
             .writeTimeout(20, TimeUnit.SECONDS)
             .retryOnConnectionFailure(true)
-            .addInterceptor(get<ApiInterceptor>())
+            .addInterceptor(get<WeatherInterceptor>())
             .addInterceptor(get<HttpLoggingInterceptor>())
             .build()
     }
 
-    single<ApiInterceptor> {
-        ApiInterceptor(apiKey = BuildConfig.WEATHER_API_KEY)
+    factory<OkHttpClient>(named(LOCATIONS)) {
+        OkHttpClient.Builder()
+            .connectTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(20, TimeUnit.SECONDS)
+            .writeTimeout(20, TimeUnit.SECONDS)
+            .retryOnConnectionFailure(true)
+            .addInterceptor(get<LocationsInterceptor>())
+            .addInterceptor(get<HttpLoggingInterceptor>())
+            .build()
     }
+
+    single<Retrofit>(named(WEATHER)) {
+        Retrofit.Builder()
+            .baseUrl(BuildConfig.WEATHER_API_BASE_URL)
+            .client(get<OkHttpClient>(named(WEATHER)))
+            .addConverterFactory(GsonConverterFactory.create(get()))
+            .build()
+    }
+
+    single<Retrofit>(named(LOCATIONS)) {
+        Retrofit.Builder()
+            .baseUrl(BuildConfig.LOCATION_API_BASE_URL)
+            .client(get<OkHttpClient>(named(LOCATIONS)))
+            .addConverterFactory(GsonConverterFactory.create(get()))
+            .build()
+    }
+
+    factory<Converter<ResponseBody, ErrorResponse>> {
+        get<Retrofit>(named(WEATHER)).responseBodyConverter(ErrorResponse::class.java, emptyArray())
+    }
+
+    single<WeatherInterceptor> {
+        WeatherInterceptor(apiKey = BuildConfig.WEATHER_API_KEY)
+    }
+
+    single<LocationsInterceptor> { LocationsInterceptor() }
 
     factory<HttpLoggingInterceptor> {
         HttpLoggingInterceptor().apply {
@@ -71,9 +98,10 @@ val dataModule = module {
     single<WeatherDatabase> { WeatherDatabase.create(context = get()) }
     single<AppSettingsStorage> { AppSettingsStorageImpl(context = get()) }
 
-    single<WeatherApi> { get<Retrofit>().create(WeatherApi::class.java) }
+    single<WeatherApi> { get<Retrofit>(named(WEATHER)).create(WeatherApi::class.java) }
+    single<LocationsApi> { get<Retrofit>(named(LOCATIONS)).create(LocationsApi::class.java) }
 
-    single<LocationsRepository> { LocationsRepositoryImpl(weatherDatabase = get()) }
+    single<LocationsRepository> { LocationsRepositoryImpl(weatherDatabase = get(), locationsApi = get()) }
     single<ForecastWeatherRepository> {
         ForecastWeatherRepositoryImpl(
             api = get(),

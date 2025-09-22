@@ -8,12 +8,3 @@ value class LocationPresentation(val value: String) {
         return value.matches(cityRegex)
     }
 }
-
-data class MatchingLocationDomainModel(
-    val id: Int,
-    val name: String,
-    val countryName: String,
-    val isFavorite: Boolean,
-)
-
-

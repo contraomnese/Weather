@@ -11,7 +11,7 @@ import okhttp3.ResponseBody
 import retrofit2.Converter
 import retrofit2.Response
 
-suspend fun <T> Response<T>.parseOrThrowError(converter: Converter<ResponseBody, ErrorResponse>): T {
+fun <T> Response<T>.parseOrThrowError(converter: Converter<ResponseBody, ErrorResponse>): T {
     if (isSuccessful) {
         val body = body()
         if (body != null) return body

@@ -130,14 +130,13 @@ fun FavoriteItem(
                                 style = MaterialTheme.typography.titleLarge,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
-                            if (localTime != null) {
-                                Text(
-                                    modifier = Modifier.wrapContentWidth(),
-                                    text = localTime!!,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            }
+                            Text(
+                                modifier = Modifier.wrapContentWidth(),
+                                text = localTime,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+
                         }
                         Text(
                             text = locationCountry,

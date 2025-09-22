@@ -9,5 +9,11 @@
 # header note.
 sdk.dir=X\:\\Users\\s1r1us\\AppData\\Local
 
+STORE_PASSWORD=
+KEY_PASSWORD=
+KEY_ALIAS=
+STORE_FILE=
+
 WEATHER_API_BASE_URL=https://api.weatherapi.com/v1/
+LOCATION_API_BASE_URL=https://nominatim.openstreetmap.org/
 WEATHER_API_KEY=

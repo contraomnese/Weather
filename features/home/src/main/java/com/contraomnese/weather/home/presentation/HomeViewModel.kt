@@ -3,13 +3,12 @@ package com.contraomnese.weather.home.presentation
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.viewModelScope
 import com.contraomnese.weather.domain.home.model.LocationPresentation
-import com.contraomnese.weather.domain.home.model.MatchingLocationDomainModel
 import com.contraomnese.weather.domain.home.usecase.AddFavoriteUseCase
-import com.contraomnese.weather.domain.home.usecase.GetLocationsUseCase
+import com.contraomnese.weather.domain.home.usecase.GetLocationsInfoUseCase
 import com.contraomnese.weather.domain.home.usecase.ObserveFavoritesUseCase
 import com.contraomnese.weather.domain.home.usecase.RemoveFavoriteUseCase
-import com.contraomnese.weather.domain.weatherByLocation.model.DetailsLocationDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeatherDomainModel
+import com.contraomnese.weather.domain.weatherByLocation.model.LocationInfoDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveForecastWeatherUseCase
 import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateForecastWeatherUseCase
 import com.contraomnese.weather.presentation.architecture.BaseViewModel
@@ -22,18 +21,16 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.collections.immutable.toPersistentMap
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
 
 @Immutable
 internal data class HomeUiState(
     override val isLoading: Boolean = false,
     val inputLocation: LocationPresentation = LocationPresentation(""),
-    val matchingLocations: ImmutableList<MatchingLocationDomainModel> = persistentListOf(),
-    val favorites: ImmutableList<DetailsLocationDomainModel> = persistentListOf(),
+    val matchingLocations: ImmutableList<LocationInfoDomainModel> = persistentListOf(),
+    val favorites: ImmutableList<LocationInfoDomainModel> = persistentListOf(),
     val favoritesForecast: ImmutableMap<Int, ForecastWeatherDomainModel> = persistentMapOf(),
 ) : UiState {
     override fun loading(): UiState = copy(isLoading = true)
@@ -42,14 +39,14 @@ internal data class HomeUiState(
 @Immutable
 internal sealed interface HomeEvent {
     data class LocationChanged(val newLocation: String) : HomeEvent
-    data class AddFavorite(val locationId: Int) : HomeEvent
+    data class AddFavorite(val location: LocationInfoDomainModel) : HomeEvent
     data class RemoveFavorite(val locationId: Int) : HomeEvent
 }
 
 internal class HomeViewModel(
-    private val useCaseExecutorProvider: UseCaseExecutorProvider,
-    private val notificationMonitor: NotificationMonitor,
-    private val getLocationsUseCase: GetLocationsUseCase,
+    useCaseExecutorProvider: UseCaseExecutorProvider,
+    notificationMonitor: NotificationMonitor,
+    private val getLocationsInfoUseCase: GetLocationsInfoUseCase,
     private val observeFavoritesUseCase: ObserveFavoritesUseCase,
     private val addFavoriteUseCase: AddFavoriteUseCase,
     private val removeFavoriteUseCase: RemoveFavoriteUseCase,
@@ -59,18 +56,6 @@ internal class HomeViewModel(
 
     init {
         observe(observeFavoritesUseCase, ::onFavoritesUpdate, ::provideException)
-        viewModelScope.launch(Dispatchers.IO) {
-            uiState.collect {
-                it.favorites.forEach { favorite ->
-                    observe(
-                        observeForecastWeatherUseCase,
-                        favorite,
-                        { forecast -> onFavoritesForecastUpdate(forecast, favorite) },
-                        ::provideException
-                    )
-                }
-            }
-        }
     }
 
     private var searchJob: Job? = null
@@ -80,30 +65,30 @@ internal class HomeViewModel(
     override fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.LocationChanged -> onLocationChanged(event.newLocation)
-            is HomeEvent.AddFavorite -> onFavoriteAdded(event.locationId)
+            is HomeEvent.AddFavorite -> onFavoriteAdded(event.location)
             is HomeEvent.RemoveFavorite -> onFavoriteRemoved(event.locationId)
         }
     }
 
-    private fun onLocationChanged(newCity: String) {
-        updateViewState { copy(inputLocation = LocationPresentation(newCity)) }
+    private fun onLocationChanged(newLocation: String) {
+        updateViewState { copy(inputLocation = LocationPresentation(newLocation)) }
 
-        if (newCity.isNotEmpty()) {
-            updateLocationsWithDebounce(500L) {
+        if (newLocation.isNotEmpty()) {
+            updateLocationsWithDebounce(2000L) {
                 execute(
-                    getLocationsUseCase,
-                    newCity,
-                    ::onCitiesUpdate,
+                    getLocationsInfoUseCase,
+                    newLocation,
+                    ::onLocationsUpdate,
                     ::provideException
                 )
             }
-        } else onCitiesUpdate(persistentListOf())
+        } else onLocationsUpdate(persistentListOf())
     }
 
-    private fun onFavoriteAdded(locationId: Int) {
+    private fun onFavoriteAdded(location: LocationInfoDomainModel) {
         execute(
             addFavoriteUseCase,
-            locationId,
+            location,
             onException = ::provideException
         )
     }
@@ -116,15 +101,23 @@ internal class HomeViewModel(
         )
     }
 
-    private fun onCitiesUpdate(newCities: List<MatchingLocationDomainModel>) {
+    private fun onLocationsUpdate(newCities: List<LocationInfoDomainModel>) {
         updateViewState { copy(matchingLocations = newCities.toPersistentList(), isLoading = false) }
     }
 
-    private fun onFavoritesUpdate(newFavorites: List<DetailsLocationDomainModel>) {
+    private fun onFavoritesUpdate(newFavorites: List<LocationInfoDomainModel>) {
         updateViewState { copy(favorites = newFavorites.toPersistentList()) }
+        newFavorites.forEach {
+            observe(
+                observeForecastWeatherUseCase,
+                it,
+                { forecast -> onFavoritesForecastUpdate(forecast, it) },
+                ::provideException
+            )
+        }
     }
 
-    private fun onFavoritesForecastUpdate(newFavoritesForecast: ForecastWeatherDomainModel?, favorite: DetailsLocationDomainModel) {
+    private fun onFavoritesForecastUpdate(newFavoritesForecast: ForecastWeatherDomainModel?, favorite: LocationInfoDomainModel) {
 
         if (newFavoritesForecast != null) {
             val favoritesForecast = uiState.value.favoritesForecast.toMutableMap()

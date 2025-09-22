@@ -9,8 +9,8 @@ import com.contraomnese.weather.weatherByLocation.navigation.navigateToWeatherBy
 
 fun NavHostController.homeNavigator() = object : HomeNavigator {
 
-    override fun onNavigateToWeatherByLocation(locationId: Int) {
-        navigateToWeatherByLocation(locationId)
+    override fun onNavigateToWeatherByLocation(locationId: Int, latitude: Double, longitude: Double) {
+        navigateToWeatherByLocation(locationId, latitude, longitude)
     }
 
     override fun onNavigateToAppSettings() {

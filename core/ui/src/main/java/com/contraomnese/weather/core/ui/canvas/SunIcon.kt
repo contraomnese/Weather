@@ -47,7 +47,7 @@ fun SunIcon(
     }
 }
 
-@Preview()
+@Preview
 @Composable
 private fun SunIconPreview() {
     WeatherTheme {

@@ -13,18 +13,13 @@ import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDayEnt
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastLocationEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.HourlyForecastEntity
 import com.contraomnese.weather.data.storage.db.locations.dao.FavoritesDao
-import com.contraomnese.weather.data.storage.db.locations.dao.LocationsDao
 import com.contraomnese.weather.data.storage.db.locations.entities.FavoriteEntity
-import com.contraomnese.weather.data.storage.db.locations.entities.LocationCountryEntity
-import com.contraomnese.weather.data.storage.db.locations.entities.LocationEntity
 
 private const val DATABASE_VERSION = 1
 const val DATABASE_NAME = "contraomnese_weather_app.sqlite3"
 
 @Database(
     entities = [
-        LocationEntity::class,
-        LocationCountryEntity::class,
         FavoriteEntity::class,
         ForecastLocationEntity::class,
         ForecastCurrentEntity::class,
@@ -39,7 +34,6 @@ const val DATABASE_NAME = "contraomnese_weather_app.sqlite3"
 )
 abstract class WeatherDatabase : RoomDatabase() {
 
-    abstract fun locationsDao(): LocationsDao
     abstract fun favoritesDao(): FavoritesDao
     abstract fun forecastDao(): ForecastDao
 

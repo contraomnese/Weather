@@ -16,13 +16,15 @@ import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.core.parameter.parametersOf
 
 @Serializable
-private data class WeatherByLocationDestination(val locationId: Int)
+private data class WeatherByLocationDestination(val locationId: Int, val latitude: Double, val longitude: Double)
 
 fun NavController.navigateToWeatherByLocation(
     locationId: Int,
+    latitude: Double,
+    longitude: Double,
     navOptions: NavOptions? = null,
 ) {
-    navigate(WeatherByLocationDestination(locationId), navOptions)
+    navigate(WeatherByLocationDestination(locationId = locationId, latitude = latitude, longitude = longitude), navOptions)
 }
 
 fun interface WeatherByLocationNavigator {
@@ -45,7 +47,11 @@ fun NavGraphBuilder.weatherByLocation(
         val viewModel: WeatherViewModel = koinViewModel(
             viewModelStoreOwner = backStackEntry,
             parameters = {
-                parametersOf(weatherByLocationDestination.locationId)
+                parametersOf(
+                    weatherByLocationDestination.locationId,
+                    weatherByLocationDestination.latitude,
+                    weatherByLocationDestination.longitude
+                )
             })
 
         WeatherRoute(

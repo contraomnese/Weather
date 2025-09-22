@@ -1,22 +1,24 @@
 package com.contraomnese.weather.data.repository
 
 import com.contraomnese.weather.data.mappers.favorite.toDomain
+import com.contraomnese.weather.data.mappers.favorite.toEntity
 import com.contraomnese.weather.data.mappers.location.toDomain
+import com.contraomnese.weather.data.network.api.LocationsApi
+import com.contraomnese.weather.data.network.parsers.parseOrThrowError
 import com.contraomnese.weather.data.storage.db.WeatherDatabase
-import com.contraomnese.weather.data.storage.db.locations.entities.FavoriteEntity
-import com.contraomnese.weather.domain.home.model.MatchingLocationDomainModel
 import com.contraomnese.weather.domain.home.repository.LocationsRepository
-import com.contraomnese.weather.domain.weatherByLocation.model.DetailsLocationDomainModel
+import com.contraomnese.weather.domain.weatherByLocation.model.LocationInfoDomainModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 
 class LocationsRepositoryImpl(
+    private val locationsApi: LocationsApi,
     private val weatherDatabase: WeatherDatabase,
 ) : LocationsRepository {
 
-    override fun getFavorites(): List<DetailsLocationDomainModel> {
+    override fun getFavorites(): List<LocationInfoDomainModel> {
         return try {
             weatherDatabase.favoritesDao().getFavorites().map { it.toDomain() }
         } catch (throwable: Throwable) {
@@ -24,12 +26,12 @@ class LocationsRepositoryImpl(
         }
     }
 
-    override fun observeFavorites(): Flow<List<DetailsLocationDomainModel>> =
+    override fun observeFavorites(): Flow<List<LocationInfoDomainModel>> =
         weatherDatabase.favoritesDao().observeFavorites().map { list -> list.map { it.toDomain() } }.flowOn(Dispatchers.IO)
 
-    override fun addFavorite(id: Int) {
+    override fun addFavorite(location: LocationInfoDomainModel) {
         try {
-            weatherDatabase.favoritesDao().addFavorite(FavoriteEntity(cityId = id))
+            weatherDatabase.favoritesDao().addFavorite(location.toEntity())
         } catch (throwable: Throwable) {
             throw throwable
         }
@@ -43,17 +45,9 @@ class LocationsRepositoryImpl(
         }
     }
 
-    override fun getLocationsBy(name: String): List<MatchingLocationDomainModel> {
+    override suspend fun getLocationsBy(name: String): List<LocationInfoDomainModel> {
         return try {
-            weatherDatabase.locationsDao().getLocationsBy("$name%").map { it.toDomain() }
-        } catch (throwable: Throwable) {
-            throw throwable
-        }
-    }
-
-    override fun getLocationBy(id: Int): DetailsLocationDomainModel {
-        return try {
-            weatherDatabase.locationsDao().getLocationBy(id).toDomain()
+            locationsApi.getLocations(name).parseOrThrowError().filter { it.addressType == "city" }.map { it.toDomain() }
         } catch (throwable: Throwable) {
             throw throwable
         }

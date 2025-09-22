@@ -297,7 +297,7 @@ internal fun WeatherScreen(
     ) {
         TitleSection(
             currentTitleBoxHeight,
-            location = uiState.location.name,
+            location = uiState.weather.locationInfo.name,
             currentTemp = uiState.weather.currentInfo.temperature,
             feelsLikeTemp = uiState.weather.currentInfo.feelsLikeTemperature,
             maxTemp = uiState.weather.forecastInfo.today.maxTemperature,

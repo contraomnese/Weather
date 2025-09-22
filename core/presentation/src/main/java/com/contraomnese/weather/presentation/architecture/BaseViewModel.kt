@@ -85,7 +85,7 @@ abstract class BaseViewModel<ViewState : UiState, Event : Any>(
 
     protected fun observeNotificationEvents(): Flow<Int> = notificationMonitor.notifications
 
-    protected fun showNotification(@StringRes notification: Int) {
+    private fun showNotification(@StringRes notification: Int) {
         viewModelScope.launch {
             notificationMonitor.emit(notification)
         }

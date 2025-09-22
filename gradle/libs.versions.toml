@@ -37,7 +37,6 @@ navigation-compose = "2.8.9"
 
 # ui
 androidxCoreSplashscreen = "1.0.0"
-uiTextGoogleFonts = "1.8.0"
 coil = "3.0.0"
 browser = "1.8.0"
 material = "1.12.0"
@@ -59,7 +58,6 @@ kotlinxSerializationJson = "1.8.0"
 mockk = "1.13.12"
 kotlinx-coroutines-test = "1.7.3"
 androidx-test-runner = "1.5.0"
-androidx-test-ext-junit = "1.2.1"
 junitVersion = "1.1.5"
 espressoCore = "3.5.0"
 appcompat = "1.7.1"
@@ -141,13 +139,10 @@ kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidx-test-runner" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 
 kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlinTestJunit5" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junitJupiterApi" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junitJupiterApi" }
-junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

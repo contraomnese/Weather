@@ -21,8 +21,8 @@ internal data class MainActivityUiState(
 }
 
 internal class MainActivityViewModel(
-    private val notificationMonitor: NotificationMonitor,
-    private val useCaseExecutorProvider: UseCaseExecutorProvider,
+    notificationMonitor: NotificationMonitor,
+    useCaseExecutorProvider: UseCaseExecutorProvider,
 ) : BaseViewModel<MainActivityUiState, MainActivityEvent>(useCaseExecutorProvider, notificationMonitor) {
 
     init {
@@ -34,9 +34,7 @@ internal class MainActivityViewModel(
 
     override fun initialState(): MainActivityUiState = MainActivityUiState(isLoading = true)
 
-    override fun onEvent(event: MainActivityEvent) {
-        Unit
-    }
+    override fun onEvent(event: MainActivityEvent) = Unit
 
     val notificationEvents: Flow<Int> = observeNotificationEvents()
 }

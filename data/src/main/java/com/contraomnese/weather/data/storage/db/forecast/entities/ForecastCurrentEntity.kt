@@ -57,7 +57,6 @@ data class ForecastCurrentEntity(
 ) {
     companion object {
         const val TABLE_NAME = "forecast_current"
-        const val ID = "id"
         const val FORECAST_LOCATION_ID = "forecast_location_id"
         const val TEMP_C = "temp_c"
         const val TEMP_F = "temp_f"

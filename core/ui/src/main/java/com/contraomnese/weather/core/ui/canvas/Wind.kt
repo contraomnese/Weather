@@ -264,7 +264,7 @@ fun Wind(
         }
 
         drawIntoCanvas { canvas ->
-            val paint = android.graphics.Paint().apply {
+            val paint = Paint().apply {
                 isAntiAlias = true
                 color = Color.TRANSPARENT
                 setShadowLayer(
@@ -320,7 +320,7 @@ private fun WindItemPreview() {
     }
 }
 
-@Preview()
+@Preview
 @Composable
 private fun WindItemPreview2() {
     WeatherTheme {

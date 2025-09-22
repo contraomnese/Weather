@@ -6,7 +6,7 @@ import com.contraomnese.weather.domain.home.repository.LocationsRepository
 
 class RemoveFavoriteUseCase(
     private val repository: LocationsRepository,
-    private val coroutineContextProvider: CoroutineContextProvider,
+    coroutineContextProvider: CoroutineContextProvider,
 ) : BackgroundExecutingUseCaseWithRequest<Int, Unit>(coroutineContextProvider) {
     override suspend fun executeInBackground(request: Int) = repository.deleteFavorite(request)
 }

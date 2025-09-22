@@ -3,9 +3,11 @@ package com.contraomnese.weather.weatherByLocation.presentation
 import androidx.compose.runtime.Immutable
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.usecase.GetAppSettingsUseCase
-import com.contraomnese.weather.domain.weatherByLocation.model.DetailsLocationDomainModel
+import com.contraomnese.weather.domain.weatherByLocation.model.CoordinatesDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeatherDomainModel
-import com.contraomnese.weather.domain.weatherByLocation.usecase.GetDetailsLocationUseCase
+import com.contraomnese.weather.domain.weatherByLocation.model.LatitudeDomainModel
+import com.contraomnese.weather.domain.weatherByLocation.model.LocationInfoDomainModel
+import com.contraomnese.weather.domain.weatherByLocation.model.LongitudeDomainModel
 import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveForecastWeatherUseCase
 import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateForecastWeatherUseCase
 import com.contraomnese.weather.presentation.architecture.BaseViewModel
@@ -16,7 +18,7 @@ import com.contraomnese.weather.presentation.usecase.UseCaseExecutorProvider
 @Immutable
 internal data class WeatherUiState(
     override val isLoading: Boolean = false,
-    val location: DetailsLocationDomainModel,
+    val location: LocationInfoDomainModel,
     val weather: ForecastWeatherDomainModel? = null,
     val appSettings: AppSettings? = null,
 ) : UiState {
@@ -27,26 +29,37 @@ internal data class WeatherUiState(
 internal sealed interface WeatherEvent
 
 internal class WeatherViewModel(
-    private val useCaseExecutorProvider: UseCaseExecutorProvider,
-    private val notificationMonitor: NotificationMonitor,
-    private val getGeoLocationUseCase: GetDetailsLocationUseCase,
+    useCaseExecutorProvider: UseCaseExecutorProvider,
+    notificationMonitor: NotificationMonitor,
     private val observeForecastWeatherUseCase: ObserveForecastWeatherUseCase,
     private val updateForecastWeatherUseCase: UpdateForecastWeatherUseCase,
     private val getAppSettingsUseCase: GetAppSettingsUseCase,
     private val locationId: Int,
+    private val lat: Double,
+    private val lot: Double,
 ) : BaseViewModel<WeatherUiState, WeatherEvent>(useCaseExecutorProvider, notificationMonitor) {
 
     init {
         observe(getAppSettingsUseCase, ::updateAppSettings)
-        execute(getGeoLocationUseCase, locationId, ::updateCurrentLocation, ::provideException)
+        updateCurrentLocation(
+            LocationInfoDomainModel(
+                id = locationId,
+                name = "",
+                countryName = "",
+                point = CoordinatesDomainModel(
+                    latitude = LatitudeDomainModel(lat),
+                    longitude = LongitudeDomainModel(lot)
+                )
+            )
+        )
     }
 
     override fun initialState(): WeatherUiState =
-        WeatherUiState(isLoading = true, location = DetailsLocationDomainModel.EMPTY)
+        WeatherUiState(isLoading = true, location = LocationInfoDomainModel.EMPTY)
 
     override fun onEvent(event: WeatherEvent) = Unit
 
-    private fun updateCurrentLocation(newLocation: DetailsLocationDomainModel) {
+    private fun updateCurrentLocation(newLocation: LocationInfoDomainModel) {
         updateViewState { copy(location = newLocation) }
         observe(observeForecastWeatherUseCase, newLocation, ::updateCurrentWeather, ::provideException)
     }

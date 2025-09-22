@@ -34,13 +34,12 @@ fun CloudIcon(
         }
 
         val left = baseClouds.first().second.x
-        val top = offsetY
         val width = (baseClouds[3].second.x - baseClouds.first().second.x)
         val height = baseClouds.first().first
 
         drawRect(
             color = cloudColor,
-            topLeft = Offset(left, top),
+            topLeft = Offset(left, offsetY),
             size = Size(width, height)
         )
     }

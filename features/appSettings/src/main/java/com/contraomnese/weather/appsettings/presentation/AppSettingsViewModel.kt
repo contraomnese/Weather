@@ -30,9 +30,9 @@ internal sealed interface AppSettingsEvent {
 }
 
 internal class AppSettingsViewModel(
-    private val useCaseExecutorProvider: UseCaseExecutorProvider,
-    private val notificationMonitor: NotificationMonitor,
-    private val getAppSettingsUseCase: GetAppSettingsUseCase,
+    useCaseExecutorProvider: UseCaseExecutorProvider,
+    notificationMonitor: NotificationMonitor,
+    getAppSettingsUseCase: GetAppSettingsUseCase,
     private val updateAppSettingsUseCase: UpdateAppSettingsUseCase,
 ) : BaseViewModel<AppSettingsUiState, AppSettingsEvent>(useCaseExecutorProvider, notificationMonitor) {
 

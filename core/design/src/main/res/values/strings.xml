@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="search_city">Search city</string>
-    <string name="clear_search_field">Clear search field</string>
     <string name="current_temperature_title" translatable="false">%1$s°</string>
-    <string name="max_min_temperature_title">Max.:%1$s°, Min.:%2$s°</string>
     <string name="feels_like_temperature_title">%2$s°/%3$s° Feels like %1$s°</string>
-    <string name="temperature_and_condition_title" translatable="false">%1$s° | %2$s</string>
     <string name="temperature" translatable="false">%1$s°</string>
-    <string name="temperature_with_separator" translatable="false">%1$s° | </string>
     <string name="temperature_high_low">H:%1$s° L:%2$s°</string>
     <string name="now">Now</string>
     <string name="local_time_title">Local time</string>
@@ -33,8 +29,6 @@
     <string name="aqi_very_bad_desc">Air quality is very poor. Everyone may experience effects — avoid outdoor exercise and stay indoors if possible.</string>
 
     <!--  Sunrise section -->
-    <string name="sunrise_title">Sunrise</string>
-    <string name="sunset_title">Sunset</string>
     <string name="day_title">Day</string>
     <string name="night_title">Night</string>
 
@@ -46,7 +40,6 @@
     <string name="cardinal_point_e">E</string>
     <string name="cardinal_point_w">W</string>
     <string name="cardinal_point_s">S</string>
-    <string name="speed_value">%1$d m/s</string>
     <string name="wind_body">Wind</string>
     <string name="gust_of_wind_body">Gust of wind</string>
 
@@ -72,9 +65,6 @@
     <!--  Rainfall section -->
     <string name="rainfall_value_mm">%.2f mm</string>
     <string name="rainfall_value_inch">%.2f inch</string>
-    <string name="in_last_24_hours">in the last 24h</string>
-    <string name="in_next_1_hour">in the next 1h</string>
-    <string name="expected_in_next_24_hours">in the next 24h</string>
     <string name="expected_raining">Rain is expected soon</string>
 
     <!--  Humidity section -->
@@ -85,18 +75,11 @@
     <string name="humidity_value" translatable="false">%1$s%%</string>
 
     <!--  Units -->
-    <string name="units_degree" translatable="false">°</string>
     <string name="units_killometer_per_hour">kph</string>
     <string name="units_mile_per_hour">mph</string>
     <string name="units_meter_in_second">m/s</string>
-    <string name="units_mbar">mbar</string>
-    <string name="units_mm">mm</string>
-    <string name="units_inches">in</string>
     <string name="units_mm_hg">mm Hg</string>
     <string name="units_gpa">gPa</string>
-
-    <!-- Screen titles -->
-    <string name="settings_title">Settings</string>
 
     <!-- Temperature -->
     <string name="temperature_title">Temperature</string>
@@ -118,6 +101,4 @@
     <string name="atm_pressure_title">Atmospheric pressure</string>
     <string name="pressure_mmhg">Millimeters of mercury (mmHg)</string>
     <string name="pressure_gpa">Gekko pascal (gPa)</string>
-
-    <string name="empty" translatable="false"></string>
 </resources>

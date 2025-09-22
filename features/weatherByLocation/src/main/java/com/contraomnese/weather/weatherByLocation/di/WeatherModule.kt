@@ -8,16 +8,19 @@ internal val weatherModule = module {
 
     viewModel { params ->
 
-        val id = params.get<Int>()
+        val id = params.get<Int>(0)
+        val lat = params.get<Double>(1)
+        val lot = params.get<Double>(2)
 
         WeatherViewModel(
             useCaseExecutorProvider = get(),
             notificationMonitor = get(),
-            getGeoLocationUseCase = get(),
             updateForecastWeatherUseCase = get(),
             observeForecastWeatherUseCase = get(),
             getAppSettingsUseCase = get(),
-            locationId = id
+            locationId = id,
+            lat = lat,
+            lot = lot
         )
     }
 }

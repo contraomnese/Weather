@@ -2,20 +2,10 @@ package com.contraomnese.weather.data.storage.db.forecast.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.contraomnese.weather.data.storage.db.locations.entities.LocationEntity
 
 
-@Entity(
-    tableName = ForecastLocationEntity.TABLE_NAME,
-    foreignKeys = [ForeignKey(
-        entity = LocationEntity::class,
-        parentColumns = [LocationEntity.ID],
-        childColumns = [ForecastLocationEntity.LOCATION_ID],
-        onDelete = ForeignKey.CASCADE
-    )]
-)
+@Entity(tableName = ForecastLocationEntity.TABLE_NAME)
 data class ForecastLocationEntity(
     @PrimaryKey(autoGenerate = true) val id: Int? = null,
     @ColumnInfo(name = LOCATION_ID) val locationId: Int = 0,

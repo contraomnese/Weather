@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="search_city">Поиск города</string>
-    <string name="clear_search_field">Очистить поле поиска</string>
-    <string name="max_min_temperature_title">Макс.:%1$s°, Мин.:%2$s°</string>
-    <string name="speed_value">%1$d м/с</string>
     <string name="temperature_high_low">Макс:%1$s° Мин:%2$s°</string>
     <string name="now">Сейчас</string>
     <string name="local_time_title">Местное время</string>
@@ -26,11 +23,9 @@
     <string name="aqi_bad_desc">Качество воздуха плохое. Людям с заболеваниями сердца или лёгких, детям и пожилым следует избегать продолжительных нагрузок на свежем воздухе.</string>
     <string name="aqi_very_bad_desc">Качество воздуха очень плохое. Негативное воздействие возможно для всех — избегайте физических нагрузок на улице и по возможности оставайтесь в помещении.</string>
 
-    <string name="sunset_title">Закат</string>
     <string name="night_title">Ночь</string>
     <string name="sunrise_time_title">Восход в %1$s</string>
     <string name="sunset_time_title">Закат в %1$s</string>
-    <string name="sunrise_title">Восход</string>
 
     <string name="cardinal_point_n">С</string>
     <string name="cardinal_point_e">В</string>
@@ -40,9 +35,6 @@
 
     <string name="rainfall_value_mm">%.2f мм</string>
     <string name="rainfall_value_inch">%.2f дюйм</string>
-    <string name="in_last_24_hours">последние 24 ч.</string>
-    <string name="in_next_1_hour">"в течении часа"</string>
-    <string name="expected_in_next_24_hours">следующие 24 ч.</string>
     <string name="expected_raining">Скоро ожидается дождь</string>
     <string name="dew_point">Точка россы в данный момент %1$d°.</string>
 
@@ -67,17 +59,11 @@
     <string name="wind_body">Ветер</string>
 
     <!--  Units -->
-    <string name="units_mm">мм</string>
-    <string name="units_inches">дюйм</string>
     <string name="units_meter_in_second">м/с</string>
     <string name="units_killometer_per_hour">км/ч</string>
     <string name="units_mile_per_hour">мили/ч</string>
     <string name="units_gpa">гПа</string>
     <string name="units_mm_hg">мм рт. ст.</string>
-    <string name="units_mbar">миллибар</string>
-
-    <!-- Screen titles -->
-    <string name="settings_title">Настройки</string>
 
     <!-- Temperature -->
     <string name="temperature_title">Температура</string>

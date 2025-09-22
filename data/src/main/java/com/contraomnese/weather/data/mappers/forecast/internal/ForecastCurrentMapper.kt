@@ -90,13 +90,6 @@ internal fun ForecastCurrentEntity.toDewPoint(temperatureUnit: TemperatureUnit):
     }
 }
 
-internal fun ForecastCurrentEntity.toPrecipitationDomain(precipitationUnit: PrecipitationUnit): Double {
-    return when (precipitationUnit) {
-        PrecipitationUnit.Millimeters -> this.precipMm
-        PrecipitationUnit.Inches -> this.precipIn
-    }
-}
-
 internal fun HourlyForecastEntity.toPrecipitationDomain(precipitationUnit: PrecipitationUnit): Double {
     return when (precipitationUnit) {
         PrecipitationUnit.Millimeters -> this.precipMm

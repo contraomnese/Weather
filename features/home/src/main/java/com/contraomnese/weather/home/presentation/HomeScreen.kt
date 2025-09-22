@@ -24,14 +24,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contraomnese.weather.core.ui.widgets.FavoriteItem
 import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
 import com.contraomnese.weather.core.ui.widgets.SearchTextField
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.icons.WeatherIcons
-import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.cornerRadius1
 import com.contraomnese.weather.design.theme.itemHeight160
 import com.contraomnese.weather.design.theme.itemHeight20
@@ -42,19 +40,11 @@ import com.contraomnese.weather.design.theme.padding32
 import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.design.theme.space16
 import com.contraomnese.weather.design.theme.space32
-import com.contraomnese.weather.domain.home.model.MatchingLocationDomainModel
-import com.contraomnese.weather.domain.weatherByLocation.model.CoordinatesDomainModel
-import com.contraomnese.weather.domain.weatherByLocation.model.DetailsLocationDomainModel
-import com.contraomnese.weather.domain.weatherByLocation.model.LatitudeDomainModel
-import com.contraomnese.weather.domain.weatherByLocation.model.LongitudeDomainModel
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toPersistentList
-import kotlin.random.Random
 
 @Composable
 internal fun HomeRoute(
     viewModel: HomeViewModel,
-    onNavigateToWeatherByLocation: (Int) -> Unit,
+    onNavigateToWeatherByLocation: (Int, Double, Double) -> Unit,
     onNavigateToAppSettings: () -> Unit,
 ) {
 
@@ -72,7 +62,7 @@ internal fun HomeRoute(
 internal fun HomeScreen(
     uiState: HomeUiState,
     onEvent: (HomeEvent) -> Unit,
-    onNavigateToWeatherByLocation: (Int) -> Unit = {},
+    onNavigateToWeatherByLocation: (Int, Double, Double) -> Unit = { _, _, _ -> },
     onNavigateToAppSettings: () -> Unit = {},
 ) {
     Box(
@@ -147,12 +137,11 @@ private fun TopBar(
     }
 }
 
-
 @Composable
 private fun MatchingLocations(
     uiState: HomeUiState,
     onEvent: (HomeEvent) -> Unit,
-    onNavigateToWeatherByLocation: (Int) -> Unit,
+    onNavigateToWeatherByLocation: (Int, Double, Double) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -161,7 +150,7 @@ private fun MatchingLocations(
         uiState.matchingLocations.forEach { location ->
             Row(
                 modifier = Modifier
-                    .clickable { onNavigateToWeatherByLocation(location.id) }
+                    .clickable { onNavigateToWeatherByLocation(location.id, location.point.latitude.value, location.point.longitude.value) }
                     .fillMaxWidth()
                     .height(itemHeight40),
                 verticalAlignment = Alignment.CenterVertically,
@@ -172,26 +161,28 @@ private fun MatchingLocations(
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onBackground
                 )
-                Text(
-                    modifier = Modifier.padding(horizontal = padding16),
-                    text = location.countryName,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f)
-                )
+                location.countryName?.let {
+                    Text(
+                        modifier = Modifier.padding(horizontal = padding16),
+                        text = it,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
+                    )
+                }
                 Spacer(
                     modifier = Modifier.weight(1f)
                 )
                 IconButton(
                     onClick = {
-                        if (location.isFavorite || uiState.favorites.any { it.id == location.id }) {
+                        if (uiState.favorites.any { it == location }) {
                             onEvent(HomeEvent.RemoveFavorite(location.id))
                         } else {
-                            onEvent(HomeEvent.AddFavorite(location.id))
+                            onEvent(HomeEvent.AddFavorite(location))
                         }
                     }
                 ) {
                     Icon(
-                        imageVector = if (location.isFavorite || uiState.favorites.any { it.id == location.id }) WeatherIcons.RemoveFavorite else WeatherIcons.AddFavorite,
+                        imageVector = if (uiState.favorites.contains(location)) WeatherIcons.RemoveFavorite else WeatherIcons.AddFavorite,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
                     )
@@ -215,7 +206,7 @@ private fun MatchingLocations(
 private fun FavoritesLocations(
     uiState: HomeUiState,
     onEvent: (HomeEvent) -> Unit,
-    onNavigateToWeatherByLocation: (Int) -> Unit,
+    onNavigateToWeatherByLocation: (Int, Double, Double) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -226,21 +217,26 @@ private fun FavoritesLocations(
     ) {
         items(uiState.favorites) { location ->
             val favoriteForecast = uiState.favoritesForecast[location.id]
-
-            if (favoriteForecast != null) {
+            favoriteForecast?.let {
                 FavoriteItem(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(itemHeight160),
-                    locationName = location.name,
-                    locationCountry = favoriteForecast.locationInfo.country,
-                    timeZone = favoriteForecast.locationInfo.timeZone,
-                    temperature = favoriteForecast.currentInfo.temperature,
-                    maxTemperature = favoriteForecast.forecastInfo.today.maxTemperature,
-                    minTemperature = favoriteForecast.forecastInfo.today.minTemperature,
-                    conditionText = favoriteForecast.currentInfo.conditionText,
-                    condition = favoriteForecast.currentInfo.condition,
-                    onTapClicked = { onNavigateToWeatherByLocation(location.id) },
+                    locationName = it.locationInfo.name,
+                    locationCountry = it.locationInfo.country,
+                    timeZone = it.locationInfo.timeZone,
+                    temperature = it.currentInfo.temperature,
+                    maxTemperature = it.forecastInfo.today.maxTemperature,
+                    minTemperature = it.forecastInfo.today.minTemperature,
+                    conditionText = it.currentInfo.conditionText,
+                    condition = it.currentInfo.condition,
+                    onTapClicked = {
+                        onNavigateToWeatherByLocation(
+                            location.id,
+                            location.point.latitude.value,
+                            location.point.longitude.value
+                        )
+                    },
                     onDeleteClicked = { onEvent(HomeEvent.RemoveFavorite(location.id)) }
                 )
             }
@@ -251,72 +247,5 @@ private fun FavoritesLocations(
                     .height(space32)
             )
         }
-    }
-}
-
-@Preview
-@Composable
-private fun HomeScreenPreview(modifier: Modifier = Modifier) {
-    WeatherTheme {
-        Box(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.background)
-                .fillMaxSize()
-        )
-        val original = MatchingLocationDomainModel(
-            id = 1,
-            name = "",
-            countryName = "",
-            isFavorite = Random.nextBoolean()
-        )
-        val cities = List(10) { index ->
-            original.copy(
-                id = index,
-                name = "City $index",
-                countryName = "Country $index"
-            )
-        }
-
-        HomeScreen(
-            uiState = HomeUiState(matchingLocations = cities.toPersistentList()),
-            onEvent = {}
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun HomeScreenLoadingPreview(modifier: Modifier = Modifier) {
-    WeatherTheme {
-        Box(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.background)
-                .fillMaxSize()
-        )
-
-        HomeScreen(
-            uiState = HomeUiState(
-                isLoading = false,
-                favorites = persistentListOf(
-                    DetailsLocationDomainModel(
-                        id = 1, name = "New York",
-                        point = CoordinatesDomainModel(
-                            latitude = LatitudeDomainModel(
-                                value = 4.5
-                            ), longitude = LongitudeDomainModel(value = 6.7)
-                        ),
-                    ),
-                    DetailsLocationDomainModel(
-                        id = 2, name = "Moscow",
-                        point = CoordinatesDomainModel(
-                            latitude = LatitudeDomainModel(
-                                value = 4.5
-                            ), longitude = LongitudeDomainModel(value = 6.7)
-                        ),
-                    ),
-                )
-            ),
-            onEvent = {}, onNavigateToWeatherByLocation = {}, onNavigateToAppSettings = {}
-        )
     }
 }

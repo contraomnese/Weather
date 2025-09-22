@@ -8,8 +8,9 @@ plugins {
     alias(libs.plugins.devtools.ksp)
 }
 
-val WEATHER_API_KEY: String = gradleLocalProperties(rootDir, providers).getProperty("WEATHER_API_KEY")
-val WEATHER_API_BASE_URL: String = gradleLocalProperties(rootDir, providers).getProperty("WEATHER_API_BASE_URL")
+val weatherApiKey: String = gradleLocalProperties(rootDir, providers).getProperty("WEATHER_API_KEY")
+val weatherApiBaseUrl: String = gradleLocalProperties(rootDir, providers).getProperty("WEATHER_API_BASE_URL")
+val locationApiBaseUrl: String = gradleLocalProperties(rootDir, providers).getProperty("LOCATION_API_BASE_URL")
 
 android {
     namespace = "com.contraomnese.weather"
@@ -35,13 +36,15 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "WEATHER_API_KEY", "\"${WEATHER_API_KEY}\"")
-            buildConfigField("String", "WEATHER_API_BASE_URL", "\"${WEATHER_API_BASE_URL}\"")
+            buildConfigField("String", "WEATHER_API_KEY", "\"${weatherApiKey}\"")
+            buildConfigField("String", "WEATHER_API_BASE_URL", "\"${weatherApiBaseUrl}\"")
+            buildConfigField("String", "LOCATION_API_BASE_URL", "\"${locationApiBaseUrl}\"")
         }
         release {
             signingConfig = signingConfigs.getByName("release")
-            buildConfigField("String", "WEATHER_API_KEY", "\"${WEATHER_API_KEY}\"")
-            buildConfigField("String", "WEATHER_API_BASE_URL", "\"${WEATHER_API_BASE_URL}\"")
+            buildConfigField("String", "WEATHER_API_KEY", "\"${weatherApiKey}\"")
+            buildConfigField("String", "WEATHER_API_BASE_URL", "\"${weatherApiBaseUrl}\"")
+            buildConfigField("String", "LOCATION_API_BASE_URL", "\"${locationApiBaseUrl}\"")
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
