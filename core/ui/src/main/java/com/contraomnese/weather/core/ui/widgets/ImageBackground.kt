@@ -22,7 +22,7 @@ fun ImageBackground(
 ) {
 
     val drawableBackgroundRes = when (condition) {
-        CompactWeatherCondition.CLEAR -> R.drawable.sun_large
+        CompactWeatherCondition.CLEAR -> R.drawable.clear_small
         CompactWeatherCondition.PARTLY_CLOUDY -> R.drawable.partly_cloud
         CompactWeatherCondition.CLOUDY -> R.drawable.overcast
         CompactWeatherCondition.FOG -> R.drawable.fog
