@@ -44,6 +44,7 @@ val itemWidth72 = 72.dp
 val itemWidth80 = 80.dp
 val itemWidth96 = 96.dp
 val itemWidth112 = 112.dp
+val itemWidth160 = 160.dp
 
 val itemHeight2 = 2.dp
 val itemHeight4 = 4.dp

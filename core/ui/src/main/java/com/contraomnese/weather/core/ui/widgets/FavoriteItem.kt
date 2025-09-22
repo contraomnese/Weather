@@ -1,16 +1,19 @@
 package com.contraomnese.weather.core.ui.widgets
 
-import androidx.compose.foundation.background
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,11 +42,12 @@ import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.icons.WeatherIcons
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.cornerRadius16
-import com.contraomnese.weather.design.theme.cornerRadius8
 import com.contraomnese.weather.design.theme.itemHeight160
+import com.contraomnese.weather.design.theme.itemThickness2
+import com.contraomnese.weather.design.theme.itemWidth160
+import com.contraomnese.weather.design.theme.itemWidth56
+import com.contraomnese.weather.design.theme.itemWidth96
 import com.contraomnese.weather.design.theme.padding16
-import com.contraomnese.weather.design.theme.padding8
-import com.contraomnese.weather.design.theme.space16
 import com.contraomnese.weather.design.theme.space8
 import com.contraomnese.weather.domain.weatherByLocation.model.internal.CompactWeatherCondition
 import com.contraomnese.weather.domain.weatherByLocation.model.internal.LocationDateTime
@@ -67,7 +71,7 @@ fun FavoriteItem(
     onDeleteClicked: () -> Unit,
 ) {
 
-    var showDelete by remember { mutableStateOf(false) }
+    var deleteVisible by remember { mutableStateOf(false) }
 
     var localTime by remember { mutableStateOf("") }
 
@@ -80,13 +84,19 @@ fun FavoriteItem(
         }
     }
 
-    Box {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.spacedBy(space8)
+    ) {
         Surface(
-            modifier = modifier
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1f)
                 .pointerInput(Unit) {
                     detectTapGestures(
                         onLongPress = {
-                            showDelete = !showDelete
+                            deleteVisible = !deleteVisible
                         },
                         onTap = {
                             onTapClicked()
@@ -103,106 +113,126 @@ fun FavoriteItem(
                     )
                 },
             shape = RoundedCornerShape(cornerRadius16),
-            color = MaterialTheme.colorScheme.surface.copy(alpha = 1.0f)
+            color = MaterialTheme.colorScheme.surface
         ) {
             ImageBackground(condition = condition)
-            Box(modifier = Modifier.padding(padding16)) {
-
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.Top,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column(
-                        modifier = Modifier.weight(2f),
-                        verticalArrangement = Arrangement.spacedBy(space16)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(space8)
-                        ) {
-                            Text(
-                                text = locationName,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                style = MaterialTheme.typography.titleLarge,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Text(
-                                modifier = Modifier.wrapContentWidth(),
-                                text = localTime,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-
-                        }
-                        Text(
-                            text = locationCountry,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                        )
+            BodySection(locationName, localTime, locationCountry, temperature, conditionText, maxTemperature, minTemperature)
+        }
+        AnimatedVisibility(
+            visible = deleteVisible
+        ) {
+            Surface(
+                modifier = Modifier
+                    .width(itemWidth56)
+                    .fillMaxHeight(),
+                shape = RoundedCornerShape(cornerRadius16),
+                border = BorderStroke(itemThickness2, MaterialTheme.colorScheme.onSurface),
+            ) {
+                IconButton(
+                    onClick = {
+                        onDeleteClicked()
+                        deleteVisible = false
                     }
-                    Text(
-                        modifier = Modifier.weight(1f),
-                        text = stringResource(R.string.temperature, temperature),
-                        textAlign = TextAlign.End,
-                        style = MaterialTheme.typography.displayMedium,
-                        color = MaterialTheme.colorScheme.onSurface
+                ) {
+                    Icon(
+                        imageVector = WeatherIcons.Delete,
+                        contentDescription = "Delete",
+                        tint = Color.White
                     )
-
                 }
+            }
+        }
 
+    }
+}
+
+@Composable
+private fun BodySection(
+    locationName: String,
+    localTime: String,
+    locationCountry: String,
+    temperature: String,
+    conditionText: String,
+    maxTemperature: String,
+    minTemperature: String,
+) {
+    Box(modifier = Modifier.padding(padding16)) {
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(
+                modifier = Modifier.weight(2f),
+                verticalArrangement = Arrangement.spacedBy(space8)
+            ) {
                 Row(
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(space8)
                 ) {
                     Text(
-                        modifier = Modifier.weight(1f),
-                        text = conditionText,
-                        maxLines = 2,
-                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.widthIn(max = itemWidth160),
+                        text = locationName,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onSurface
                     )
-
                     Text(
-                        modifier = Modifier
-                            .weight(1.5f)
-                            .align(Alignment.Bottom),
-                        text = stringResource(R.string.temperature_high_low, maxTemperature, minTemperature),
-                        textAlign = TextAlign.End,
+                        modifier = Modifier.width(itemWidth56),
+                        text = localTime,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                }
-            }
 
-        }
-        if (showDelete) {
-            IconButton(
-                onClick = {
-                    onDeleteClicked()
-                    showDelete = false
-                },
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .offset(x = padding8, y = -padding8)
-                    .background(
-                        color = Color.Red,
-                        shape = RoundedCornerShape(cornerRadius8)
-                    )
-            ) {
-                Icon(
-                    imageVector = WeatherIcons.Delete,
-                    contentDescription = "Delete",
-                    tint = Color.White
+                }
+                Text(
+                    text = locationCountry,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )
             }
+            Text(
+                modifier = Modifier.width(itemWidth96),
+                text = stringResource(R.string.temperature, temperature),
+                textAlign = TextAlign.End,
+                style = MaterialTheme.typography.displayMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+        }
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(space8)
+        ) {
+            Text(
+                modifier = Modifier.weight(1f),
+                text = conditionText,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Text(
+                modifier = Modifier
+                    .weight(1f)
+                    .align(Alignment.Bottom),
+                text = stringResource(R.string.temperature_high_low, maxTemperature, minTemperature),
+                textAlign = TextAlign.End,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
         }
     }
 }
@@ -216,10 +246,10 @@ fun FavoriteItemPreview() {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(itemHeight160),
-            locationName = "New York",
+            locationName = "New York New York New York",
             locationCountry = "USA USA USA USA USA",
             timeZone = TimeZone.of("Europe/Moscow"),
-            conditionText = "Ясно",
+            conditionText = "Ясно Ясно Ясно Ясно Ясно Ясно",
             condition = CompactWeatherCondition.CLEAR,
             temperature = "21",
             maxTemperature = "25",
