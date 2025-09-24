@@ -1,7 +1,8 @@
 package com.contraomnese.weather
 
 import androidx.compose.runtime.Immutable
-import com.contraomnese.weather.domain.home.usecase.GetFavoritesUseCase
+import com.contraomnese.weather.domain.home.usecase.AddFavoriteUseCase
+import com.contraomnese.weather.domain.home.usecase.ObserveFavoritesUseCase
 import com.contraomnese.weather.domain.weatherByLocation.model.LocationInfoDomainModel
 import com.contraomnese.weather.presentation.architecture.BaseViewModel
 import com.contraomnese.weather.presentation.architecture.UiState
@@ -13,7 +14,9 @@ import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.Flow
 
 @Immutable
-internal sealed class MainActivityEvent
+internal sealed interface MainActivityEvent {
+    data class AddFavorite(val location: LocationInfoDomainModel) : MainActivityEvent
+}
 
 internal data class MainActivityUiState(
     override val isLoading: Boolean = true,
@@ -26,20 +29,33 @@ internal data class MainActivityUiState(
 internal class MainActivityViewModel(
     notificationMonitor: NotificationMonitor,
     useCaseExecutorProvider: UseCaseExecutorProvider,
-    private val getFavoritesUseCase: GetFavoritesUseCase,
+    private val observeFavoritesUseCase: ObserveFavoritesUseCase,
+    private val addFavoriteUseCase: AddFavoriteUseCase,
 ) : BaseViewModel<MainActivityUiState, MainActivityEvent>(useCaseExecutorProvider, notificationMonitor) {
 
     init {
-        execute(getFavoritesUseCase, ::onFavoritesUpdate, ::provideException)
+        observe(observeFavoritesUseCase, ::onFavoritesUpdate, ::provideException)
     }
 
     override fun initialState(): MainActivityUiState = MainActivityUiState(isLoading = true)
 
-    override fun onEvent(event: MainActivityEvent) = Unit
+    override fun onEvent(event: MainActivityEvent) {
+        when (event) {
+            is MainActivityEvent.AddFavorite -> onFavoriteAdded(event.location)
+        }
+    }
 
     val notificationEvents: Flow<Int> = observeNotificationEvents()
 
     private fun onFavoritesUpdate(newFavorites: List<LocationInfoDomainModel>) {
         updateViewState { copy(favorites = newFavorites.toPersistentList(), isLoading = false) }
+    }
+
+    private fun onFavoriteAdded(location: LocationInfoDomainModel) {
+        execute(
+            addFavoriteUseCase,
+            location,
+            onException = ::provideException
+        )
     }
 }

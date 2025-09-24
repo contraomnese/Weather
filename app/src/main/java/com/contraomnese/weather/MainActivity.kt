@@ -79,6 +79,6 @@ internal fun WeatherApp(viewModel: MainActivityViewModel) {
     }
 
     if (!uiState.isLoading) {
-        WeatherHost(snackBarHostState = snackBarHostState, uiState = uiState)
+        WeatherHost(snackBarHostState = snackBarHostState, uiState = uiState, onEvent = viewModel::onEvent)
     }
 }

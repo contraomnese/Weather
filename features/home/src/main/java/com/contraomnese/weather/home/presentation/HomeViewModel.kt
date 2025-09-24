@@ -107,13 +107,15 @@ internal class HomeViewModel(
 
     private fun onFavoritesUpdate(newFavorites: List<LocationInfoDomainModel>) {
         updateViewState { copy(favorites = newFavorites.toPersistentList()) }
-        newFavorites.forEach {
-            observe(
-                observeForecastWeatherUseCase,
-                it,
-                { forecast -> onFavoritesForecastUpdate(forecast, it) },
-                ::provideException
-            )
+        newFavorites.forEach { location ->
+            if (location.id !in uiState.value.favoritesForecast.keys) {
+                observe(
+                    observeForecastWeatherUseCase,
+                    location,
+                    { forecast -> onFavoritesForecastUpdate(forecast, location) },
+                    ::provideException
+                )
+            }
         }
     }
 

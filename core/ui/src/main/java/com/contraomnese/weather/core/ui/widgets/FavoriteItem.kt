@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -47,7 +46,6 @@ import com.contraomnese.weather.design.icons.WeatherIcons
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.cornerRadius16
 import com.contraomnese.weather.design.theme.itemHeight160
-import com.contraomnese.weather.design.theme.itemWidth160
 import com.contraomnese.weather.design.theme.itemWidth56
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.space8
@@ -172,17 +170,21 @@ private fun BodySection(
     maxTemperature: String,
     minTemperature: String,
 ) {
-    Box(modifier = Modifier.padding(padding16)) {
+    Box(
+        modifier = Modifier
+            .padding(padding16)
+            .fillMaxWidth()
+    ) {
 
         Row(
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.spacedBy(padding16)
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
-                modifier = Modifier.weight(2f),
+                modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(space8)
             ) {
                 Row(
@@ -190,18 +192,21 @@ private fun BodySection(
                     horizontalArrangement = Arrangement.spacedBy(space8)
                 ) {
                     Text(
-                        modifier = Modifier.widthIn(max = itemWidth160),
                         text = locationName,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier
+                            .weight(1f, fill = false)
+                            .wrapContentWidth(Alignment.Start)
                     )
+
                     Text(
-                        modifier = Modifier.width(itemWidth56),
                         text = localTime,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.wrapContentWidth(Alignment.End)
                     )
 
                 }
@@ -213,41 +218,39 @@ private fun BodySection(
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )
             }
+
             Text(
-                modifier = Modifier.wrapContentWidth(),
                 text = stringResource(R.string.temperature, temperature),
                 textAlign = TextAlign.End,
                 style = MaterialTheme.typography.displayMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.align(Alignment.CenterVertically)
             )
-
         }
 
         Row(
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(space8)
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                modifier = Modifier.weight(1f),
                 text = conditionText,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f)
             )
 
             Text(
-                modifier = Modifier
-                    .weight(1f)
-                    .align(Alignment.Bottom),
                 text = stringResource(R.string.temperature_high_low, maxTemperature, minTemperature),
                 textAlign = TextAlign.End,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f)
             )
         }
     }
@@ -262,8 +265,8 @@ fun FavoriteItemPreview() {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(itemHeight160),
-            locationName = "New York New York New York",
-            locationCountry = "USA USA USA USA USA",
+            locationName = "New York",
+            locationCountry = "USA USA USA USA USA USA USA USA USA USA",
             timeZone = TimeZone.of("Europe/Moscow"),
             conditionText = "Ясно Ясно Ясно Ясно Ясно Ясно",
             condition = CompactWeatherCondition.CLEAR,

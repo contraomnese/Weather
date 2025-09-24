@@ -14,7 +14,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredWidthIn
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contraomnese.weather.core.ui.widgets.FavoriteItem
 import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
@@ -38,6 +41,8 @@ import com.contraomnese.weather.design.theme.itemHeight160
 import com.contraomnese.weather.design.theme.itemHeight20
 import com.contraomnese.weather.design.theme.itemHeight40
 import com.contraomnese.weather.design.theme.itemThickness2
+import com.contraomnese.weather.design.theme.itemWidth160
+import com.contraomnese.weather.design.theme.itemWidth56
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.design.theme.space16
@@ -91,7 +96,7 @@ private fun TopBar(
 ) {
     Row(
         modifier = Modifier
-            .padding(start = padding16, end = padding16, bottom = padding16)
+            .padding(padding16)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -159,25 +164,33 @@ private fun MatchingLocations(
             ) {
                 location.name?.let {
                     Text(
+                        modifier = Modifier.requiredWidthIn(max = itemWidth160),
                         text = it,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onBackground
                     )
                 }
                 location.countryName?.let {
                     Text(
-                        modifier = Modifier.padding(horizontal = padding16),
+                        modifier = Modifier
+                            .padding(horizontal = padding16)
+                            .weight(1f),
                         text = it,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
                     )
                 }
                 Spacer(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.width(space16)
                 )
                 IconButton(
+                    modifier = Modifier.width(itemWidth56),
                     onClick = {
-                        if (uiState.favorites.any { it == location }) {
+                        if (uiState.favorites.any { it.id == location.id }) {
                             onEvent(HomeEvent.RemoveFavorite(location.id))
                         } else {
                             onEvent(HomeEvent.AddFavorite(location))
@@ -185,7 +198,7 @@ private fun MatchingLocations(
                     }
                 ) {
                     Icon(
-                        imageVector = if (uiState.favorites.contains(location)) WeatherIcons.RemoveFavorite else WeatherIcons.AddFavorite,
+                        imageVector = if (uiState.favorites.any { it.id == location.id }) WeatherIcons.RemoveFavorite else WeatherIcons.AddFavorite,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
                     )
@@ -218,7 +231,7 @@ private fun FavoritesLocations(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(space16),
     ) {
-        items(uiState.favorites) { location ->
+        items(uiState.favorites, key = { location -> location.id }) { location ->
             val favoriteForecast = uiState.favoritesForecast[location.id]
             favoriteForecast?.let {
                 FavoriteItem(

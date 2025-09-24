@@ -31,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,6 +40,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.contraomnese.weather.MainActivityEvent
 import com.contraomnese.weather.MainActivityUiState
 import com.contraomnese.weather.appsettings.navigation.appSettings
 import com.contraomnese.weather.core.ui.widgets.NotificationSnackBar
@@ -49,6 +51,7 @@ import com.contraomnese.weather.design.theme.itemWidth56
 import com.contraomnese.weather.design.theme.padding20
 import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.design.theme.space16
+import com.contraomnese.weather.domain.weatherByLocation.model.LocationInfoDomainModel
 import com.contraomnese.weather.home.navigation.HomeDestination
 import com.contraomnese.weather.home.navigation.home
 import com.contraomnese.weather.home.navigation.navigateToHome
@@ -61,11 +64,14 @@ internal fun WeatherHost(
     navController: NavHostController = rememberNavController(),
     snackBarHostState: SnackbarHostState = remember { SnackbarHostState() },
     uiState: MainActivityUiState,
+    onEvent: (MainActivityEvent) -> Unit,
 ) {
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val locationId = navBackStackEntry?.arguments?.getInt("locationId")
+    val locationLat = navBackStackEntry?.arguments?.getDouble("latitude")
+    val locationLon = navBackStackEntry?.arguments?.getDouble("longitude")
 
     val bottomBarVisible by remember(currentRoute) {
         mutableStateOf(
@@ -102,7 +108,7 @@ internal fun WeatherHost(
             }
         },
         bottomBar = {
-            if (bottomBarVisible && uiState.favorites.isNotEmpty()) {
+            if (bottomBarVisible) {
                 BottomAppBar(
                     modifier = Modifier.height(itemHeight48),
                     containerColor = MaterialTheme.colorScheme.surface,
@@ -114,19 +120,42 @@ internal fun WeatherHost(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
+                        var clicked by remember { mutableStateOf(false) }
                         Spacer(Modifier.width(itemWidth56))
                         Spacer(Modifier.width(space16))
-
-                        Row(
-                            modifier = Modifier.wrapContentWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(padding8)
-                        ) {
-                            uiState.favorites.forEachIndexed { index, location ->
-                                val isSelected = pagerState.currentPage == index
+                        if (uiState.favorites.firstOrNull { it.id == locationId } != null && !clicked) {
+                            Row(
+                                modifier = Modifier.wrapContentWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(padding8)
+                            ) {
+                                uiState.favorites.forEachIndexed { index, location ->
+                                    val isSelected = pagerState.currentPage == index
+                                    Icon(
+                                        modifier = Modifier.size(itemWidth16),
+                                        imageVector = if (isSelected) WeatherIcons.CircleFilled else WeatherIcons.Circle,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onBackground
+                                    )
+                                }
+                            }
+                        } else {
+                            IconButton(
+                                modifier = Modifier.width(itemWidth56),
+                                enabled = !clicked,
+                                onClick = {
+                                    if (locationId != null && locationLat != null && locationLon != null) {
+                                        onEvent(
+                                            MainActivityEvent.AddFavorite(
+                                                LocationInfoDomainModel.from(id = locationId, lat = locationLat, lon = locationLon)
+                                            )
+                                        )
+                                        clicked = true
+                                    }
+                                }
+                            ) {
                                 Icon(
-                                    modifier = Modifier.size(itemWidth16),
-                                    imageVector = if (isSelected) WeatherIcons.CircleFilled else WeatherIcons.Circle,
+                                    imageVector = if (clicked) WeatherIcons.RemoveFavorite else WeatherIcons.AddFavorite,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.onBackground
                                 )

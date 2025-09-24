@@ -5,7 +5,6 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -85,7 +84,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlin.math.abs
 
-@ExperimentalFoundationApi
 @Composable
 internal fun WeatherRoute(
     viewModel: WeatherViewModel,
@@ -336,7 +334,7 @@ internal fun WeatherScreen(
     ) {
         TitleSection(
             currentTitleBoxHeight,
-            location = uiState.location.name ?: uiState.weather.locationInfo.name,
+            location = if (uiState.location.name.isNullOrBlank()) uiState.weather.locationInfo.name else uiState.location.name!!,
             currentTemp = uiState.weather.currentInfo.temperature,
             feelsLikeTemp = uiState.weather.currentInfo.feelsLikeTemperature,
             maxTemp = uiState.weather.forecastInfo.today.maxTemperature,
@@ -674,7 +672,7 @@ private fun PressureSection(
 fun AnimatedBackground(condition: CompactWeatherCondition) {
     Crossfade(
         targetState = condition,
-        animationSpec = tween(durationMillis = 800, easing = FastOutSlowInEasing),
+        animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing),
         label = "WeatherBackground"
     ) { targetCondition ->
         ImageBackgroundWithGradient(condition = targetCondition)

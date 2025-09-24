@@ -8,15 +8,10 @@ data class LocationInfoDomainModel(
     val point: CoordinatesDomainModel,
 ) {
     companion object {
-        val EMPTY = LocationInfoDomainModel(
-            id = 0,
-            name = null,
-            countryName = null,
-            point = CoordinatesDomainModel(
-                latitude = LatitudeDomainModel(value = .0),
-                longitude = LongitudeDomainModel(value = .0)
-            )
-        )
+        val EMPTY = from(0, .0, .0)
+
+        fun from(id: Int, lat: Double, lon: Double) =
+            LocationInfoDomainModel(id, point = CoordinatesDomainModel(LatitudeDomainModel(lat), LongitudeDomainModel(lon)))
     }
 
     fun toPoint(): String = "${point.latitude.value},${point.longitude.value}"
