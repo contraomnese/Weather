@@ -18,7 +18,7 @@ fun FavoriteEntity.toDomain() = LocationInfoDomainModel(
 
 fun LocationInfoDomainModel.toEntity() = FavoriteEntity(
     locationId = id,
-    name = name,
+    name = name ?: "",
     countryName = countryName ?: "",
     latitude = point.latitude.value,
     longitude = point.longitude.value

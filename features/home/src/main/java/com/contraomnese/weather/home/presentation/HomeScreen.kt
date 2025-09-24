@@ -157,11 +157,13 @@ private fun MatchingLocations(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = location.name,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
+                location.name?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
                 location.countryName?.let {
                     Text(
                         modifier = Modifier.padding(horizontal = padding16),

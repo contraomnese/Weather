@@ -1,5 +1,6 @@
 package com.contraomnese.weather.weatherByLocation.navigation
 
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -34,6 +35,7 @@ fun interface WeatherByLocationNavigator {
 @OptIn(KoinExperimentalAPI::class)
 fun NavGraphBuilder.weatherByLocation(
     externalNavigator: WeatherByLocationNavigator,
+    pagerState: PagerState,
 ) {
 
     composable<WeatherByLocationDestination> { backStackEntry ->
@@ -55,7 +57,9 @@ fun NavGraphBuilder.weatherByLocation(
             })
 
         WeatherRoute(
-            viewModel = viewModel
+            viewModel = viewModel,
+            onEvent = viewModel::onEvent,
+            pagerState = pagerState
         )
     }
 }

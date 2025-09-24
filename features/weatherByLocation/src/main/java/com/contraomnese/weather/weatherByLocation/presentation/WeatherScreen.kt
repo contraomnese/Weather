@@ -1,5 +1,11 @@
 package com.contraomnese.weather.weatherByLocation.presentation
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,12 +14,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerDefaults
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -38,6 +49,7 @@ import com.contraomnese.weather.core.ui.widgets.ForecastDailyColumn
 import com.contraomnese.weather.core.ui.widgets.ForecastHourlyLazyRow
 import com.contraomnese.weather.core.ui.widgets.HumidityItem
 import com.contraomnese.weather.core.ui.widgets.ImageBackgroundWithGradient
+import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
 import com.contraomnese.weather.core.ui.widgets.PressureItem
 import com.contraomnese.weather.core.ui.widgets.RainfallItem
 import com.contraomnese.weather.core.ui.widgets.SunriseItem
@@ -47,6 +59,7 @@ import com.contraomnese.weather.core.ui.widgets.WindItem
 import com.contraomnese.weather.design.theme.itemHeight150
 import com.contraomnese.weather.design.theme.itemHeight300
 import com.contraomnese.weather.design.theme.itemHeight32
+import com.contraomnese.weather.design.theme.itemWidth64
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding32
 import com.contraomnese.weather.design.theme.padding8
@@ -57,6 +70,7 @@ import com.contraomnese.weather.domain.app.model.PressureUnit
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import com.contraomnese.weather.domain.app.model.WindSpeedUnit
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeatherDomainModel
+import com.contraomnese.weather.domain.weatherByLocation.model.internal.CompactWeatherCondition
 import com.contraomnese.weather.weatherByLocation.presentation.data.AqiSection
 import com.contraomnese.weather.weatherByLocation.presentation.data.DailyForecastSection
 import com.contraomnese.weather.weatherByLocation.presentation.data.HourlyForecastSection
@@ -71,23 +85,60 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlin.math.abs
 
-
+@ExperimentalFoundationApi
 @Composable
 internal fun WeatherRoute(
     viewModel: WeatherViewModel,
-    modifier: Modifier = Modifier,
+    onEvent: (WeatherEvent) -> Unit,
+    pagerState: PagerState,
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val backgroundModifier = if (uiState.isLoading) Modifier.background(MaterialTheme.colorScheme.background) else Modifier
 
-    Box(modifier = modifier
-        .fillMaxSize()
-        .then(backgroundModifier)
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .then(backgroundModifier)
     ) {
 
-        if (!uiState.isLoading) WeatherScreen(uiState = uiState)
+        if (!uiState.isLoading) {
+            AnimatedBackground(condition = uiState.weather!!.currentInfo.condition)
+
+            val initialPage = remember {
+                uiState.favorites.indexOfFirst { uiState.location?.id == it.id }
+            }
+
+            if (initialPage == -1) {
+                WeatherScreen(uiState = uiState)
+            } else {
+                val fling = PagerDefaults.flingBehavior(
+                    state = pagerState,
+                    snapAnimationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessLow)
+                )
+
+                LaunchedEffect(pagerState.currentPage) {
+                    onEvent(WeatherEvent.LocationChanged(pagerState.currentPage))
+                }
+
+                LaunchedEffect(Unit) {
+                    pagerState.scrollToPage(initialPage)
+                }
+
+                HorizontalPager(state = pagerState, flingBehavior = fling) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        WeatherScreen(uiState = uiState)
+                    }
+                }
+            }
+        } else {
+            LoadingIndicator(
+                Modifier
+                    .align(Alignment.Center)
+                    .width(itemWidth64)
+            )
+        }
     }
 }
 
@@ -95,6 +146,7 @@ internal fun WeatherRoute(
 internal fun WeatherScreen(
     uiState: WeatherUiState,
 ) {
+    requireNotNull(uiState.location)
     requireNotNull(uiState.weather)
     requireNotNull(uiState.appSettings)
 
@@ -276,8 +328,6 @@ internal fun WeatherScreen(
         }
     }
 
-    ImageBackgroundWithGradient(condition = uiState.weather.currentInfo.condition)
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -286,7 +336,7 @@ internal fun WeatherScreen(
     ) {
         TitleSection(
             currentTitleBoxHeight,
-            location = uiState.weather.locationInfo.name,
+            location = uiState.location.name ?: uiState.weather.locationInfo.name,
             currentTemp = uiState.weather.currentInfo.temperature,
             feelsLikeTemp = uiState.weather.currentInfo.feelsLikeTemperature,
             maxTemp = uiState.weather.forecastInfo.today.maxTemperature,
@@ -296,7 +346,7 @@ internal fun WeatherScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(start = padding8, end = padding8, top = padding8, bottom = padding8)
+                .padding(padding8)
                 .nestedScroll(nestedScrollConnection),
             state = lazyListState,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -617,5 +667,16 @@ private fun PressureSection(
             value = today.pressure,
             pressureUnit = pressureUnit
         )
+    }
+}
+
+@Composable
+fun AnimatedBackground(condition: CompactWeatherCondition) {
+    Crossfade(
+        targetState = condition,
+        animationSpec = tween(durationMillis = 800, easing = FastOutSlowInEasing),
+        label = "WeatherBackground"
+    ) { targetCondition ->
+        ImageBackgroundWithGradient(condition = targetCondition)
     }
 }

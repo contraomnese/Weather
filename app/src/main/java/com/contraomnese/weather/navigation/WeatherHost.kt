@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,6 +48,7 @@ import com.contraomnese.weather.design.theme.itemWidth16
 import com.contraomnese.weather.design.theme.itemWidth56
 import com.contraomnese.weather.design.theme.padding20
 import com.contraomnese.weather.design.theme.padding8
+import com.contraomnese.weather.design.theme.space16
 import com.contraomnese.weather.home.navigation.HomeDestination
 import com.contraomnese.weather.home.navigation.home
 import com.contraomnese.weather.home.navigation.navigateToHome
@@ -73,6 +76,11 @@ internal fun WeatherHost(
         )
     }
 
+    val pagerState = rememberPagerState(
+        initialPage = uiState.favorites.indexOfFirst { it.id == locationId }.coerceAtLeast(0),
+        pageCount = { uiState.favorites.size }
+    )
+
     Scaffold(
         modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBarsIgnoringVisibility),
         snackbarHost = {
@@ -94,10 +102,9 @@ internal fun WeatherHost(
             }
         },
         bottomBar = {
-            if (bottomBarVisible) {
+            if (bottomBarVisible && uiState.favorites.isNotEmpty()) {
                 BottomAppBar(
-                    modifier = Modifier
-                        .height(itemHeight48),
+                    modifier = Modifier.height(itemHeight48),
                     containerColor = MaterialTheme.colorScheme.surface,
                 ) {
                     Row(
@@ -107,32 +114,26 @@ internal fun WeatherHost(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Spacer(modifier = Modifier.width(itemWidth56))
-                        Spacer(modifier = Modifier.weight(1f))
+                        Spacer(Modifier.width(itemWidth56))
+                        Spacer(Modifier.width(space16))
+
                         Row(
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.wrapContentWidth(),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(padding8)
                         ) {
-                            uiState.favorites.forEach {
-                                if (locationId != null && locationId == it.id) {
-                                    Icon(
-                                        modifier = Modifier.size(itemWidth16),
-                                        imageVector = WeatherIcons.CircleFilled,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.onBackground
-                                    )
-                                } else {
-                                    Icon(
-                                        modifier = Modifier.size(itemWidth16),
-                                        imageVector = WeatherIcons.Circle,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.onBackground
-                                    )
-                                }
+                            uiState.favorites.forEachIndexed { index, location ->
+                                val isSelected = pagerState.currentPage == index
+                                Icon(
+                                    modifier = Modifier.size(itemWidth16),
+                                    imageVector = if (isSelected) WeatherIcons.CircleFilled else WeatherIcons.Circle,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
                             }
                         }
-                        Spacer(modifier = Modifier.weight(1f))
+
+                        Spacer(Modifier.width(space16))
                         IconButton(
                             modifier = Modifier.width(itemWidth56),
                             onClick = { navController.navigateToHome() }
@@ -171,7 +172,7 @@ internal fun WeatherHost(
             ) {
                 home(externalNavigator = navController.homeNavigator())
                 appSettings(externalNavigator = navController.appSettingsNavigator())
-                weatherByLocation(externalNavigator = navController.weatherByLocationNavigator())
+                weatherByLocation(externalNavigator = navController.weatherByLocationNavigator(), pagerState = pagerState)
             }
         }
     }
