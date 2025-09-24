@@ -1,11 +1,15 @@
 package com.contraomnese.weather.appsettings.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -23,7 +27,6 @@ import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding4
-import com.contraomnese.weather.design.theme.padding40
 import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.model.PrecipitationUnit
@@ -56,7 +59,9 @@ private fun AppSettingsScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(start = padding16, end = padding16, top = padding40),
+            .background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = padding16)
+            .padding(WindowInsets.statusBars.asPaddingValues()),
         verticalArrangement = Arrangement.spacedBy(padding8)
     ) {
         RadioGroup(

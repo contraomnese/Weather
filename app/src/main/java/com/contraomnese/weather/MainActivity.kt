@@ -82,7 +82,3 @@ internal fun WeatherApp(viewModel: MainActivityViewModel) {
         WeatherHost(snackBarHostState = snackBarHostState, uiState = uiState)
     }
 }
-
-
-private val lightScrim = android.graphics.Color.argb(0xe6, 0xFF, 0xFF, 0xFF)
-private val darkScrim = android.graphics.Color.argb(0x80, 0x1b, 0x1b, 0x1b)

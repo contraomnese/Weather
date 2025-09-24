@@ -84,7 +84,8 @@ internal fun WeatherRoute(
 
     Box(modifier = modifier
         .fillMaxSize()
-        .then(backgroundModifier)) {
+        .then(backgroundModifier)
+    ) {
 
         if (!uiState.isLoading) WeatherScreen(uiState = uiState)
     }
@@ -295,7 +296,7 @@ internal fun WeatherScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = padding8, vertical = padding8)
+                .padding(start = padding8, end = padding8, top = padding8, bottom = padding8)
                 .nestedScroll(nestedScrollConnection),
             state = lazyListState,
             horizontalAlignment = Alignment.CenterHorizontally,

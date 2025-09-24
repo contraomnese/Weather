@@ -5,17 +5,19 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsIgnoringVisibility
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -50,6 +52,7 @@ import com.contraomnese.weather.home.navigation.navigateToHome
 import com.contraomnese.weather.weatherByLocation.navigation.WeatherByLocationDestination
 import com.contraomnese.weather.weatherByLocation.navigation.weatherByLocation
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun WeatherHost(
     navController: NavHostController = rememberNavController(),
@@ -71,6 +74,7 @@ internal fun WeatherHost(
     }
 
     Scaffold(
+        modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBarsIgnoringVisibility),
         snackbarHost = {
             Box(
                 Modifier
@@ -143,12 +147,12 @@ internal fun WeatherHost(
                 }
             }
         },
-        contentWindowInsets = WindowInsets.systemBars,
+        contentWindowInsets = WindowInsets.navigationBars,
         containerColor = Color.Transparent,
     ) { innerPadding ->
         Box(
             modifier = Modifier
-                .consumeWindowInsets(innerPadding)
+                .padding(innerPadding)
                 .fillMaxSize()
         ) {
             NavHost(

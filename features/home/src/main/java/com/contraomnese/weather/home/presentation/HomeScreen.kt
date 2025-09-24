@@ -7,11 +7,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,7 +39,6 @@ import com.contraomnese.weather.design.theme.itemHeight20
 import com.contraomnese.weather.design.theme.itemHeight40
 import com.contraomnese.weather.design.theme.itemThickness2
 import com.contraomnese.weather.design.theme.padding16
-import com.contraomnese.weather.design.theme.padding32
 import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.design.theme.space16
 import com.contraomnese.weather.design.theme.space32
@@ -69,10 +71,9 @@ internal fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+            .padding(WindowInsets.statusBars.asPaddingValues())
     ) {
-        Column(
-            modifier = Modifier.padding(top = padding32)
-        ) {
+        Column {
             TopBar(uiState, onEvent, onNavigateToAppSettings)
             MatchingLocations(uiState, onEvent, onNavigateToWeatherByLocation)
             if (uiState.inputLocation.value.isEmpty()) {
@@ -90,7 +91,7 @@ private fun TopBar(
 ) {
     Row(
         modifier = Modifier
-            .padding(padding16)
+            .padding(start = padding16, end = padding16, bottom = padding16)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
