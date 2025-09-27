@@ -91,6 +91,6 @@ fun ImageBackgroundWithGradient(
 @Composable
 private fun ImageBackgroundWithGradientPreview() {
     WeatherTheme {
-        ImageBackgroundWithGradient(condition = CompactWeatherCondition.CLEAR)
+        ImageBackgroundWithGradient(condition = CompactWeatherCondition.RAIN)
     }
 }

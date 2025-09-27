@@ -45,12 +45,12 @@ val uvIndexGradientStops = listOf(
 )
 
 val temperatureGradientStops = listOf(
-    -40f to Color(0xFF7015C0),
-    -30f to Color(0xFF4815C0),
-    -20f to Color(0xFF1531C0),
-    -10f to Color(0xFF1565C0),
-    0f to Color(0xFF4FF7C2),
-    10f to Color(0xFF43A06D),
+    -40f to Color(0xFF511089),
+    -30f to Color(0xFF7015C0),
+    -20f to Color(0xFF4815C0),
+    -10f to Color(0xFF3652DC),
+    0f to Color(0xFF157CC0),
+    10f to Color(0xFF3CC4A2),
     20f to Color(0xFF67A043),
     30f to Color(0xFFDCB835),
     40f to Color(0xFFDC5C35),

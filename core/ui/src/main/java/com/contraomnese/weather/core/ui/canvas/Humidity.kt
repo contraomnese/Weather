@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
+import kotlin.math.min
 
 @Composable
 fun HumidityLevel(
@@ -38,13 +39,14 @@ fun HumidityLevel(
 
     val density = LocalDensity.current
     var width by remember(key1 = value) { mutableIntStateOf(0) }
+    var height by remember(key1 = value) { mutableIntStateOf(0) }
     val textMeasurer = rememberTextMeasurer()
 
     val humidityTextLayout = textMeasurer.measure(
         text = AnnotatedString(stringResource(R.string.humidity_value, value)),
         style = MaterialTheme.typography.headlineMedium.copy(
             color = Color.White,
-            fontSize = with(density) { (width / 5).toSp() },
+            fontSize = with(density) { (min(width, height) / 5).toSp() },
             lineBreak = LineBreak.Heading,
             textAlign = TextAlign.Center
         ),
@@ -54,6 +56,7 @@ fun HumidityLevel(
 
     Canvas(modifier = modifier.onSizeChanged {
         width = it.width
+        height = it.height
     }) {
         val radius = size.height / 2.5f
         val strokeWidth = radius * 0.04f
@@ -62,7 +65,7 @@ fun HumidityLevel(
             val paint = android.graphics.Paint().apply {
                 isAntiAlias = true
                 style = android.graphics.Paint.Style.FILL
-                color = android.graphics.Color.rgb(15, 78, 115)
+                color = android.graphics.Color.argb(150, 100, 150, 255)
             }
 
             val circlePath = Path().apply {
