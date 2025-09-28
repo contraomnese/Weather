@@ -14,7 +14,6 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
@@ -28,7 +27,7 @@ import com.contraomnese.weather.design.theme.padding8
 
 @Composable
 fun TitleSection(
-    height: Float,
+    modifier: Modifier = Modifier,
     location: String,
     currentTemp: String,
     maxTemp: String,
@@ -37,12 +36,9 @@ fun TitleSection(
     condition: String,
 ) {
 
-    val density = LocalDensity.current
-
     BoxWithConstraints(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .height(with(density) { height.toDp() })
             .padding(horizontal = padding8)
             .background(MaterialTheme.colorScheme.surface.copy(alpha = .0f)),
         contentAlignment = Alignment.Center
@@ -114,7 +110,7 @@ fun TitleSection(
 private fun TitleSectionFullPreview() {
     WeatherTheme {
         TitleSection(
-            height = 800f,
+            modifier = Modifier.height(400.dp),
             location = "Moscow",
             currentTemp = "23",
             feelsLikeTemp = "26",
@@ -130,7 +126,7 @@ private fun TitleSectionFullPreview() {
 private fun TitleSectionPreview() {
     WeatherTheme {
         TitleSection(
-            height = 400f,
+            modifier = Modifier.height(200.dp),
             location = "Moscow",
             currentTemp = "23",
             feelsLikeTemp = "26",

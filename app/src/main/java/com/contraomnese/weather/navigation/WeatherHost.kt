@@ -1,5 +1,6 @@
 package com.contraomnese.weather.navigation
 
+import android.util.Log
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -21,8 +22,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,6 +32,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -83,10 +83,15 @@ internal fun WeatherHost(
         mutableStateOf(currentRoute?.startsWith(WeatherByLocationDestination::class.java.name) ?: false)
     }
 
-    val pagerState = rememberPagerState(
-        initialPage = uiState.favorites.indexOfFirst { it.id == locationId }.coerceAtLeast(0),
-        pageCount = { uiState.favorites.size }
-    )
+    val currentLocation = remember(locationId, locationLat, locationLon) {
+        if (locationId != null && locationLat != null && locationLon != null) {
+            LocationInfoDomainModel.from(id = locationId, lat = locationLat, lon = locationLon)
+        } else {
+            null
+        }
+    }
+
+    var favoriteIndicatorIndex by remember(currentRoute) { mutableIntStateOf(uiState.favorites.indexOfFirst { it.id == locationId }) }
 
     val startDestination = remember {
         uiState.favorites.firstOrNull()?.let {
@@ -98,12 +103,19 @@ internal fun WeatherHost(
         } ?: HomeDestination
     }
 
+    Log.d("WeatherHost", "favorites: ${uiState.favorites.map { it.id }}")
+    Log.d("WeatherHost", "locationId: ${locationId}")
+    Log.d("WeatherHost", "favoriteIndicatorIndex: $favoriteIndicatorIndex")
+    Log.d("WeatherHost", "startDestination: $startDestination")
+    Log.d("WeatherHost", "arguments: ${navBackStackEntry?.arguments?.getInt("locationId")}")
+
+
     Scaffold(
         modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBarsIgnoringVisibility),
         snackbarHost = { WeatherSnackBarHost(snackBarHostState) },
         bottomBar = {
             if (bottomBarVisible) {
-                WeatherBottomBar(uiState.favorites, locationId, pagerState, locationLat, locationLon, onEvent, navController)
+                WeatherBottomBar(uiState.favorites, currentLocation, favoriteIndicatorIndex, onEvent, navController)
             }
         },
         contentWindowInsets = WindowInsets.navigationBars,
@@ -124,7 +136,10 @@ internal fun WeatherHost(
             ) {
                 home(externalNavigator = navController.homeNavigator())
                 appSettings(externalNavigator = navController.appSettingsNavigator())
-                weatherByLocation(externalNavigator = navController.weatherByLocationNavigator(), pagerState = pagerState)
+                weatherByLocation(
+                    externalNavigator = navController.weatherByLocationNavigator(),
+                    favoriteIndexCallback = { index -> favoriteIndicatorIndex = index }
+                )
             }
         }
     }
@@ -133,13 +148,13 @@ internal fun WeatherHost(
 @Composable
 private fun WeatherBottomBar(
     favorites: ImmutableList<LocationInfoDomainModel>,
-    locationId: Int?,
-    pagerState: PagerState,
-    locationLat: Double?,
-    locationLon: Double?,
+    location: LocationInfoDomainModel?,
+    favoriteIndicatorIndex: Int,
     onEvent: (MainActivityEvent) -> Unit,
     navController: NavHostController,
 ) {
+
+    requireNotNull(location)
 
     BottomAppBar(
         modifier = Modifier
@@ -155,11 +170,9 @@ private fun WeatherBottomBar(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Spacer(Modifier.width(itemWidth56))
-            if (favorites.firstOrNull { it.id == locationId } != null) {
-                FavoritesIndicator(favorites, pagerState)
-            } else {
-                AddToFavoriteButton(locationId, locationLat, locationLon, onEvent)
-            }
+            if (favoriteIndicatorIndex >= 0) {
+                FavoritesIndicator(favorites, favoriteIndicatorIndex)
+            } else AddToFavoriteButton(location, onEvent)
             HomeButton(navController)
         }
     }
@@ -182,17 +195,17 @@ private fun HomeButton(navController: NavHostController) {
 @Composable
 private fun FavoritesIndicator(
     favorites: ImmutableList<LocationInfoDomainModel>,
-    pagerState: PagerState,
+    favoriteIndicatorIndex: Int,
 ) {
     val density = LocalDensity.current
     val lazyListState = rememberLazyListState()
 
-    LaunchedEffect(pagerState.currentPage) {
+    LaunchedEffect(favoriteIndicatorIndex) {
         val centerOffset = (lazyListState.layoutInfo.viewportEndOffset -
                 lazyListState.layoutInfo.viewportStartOffset) / 2
 
         lazyListState.animateScrollToItem(
-            index = pagerState.currentPage,
+            index = favoriteIndicatorIndex,
             scrollOffset = (-centerOffset + with(density) { itemWidth16.toPx() / 2 }).toInt()
         )
     }
@@ -205,7 +218,7 @@ private fun FavoritesIndicator(
         userScrollEnabled = false
     ) {
         items(favorites.size) { index ->
-            val isSelected = pagerState.currentPage == index
+            val isSelected = favoriteIndicatorIndex == index
             Icon(
                 modifier = Modifier.size(itemWidth16),
                 imageVector = if (isSelected) WeatherIcons.CircleFilled else WeatherIcons.Circle,
@@ -218,9 +231,7 @@ private fun FavoritesIndicator(
 
 @Composable
 private fun AddToFavoriteButton(
-    locationId: Int?,
-    locationLat: Double?,
-    locationLon: Double?,
+    location: LocationInfoDomainModel,
     onEvent: (MainActivityEvent) -> Unit,
 ) {
     var clicked by remember { mutableStateOf(false) }
@@ -229,14 +240,12 @@ private fun AddToFavoriteButton(
         modifier = Modifier.width(itemWidth56),
         enabled = !clicked,
         onClick = {
-            if (locationId != null && locationLat != null && locationLon != null) {
-                onEvent(
-                    MainActivityEvent.AddFavorite(
-                        LocationInfoDomainModel.from(id = locationId, lat = locationLat, lon = locationLon)
-                    )
+            onEvent(
+                MainActivityEvent.AddFavorite(
+                    location
                 )
-                clicked = true
-            }
+            )
+            clicked = true
         }
     ) {
         Icon(
