@@ -48,6 +48,7 @@ import com.contraomnese.weather.design.theme.cornerRadius16
 import com.contraomnese.weather.design.theme.itemHeight160
 import com.contraomnese.weather.design.theme.itemWidth56
 import com.contraomnese.weather.design.theme.padding16
+import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.design.theme.space8
 import com.contraomnese.weather.domain.weatherByLocation.model.internal.CompactWeatherCondition
 import com.contraomnese.weather.domain.weatherByLocation.model.internal.LocationDateTime
@@ -184,19 +185,28 @@ private fun BodySection(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(space8)
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = padding8),
             ) {
+                Text(
+                    text = locationName,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+
+                    )
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(space8)
                 ) {
                     Text(
-                        text = locationName,
+                        text = locationCountry,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                         modifier = Modifier
                             .weight(1f, fill = false)
                             .wrapContentWidth(Alignment.Start)
@@ -208,15 +218,7 @@ private fun BodySection(
                         color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.wrapContentWidth(Alignment.End)
                     )
-
                 }
-                Text(
-                    text = locationCountry,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                )
             }
 
             Text(
@@ -250,7 +252,9 @@ private fun BodySection(
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
+                    .align(Alignment.Bottom)
             )
         }
     }
@@ -265,7 +269,7 @@ fun FavoriteItemPreview() {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(itemHeight160),
-            locationName = "New York",
+            locationName = "New York New York New York",
             locationCountry = "USA USA USA USA USA USA USA USA USA USA",
             timeZone = TimeZone.of("Europe/Moscow"),
             conditionText = "Ясно Ясно Ясно Ясно Ясно Ясно",

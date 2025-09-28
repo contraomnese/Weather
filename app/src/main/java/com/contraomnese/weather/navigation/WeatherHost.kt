@@ -1,6 +1,5 @@
 package com.contraomnese.weather.navigation
 
-import android.util.Log
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -75,7 +74,8 @@ internal fun WeatherHost(
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    val locationId = navBackStackEntry?.arguments?.getInt("locationId")
+    val locationId = navBackStackEntry?.arguments?.getInt("id")
+    val locationName = navBackStackEntry?.arguments?.getString("name")
     val locationLat = navBackStackEntry?.arguments?.getDouble("latitude")
     val locationLon = navBackStackEntry?.arguments?.getDouble("longitude")
 
@@ -83,9 +83,9 @@ internal fun WeatherHost(
         mutableStateOf(currentRoute?.startsWith(WeatherByLocationDestination::class.java.name) ?: false)
     }
 
-    val currentLocation = remember(locationId, locationLat, locationLon) {
-        if (locationId != null && locationLat != null && locationLon != null) {
-            LocationInfoDomainModel.from(id = locationId, lat = locationLat, lon = locationLon)
+    val currentLocation = remember(locationId, locationName, locationLat, locationLon) {
+        if (locationId != null && locationName != null && locationLat != null && locationLon != null) {
+            LocationInfoDomainModel.from(id = locationId, name = locationName, lat = locationLat, lon = locationLon)
         } else {
             null
         }
@@ -96,19 +96,13 @@ internal fun WeatherHost(
     val startDestination = remember {
         uiState.favorites.firstOrNull()?.let {
             WeatherByLocationDestination(
-                locationId = it.id,
+                id = it.id,
+                name = it.name,
                 latitude = it.point.latitude.value,
                 longitude = it.point.longitude.value
             )
         } ?: HomeDestination
     }
-
-    Log.d("WeatherHost", "favorites: ${uiState.favorites.map { it.id }}")
-    Log.d("WeatherHost", "locationId: ${locationId}")
-    Log.d("WeatherHost", "favoriteIndicatorIndex: $favoriteIndicatorIndex")
-    Log.d("WeatherHost", "startDestination: $startDestination")
-    Log.d("WeatherHost", "arguments: ${navBackStackEntry?.arguments?.getInt("locationId")}")
-
 
     Scaffold(
         modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBarsIgnoringVisibility),

@@ -28,8 +28,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contraomnese.weather.core.ui.widgets.FavoriteItem
 import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
@@ -41,17 +43,17 @@ import com.contraomnese.weather.design.theme.itemHeight160
 import com.contraomnese.weather.design.theme.itemHeight20
 import com.contraomnese.weather.design.theme.itemHeight40
 import com.contraomnese.weather.design.theme.itemThickness2
-import com.contraomnese.weather.design.theme.itemWidth160
 import com.contraomnese.weather.design.theme.itemWidth56
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.design.theme.space16
 import com.contraomnese.weather.design.theme.space32
+import com.contraomnese.weather.design.theme.space8
 
 @Composable
 internal fun HomeRoute(
     viewModel: HomeViewModel,
-    onNavigateToWeatherByLocation: (Int, Double, Double) -> Unit,
+    onNavigateToWeatherByLocation: (Int, String, Double, Double) -> Unit,
     onNavigateToAppSettings: () -> Unit,
 ) {
 
@@ -69,7 +71,7 @@ internal fun HomeRoute(
 internal fun HomeScreen(
     uiState: HomeUiState,
     onEvent: (HomeEvent) -> Unit,
-    onNavigateToWeatherByLocation: (Int, Double, Double) -> Unit = { _, _, _ -> },
+    onNavigateToWeatherByLocation: (Int, String, Double, Double) -> Unit = { _, _, _, _ -> },
     onNavigateToAppSettings: () -> Unit = {},
 ) {
     Box(
@@ -147,8 +149,11 @@ private fun TopBar(
 private fun MatchingLocations(
     uiState: HomeUiState,
     onEvent: (HomeEvent) -> Unit,
-    onNavigateToWeatherByLocation: (Int, Double, Double) -> Unit,
+    onNavigateToWeatherByLocation: (Int, String, Double, Double) -> Unit,
 ) {
+
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+
     Column(
         modifier = Modifier
             .padding(horizontal = padding16)
@@ -156,22 +161,29 @@ private fun MatchingLocations(
         uiState.matchingLocations.forEach { location ->
             Row(
                 modifier = Modifier
-                    .clickable { onNavigateToWeatherByLocation(location.id, location.point.latitude.value, location.point.longitude.value) }
+                    .clickable {
+                        onNavigateToWeatherByLocation(
+                            location.id,
+                            location.name,
+                            location.point.latitude.value,
+                            location.point.longitude.value
+                        )
+                    }
                     .fillMaxWidth()
                     .height(itemHeight40),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                location.name?.let {
-                    Text(
-                        modifier = Modifier.requiredWidthIn(max = itemWidth160),
-                        text = it,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                }
+
+                Text(
+                    modifier = Modifier.requiredWidthIn(max = screenWidth / 2),
+                    text = location.name,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+
                 location.countryName?.let {
                     Text(
                         modifier = Modifier
@@ -185,7 +197,7 @@ private fun MatchingLocations(
                     )
                 }
                 Spacer(
-                    modifier = Modifier.width(space16)
+                    modifier = Modifier.width(space8)
                 )
                 IconButton(
                     modifier = Modifier.width(itemWidth56),
@@ -222,7 +234,7 @@ private fun MatchingLocations(
 private fun FavoritesLocations(
     uiState: HomeUiState,
     onEvent: (HomeEvent) -> Unit,
-    onNavigateToWeatherByLocation: (Int, Double, Double) -> Unit,
+    onNavigateToWeatherByLocation: (Int, String, Double, Double) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -249,6 +261,7 @@ private fun FavoritesLocations(
                     onTapClicked = {
                         onNavigateToWeatherByLocation(
                             location.id,
+                            location.name,
                             location.point.latitude.value,
                             location.point.longitude.value
                         )

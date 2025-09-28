@@ -47,7 +47,14 @@ class LocationsRepositoryImpl(
 
     override suspend fun getLocationsBy(name: String): List<LocationInfoDomainModel> {
         return try {
-            locationsApi.getLocations(name).parseOrThrowError().filter { it.addressType == "city" }.map { it.toDomain() }
+            val locations = locationsApi.getLocations(name).parseOrThrowError()
+            val primary = locations.filter { it.type == "administrative" || it.type == "city" || it.type == "town" }
+
+            val result = primary.ifEmpty {
+                locations
+            }
+
+            result.map { it.toDomain() }
         } catch (throwable: Throwable) {
             throw throwable
         }

@@ -12,10 +12,11 @@ internal val weatherModule = module {
 
     viewModel { params ->
 
-        val (id: Int, lat: Double, lot: Double) = params
+        val (id: Int, name: String, lat: Double, lot: Double) = params
 
         val location = LocationInfoDomainModel(
             id = id,
+            name = name,
             point = CoordinatesDomainModel(
                 latitude = LatitudeDomainModel(lat),
                 longitude = LongitudeDomainModel(lot)

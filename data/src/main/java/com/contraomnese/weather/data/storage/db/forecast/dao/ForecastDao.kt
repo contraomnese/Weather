@@ -105,11 +105,12 @@ interface ForecastDao {
     @Transaction
     suspend fun updateForecastForLocation(
         locationId: Int,
+        locationName: String,
         forecastResponse: ForecastResponse,
     ) {
 
         deleteForecastForLocation(locationId)
-        val forecastLocationId = insertForecastLocation(forecastResponse.location.toEntity(locationId)).toInt()
+        val forecastLocationId = insertForecastLocation(forecastResponse.location.toEntity(locationId).copy(name = locationName)).toInt()
 
         insertForecastCurrent(forecastResponse.current.toEntity(forecastLocationId))
         insertAlerts(forecastResponse.alerts.alert.map { it.toEntity(forecastLocationId) })

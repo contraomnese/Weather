@@ -45,11 +45,15 @@ fun TitleSection(
     ) {
         if (maxHeight > 250.dp) {
             Column(
+                modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(padding8)
             ) {
                 Text(
-                    location, style = MaterialTheme.typography.headlineLarge,
+                    modifier = Modifier.fillMaxWidth(),
+                    text = location,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.headlineLarge,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
@@ -75,7 +79,10 @@ fun TitleSection(
                 verticalArrangement = Arrangement.spacedBy(padding8)
             ) {
                 Text(
-                    location, style = MaterialTheme.typography.headlineLarge,
+                    modifier = Modifier.fillMaxWidth(),
+                    text = location,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.headlineLarge,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Row(
@@ -105,13 +112,13 @@ fun TitleSection(
     }
 }
 
-@Preview
+@Preview(showSystemUi = true, showBackground = true, backgroundColor = 0xFF180B0B)
 @Composable
 private fun TitleSectionFullPreview() {
     WeatherTheme {
         TitleSection(
             modifier = Modifier.height(400.dp),
-            location = "Moscow",
+            location = "городской округ Великий Новгород",
             currentTemp = "23",
             feelsLikeTemp = "26",
             maxTemp = "26",

@@ -390,7 +390,7 @@ internal fun WeatherScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(with(LocalDensity.current) { currentTitleBoxHeight.toDp() }),
-            location = if (uiState.location.name.isNullOrBlank()) uiState.weather.locationInfo.name else uiState.location.name!!,
+            location = uiState.weather.locationInfo.name,
             currentTemp = uiState.weather.currentInfo.temperature,
             feelsLikeTemp = uiState.weather.currentInfo.feelsLikeTemperature,
             maxTemp = uiState.weather.forecastInfo.today.maxTemperature,

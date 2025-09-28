@@ -53,6 +53,7 @@ class ForecastWeatherRepositoryImpl(
         weatherDatabase.forecastDao()
             .updateForecastForLocation(
                 locationId = location.id,
+                locationName = location.name,
                 forecastResponse = response
             )
     }

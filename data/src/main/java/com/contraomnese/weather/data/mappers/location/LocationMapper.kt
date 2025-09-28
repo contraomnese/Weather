@@ -23,7 +23,7 @@ fun ForecastLocationNetwork.toEntity(locationId: Int) = ForecastLocationEntity(
 fun LocationNetwork.toDomain() = LocationInfoDomainModel(
     id = placeId.toInt(),
     name = name,
-    countryName = address?.country,
+    countryName = address.country,
     point = CoordinatesDomainModel(
         latitude = LatitudeDomainModel(value = lat.toDouble()),
         longitude = LongitudeDomainModel(value = lon.toDouble())

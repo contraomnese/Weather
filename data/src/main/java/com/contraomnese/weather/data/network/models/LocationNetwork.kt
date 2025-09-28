@@ -17,14 +17,12 @@ data class LocationNetwork(
     @SerializedName("addresstype") val addressType: String,
     val name: String,
     @SerializedName("display_name") val displayName: String,
-    val address: Address?,
+    val address: Address,
     @SerializedName("boundingbox") val boundingBox: List<String>,
 )
 
 data class Address(
+    val city: String,
     val state: String,
-    @SerializedName("ISO3166-2-lvl4") val iso: String,
-    val region: String,
     val country: String,
-    val countryCode: String,
 )
