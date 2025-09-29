@@ -74,33 +74,17 @@ internal fun WeatherHost(
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    val locationId = navBackStackEntry?.arguments?.getInt("id")
-    val locationName = navBackStackEntry?.arguments?.getString("name")
-    val locationLat = navBackStackEntry?.arguments?.getDouble("latitude")
-    val locationLon = navBackStackEntry?.arguments?.getDouble("longitude")
+    val navigatedLocationId = navBackStackEntry?.arguments?.getInt("id")
 
     val bottomBarVisible by remember(currentRoute) {
         mutableStateOf(currentRoute?.startsWith(WeatherByLocationDestination::class.java.name) ?: false)
     }
 
-    val currentLocation = remember(locationId, locationName, locationLat, locationLon) {
-        if (locationId != null && locationName != null && locationLat != null && locationLon != null) {
-            LocationInfoDomainModel.from(id = locationId, name = locationName, lat = locationLat, lon = locationLon)
-        } else {
-            null
-        }
-    }
-
-    var favoriteIndicatorIndex by remember(currentRoute) { mutableIntStateOf(uiState.favorites.indexOfFirst { it.id == locationId }) }
+    var favoriteIndicatorIndex by remember(currentRoute) { mutableIntStateOf(uiState.favorites.indexOfFirst { it.id == navigatedLocationId }) }
 
     val startDestination = remember {
         uiState.favorites.firstOrNull()?.let {
-            WeatherByLocationDestination(
-                id = it.id,
-                name = it.name,
-                latitude = it.point.latitude.value,
-                longitude = it.point.longitude.value
-            )
+            WeatherByLocationDestination(id = it.id)
         } ?: HomeDestination
     }
 
@@ -109,7 +93,7 @@ internal fun WeatherHost(
         snackbarHost = { WeatherSnackBarHost(snackBarHostState) },
         bottomBar = {
             if (bottomBarVisible) {
-                WeatherBottomBar(uiState.favorites, currentLocation, favoriteIndicatorIndex, onEvent, navController)
+                WeatherBottomBar(uiState.favorites, navigatedLocationId, favoriteIndicatorIndex, onEvent, navController)
             }
         },
         contentWindowInsets = WindowInsets.navigationBars,
@@ -142,13 +126,13 @@ internal fun WeatherHost(
 @Composable
 private fun WeatherBottomBar(
     favorites: ImmutableList<LocationInfoDomainModel>,
-    location: LocationInfoDomainModel?,
+    locationId: Int?,
     favoriteIndicatorIndex: Int,
     onEvent: (MainActivityEvent) -> Unit,
     navController: NavHostController,
 ) {
 
-    requireNotNull(location)
+    requireNotNull(locationId)
 
     BottomAppBar(
         modifier = Modifier
@@ -166,7 +150,7 @@ private fun WeatherBottomBar(
             Spacer(Modifier.width(itemWidth56))
             if (favoriteIndicatorIndex >= 0) {
                 FavoritesIndicator(favorites, favoriteIndicatorIndex)
-            } else AddToFavoriteButton(location, onEvent)
+            } else AddToFavoriteButton(locationId, onEvent)
             HomeButton(navController)
         }
     }
@@ -225,7 +209,7 @@ private fun FavoritesIndicator(
 
 @Composable
 private fun AddToFavoriteButton(
-    location: LocationInfoDomainModel,
+    locationId: Int,
     onEvent: (MainActivityEvent) -> Unit,
 ) {
     var clicked by remember { mutableStateOf(false) }
@@ -236,7 +220,7 @@ private fun AddToFavoriteButton(
         onClick = {
             onEvent(
                 MainActivityEvent.AddFavorite(
-                    location
+                    locationId
                 )
             )
             clicked = true

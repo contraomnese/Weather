@@ -11,6 +11,7 @@ plugins {
 val weatherApiKey: String = gradleLocalProperties(rootDir, providers).getProperty("WEATHER_API_KEY")
 val weatherApiBaseUrl: String = gradleLocalProperties(rootDir, providers).getProperty("WEATHER_API_BASE_URL")
 val locationApiBaseUrl: String = gradleLocalProperties(rootDir, providers).getProperty("LOCATION_API_BASE_URL")
+val locationApiKey: String = gradleLocalProperties(rootDir, providers).getProperty("LOCATION_API_KEY")
 
 android {
     namespace = "com.contraomnese.weather"
@@ -39,12 +40,14 @@ android {
             buildConfigField("String", "WEATHER_API_KEY", "\"${weatherApiKey}\"")
             buildConfigField("String", "WEATHER_API_BASE_URL", "\"${weatherApiBaseUrl}\"")
             buildConfigField("String", "LOCATION_API_BASE_URL", "\"${locationApiBaseUrl}\"")
+            buildConfigField("String", "LOCATION_API_KEY", "\"${locationApiKey}\"")
         }
         release {
             signingConfig = signingConfigs.getByName("release")
             buildConfigField("String", "WEATHER_API_KEY", "\"${weatherApiKey}\"")
             buildConfigField("String", "WEATHER_API_BASE_URL", "\"${weatherApiBaseUrl}\"")
             buildConfigField("String", "LOCATION_API_BASE_URL", "\"${locationApiBaseUrl}\"")
+            buildConfigField("String", "LOCATION_API_KEY", "\"${locationApiKey}\"")
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }

@@ -1,17 +1,17 @@
 package com.contraomnese.weather.data.network.parsers
 
 import android.util.Log
-import com.contraomnese.weather.data.network.models.ErrorResponse
+import com.contraomnese.weather.data.network.models.WeatherErrorResponse
+import com.contraomnese.weather.domain.cleanarchitecture.exception.ApiUnavailableDomainException
 import com.contraomnese.weather.domain.cleanarchitecture.exception.AuthorizationDomainException
 import com.contraomnese.weather.domain.cleanarchitecture.exception.LocationNotFoundDomainException
 import com.contraomnese.weather.domain.cleanarchitecture.exception.RequestDomainException
 import com.contraomnese.weather.domain.cleanarchitecture.exception.UnknownDomainException
-import com.contraomnese.weather.domain.cleanarchitecture.exception.WeatherApiUnavailableDomainException
 import okhttp3.ResponseBody
 import retrofit2.Converter
 import retrofit2.Response
 
-fun <T> Response<T>.parseOrThrowError(converter: Converter<ResponseBody, ErrorResponse>): T {
+fun <T> Response<T>.parseOrThrowError(converter: Converter<ResponseBody, WeatherErrorResponse>): T {
     if (isSuccessful) {
         val body = body()
         if (body != null) return body
@@ -32,7 +32,7 @@ fun <T> Response<T>.parseOrThrowError(converter: Converter<ResponseBody, ErrorRe
             1002, 2006, 2007, 2008, 2009 -> throw AuthorizationDomainException(result)
             1003, 1005, 9000, 9001 -> throw RequestDomainException(result)
             1006 -> throw LocationNotFoundDomainException(result)
-            9999 -> throw WeatherApiUnavailableDomainException(result)
+            9999 -> throw ApiUnavailableDomainException(result)
             else -> throw UnknownDomainException(result)
         }
     }

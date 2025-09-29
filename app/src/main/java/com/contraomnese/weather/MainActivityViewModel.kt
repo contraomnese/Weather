@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Immutable
 internal sealed interface MainActivityEvent {
-    data class AddFavorite(val location: LocationInfoDomainModel) : MainActivityEvent
+    data class AddFavorite(val locationId: Int) : MainActivityEvent
 }
 
 internal data class MainActivityUiState(
@@ -41,7 +41,7 @@ internal class MainActivityViewModel(
 
     override fun onEvent(event: MainActivityEvent) {
         when (event) {
-            is MainActivityEvent.AddFavorite -> onFavoriteAdded(event.location)
+            is MainActivityEvent.AddFavorite -> onFavoriteAdded(event.locationId)
         }
     }
 
@@ -51,10 +51,10 @@ internal class MainActivityViewModel(
         updateViewState { copy(favorites = newFavorites.toPersistentList(), isLoading = false) }
     }
 
-    private fun onFavoriteAdded(location: LocationInfoDomainModel) {
+    private fun onFavoriteAdded(locationId: Int) {
         execute(
             addFavoriteUseCase,
-            location,
+            locationId,
             onException = ::provideException
         )
     }

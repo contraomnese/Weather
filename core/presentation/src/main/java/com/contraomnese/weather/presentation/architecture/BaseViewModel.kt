@@ -3,12 +3,12 @@ package com.contraomnese.weather.presentation.architecture
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.contraomnese.weather.domain.cleanarchitecture.exception.ApiUnavailableDomainException
 import com.contraomnese.weather.domain.cleanarchitecture.exception.AuthorizationDomainException
 import com.contraomnese.weather.domain.cleanarchitecture.exception.DomainException
 import com.contraomnese.weather.domain.cleanarchitecture.exception.LocationNotFoundDomainException
 import com.contraomnese.weather.domain.cleanarchitecture.exception.RequestDomainException
 import com.contraomnese.weather.domain.cleanarchitecture.exception.UnknownDomainException
-import com.contraomnese.weather.domain.cleanarchitecture.exception.WeatherApiUnavailableDomainException
 import com.contraomnese.weather.domain.cleanarchitecture.usecase.StreamingUseCase
 import com.contraomnese.weather.domain.cleanarchitecture.usecase.StreamingUseCaseWithRequest
 import com.contraomnese.weather.domain.cleanarchitecture.usecase.UseCase
@@ -96,7 +96,7 @@ abstract class BaseViewModel<ViewState : UiState, Event : Any>(
             is AuthorizationDomainException -> showNotification(R.string.authorization_domain_exception)
             is LocationNotFoundDomainException -> showNotification(R.string.weather_for_location_not_found_domain_exception)
             is RequestDomainException -> showNotification(R.string.wrong_request_domain_exception)
-            is WeatherApiUnavailableDomainException -> showNotification(R.string.weather_api_domain_exception)
+            is ApiUnavailableDomainException -> showNotification(R.string.weather_api_domain_exception)
             is UnknownDomainException -> showNotification(R.string.unknown_domain_exception)
             else -> showNotification(R.string.unforeseen_internal_exception)
         }

@@ -121,7 +121,7 @@ internal fun WeatherRoute(
 
         if (!uiState.isLoading) {
 
-            val favoriteIndex = uiState.favorites.indexOfFirst { it.id == uiState.location?.id }
+            val favoriteIndex = uiState.favorites.indexOfFirst { it.id == uiState.locationId }
 
             LaunchedEffect(Unit) {
                 if (favoriteIndex >= 0) {
@@ -194,7 +194,7 @@ internal fun WeatherScreen(
     modifier: Modifier = Modifier,
     uiState: WeatherUiState,
 ) {
-    requireNotNull(uiState.location)
+    requireNotNull(uiState.locationId)
     requireNotNull(uiState.weather)
     requireNotNull(uiState.appSettings)
 

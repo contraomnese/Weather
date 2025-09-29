@@ -3,17 +3,18 @@ package com.contraomnese.weather.domain.weatherByLocation.model
 
 data class LocationInfoDomainModel(
     val id: Int,
-    val name: String,
-    val countryName: String? = null,
+    val city: String,
+    val state: String? = null,
+    val country: String? = null,
     val point: CoordinatesDomainModel,
 ) {
     companion object {
         val EMPTY = from(0, "", .0, .0)
 
-        fun from(id: Int, name: String, lat: Double, lon: Double) =
+        fun from(id: Int, city: String, lat: Double, lon: Double) =
             LocationInfoDomainModel(
                 id = id,
-                name = name,
+                city = city,
                 point = CoordinatesDomainModel(LatitudeDomainModel(lat), LongitudeDomainModel(lon))
             )
     }

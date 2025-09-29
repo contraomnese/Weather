@@ -1,10 +1,10 @@
 package com.contraomnese.weather.data.network.models
 
-data class ErrorResponse(
-    val error: ErrorDetail,
+data class WeatherErrorResponse(
+    val error: WeatherErrorDetail,
 )
 
-data class ErrorDetail(
+data class WeatherErrorDetail(
     val code: Int,
     val message: String,
 )

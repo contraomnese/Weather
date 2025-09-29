@@ -5,7 +5,8 @@ import com.contraomnese.weather.data.network.api.LocationsApi
 import com.contraomnese.weather.data.network.api.WeatherApi
 import com.contraomnese.weather.data.network.interceptors.LocationsInterceptor
 import com.contraomnese.weather.data.network.interceptors.WeatherInterceptor
-import com.contraomnese.weather.data.network.models.ErrorResponse
+import com.contraomnese.weather.data.network.models.LocationsErrorResponse
+import com.contraomnese.weather.data.network.models.WeatherErrorResponse
 import com.contraomnese.weather.data.repository.AppSettingsRepositoryImpl
 import com.contraomnese.weather.data.repository.ForecastWeatherRepositoryImpl
 import com.contraomnese.weather.data.repository.LocationsRepositoryImpl
@@ -75,15 +76,20 @@ val dataModule = module {
             .build()
     }
 
-    factory<Converter<ResponseBody, ErrorResponse>> {
-        get<Retrofit>(named(WEATHER)).responseBodyConverter(ErrorResponse::class.java, emptyArray())
+    factory<Converter<ResponseBody, WeatherErrorResponse>> {
+        get<Retrofit>(named(WEATHER)).responseBodyConverter(WeatherErrorResponse::class.java, emptyArray())
     }
+
+    factory<Converter<ResponseBody, LocationsErrorResponse>> {
+        get<Retrofit>(named(LOCATIONS)).responseBodyConverter(LocationsErrorResponse::class.java, emptyArray())
+    }
+
 
     single<WeatherInterceptor> {
         WeatherInterceptor(apiKey = BuildConfig.WEATHER_API_KEY)
     }
 
-    single<LocationsInterceptor> { LocationsInterceptor() }
+    single<LocationsInterceptor> { LocationsInterceptor(apiKey = BuildConfig.LOCATION_API_KEY) }
 
     factory<HttpLoggingInterceptor> {
         HttpLoggingInterceptor().apply {
@@ -101,7 +107,7 @@ val dataModule = module {
     single<WeatherApi> { get<Retrofit>(named(WEATHER)).create(WeatherApi::class.java) }
     single<LocationsApi> { get<Retrofit>(named(LOCATIONS)).create(LocationsApi::class.java) }
 
-    single<LocationsRepository> { LocationsRepositoryImpl(weatherDatabase = get(), locationsApi = get()) }
+    single<LocationsRepository> { LocationsRepositoryImpl(weatherDatabase = get(), locationsApi = get(), errorConverter = get()) }
     single<ForecastWeatherRepository> {
         ForecastWeatherRepositoryImpl(
             api = get(),

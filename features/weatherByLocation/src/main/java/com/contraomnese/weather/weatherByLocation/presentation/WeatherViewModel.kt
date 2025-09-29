@@ -19,7 +19,7 @@ import kotlinx.collections.immutable.toPersistentList
 @Immutable
 internal data class WeatherUiState(
     override val isLoading: Boolean = false,
-    val location: LocationInfoDomainModel? = null,
+    val locationId: Int? = null,
     val weather: ForecastWeatherDomainModel? = null,
     val appSettings: AppSettings? = null,
     val favorites: ImmutableList<LocationInfoDomainModel> = persistentListOf(),
@@ -29,7 +29,7 @@ internal data class WeatherUiState(
 
 @Immutable
 internal sealed interface WeatherEvent {
-    data class LocationChanged(val newLocation: Int) : WeatherEvent
+    data class LocationChanged(val locationId: Int) : WeatherEvent
 }
 
 internal class WeatherViewModel(
@@ -39,22 +39,22 @@ internal class WeatherViewModel(
     private val updateForecastWeatherUseCase: UpdateForecastWeatherUseCase,
     private val getAppSettingsUseCase: GetAppSettingsUseCase,
     private val observeFavoritesUseCase: ObserveFavoritesUseCase,
-    private val location: LocationInfoDomainModel,
+    private val navLocationId: Int,
 ) : BaseViewModel<WeatherUiState, WeatherEvent>(useCaseExecutorProvider, notificationMonitor) {
 
     init {
         observe(getAppSettingsUseCase, ::updateAppSettings)
         observe(observeFavoritesUseCase, ::onFavoritesUpdate, ::provideException)
-        updateCurrentLocation(location)
+        updateCurrentLocation(navLocationId)
     }
 
     override fun initialState(): WeatherUiState {
-        return WeatherUiState(isLoading = true, location = location)
+        return WeatherUiState(isLoading = true, locationId = navLocationId)
     }
 
     override fun onEvent(event: WeatherEvent) {
         when (event) {
-            is WeatherEvent.LocationChanged -> updateCurrentLocation(uiState.value.favorites[event.newLocation])
+            is WeatherEvent.LocationChanged -> updateCurrentLocation(uiState.value.favorites[event.locationId].id)
         }
     }
 
@@ -66,14 +66,14 @@ internal class WeatherViewModel(
         updateViewState { copy(favorites = newFavorites.toPersistentList()) }
     }
 
-    private fun updateCurrentLocation(newLocation: LocationInfoDomainModel) {
-        updateViewState { copy(location = newLocation) }
-        observe(observeForecastWeatherUseCase, newLocation, ::updateCurrentWeather, ::provideException)
+    private fun updateCurrentLocation(newLocationId: Int) {
+        updateViewState { copy(locationId = newLocationId) }
+        observe(observeForecastWeatherUseCase, newLocationId, ::updateCurrentWeather, ::provideException)
     }
 
     private fun updateCurrentWeather(newWeather: ForecastWeatherDomainModel?) {
         newWeather?.let {
             updateViewState { copy(weather = newWeather, isLoading = false) }
-        } ?: execute(updateForecastWeatherUseCase, uiState.value.location!!, onException = ::provideException)
+        } ?: execute(updateForecastWeatherUseCase, uiState.value.locationId!!, onException = ::provideException)
     }
 }

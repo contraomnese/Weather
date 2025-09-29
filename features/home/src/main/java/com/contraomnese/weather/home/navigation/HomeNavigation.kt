@@ -15,7 +15,7 @@ import org.koin.core.annotation.KoinExperimentalAPI
 object HomeDestination
 
 interface HomeNavigator {
-    fun onNavigateToWeatherByLocation(id: Int, name: String, latitude: Double, longitude: Double)
+    fun onNavigateToWeatherByLocation(id: Int)
     fun onNavigateToAppSettings()
     fun onNavigateUp()
 }

@@ -39,7 +39,7 @@ internal data class HomeUiState(
 @Immutable
 internal sealed interface HomeEvent {
     data class LocationChanged(val newLocation: String) : HomeEvent
-    data class AddFavorite(val location: LocationInfoDomainModel) : HomeEvent
+    data class AddFavorite(val locationId: Int) : HomeEvent
     data class RemoveFavorite(val locationId: Int) : HomeEvent
 }
 
@@ -65,7 +65,7 @@ internal class HomeViewModel(
     override fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.LocationChanged -> onLocationChanged(event.newLocation)
-            is HomeEvent.AddFavorite -> onFavoriteAdded(event.location)
+            is HomeEvent.AddFavorite -> onFavoriteAdded(event.locationId)
             is HomeEvent.RemoveFavorite -> onFavoriteRemoved(event.locationId)
         }
     }
@@ -85,10 +85,10 @@ internal class HomeViewModel(
         } else onLocationsUpdate(persistentListOf())
     }
 
-    private fun onFavoriteAdded(location: LocationInfoDomainModel) {
+    private fun onFavoriteAdded(locationId: Int) {
         execute(
             addFavoriteUseCase,
-            location,
+            locationId,
             onException = ::provideException
         )
     }
@@ -111,7 +111,7 @@ internal class HomeViewModel(
             if (location.id !in uiState.value.favoritesForecast.keys) {
                 observe(
                     observeForecastWeatherUseCase,
-                    location,
+                    location.id,
                     { forecast -> onFavoritesForecastUpdate(forecast, location) },
                     ::provideException
                 )
@@ -126,7 +126,7 @@ internal class HomeViewModel(
             favoritesForecast[favorite.id] = newFavoritesForecast
             updateViewState { copy(favoritesForecast = favoritesForecast.toPersistentMap()) }
         } else {
-            execute(updateForecastWeatherUseCase, favorite, onException = ::provideException)
+            execute(updateForecastWeatherUseCase, favorite.id, onException = ::provideException)
         }
     }
 
