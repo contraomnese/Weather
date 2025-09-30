@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="search_city">Поиск города</string>
+    <string name="search">Поиск</string>
     <string name="temperature_high_low">Макс:%1$s° Мин:%2$s°</string>
     <string name="now">Сейчас</string>
     <string name="local_time_title">Местное время</string>
@@ -91,4 +91,18 @@
     <string name="dew_point_neutral">Умеренно</string>
     <string name="dew_point_sad">Душно</string>
 
+    <!-- Permissions -->
+    <string name="permission_location_denied_title">Для этого приложения важно разрешение на определение местоположения. Пожалуйста, предоставьте его.</string>
+    <string name="permission_location_first_time_title">Для доступа к этой функции требуется разрешение на определение местоположения. Пожалуйста, предоставьте разрешение.</string>
+    <string name="get_location_title">Получить местоположение</string>
+    <string name="confirm_title">Подтверждаю</string>
+
+    <!-- GPS -->
+    <string name="gps_alert_title">Для определения местоположения необходим GPS.</string>
+    <string name="gps_activate_title">Включить</string>
+    <string name="gps_enabled_title">GPS включен ✅</string>
+    <string name="gps_disabled_title">GPS отключен ⚠️</string>
+    <string name="gps_not_activated_title">GPS не был включён ❌</string>
+    <string name="gps_dialog_error_title">Ошибка открытия диалога</string>
+    <string name="gps_unavailable_title">GPS недоступен</string>
 </resources>

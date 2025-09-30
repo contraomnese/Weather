@@ -12,6 +12,9 @@ interface MatchingLocationsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addLocations(locations: List<MatchingLocationEntity>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun addLocation(location: MatchingLocationEntity)
+
     @Query("SELECT * FROM matching_locations WHERE network_id = :id")
     fun getLocation(id: Int): MatchingLocationEntity
 

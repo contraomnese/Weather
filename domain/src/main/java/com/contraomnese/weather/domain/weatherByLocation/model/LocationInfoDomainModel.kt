@@ -4,22 +4,19 @@ package com.contraomnese.weather.domain.weatherByLocation.model
 data class LocationInfoDomainModel(
     val id: Int,
     val city: String,
-    val state: String? = null,
-    val country: String? = null,
+    val state: String,
+    val country: String,
     val point: CoordinatesDomainModel,
 ) {
     companion object {
-        val EMPTY = from(0, "", .0, .0)
-
-        fun from(id: Int, city: String, lat: Double, lon: Double) =
-            LocationInfoDomainModel(
-                id = id,
-                city = city,
-                point = CoordinatesDomainModel(LatitudeDomainModel(lat), LongitudeDomainModel(lon))
-            )
+        val EMPTY = LocationInfoDomainModel(
+            id = 0,
+            city = "city",
+            state = "",
+            country = "",
+            point = CoordinatesDomainModel(LatitudeDomainModel(.0), LongitudeDomainModel(.0))
+        )
     }
-
-    fun toPoint(): String = "${point.latitude.value},${point.longitude.value}"
 }
 
 @JvmInline

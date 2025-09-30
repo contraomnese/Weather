@@ -4,6 +4,7 @@ import com.contraomnese.weather.domain.app.usecase.GetAppSettingsUseCase
 import com.contraomnese.weather.domain.app.usecase.UpdateAppSettingsUseCase
 import com.contraomnese.weather.domain.home.usecase.AddFavoriteUseCase
 import com.contraomnese.weather.domain.home.usecase.GetFavoritesUseCase
+import com.contraomnese.weather.domain.home.usecase.GetLocationUseCase
 import com.contraomnese.weather.domain.home.usecase.GetLocationsInfoUseCase
 import com.contraomnese.weather.domain.home.usecase.ObserveFavoritesUseCase
 import com.contraomnese.weather.domain.home.usecase.RemoveFavoriteUseCase
@@ -15,6 +16,12 @@ val domainModule = module {
 
     factory<GetLocationsInfoUseCase> {
         GetLocationsInfoUseCase(
+            repository = get(),
+            coroutineContextProvider = get()
+        )
+    }
+    factory<GetLocationUseCase> {
+        GetLocationUseCase(
             repository = get(),
             coroutineContextProvider = get()
         )

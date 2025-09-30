@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface LocationsRepository {
 
     suspend fun getLocationsBy(name: String): List<LocationInfoDomainModel>
+    suspend fun getLocationBy(lat: Double, lon: Double): LocationInfoDomainModel
     fun addFavorite(locationId: Int)
     fun deleteFavorite(id: Int)
     fun getFavorites(): List<LocationInfoDomainModel>

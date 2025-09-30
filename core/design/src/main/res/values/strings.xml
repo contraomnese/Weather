@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="search_city">Search city</string>
+    <string name="search">Search</string>
     <string name="current_temperature_title" translatable="false">%1$s°</string>
     <string name="feels_like_temperature_title">%2$s°/%3$s° Feels like %1$s°</string>
     <string name="temperature" translatable="false">%1$s°</string>
@@ -101,4 +101,19 @@
     <string name="atm_pressure_title">Atmospheric pressure</string>
     <string name="pressure_mmhg">Millimeters of mercury (mmHg)</string>
     <string name="pressure_gpa">Gekko pascal (gPa)</string>
+
+    <!-- Permissions -->
+    <string name="permission_location_denied_title">The location permission is important for this app. Please grant the permission.</string>
+    <string name="permission_location_first_time_title">The location permission required for this feature to be available. Please grant the permission.</string>
+    <string name="get_location_title">Get location</string>
+    <string name="confirm_title">Confirm</string>
+
+    <!-- GPS -->
+    <string name="gps_alert_title">GPS is required to determine location.</string>
+    <string name="gps_activate_title">Activate</string>
+    <string name="gps_enabled_title">GPS enabled ✅</string>
+    <string name="gps_disabled_title">GPS disabled ⚠️</string>
+    <string name="gps_not_activated_title">GPS was not turned on ❌</string>
+    <string name="gps_dialog_error_title">Error opening dialog</string>
+    <string name="gps_unavailable_title">GPS is unavailable</string>
 </resources>

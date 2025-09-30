@@ -15,4 +15,11 @@ interface LocationsApi {
         @Query("normalizeaddress") normalizeAddress: Int = 1,
     ): Response<List<LocationNetwork>>
 
+    @GET("reverse")
+    suspend fun getLocation(
+        @Query("lat") latitude: Double,
+        @Query("lon") longitude: Double,
+        @Query("format") format: String = "json",
+    ): Response<LocationNetwork>
+
 }

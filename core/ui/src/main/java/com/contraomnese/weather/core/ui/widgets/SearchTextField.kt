@@ -37,7 +37,7 @@ fun SearchTextField(
             Icon(
                 imageVector = WeatherIcons.Search,
                 contentDescription = stringResource(
-                    id = R.string.search_city,
+                    id = R.string.search,
                 ),
             )
         },

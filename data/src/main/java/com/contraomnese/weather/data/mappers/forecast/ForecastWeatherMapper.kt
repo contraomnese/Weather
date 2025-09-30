@@ -51,7 +51,8 @@ fun LocationWithForecasts.toDomain(appSettings: AppSettings): ForecastWeatherDom
             forecastDays[1].hour.filter { hour -> hour.timeEpoch < nextDayHourLimit }
                 .map { it.toPrecipitationDomain(precipitationUnit = appSettings.precipitationUnit) }
 
-    val rainfallNow = forecastDays[0].hour.first { hour -> hour.timeEpoch > location.localtimeEpoch }
+    val rainfallNow =
+        (forecastDays[0].hour.firstOrNull { hour -> hour.timeEpoch > location.localtimeEpoch } ?: forecastDays[1].hour.first())
         .toPrecipitationDomain(precipitationUnit = appSettings.precipitationUnit)
 
     val locationTime = DateTimeParser.parseIso(location.localtime)

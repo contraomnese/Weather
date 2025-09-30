@@ -2,7 +2,7 @@ package com.contraomnese.weather.domain.home.model
 
 
 @JvmInline
-value class LocationPresentation(val value: String) {
+value class InputLocationPresentation(val value: String) {
     fun isValidLocation(): Boolean {
         val cityRegex = "^[\\p{L}\\s\\-'.,]*\$".toRegex()
         return value.matches(cityRegex)

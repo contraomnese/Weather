@@ -1,8 +1,10 @@
 [versions]
 
 # app config
+accompanistPermissions = "0.37.3"
 compileSdk = "35"
 minSdk = "23"
+playServicesLocation = "21.3.0"
 targetSdk = "35"
 
 # plugins
@@ -70,6 +72,7 @@ junit = "4.13.2"
 [libraries]
 
 # DI
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
 koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
@@ -118,6 +121,7 @@ androidx-browser = { module = "androidx.browser:browser", version.ref = "browser
 
 # data
 okhttp3-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp3" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit2" }
 retrofit-converter_json = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit2" }
 converter-simplexml = { module = "com.squareup.retrofit2:converter-simplexml", version.ref = "converterSimplexml" }
@@ -169,7 +173,9 @@ core = [
     "kotlinx-coroutines-android",
     "kotlinx-coroutines-core",
     "kotlinx-serialization-json",
-    "kotlinx-datetime"
+    "kotlinx-datetime",
+    "accompanist-permissions",
+    "play-services-location"
 ]
 
 # Navigation

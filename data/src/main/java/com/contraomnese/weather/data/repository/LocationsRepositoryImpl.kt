@@ -74,4 +74,19 @@ class LocationsRepositoryImpl(
         }
     }
 
+    override suspend fun getLocationBy(lat: Double, lon: Double): LocationInfoDomainModel {
+        return try {
+            val location = locationsApi.getLocation(latitude = lat, longitude = lon).parseOrThrowError(errorConverter)
+
+            val result = location.toEntity()
+
+            weatherDatabase.matchingLocationsDao().addLocation(result)
+
+            result.toDomain()
+        } catch (throwable: Throwable) {
+            throw throwable
+        }
+    }
+
+
 }

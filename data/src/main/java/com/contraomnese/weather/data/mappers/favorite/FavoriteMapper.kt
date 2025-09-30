@@ -10,7 +10,8 @@ import com.contraomnese.weather.domain.weatherByLocation.model.LongitudeDomainMo
 fun FavoriteEntity.toDomain() = LocationInfoDomainModel(
     id = locationId,
     city = name,
-    state = countryName,
+    state = "", // TODO: add to entity
+    country = countryName,
     point = CoordinatesDomainModel(
         latitude = LatitudeDomainModel(value = latitude),
         longitude = LongitudeDomainModel(value = longitude)
