@@ -6,6 +6,8 @@
     <string name="local_time_title">Местное время</string>
     <string name="today_forecast_title">СЕГОДНЯ</string>
     <string name="daily_forecast_title">ПРОГНОЗ НА 3 ДНЯ</string>
+    <string name="use_search_title">Воспользуйтесь поиском</string>
+    <string name="use_gps_title">или GPS определением</string>
 
     <string name="aqi_title">КАЧЕСТВО ВОЗДУХА</string>
     <string name="uv_title">УФ-ИНДЕКС</string>

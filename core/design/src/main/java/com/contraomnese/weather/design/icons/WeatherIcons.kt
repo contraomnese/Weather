@@ -3,6 +3,7 @@ package com.contraomnese.weather.design.icons
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.FormatListBulleted
 import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.filled.GpsFixed
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material.icons.outlined.Air
 import androidx.compose.material.icons.outlined.CalendarToday
@@ -44,4 +45,5 @@ object WeatherIcons {
     val Menu = Icons.AutoMirrored.Outlined.FormatListBulleted
     val Circle = Icons.Outlined.Circle
     val CircleFilled = Icons.Filled.Circle
+    val GPS = Icons.Filled.GpsFixed
 }

@@ -7,6 +7,8 @@
     <string name="temperature_high_low">H:%1$s° L:%2$s°</string>
     <string name="now">Now</string>
     <string name="local_time_title">Local time</string>
+    <string name="use_search_title">Use the search</string>
+    <string name="use_gps_title">or GPS determination</string>
 
     <!--  Titles -->
     <string name="today_forecast_title">TODAY</string>

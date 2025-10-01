@@ -158,6 +158,7 @@ private fun GpsActivateDialog(
                     ) {
                         Text(
                             text = stringResource(R.string.gps_activate_title),
+                            style = MaterialTheme.typography.titleMedium
                         )
                     }
 

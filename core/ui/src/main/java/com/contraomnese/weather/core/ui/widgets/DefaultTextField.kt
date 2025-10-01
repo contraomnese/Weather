@@ -157,8 +157,8 @@ private fun PlaceholderText(placeholder: String) {
 
 @Composable
 private fun defaultFieldColors() = TextFieldDefaults.colors(
-    focusedContainerColor = MaterialTheme.colorScheme.onSurface.copy(0.1f),
-    unfocusedContainerColor = MaterialTheme.colorScheme.onSurface.copy(0.1f),
+    focusedContainerColor = MaterialTheme.colorScheme.onSurface.copy(0.2f),
+    unfocusedContainerColor = MaterialTheme.colorScheme.onSurface.copy(0.2f),
     focusedLeadingIconColor = MaterialTheme.colorScheme.onSurface.copy(0.8f),
     unfocusedLeadingIconColor = MaterialTheme.colorScheme.onSurface.copy(0.5f),
     focusedTrailingIconColor = MaterialTheme.colorScheme.onSurface.copy(0.8f),

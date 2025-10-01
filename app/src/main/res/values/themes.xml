@@ -10,7 +10,7 @@
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
         <item name="windowSplashScreenAnimationDuration">500</item>
         <item name="postSplashScreenTheme">@style/Theme.Weather</item>
-        <item name="windowSplashScreenBackground">#4B6C95</item>
+        <item name="windowSplashScreenBackground">#1A5E9C</item>
     </style>
 
 </resources>
