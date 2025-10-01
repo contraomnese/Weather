@@ -150,7 +150,7 @@ internal fun BoxScope.HomeScreen(
     onNavigateToAppSettings: () -> Unit = {},
 ) {
     val context = LocalContext.current
-    val imeVisible = WindowInsets.isImeVisible
+    val keyboardVisible = WindowInsets.isImeVisible
     val density = LocalDensity.current
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
@@ -173,11 +173,13 @@ internal fun BoxScope.HomeScreen(
         }
     }
 
-    LaunchedEffect(imeVisible) {
-        if (!imeVisible) {
-            isSearchMode = false
-        } else {
-            if (uiState.favoritesForecast.isEmpty()) isSearchMode = true
+    LaunchedEffect(uiState.favoritesForecast) {
+        if (uiState.favoritesForecast.isEmpty()) isSearchMode = false
+    }
+
+    LaunchedEffect(keyboardVisible) {
+        if (uiState.favoritesForecast.isEmpty()) {
+            isSearchMode = keyboardVisible
         }
     }
 
@@ -364,11 +366,9 @@ private fun TopBar(
                                 radius = itemHeight64,
                                 color = MaterialTheme.colorScheme.secondary.copy(alpha = 1f)
                             )
-                        ) {
-                            onPermissionRequest(true)
-                        }
+                        ) { }
                         .align(Alignment.Center),
-                    onClick = { },
+                    onClick = { onPermissionRequest(true) },
                     interactionSource = interactionSource,
                 ) {
                     Icon(
@@ -569,6 +569,18 @@ private fun OpenWebsiteLink(modifier: Modifier, url: String, description: String
 private fun HomeScreenPreview() {
     val uiState = HomeUiState(
         matchingLocations = listOf(
+            LocationInfoDomainModel.EMPTY.copy(
+                city = "Москва",
+                state = "Московская область",
+                country = "Россия"
+            ),
+            LocationInfoDomainModel.EMPTY.copy(
+                city = "Москоу",
+                state = "Айдахо",
+                country = "США"
+            )
+        ).toPersistentList(),
+        favorites = listOf(
             LocationInfoDomainModel.EMPTY.copy(
                 city = "Москва",
                 state = "Московская область",
