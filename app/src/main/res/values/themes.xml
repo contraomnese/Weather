@@ -7,10 +7,9 @@
     </style>
 
     <style name="Theme.Weather.Splash" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
-        <item name="windowSplashScreenAnimationDuration">500</item>
+        <item name="windowSplashScreenAnimationDuration">0</item>
         <item name="postSplashScreenTheme">@style/Theme.Weather</item>
-        <item name="windowSplashScreenBackground">#1A5E9C</item>
+        <item name="windowSplashScreenBackground">#2C72A1</item>
     </style>
 
 </resources>

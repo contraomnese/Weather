@@ -11,8 +11,10 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -222,5 +224,45 @@ private fun checkGps(
 private fun AlertGpsDialogPreview() {
     WeatherTheme {
         GpsActivateDialog()
+    }
+}
+
+@Preview(locale = "ru", showSystemUi = true, showBackground = true, backgroundColor = 0xE81D6497)
+@Composable
+private fun BackgroundPreview() {
+    WeatherTheme {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {}
+    }
+}
+
+@Preview(locale = "ru", showSystemUi = true, showBackground = true, backgroundColor = 0xFF2C72A1)
+@Composable
+private fun CurrentBackgroundPreview() {
+    WeatherTheme {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {}
+    }
+}
+
+@Preview(locale = "ru", showSystemUi = true, showBackground = true, backgroundColor = 0xFF4B6C95)
+@Composable
+private fun OldBackgroundPreview() {
+    WeatherTheme {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {}
+    }
+}
+
+@Preview(locale = "ru", showSystemUi = true, showBackground = true, backgroundColor = 0xFF1A5E9C)
+@Composable
+private fun NewBackgroundPreview() {
+    WeatherTheme {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {}
     }
 }

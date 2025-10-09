@@ -15,7 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 private val weatherScheme = lightColorScheme(
     primary = Color(0xFFFFFFFF),
     onPrimary = Color(0xFF000000),
-    background = Color(0xFF1A5E9C),
+    background = Color(0xFF2C72A1),
     onBackground = Color(0xFFFFFFFF),
     surface = Color(0xFF2D3340),
     onSurface = Color(0xFFFFFFFF),
