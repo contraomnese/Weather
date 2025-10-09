@@ -28,9 +28,9 @@ Keep track of the weather anywhere in the world or add your favorite cities for 
 
 ## Screens
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/a5bcd6f6-248f-49ef-8633-a9758aae9cad" width="300"/>
-  <img src="https://github.com/user-attachments/assets/1b90b0df-8540-4f6b-9955-34eb384eded6" width="300"/>
-  <img src="https://github.com/user-attachments/assets/83c4368c-408c-43a3-92dc-80ee0eb14648" width="300"/>
+  <img src="https://github.com/user-attachments/assets/e85059ad-58bb-43a3-8116-de015e8b85fe" width="300"/>
+  <img src="https://github.com/user-attachments/assets/90584138-8583-48ae-bd4f-9fbbcd9fb843" width="300"/>
+  <img src="https://github.com/user-attachments/assets/fcde2f71-a06d-4058-8a9b-9d517987e300" width="300"/>
 </p>
 
 ## Main screen
@@ -50,21 +50,26 @@ Keep track of the weather anywhere in the world or add your favorite cities for 
 </p>
 <p align="center">
   <img src="https://github.com/user-attachments/assets/fdf0e90f-db0b-4ee7-b780-7cf386d4e96c" width="400"/>
-  <img src="https://github.com/user-attachments/assets/03e2a713-c6fa-4750-86b3-45d6216d7fa1" width="400"/>
+  <img src="https://github.com/user-attachments/assets/13bae384-4856-47ea-acd6-82ddf0ec5706" width="400"/>
 </p>
 
-## First open app
-https://github.com/user-attachments/assets/4ca3520c-810f-4d91-b283-56d2b6573eaf
+## First open app - use search
+https://github.com/user-attachments/assets/e72e5ecf-b283-4b7b-ba8e-471d4002d0e0
+
+## First open app - use GPS
+https://github.com/user-attachments/assets/af3f3a20-9c43-470d-81bc-331a12cb2fdf
 
 ## Change app settings
-https://github.com/user-attachments/assets/69f120b7-b551-406d-ac32-6d16f0248718
+https://github.com/user-attachments/assets/f99715ce-5026-4a45-99a6-5c5d6f4ea382
+
 
 ## Add to favorites from search
-https://github.com/user-attachments/assets/60c18e7e-ceee-4471-9bec-78a0bd7ad014
-
-## Add to favorites from screen
-https://github.com/user-attachments/assets/d0bfb629-f427-473a-8a8c-2ae1ccc57db4
+https://github.com/user-attachments/assets/0856e915-887f-491e-8c49-48870f2f71dc
 
 ## Move between favorites
-https://github.com/user-attachments/assets/cb7aaa18-626a-4d40-a25c-18dd26c78de8
+https://github.com/user-attachments/assets/5221ee25-ebea-435b-8911-bc1807462b34
+
+## Remove from favorites
+https://github.com/user-attachments/assets/6051293b-e046-441b-839c-f6d1d8185110
+
 
