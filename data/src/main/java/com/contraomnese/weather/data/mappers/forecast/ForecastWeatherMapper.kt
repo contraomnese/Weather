@@ -15,13 +15,13 @@ import com.contraomnese.weather.data.parsers.DateTimeParser
 import com.contraomnese.weather.data.storage.db.forecast.dao.LocationWithForecasts
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
-import com.contraomnese.weather.domain.weatherByLocation.model.AlertsInfo
-import com.contraomnese.weather.domain.weatherByLocation.model.CurrentInfo
-import com.contraomnese.weather.domain.weatherByLocation.model.ForecastInfo
-import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeatherDomainModel
-import com.contraomnese.weather.domain.weatherByLocation.model.LocationInfo
-import com.contraomnese.weather.domain.weatherByLocation.model.internal.CompactWeatherCondition
-import com.contraomnese.weather.domain.weatherByLocation.model.internal.UvIndex
+import com.contraomnese.weather.domain.weatherByLocation.model.AlertsWeather
+import com.contraomnese.weather.domain.weatherByLocation.model.Weather
+import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeather
+import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
+import com.contraomnese.weather.domain.weatherByLocation.model.ForecastLocation
+import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
+import com.contraomnese.weather.domain.weatherByLocation.model.UvIndex
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.datetime.TimeZone
@@ -35,7 +35,7 @@ private const val IS_SUN_UP = 1
 private const val DAILY_WILL_RAIN = 1
 private const val DEFAULT_RAINFALL = 0.0
 
-fun LocationWithForecasts.toDomain(appSettings: AppSettings): ForecastWeatherDomainModel {
+fun LocationWithForecasts.toDomain(appSettings: AppSettings): Forecast {
 
     val nextDayHourLimit = location.localtimeEpoch + HOURS * MINUTES * SECONDS
     val forecastHours =
@@ -57,9 +57,9 @@ fun LocationWithForecasts.toDomain(appSettings: AppSettings): ForecastWeatherDom
 
     val locationTime = DateTimeParser.parseIso(location.localtime)
 
-    return ForecastWeatherDomainModel(
-        locationInfo = LocationInfo(
-            name = location.name,
+    return Forecast(
+        location = ForecastLocation(
+            city = location.name,
             country = location.country,
             latitude = location.latitude,
             longitude = location.longitude,
@@ -68,7 +68,7 @@ fun LocationWithForecasts.toDomain(appSettings: AppSettings): ForecastWeatherDom
             timeZone = TimeZone.of(location.timeZoneId),
             isSunUp = forecastDays.first().astro.isSunUp == IS_SUN_UP
         ),
-        currentInfo = CurrentInfo(
+        today = Weather(
             temperature = forecastCurrent.toTemperatureDomain(appSettings.temperatureUnit),
             feelsLikeTemperature = when (appSettings.temperatureUnit) {
                 TemperatureUnit.Celsius -> forecastCurrent.feelsLikeC.roundToInt().toString()
@@ -92,12 +92,12 @@ fun LocationWithForecasts.toDomain(appSettings: AppSettings): ForecastWeatherDom
             uvIndex = UvIndex(forecastCurrent.uv.roundToInt()),
             airQuality = forecastCurrent.toAirQualityInfo()
         ),
-        forecastInfo = ForecastInfo(
+        forecast = ForecastWeather(
             today = forecastDays.first().toForecastTodayDomain(appSettings),
-            forecastDays = forecastDays.map { it.toForecastDayDomain(appSettings) }.toPersistentList(),
-            forecastHours = forecastHours.map { it.toDomain(appSettings) }.toPersistentList()
+            days = forecastDays.map { it.toForecastDayDomain(appSettings) }.toPersistentList(),
+            hours = forecastHours.map { it.toDomain(appSettings) }.toPersistentList()
         ),
-        alertsInfo = AlertsInfo(
+        alerts = AlertsWeather(
             alerts = forecastAlert.map { it.desc }.toPersistentList()
         )
     )

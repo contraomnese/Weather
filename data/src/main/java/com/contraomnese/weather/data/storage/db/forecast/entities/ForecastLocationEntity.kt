@@ -10,6 +10,7 @@ data class ForecastLocationEntity(
     @PrimaryKey(autoGenerate = true) val id: Int? = null,
     @ColumnInfo(name = LOCATION_ID) val locationId: Int = 0,
     @ColumnInfo(name = NAME) val name: String,
+    @ColumnInfo(name = REGION) val region: String,
     @ColumnInfo(name = COUNTRY) val country: String,
     @ColumnInfo(name = LATITUDE) val latitude: Double,
     @ColumnInfo(name = LONGITUDE) val longitude: Double,
@@ -23,6 +24,7 @@ data class ForecastLocationEntity(
         const val ID = "id"
         const val LOCATION_ID = "location_id"
         const val NAME = "name"
+        const val REGION = "region"
         const val COUNTRY = "country"
         const val LATITUDE = "latitude"
         const val LONGITUDE = "longitude"

@@ -1,11 +1,11 @@
 package com.contraomnese.weather.di
 
-import com.contraomnese.weather.domain.app.usecase.GetAppSettingsUseCase
+import com.contraomnese.weather.domain.app.usecase.ObserveAppSettingsUseCase
 import com.contraomnese.weather.domain.app.usecase.UpdateAppSettingsUseCase
 import com.contraomnese.weather.domain.home.usecase.AddFavoriteUseCase
 import com.contraomnese.weather.domain.home.usecase.GetFavoritesUseCase
 import com.contraomnese.weather.domain.home.usecase.GetLocationUseCase
-import com.contraomnese.weather.domain.home.usecase.GetLocationsInfoUseCase
+import com.contraomnese.weather.domain.home.usecase.GetLocationsUseCase
 import com.contraomnese.weather.domain.home.usecase.ObserveFavoritesUseCase
 import com.contraomnese.weather.domain.home.usecase.RemoveFavoriteUseCase
 import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveForecastWeatherUseCase
@@ -14,8 +14,8 @@ import org.koin.dsl.module
 
 val domainModule = module {
 
-    factory<GetLocationsInfoUseCase> {
-        GetLocationsInfoUseCase(
+    factory<GetLocationsUseCase> {
+        GetLocationsUseCase(
             repository = get(),
             coroutineContextProvider = get()
         )
@@ -60,8 +60,8 @@ val domainModule = module {
             coroutineContextProvider = get()
         )
     }
-    factory<GetAppSettingsUseCase> {
-        GetAppSettingsUseCase(
+    factory<ObserveAppSettingsUseCase> {
+        ObserveAppSettingsUseCase(
             repository = get()
         )
     }

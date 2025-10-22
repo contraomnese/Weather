@@ -44,8 +44,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.contraomnese.weather.MainActivityAction
 import com.contraomnese.weather.MainActivityEvent
-import com.contraomnese.weather.MainActivityUiState
+import com.contraomnese.weather.MainActivityState
 import com.contraomnese.weather.appsettings.navigation.appSettings
 import com.contraomnese.weather.core.ui.widgets.NotificationSnackBar
 import com.contraomnese.weather.design.icons.WeatherIcons
@@ -55,7 +56,7 @@ import com.contraomnese.weather.design.theme.itemWidth16
 import com.contraomnese.weather.design.theme.itemWidth56
 import com.contraomnese.weather.design.theme.padding20
 import com.contraomnese.weather.design.theme.padding8
-import com.contraomnese.weather.domain.weatherByLocation.model.LocationInfoDomainModel
+import com.contraomnese.weather.domain.weatherByLocation.model.Location
 import com.contraomnese.weather.home.navigation.HomeDestination
 import com.contraomnese.weather.home.navigation.home
 import com.contraomnese.weather.home.navigation.navigateToHome
@@ -68,8 +69,8 @@ import kotlinx.collections.immutable.ImmutableList
 internal fun WeatherHost(
     navController: NavHostController = rememberNavController(),
     snackBarHostState: SnackbarHostState,
-    uiState: MainActivityUiState,
-    onEvent: (MainActivityEvent) -> Unit,
+    uiState: MainActivityState,
+    pushAction: (MainActivityAction) -> Unit,
 ) {
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -93,7 +94,7 @@ internal fun WeatherHost(
         snackbarHost = { WeatherSnackBarHost(snackBarHostState) },
         bottomBar = {
             if (bottomBarVisible) {
-                WeatherBottomBar(uiState.favorites, navigatedLocationId, favoriteIndicatorIndex, onEvent, navController)
+                WeatherBottomBar(uiState.favorites, navigatedLocationId, favoriteIndicatorIndex, pushAction, navController)
             }
         },
         contentWindowInsets = WindowInsets.navigationBars,
@@ -115,8 +116,7 @@ internal fun WeatherHost(
                 home(externalNavigator = navController.homeNavigator())
                 appSettings(externalNavigator = navController.appSettingsNavigator())
                 weatherByLocation(
-                    externalNavigator = navController.weatherByLocationNavigator(),
-                    favoriteIndexCallback = { index -> favoriteIndicatorIndex = index }
+                    externalNavigator = navController.weatherByLocationNavigator()
                 )
             }
         }
@@ -125,10 +125,10 @@ internal fun WeatherHost(
 
 @Composable
 private fun WeatherBottomBar(
-    favorites: ImmutableList<LocationInfoDomainModel>,
+    favorites: ImmutableList<Location>,
     locationId: Int?,
     favoriteIndicatorIndex: Int,
-    onEvent: (MainActivityEvent) -> Unit,
+    pushAction: (MainActivityAction) -> Unit,
     navController: NavHostController,
 ) {
 
@@ -150,7 +150,7 @@ private fun WeatherBottomBar(
             Spacer(Modifier.width(itemWidth56))
             if (favoriteIndicatorIndex >= 0) {
                 FavoritesIndicator(favorites, favoriteIndicatorIndex)
-            } else AddToFavoriteButton(locationId, onEvent)
+            } else AddToFavoriteButton(locationId, pushAction)
             HomeButton(navController)
         }
     }
@@ -172,7 +172,7 @@ private fun HomeButton(navController: NavHostController) {
 
 @Composable
 private fun FavoritesIndicator(
-    favorites: ImmutableList<LocationInfoDomainModel>,
+    favorites: ImmutableList<Location>,
     favoriteIndicatorIndex: Int,
 ) {
     val density = LocalDensity.current
@@ -210,7 +210,7 @@ private fun FavoritesIndicator(
 @Composable
 private fun AddToFavoriteButton(
     locationId: Int,
-    onEvent: (MainActivityEvent) -> Unit,
+    pushAction: (MainActivityAction) -> Unit,
 ) {
     var clicked by remember { mutableStateOf(false) }
 
@@ -218,11 +218,7 @@ private fun AddToFavoriteButton(
         modifier = Modifier.width(itemWidth56),
         enabled = !clicked,
         onClick = {
-            onEvent(
-                MainActivityEvent.AddFavorite(
-                    locationId
-                )
-            )
+            pushAction(MainActivityAction.AddFavorite(locationId))
             clicked = true
         }
     ) {

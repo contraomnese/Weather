@@ -1,4 +1,4 @@
-package com.contraomnese.weather.domain.weatherByLocation.model.internal
+package com.contraomnese.weather.domain.weatherByLocation.model
 
 data class ForecastHour(
     val time: String,

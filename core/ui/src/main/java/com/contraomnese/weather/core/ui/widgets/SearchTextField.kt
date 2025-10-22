@@ -7,6 +7,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.TextFieldValue
 import com.contraomnese.weather.design.DevicePreviews
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.icons.WeatherIcons
@@ -16,8 +17,8 @@ import com.contraomnese.weather.design.theme.padding16
 @Composable
 fun SearchTextField(
     modifier: Modifier = Modifier,
-    searchQuery: String,
-    onSearchQueryChanged: (String) -> Unit = {},
+    searchQuery: TextFieldValue,
+    onSearchQueryChanged: (TextFieldValue) -> Unit = {},
     onSearchFocusChanged: (Boolean) -> Unit = {},
     isError: Boolean = false,
     enabled: Boolean = true,
@@ -52,7 +53,7 @@ private fun SearchTextFieldPreview() {
     WeatherTheme {
         Box(modifier = Modifier.fillMaxSize()) {
             SearchTextField(
-                searchQuery = "London",
+                searchQuery = TextFieldValue("London"),
                 modifier = Modifier.padding(padding16)
             )
         }

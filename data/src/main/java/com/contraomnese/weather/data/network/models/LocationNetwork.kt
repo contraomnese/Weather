@@ -13,7 +13,7 @@ data class LocationNetwork(
     val lon: String,
     @SerializedName("display_name") val displayName: String,
     @SerializedName("class") val clazz: String,
-    val type: String?,
+    val type: String,
     val importance: Double,
     val icon: String,
     val address: Address,

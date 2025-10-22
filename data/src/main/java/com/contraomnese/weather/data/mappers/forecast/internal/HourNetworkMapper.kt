@@ -4,8 +4,8 @@ import com.contraomnese.weather.data.network.models.HourNetwork
 import com.contraomnese.weather.data.storage.db.forecast.entities.HourlyForecastEntity
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
-import com.contraomnese.weather.domain.weatherByLocation.model.internal.CompactWeatherCondition
-import com.contraomnese.weather.domain.weatherByLocation.model.internal.ForecastHour
+import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
+import com.contraomnese.weather.domain.weatherByLocation.model.ForecastHour
 import kotlin.math.roundToInt
 
 private const val IS_DAY = 1

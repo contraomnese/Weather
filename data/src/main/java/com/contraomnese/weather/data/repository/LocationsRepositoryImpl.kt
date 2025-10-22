@@ -9,7 +9,7 @@ import com.contraomnese.weather.data.network.models.LocationsErrorResponse
 import com.contraomnese.weather.data.network.parsers.parseOrThrowError
 import com.contraomnese.weather.data.storage.db.WeatherDatabase
 import com.contraomnese.weather.domain.home.repository.LocationsRepository
-import com.contraomnese.weather.domain.weatherByLocation.model.LocationInfoDomainModel
+import com.contraomnese.weather.domain.weatherByLocation.model.Location
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -23,7 +23,7 @@ class LocationsRepositoryImpl(
     private val errorConverter: Converter<ResponseBody, LocationsErrorResponse>,
 ) : LocationsRepository {
 
-    override fun getFavorites(): List<LocationInfoDomainModel> {
+    override fun getFavorites(): List<Location> {
         return try {
             weatherDatabase.favoritesDao().getFavorites().map { it.toDomain() }
         } catch (throwable: Throwable) {
@@ -31,7 +31,7 @@ class LocationsRepositoryImpl(
         }
     }
 
-    override fun observeFavorites(): Flow<List<LocationInfoDomainModel>> =
+    override fun observeFavorites(): Flow<List<Location>> =
         weatherDatabase.favoritesDao().observeFavorites().map { list -> list.map { it.toDomain() } }.flowOn(Dispatchers.IO)
 
     override fun addFavorite(locationId: Int) {
@@ -57,7 +57,7 @@ class LocationsRepositoryImpl(
         }
     }
 
-    override suspend fun getLocationsBy(name: String): List<LocationInfoDomainModel> {
+    override suspend fun getLocationsBy(name: String): List<Location> {
         return try {
             val locations = locationsApi.getLocations(name).parseOrThrowError(errorConverter)
             val primary = locations.filter { it.type == "city" || it.type == "town" }
@@ -74,7 +74,7 @@ class LocationsRepositoryImpl(
         }
     }
 
-    override suspend fun getLocationBy(lat: Double, lon: Double): LocationInfoDomainModel {
+    override suspend fun getLocationBy(lat: Double, lon: Double): Location {
         return try {
             val location = locationsApi.getLocation(latitude = lat, longitude = lon).parseOrThrowError(errorConverter)
 

@@ -1,6 +1,6 @@
-package com.contraomnese.weather.domain.weatherByLocation.model.internal
+package com.contraomnese.weather.domain.weatherByLocation.model
 
-data class AirQualityInfo(
+data class AirQuality(
     val aqiIndex: Int,
     val aqiText: String,
     val coLevel: PollutantLevel,

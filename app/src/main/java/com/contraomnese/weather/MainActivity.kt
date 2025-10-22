@@ -95,26 +95,16 @@ internal fun WeatherApp(viewModel: MainActivityViewModel) {
     val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
 
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        viewModel.notificationEvents.collect { messageResId ->
-            val message = context.getString(messageResId)
-            snackBarHostState.showSnackbar(
-                message = message,
-                duration = SnackbarDuration.Short
-            )
-        }
-    }
+    val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
 
     Crossfade(targetState = uiState.isLoading, animationSpec = tween(1000)) { loading ->
         if (loading) {
-            SplashScreen(uiState.isLoading) { viewModel.onEvent(MainActivityEvent.NotLoading) }
+            SplashScreen(uiState.isLoading) { viewModel.push(MainActivityAction.NotLoading) }
         } else {
             WeatherHost(
                 snackBarHostState = remember { SnackbarHostState() },
                 uiState = uiState,
-                onEvent = viewModel::onEvent
+                pushAction = viewModel::push
             )
         }
     }

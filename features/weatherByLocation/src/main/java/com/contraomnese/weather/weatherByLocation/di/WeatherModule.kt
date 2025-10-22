@@ -4,20 +4,19 @@ import com.contraomnese.weather.weatherByLocation.presentation.WeatherViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
-internal val weatherModule = module {
+internal val weatherModule
+    get() = module {
 
-    viewModel { params ->
+        viewModel { params ->
 
-        val locationId: Int = params.get()
+            val locationId: Int = params.get()
 
-        WeatherViewModel(
-            useCaseExecutorProvider = get(),
-            notificationMonitor = get(),
-            updateForecastWeatherUseCase = get(),
-            observeForecastWeatherUseCase = get(),
-            getAppSettingsUseCase = get(),
-            observeFavoritesUseCase = get(),
-            navLocationId = locationId
-        )
+            WeatherViewModel(
+                updateForecastWeatherUseCase = get(),
+                observeForecastWeatherUseCase = get(),
+                observeAppSettingsUseCase = get(),
+                observeFavoritesUseCase = get(),
+                navLocationId = locationId
+            )
+        }
     }
-}

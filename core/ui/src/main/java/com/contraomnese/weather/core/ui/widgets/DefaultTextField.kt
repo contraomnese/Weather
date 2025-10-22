@@ -1,5 +1,6 @@
 package com.contraomnese.weather.core.ui.widgets
 
+import android.util.Log
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.PaddingValues
@@ -32,6 +33,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,8 +51,8 @@ import com.contraomnese.weather.design.theme.padding4
 @Composable
 fun DefaultTextField(
     modifier: Modifier = Modifier,
-    value: String,
-    onValueChanged: (String) -> Unit,
+    value: TextFieldValue,
+    onValueChanged: (TextFieldValue) -> Unit,
     onTextFieldFocusChanged: (Boolean) -> Unit = {},
     isError: Boolean = false,
     enabled: Boolean = true,
@@ -68,6 +70,8 @@ fun DefaultTextField(
     val focusManager = LocalFocusManager.current
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
+
+    Log.d("DefaultTextField", "value: $value")
 
     LaunchedEffect(isFocused) {
         onTextFieldFocusChanged(isFocused)
@@ -102,17 +106,17 @@ fun DefaultTextField(
             cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface.copy(0.5f)),
             decorationBox = { innerTextField ->
                 TextFieldDefaults.DecorationBox(
-                    value = value,
+                    value = value.text,
                     innerTextField = innerTextField,
                     enabled = enabled,
                     isError = isError,
                     singleLine = singleLine,
                     leadingIcon = leadingIcon,
                     trailingIcon = trailingIcon ?: {
-                        if (value.isNotEmpty()) {
+                        if (value.text.isNotEmpty()) {
                             IconButton(
                                 onClick = {
-                                    onValueChanged("")
+                                    onValueChanged(TextFieldValue(""))
                                 },
                             ) {
                                 Icon(
@@ -176,7 +180,7 @@ private fun defaultFieldColors() = TextFieldDefaults.colors(
 private fun TextFieldPlaceholderPreview() {
     WeatherTheme {
         DefaultTextField(
-            value = "",
+            value = TextFieldValue(""),
             onValueChanged = {},
             isError = false,
             singleLine = true,
@@ -190,7 +194,7 @@ private fun TextFieldPlaceholderPreview() {
 private fun TextFieldValuePreview() {
     WeatherTheme {
         DefaultTextField(
-            value = "Value",
+            value = TextFieldValue("Value"),
             onValueChanged = {},
             isError = false,
             singleLine = true,
@@ -203,7 +207,7 @@ private fun TextFieldValuePreview() {
 private fun TextFieldIsErrorPreview() {
     WeatherTheme {
         DefaultTextField(
-            value = "03-1",
+            value = TextFieldValue("03-1"),
             onValueChanged = {},
             isError = true,
             singleLine = true,

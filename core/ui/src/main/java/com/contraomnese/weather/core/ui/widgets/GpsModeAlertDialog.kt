@@ -50,10 +50,10 @@ import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.Priority
 
 @Composable
-fun AlertGpsDialog(
+fun GpsModeAlertDialog(
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit = {},
-    onGpsEnabled: (Boolean) -> Unit = {},
+    onGpsModeEnabled: (Boolean) -> Unit = {},
 ) {
 
     val context = LocalContext.current
@@ -80,7 +80,7 @@ fun AlertGpsDialog(
     }
 
     LaunchedEffect(gpsEnabled) {
-        onGpsEnabled(gpsEnabled)
+        onGpsModeEnabled(gpsEnabled)
     }
 
     LaunchedEffect(Unit) {

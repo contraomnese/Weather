@@ -1,4 +1,4 @@
-package com.contraomnese.weather.domain.weatherByLocation.model.internal
+package com.contraomnese.weather.domain.weatherByLocation.model
 
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format

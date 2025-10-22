@@ -30,7 +30,9 @@ fun NavGraphBuilder.appSettings(
         val viewModel: AppSettingsViewModel = koinViewModel(viewModelStoreOwner = backStackEntry)
 
         AppSettingsRoute(
-            viewModel = viewModel
+            viewModel = viewModel,
+            eventFlow = viewModel.eventFlow,
+            pushAction = viewModel::push
         )
     }
 }

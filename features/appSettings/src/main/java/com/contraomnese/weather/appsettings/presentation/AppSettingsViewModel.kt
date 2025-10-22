@@ -1,82 +1,49 @@
 package com.contraomnese.weather.appsettings.presentation
 
-import androidx.compose.runtime.Immutable
-import com.contraomnese.weather.domain.app.model.AppSettings
-import com.contraomnese.weather.domain.app.model.PrecipitationUnit
-import com.contraomnese.weather.domain.app.model.PressureUnit
-import com.contraomnese.weather.domain.app.model.TemperatureUnit
-import com.contraomnese.weather.domain.app.model.WindSpeedUnit
-import com.contraomnese.weather.domain.app.usecase.GetAppSettingsUseCase
+import androidx.lifecycle.viewModelScope
+import com.contraomnese.weather.domain.app.usecase.ObserveAppSettingsUseCase
 import com.contraomnese.weather.domain.app.usecase.UpdateAppSettingsUseCase
-import com.contraomnese.weather.presentation.architecture.BaseViewModel
-import com.contraomnese.weather.presentation.architecture.UiState
-import com.contraomnese.weather.presentation.notification.NotificationMonitor
-import com.contraomnese.weather.presentation.usecase.UseCaseExecutorProvider
+import com.contraomnese.weather.presentation.architecture.MviModel
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 
-@Immutable
-internal data class AppSettingsUiState(
-    override val isLoading: Boolean = false,
-    val appSettings: AppSettings = AppSettings(),
-) : UiState {
-    override fun loading(): UiState = copy(isLoading = true)
-}
-
-@Immutable
-internal sealed interface AppSettingsEvent {
-    data class TemperatureUnitChanged(val newTemperatureUnit: TemperatureUnit) : AppSettingsEvent
-    data class PressureUnitChanged(val newPressureUnit: PressureUnit) : AppSettingsEvent
-    data class PrecipitationUnitChanged(val newPrecipitationUnit: PrecipitationUnit) : AppSettingsEvent
-    data class WindSpeedUnitChanged(val newWindSpeedUnit: WindSpeedUnit) : AppSettingsEvent
-}
 
 internal class AppSettingsViewModel(
-    useCaseExecutorProvider: UseCaseExecutorProvider,
-    notificationMonitor: NotificationMonitor,
-    getAppSettingsUseCase: GetAppSettingsUseCase,
+    private val observeAppSettingsUseCase: ObserveAppSettingsUseCase,
     private val updateAppSettingsUseCase: UpdateAppSettingsUseCase,
-) : BaseViewModel<AppSettingsUiState, AppSettingsEvent>(useCaseExecutorProvider, notificationMonitor) {
+) : MviModel<AppSettingsAction, AppSettingsEffect, AppSettingsEvent, AppSettingsScreenState>(
+    defaultState = AppSettingsScreenState.DEFAULT,
+    tag = "AppSettingsViewModel"
+) {
 
-    init {
-        observe(getAppSettingsUseCase, ::updateAppSettingsState)
+    override suspend fun bootstrap() {
+        push(AppSettingsEffect.SettingsUpdated(observeAppSettingsUseCase().first()))
+
+        stateFlow
+            .map { it.appSettings }
+            .distinctUntilChanged()
+            .onEach {
+                updateAppSettingsUseCase(it)
+            }
+            .launchIn(viewModelScope)
     }
 
-    override fun initialState(): AppSettingsUiState = AppSettingsUiState()
-
-    override fun onEvent(event: AppSettingsEvent) {
-        when (event) {
-            is AppSettingsEvent.TemperatureUnitChanged -> onTemperatureUnitChanged(event.newTemperatureUnit)
-            is AppSettingsEvent.PressureUnitChanged -> onPressureUnitChanged(event.newPressureUnit)
-            is AppSettingsEvent.PrecipitationUnitChanged -> onPrecipitationUnitChanged(event.newPrecipitationUnit)
-            is AppSettingsEvent.WindSpeedUnitChanged -> onWindSpeedUnitChanged(event.newWindSpeedUnit)
+    override fun reducer(effect: AppSettingsEffect, previousState: AppSettingsScreenState) =
+        when (effect) {
+            is AppSettingsEffect.PrecipitationUnitChanged -> previousState.setPrecipitationUnit(effect.precipitationUnit)
+            is AppSettingsEffect.PressureUnitChanged -> previousState.setPressureUnit(effect.pressureUnit)
+            is AppSettingsEffect.TemperatureUnitChanged -> previousState.setTemperatureUnit(effect.temperatureUnit)
+            is AppSettingsEffect.WindSpeedUnitChanged -> previousState.setWindSpeedUnit(effect.windSpeedUnit)
+            is AppSettingsEffect.SettingsUpdated -> previousState.setAppSettings(effect.appSettings)
         }
-    }
 
-    private fun updateAppSettings(newAppSettings: AppSettings) {
-        execute(
-            updateAppSettingsUseCase,
-            newAppSettings,
-            onException = ::provideException
-        )
-        updateAppSettingsState(newAppSettings)
-    }
-
-    private fun updateAppSettingsState(newAppSettings: AppSettings) {
-        updateViewState { copy(appSettings = newAppSettings) }
-    }
-
-    private fun onTemperatureUnitChanged(newTemperatureUnit: TemperatureUnit) {
-        updateAppSettings(uiState.value.appSettings.copy(temperatureUnit = newTemperatureUnit))
-    }
-
-    private fun onPressureUnitChanged(newPressureUnit: PressureUnit) {
-        updateAppSettings(uiState.value.appSettings.copy(pressureUnit = newPressureUnit))
-    }
-
-    private fun onPrecipitationUnitChanged(newPrecipitationUnit: PrecipitationUnit) {
-        updateAppSettings(uiState.value.appSettings.copy(precipitationUnit = newPrecipitationUnit))
-    }
-
-    private fun onWindSpeedUnitChanged(newWindSpeedUnit: WindSpeedUnit) {
-        updateAppSettings(uiState.value.appSettings.copy(windSpeedUnit = newWindSpeedUnit))
+    override suspend fun actor(action: AppSettingsAction) = when (action) {
+        is AppSettingsAction.PrecipitationUnitChange -> push(AppSettingsEffect.PrecipitationUnitChanged(action.precipitationUnit))
+        is AppSettingsAction.PressureUnitChange -> push(AppSettingsEffect.PressureUnitChanged(action.pressureUnit))
+        is AppSettingsAction.TemperatureUnitChange -> push(AppSettingsEffect.TemperatureUnitChanged(action.temperatureUnit))
+        is AppSettingsAction.WindSpeedUnitChange -> push(AppSettingsEffect.WindSpeedUnitChanged(action.windSpeedUnit))
     }
 }

@@ -1,186 +1,132 @@
 package com.contraomnese.weather.home.presentation
 
-import androidx.compose.runtime.Immutable
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.viewModelScope
-import com.contraomnese.weather.domain.home.model.InputLocationPresentation
 import com.contraomnese.weather.domain.home.usecase.AddFavoriteUseCase
 import com.contraomnese.weather.domain.home.usecase.GetLocationUseCase
-import com.contraomnese.weather.domain.home.usecase.GetLocationsInfoUseCase
+import com.contraomnese.weather.domain.home.usecase.GetLocationsUseCase
 import com.contraomnese.weather.domain.home.usecase.ObserveFavoritesUseCase
 import com.contraomnese.weather.domain.home.usecase.RemoveFavoriteUseCase
-import com.contraomnese.weather.domain.weatherByLocation.model.CoordinatesDomainModel
-import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeatherDomainModel
-import com.contraomnese.weather.domain.weatherByLocation.model.LatitudeDomainModel
-import com.contraomnese.weather.domain.weatherByLocation.model.LocationInfoDomainModel
-import com.contraomnese.weather.domain.weatherByLocation.model.LongitudeDomainModel
+import com.contraomnese.weather.domain.weatherByLocation.model.LocationCoordinates
 import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveForecastWeatherUseCase
 import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateForecastWeatherUseCase
-import com.contraomnese.weather.presentation.architecture.BaseViewModel
-import com.contraomnese.weather.presentation.architecture.UiState
-import com.contraomnese.weather.presentation.notification.NotificationMonitor
-import com.contraomnese.weather.presentation.usecase.UseCaseExecutorProvider
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.ImmutableMap
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.persistentMapOf
-import kotlinx.collections.immutable.toPersistentList
-import kotlinx.collections.immutable.toPersistentMap
-import kotlinx.coroutines.Job
+import com.contraomnese.weather.presentation.architecture.MviModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-
-@Immutable
-internal data class HomeUiState(
-    override val isLoading: Boolean = false,
-    val isSearching: Boolean = false,
-    val inputLocation: InputLocationPresentation = InputLocationPresentation(""),
-    val gpsLocation: LocationInfoDomainModel? = null,
-    val matchingLocations: ImmutableList<LocationInfoDomainModel> = persistentListOf(),
-    val favorites: ImmutableList<LocationInfoDomainModel> = persistentListOf(),
-    val favoritesForecast: ImmutableMap<Int, ForecastWeatherDomainModel> = persistentMapOf(),
-) : UiState {
-    override fun loading(): HomeUiState = copy(isLoading = true)
-}
-
-@Immutable
-internal sealed interface HomeEvent {
-    data class InputLocationChanged(val newInput: String) : HomeEvent
-    data class GpsLocationChanged(val lat: Double, val lon: Double) : HomeEvent
-    data class AddFavorite(val locationId: Int) : HomeEvent
-    data class RemoveFavorite(val locationId: Int) : HomeEvent
-}
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 
 internal class HomeViewModel(
-    useCaseExecutorProvider: UseCaseExecutorProvider,
-    notificationMonitor: NotificationMonitor,
-    private val getLocationsInfoUseCase: GetLocationsInfoUseCase,
+    private val getLocationsUseCase: GetLocationsUseCase,
     private val getLocationUseCase: GetLocationUseCase,
     private val observeFavoritesUseCase: ObserveFavoritesUseCase,
     private val addFavoriteUseCase: AddFavoriteUseCase,
     private val removeFavoriteUseCase: RemoveFavoriteUseCase,
     private val observeForecastWeatherUseCase: ObserveForecastWeatherUseCase,
     private val updateForecastWeatherUseCase: UpdateForecastWeatherUseCase,
-) : BaseViewModel<HomeUiState, HomeEvent>(useCaseExecutorProvider, notificationMonitor) {
+) : MviModel<HomeScreenAction, HomeScreenEffect, HomeScreenEvent, HomeScreenState>(
+    defaultState = HomeScreenState.DEFAULT,
+    tag = "HomeViewModel",
+) {
 
-    init {
-        observe(observeFavoritesUseCase, ::onFavoritesUpdate, ::provideException)
+    companion object {
+        private const val LOCATION_UPDATE_DELAY = 2000L
     }
 
-    private var searchJob: Job? = null
-
-    override fun initialState(): HomeUiState = HomeUiState(isLoading = true)
-
-    override fun onEvent(event: HomeEvent) {
-        when (event) {
-            is HomeEvent.InputLocationChanged -> onInputLocationChanged(event.newInput)
-            is HomeEvent.AddFavorite -> onFavoriteAdded(event.locationId)
-            is HomeEvent.RemoveFavorite -> onFavoriteRemoved(event.locationId)
-            is HomeEvent.GpsLocationChanged -> onGpsLocationChanged(
-                CoordinatesDomainModel(
-                    LatitudeDomainModel(event.lat),
-                    LongitudeDomainModel(event.lon)
-                )
-            )
-        }
-    }
-
-    private fun onInputLocationChanged(newLocation: String) {
-        updateViewState { copy(inputLocation = InputLocationPresentation(newLocation)) }
-
-        if (newLocation.isNotEmpty()) {
-            updateLocationsWithDebounce(2000L) {
-                execute(
-                    getLocationsInfoUseCase,
-                    newLocation,
-                    ::onLocationsUpdated,
-                    ::provideException
-                )
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override suspend fun bootstrap() {
+        observeFavoritesUseCase()
+            .onEach {
+                push(HomeScreenEffect.FavoritesUpdated(it))
             }
-        } else onLocationsUpdated(persistentListOf())
-    }
+            .launchIn(viewModelScope)
 
-    private fun onGpsLocationChanged(coordinates: CoordinatesDomainModel) {
-        execute(
-            getLocationUseCase,
-            coordinates,
-            ::onGpsLocationUpdated,
-            ::provideException
-        )
-    }
-
-    private fun onFavoriteAdded(locationId: Int) {
-        execute(
-            addFavoriteUseCase,
-            locationId,
-            onException = ::provideException
-        )
-    }
-
-    private fun onFavoriteRemoved(locationId: Int) {
-        execute(
-            removeFavoriteUseCase,
-            locationId,
-            onException = ::provideException
-        )
-    }
-
-    private fun onLocationsUpdated(newCities: List<LocationInfoDomainModel>) {
-        updateViewState { copy(matchingLocations = newCities.toPersistentList(), isSearching = false) }
-    }
-
-    private fun onGpsLocationUpdated(newLocation: LocationInfoDomainModel) {
-        updateViewState { copy(gpsLocation = newLocation) }
-    }
-
-    private fun onFavoritesUpdate(newFavorites: List<LocationInfoDomainModel>) {
-
-        if (newFavorites.isEmpty()) updateViewState {
-            copy(
-                isLoading = false,
-                favorites = persistentListOf(),
-                favoritesForecast = persistentMapOf()
-            )
-        }
-        else {
-            updateViewState { copy(favorites = newFavorites.toPersistentList()) }
-            val missing = newFavorites.filter { it.id !in uiState.value.favoritesForecast.keys }
-
-            var remaining = missing.size
-            missing.forEach { location ->
-                observe(
-                    observeForecastWeatherUseCase,
-                    location.id,
-                    { forecast ->
-                        onFavoritesForecastUpdate(forecast, location)
-                        remaining -= 1
-                        if (remaining == 0) {
-                            updateViewState { copy(isLoading = false) }
-                        }
-                    },
-                    ::provideException
-                )
+        stateFlow
+            .map { it.favorites }
+            .distinctUntilChanged()
+            .onEach { newFavorites ->
+                push(HomeScreenEvent.SwitchSearchMode(newFavorites.isNotEmpty()))
             }
+            .flatMapLatest { newFavorites ->
+                if (newFavorites.isEmpty()) {
+                    emptyFlow()
+                } else {
+                    val forecastFlows = newFavorites.map { location ->
+                        observeForecastWeatherUseCase(location.id)
+                            .onEach { if (it == null) updateForecastWeatherUseCase(location.id) }
+                            .filterNotNull()
+                            .map { forecast -> location.id to forecast }
+                    }
+                    combine(forecastFlows) { pairs ->
+                        pairs.toMap()
+                    }
+                }
+            }
+            .onEach { forecastsMap ->
+                push(HomeScreenEffect.FavoritesForecastUpdated(forecastsMap))
+            }
+            .launchIn(viewModelScope)
+    }
+
+    override fun reducer(effect: HomeScreenEffect, previousState: HomeScreenState): HomeScreenState = when (effect) {
+        is HomeScreenEffect.InputLocationUpdated -> previousState.setInputLocation(effect.input)
+        is HomeScreenEffect.GpsLocationUpdated -> previousState.setGpsLocation(effect.location)
+        is HomeScreenEffect.MatchingLocationsUpdated -> previousState.setMatchingLocations(effect.locations)
+        is HomeScreenEffect.FavoritesUpdated -> previousState.setFavorites(effect.favorites)
+        is HomeScreenEffect.FavoritesForecastUpdated -> previousState.setFavoritesForecast(effect.favoritesForecast)
+        is HomeScreenEffect.AccessFineLocationPermissionGranted -> previousState.setAccessFineLocationPermissionGranted(effect.isGranted)
+        is HomeScreenEffect.GpsModeEnabled -> previousState.setGpsModeEnabled(effect.isEnabled)
+    }
+
+    override suspend fun actor(action: HomeScreenAction) = when (action) {
+        is HomeScreenAction.InputLocation -> processLocationInput(action.input)
+        is HomeScreenAction.UpdateGpsLocation -> processGpsLocationChange(LocationCoordinates.from(action.lat, action.lon))
+        is HomeScreenAction.AddFavorite -> processFavoriteAdd(action.locationId)
+        is HomeScreenAction.RemoveFavorite -> processFavoriteRemove(action.locationId)
+        is HomeScreenAction.SwitchGpsMode -> processSwitchGpsMode(action.enabled)
+        is HomeScreenAction.AccessFineLocationPermissionGranted -> processAccessFineLocationPermissionGranted(action.granted)
+        is HomeScreenAction.DeviceGpsModeEnabled -> processGpsModeEnabled(action.enabled)
+    }
+
+    private suspend fun processLocationInput(input: TextFieldValue) {
+        push(HomeScreenEffect.InputLocationUpdated(input))
+
+        if (input.text.isNotEmpty()) {
+            delay(LOCATION_UPDATE_DELAY)
+            push(HomeScreenEffect.MatchingLocationsUpdated(getLocationsUseCase(input.text)))
         }
     }
 
-    private fun onFavoritesForecastUpdate(newFavoritesForecast: ForecastWeatherDomainModel?, favorite: LocationInfoDomainModel) {
-
-        if (newFavoritesForecast != null) {
-            val favoritesForecast = uiState.value.favoritesForecast.toMutableMap()
-            favoritesForecast[favorite.id] = newFavoritesForecast
-            updateViewState { copy(favoritesForecast = favoritesForecast.toPersistentMap()) }
-        } else {
-            execute(updateForecastWeatherUseCase, favorite.id, onException = ::provideException)
-        }
+    private suspend fun processGpsLocationChange(coordinates: LocationCoordinates) {
+        push(HomeScreenEffect.GpsLocationUpdated(getLocationUseCase(coordinates)))
     }
 
-    private fun updateLocationsWithDebounce(debounce: Long, action: () -> Unit) {
-        searchJob?.cancel()
-        searchJob = viewModelScope.launch {
-            updateViewState { copy(isSearching = true) }
-            delay(debounce)
-            action()
-        }
+    private suspend fun processFavoriteAdd(locationId: Int) {
+        addFavoriteUseCase(locationId)
+    }
+
+    private suspend fun processFavoriteRemove(locationId: Int) {
+        removeFavoriteUseCase(locationId)
+    }
+
+    private fun processSwitchGpsMode(enabled: Boolean) {
+        push(HomeScreenEvent.SwitchGpsMode(enabled))
+    }
+
+    private suspend fun processAccessFineLocationPermissionGranted(isGranted: Boolean) {
+        delay(1000)
+        push(HomeScreenEffect.AccessFineLocationPermissionGranted(isGranted))
+    }
+
+    private fun processGpsModeEnabled(isEnabled: Boolean) {
+        push(HomeScreenEffect.GpsModeEnabled(isEnabled))
+        if (isEnabled) push(HomeScreenEvent.GetGpsLocation)
     }
 
 }

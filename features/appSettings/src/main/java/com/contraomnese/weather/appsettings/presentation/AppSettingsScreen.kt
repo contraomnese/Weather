@@ -33,18 +33,28 @@ import com.contraomnese.weather.domain.app.model.PrecipitationUnit
 import com.contraomnese.weather.domain.app.model.PressureUnit
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import com.contraomnese.weather.domain.app.model.WindSpeedUnit
+import com.contraomnese.weather.presentation.architecture.collectEvent
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 internal fun AppSettingsRoute(
     viewModel: AppSettingsViewModel,
+    eventFlow: Flow<AppSettingsEvent>,
+    pushAction: (AppSettingsAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
+
+    eventFlow.collectEvent { event ->
+        when (event) {
+            else -> {}
+        }
+    }
 
     AppSettingsScreen(
         uiState = uiState,
-        onEvent = viewModel::onEvent,
+        pushAction = pushAction,
         modifier = modifier
     )
 }
@@ -52,8 +62,8 @@ internal fun AppSettingsRoute(
 @Composable
 private fun AppSettingsScreen(
     modifier: Modifier = Modifier,
-    uiState: AppSettingsUiState,
-    onEvent: (AppSettingsEvent) -> Unit,
+    uiState: AppSettingsScreenState,
+    pushAction: (AppSettingsAction) -> Unit,
 ) {
 
     Column(
@@ -69,7 +79,7 @@ private fun AppSettingsScreen(
             options = TemperatureUnit.entries.toList(),
             selected = uiState.appSettings.temperatureUnit,
             onSelected = {
-                onEvent(AppSettingsEvent.TemperatureUnitChanged(it))
+                pushAction(AppSettingsAction.TemperatureUnitChange(it))
             }
         )
 
@@ -78,7 +88,7 @@ private fun AppSettingsScreen(
             options = WindSpeedUnit.entries.toList(),
             selected = uiState.appSettings.windSpeedUnit,
             onSelected = {
-                onEvent(AppSettingsEvent.WindSpeedUnitChanged(it))
+                pushAction(AppSettingsAction.WindSpeedUnitChange(it))
             }
         )
 
@@ -87,7 +97,7 @@ private fun AppSettingsScreen(
             options = PrecipitationUnit.entries.toList(),
             selected = uiState.appSettings.precipitationUnit,
             onSelected = {
-                onEvent(AppSettingsEvent.PrecipitationUnitChanged(it))
+                pushAction(AppSettingsAction.PrecipitationUnitChange(it))
             }
         )
 
@@ -96,7 +106,7 @@ private fun AppSettingsScreen(
             options = PressureUnit.entries.toList(),
             selected = uiState.appSettings.pressureUnit,
             onSelected = {
-                onEvent(AppSettingsEvent.PressureUnitChanged(it))
+                pushAction(AppSettingsAction.PressureUnitChange(it))
             }
         )
     }
@@ -177,10 +187,10 @@ inline fun <reified T : Enum<T>> T.toTextRes(): Int = when (this) {
 private fun AppSettingsPreview() {
     WeatherTheme {
         AppSettingsScreen(
-            uiState = AppSettingsUiState(
+            uiState = AppSettingsScreenState(
                 appSettings = AppSettings()
             ),
-            onEvent = {}
+            pushAction = {}
         )
     }
 }

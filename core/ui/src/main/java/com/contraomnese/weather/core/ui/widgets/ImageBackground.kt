@@ -13,7 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight160
-import com.contraomnese.weather.domain.weatherByLocation.model.internal.CompactWeatherCondition
+import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
 
 @Composable
 fun ImageBackground(

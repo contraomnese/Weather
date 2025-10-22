@@ -11,8 +11,8 @@ import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemThickness1
 import com.contraomnese.weather.design.theme.padding4
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
-import com.contraomnese.weather.domain.weatherByLocation.model.internal.CompactWeatherCondition
-import com.contraomnese.weather.domain.weatherByLocation.model.internal.ForecastDay
+import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
+import com.contraomnese.weather.domain.weatherByLocation.model.ForecastDay
 
 
 @Composable

@@ -23,7 +23,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -76,8 +75,9 @@ import com.contraomnese.weather.domain.app.model.PrecipitationUnit
 import com.contraomnese.weather.domain.app.model.PressureUnit
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import com.contraomnese.weather.domain.app.model.WindSpeedUnit
-import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeatherDomainModel
-import com.contraomnese.weather.domain.weatherByLocation.model.internal.CompactWeatherCondition
+import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
+import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
+import com.contraomnese.weather.presentation.architecture.collectEvent
 import com.contraomnese.weather.weatherByLocation.presentation.data.AqiSection
 import com.contraomnese.weather.weatherByLocation.presentation.data.DailyForecastSection
 import com.contraomnese.weather.weatherByLocation.presentation.data.HourlyForecastSection
@@ -91,6 +91,7 @@ import com.contraomnese.weather.weatherByLocation.presentation.data.WindSection
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -98,20 +99,28 @@ import kotlin.math.roundToInt
 @Composable
 internal fun WeatherRoute(
     viewModel: WeatherViewModel,
-    onEvent: (WeatherEvent) -> Unit,
-    favoriteItemSwiped: (Int) -> Unit = {},
+    eventFlow: Flow<WeatherScreenEvent>,
+    pushAction: (WeatherScreenAction) -> Unit,
 ) {
 
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
+
+    eventFlow.collectEvent { event ->
+        when (event) {
+            is WeatherScreenEvent.NavigateToBack -> TODO()
+            is WeatherScreenEvent.ShowError -> TODO()
+            is WeatherScreenEvent.SwapFavoriteGetWeather -> pushAction(WeatherScreenAction.SwapFavorite(event.index))
+        }
+    }
 
     val backgroundModifier = if (uiState.isLoading) Modifier.background(MaterialTheme.colorScheme.background) else Modifier
 
     val coroutineScope = rememberCoroutineScope()
-    var offsetX by remember { mutableStateOf(0f) }
+    var offsetX by remember { mutableFloatStateOf(0f) }
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp.toPx()
 
-    val scaleAnimatable = remember { Animatable(1f) }
-    val alphaAnimatable = remember { Animatable(1f) }
+    val scaleAnimated = remember { Animatable(1f) }
+    val alphaAnimated = remember { Animatable(1f) }
 
     Box(
         modifier = Modifier
@@ -123,13 +132,7 @@ internal fun WeatherRoute(
 
             val favoriteIndex = uiState.favorites.indexOfFirst { it.id == uiState.locationId }
 
-            LaunchedEffect(Unit) {
-                if (favoriteIndex >= 0) {
-                    favoriteItemSwiped(favoriteIndex)
-                }
-            }
-
-            AnimatedBackground(condition = uiState.weather!!.currentInfo.condition)
+            AnimatedBackground(condition = uiState.weather!!.today.condition)
 
             Box(
                 modifier = Modifier
@@ -140,16 +143,14 @@ internal fun WeatherRoute(
                                 when {
                                     offsetX > screenWidth * 0.25f && favoriteIndex > 0 -> {
                                         val prevFavoriteIndex = favoriteIndex - 1
-                                        onEvent(WeatherEvent.LocationChanged(prevFavoriteIndex))
-                                        favoriteItemSwiped(prevFavoriteIndex)
-                                        AnimateMove(coroutineScope, scaleAnimatable, alphaAnimatable)
+                                        pushAction(WeatherScreenAction.SwapFavorite(prevFavoriteIndex))
+                                        AnimateMove(coroutineScope, scaleAnimated, alphaAnimated)
                                     }
 
                                     offsetX < -screenWidth * 0.25f && favoriteIndex < uiState.favorites.lastIndex -> {
                                         val nextFavoriteIndex = favoriteIndex + 1
-                                        onEvent(WeatherEvent.LocationChanged(nextFavoriteIndex))
-                                        favoriteItemSwiped(nextFavoriteIndex)
-                                        AnimateMove(coroutineScope, scaleAnimatable, alphaAnimatable)
+                                        pushAction(WeatherScreenAction.SwapFavorite(nextFavoriteIndex))
+                                        AnimateMove(coroutineScope, scaleAnimated, alphaAnimated)
                                     }
                                 }
                                 coroutineScope.launch {
@@ -172,9 +173,9 @@ internal fun WeatherRoute(
                         modifier = Modifier
                             .offset { IntOffset(offsetX.roundToInt(), 0) }
                             .graphicsLayer {
-                                scaleX = scaleAnimatable.value
-                                scaleY = scaleAnimatable.value
-                                alpha = alphaAnimatable.value
+                                scaleX = scaleAnimated.value
+                                scaleY = scaleAnimated.value
+                                alpha = alphaAnimated.value
                             }
                     )
                 }
@@ -192,9 +193,8 @@ internal fun WeatherRoute(
 @Composable
 internal fun WeatherScreen(
     modifier: Modifier = Modifier,
-    uiState: WeatherUiState,
+    uiState: WeatherScreenState,
 ) {
-    requireNotNull(uiState.locationId)
     requireNotNull(uiState.weather)
     requireNotNull(uiState.appSettings)
 
@@ -225,7 +225,7 @@ internal fun WeatherScreen(
                 HourlyForecastSection(),
                 DailyForecastSection(),
                 AqiSection(),
-                SunriseSection(isDay = uiState.weather.currentInfo.isDay),
+                SunriseSection(isDay = uiState.weather.today.isDay),
                 UVIndexSection(),
                 WindSection(),
                 HumiditySection(),
@@ -390,12 +390,12 @@ internal fun WeatherScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(with(LocalDensity.current) { currentTitleBoxHeight.toDp() }),
-            location = uiState.weather.locationInfo.name,
-            currentTemp = uiState.weather.currentInfo.temperature,
-            feelsLikeTemp = uiState.weather.currentInfo.feelsLikeTemperature,
-            maxTemp = uiState.weather.forecastInfo.today.maxTemperature,
-            minTemp = uiState.weather.forecastInfo.today.minTemperature,
-            condition = uiState.weather.currentInfo.conditionText,
+            location = uiState.weather.location.city,
+            currentTemp = uiState.weather.today.temperature,
+            feelsLikeTemp = uiState.weather.today.feelsLikeTemperature,
+            maxTemp = uiState.weather.forecast.today.maxTemperature,
+            minTemp = uiState.weather.forecast.today.minTemperature,
+            condition = uiState.weather.today.conditionText,
         )
         LazyColumn(
             modifier = Modifier
@@ -489,7 +489,7 @@ internal fun WeatherScreen(
 private fun HourlyForecastSection(
     headerSectionHeight: Dp,
     section: HourlyForecastSection,
-    weather: ForecastWeatherDomainModel,
+    weather: Forecast,
     progress: Float,
     measureContainerHeight: (Int) -> Unit,
 ) {
@@ -498,13 +498,13 @@ private fun HourlyForecastSection(
         currentBodyHeight = section.bodyHeight,
         headerTitle = stringResource(section.title),
         headerIcon = section.icon,
-        alertTitle = weather.alertsInfo.alerts.firstOrNull(),
+        alertTitle = weather.alerts.alerts.firstOrNull(),
         progress = progress,
         onContentMeasured = measureContainerHeight
     ) {
         ForecastHourlyLazyRow(
             modifier = Modifier.padding(horizontal = padding16, vertical = padding8),
-            items = weather.forecastInfo.forecastHours
+            items = weather.forecast.hours
         )
     }
 }
@@ -514,7 +514,7 @@ private fun DailyForecastSection(
     headerSectionHeight: Dp,
     section: DailyForecastSection,
     measureContainerHeight: (Int) -> Unit,
-    weather: ForecastWeatherDomainModel,
+    weather: Forecast,
     temperatureUnit: TemperatureUnit,
 ) {
     CollapsableContainer(
@@ -526,8 +526,8 @@ private fun DailyForecastSection(
     ) {
         ForecastDailyColumn(
             modifier = Modifier.padding(horizontal = padding16),
-            items = weather.forecastInfo.forecastDays,
-            currentTemperature = weather.currentInfo.temperature.toInt(),
+            items = weather.forecast.days,
+            currentTemperature = weather.today.temperature.toInt(),
             temperatureUnit = temperatureUnit
         )
     }
@@ -538,7 +538,7 @@ private fun AqiSection(
     headerSectionHeight: Dp,
     section: WeatherSection,
     measureContainerHeight: (Int) -> Unit,
-    weather: ForecastWeatherDomainModel,
+    weather: Forecast,
 ) {
     CollapsableContainer(
         headerHeight = headerSectionHeight,
@@ -549,13 +549,13 @@ private fun AqiSection(
     ) {
         AirQualityItem(
             modifier = Modifier.padding(horizontal = padding16, vertical = padding8),
-            aqiIndex = weather.currentInfo.airQuality.aqiIndex,
-            coLevel = weather.currentInfo.airQuality.coLevel,
-            no2Level = weather.currentInfo.airQuality.no2Level,
-            o3Level = weather.currentInfo.airQuality.o3Level,
-            so2Level = weather.currentInfo.airQuality.so2Level,
-            pm25Level = weather.currentInfo.airQuality.pm25Level,
-            pm10Level = weather.currentInfo.airQuality.pm10Level,
+            aqiIndex = weather.today.airQuality.aqiIndex,
+            coLevel = weather.today.airQuality.coLevel,
+            no2Level = weather.today.airQuality.no2Level,
+            o3Level = weather.today.airQuality.o3Level,
+            so2Level = weather.today.airQuality.so2Level,
+            pm25Level = weather.today.airQuality.pm25Level,
+            pm10Level = weather.today.airQuality.pm10Level,
         )
     }
 }
@@ -565,14 +565,14 @@ private fun SunriseSection(
     headerSectionHeight: Dp,
     section: SunriseSection,
     measureContainerHeight: (Int) -> Unit,
-    weather: ForecastWeatherDomainModel,
+    weather: Forecast,
 ) {
-    val today = weather.forecastInfo.today
-    val location = weather.locationInfo
+    val today = weather.forecast.today
+    val location = weather.location
 
     val sunrise = today.sunrise
     val sunset = today.sunset
-    val isDay = weather.currentInfo.isDay
+    val isDay = weather.today.isDay
 
     if (sunrise != null && sunset != null) {
         CollapsableContainer(
@@ -598,9 +598,9 @@ private fun UvIndexSection(
     headerSectionHeight: Dp,
     section: UVIndexSection,
     measureContainerHeight: (Int) -> Unit,
-    weather: ForecastWeatherDomainModel,
+    weather: Forecast,
 ) {
-    val today = weather.currentInfo
+    val today = weather.today
 
     CollapsableContainer(
         headerHeight = headerSectionHeight,
@@ -621,10 +621,10 @@ private fun WindSection(
     headerSectionHeight: Dp,
     section: WindSection,
     measureContainerHeight: (Int) -> Unit,
-    weather: ForecastWeatherDomainModel,
+    weather: Forecast,
     windSpeedUnit: WindSpeedUnit,
 ) {
-    val today = weather.currentInfo
+    val today = weather.today
 
     CollapsableContainer(
         headerHeight = headerSectionHeight,
@@ -649,10 +649,10 @@ private fun HumiditySection(
     headerSectionHeight: Dp,
     section: HumiditySection,
     measureContainerHeight: (Int) -> Unit,
-    weather: ForecastWeatherDomainModel,
+    weather: Forecast,
     temperatureUnit: TemperatureUnit,
 ) {
-    val today = weather.currentInfo
+    val today = weather.today
 
     CollapsableContainer(
         headerHeight = headerSectionHeight,
@@ -675,10 +675,10 @@ private fun RainfallSection(
     headerSectionHeight: Dp,
     section: RainfallSection,
     measureContainerHeight: (Int) -> Unit,
-    weather: ForecastWeatherDomainModel,
+    weather: Forecast,
     precipitationUnit: PrecipitationUnit,
 ) {
-    val today = weather.currentInfo
+    val today = weather.today
 
     CollapsableContainer(
         headerHeight = headerSectionHeight,
@@ -704,10 +704,10 @@ private fun PressureSection(
     headerSectionHeight: Dp,
     section: PressureSection,
     measureContainerHeight: (Int) -> Unit,
-    weather: ForecastWeatherDomainModel,
+    weather: Forecast,
     pressureUnit: PressureUnit,
 ) {
-    val today = weather.currentInfo
+    val today = weather.today
 
     CollapsableContainer(
         headerHeight = headerSectionHeight,

@@ -43,7 +43,7 @@ import com.google.accompanist.permissions.shouldShowRationale
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun AlertPermissionDialog(
+fun PermissionAlertDialog(
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit = {},
     onPermissionGranted: (Boolean) -> Unit = {},
@@ -80,7 +80,7 @@ fun AlertPermissionDialog(
             showRationale = permissionState.status.shouldShowRationale,
             deniedTitle = deniedTitle,
             firstTimeTitle = firstTimeTitle,
-            onClicked = { confirmed = true })
+            onClick = { confirmed = true })
     }
 }
 
@@ -92,7 +92,7 @@ private fun PermissionDialog(
     showRationale: Boolean,
     @StringRes deniedTitle: Int,
     @StringRes firstTimeTitle: Int,
-    onClicked: () -> Unit = {},
+    onClick: () -> Unit = {},
 ) {
     BasicAlertDialog(onDismissRequest = onDismissRequest) {
         Surface(
@@ -114,7 +114,7 @@ private fun PermissionDialog(
                 )
                 Spacer(modifier = Modifier.height(space16))
                 TextButton(
-                    onClick = onClicked,
+                    onClick = onClick,
                     modifier = Modifier.align(Alignment.End),
                     border = BorderStroke(itemThickness1, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
                 ) {

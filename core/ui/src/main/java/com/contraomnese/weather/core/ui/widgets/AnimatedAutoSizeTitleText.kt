@@ -34,7 +34,7 @@ import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding80
 
 @Composable
-fun BoxScope.AutoSizeTitleText(
+fun BoxScope.AnimatedAutoSizeTitleText(
     modifier: Modifier = Modifier,
     alignment: Alignment = Alignment.TopStart,
     visible: Boolean = true,
@@ -104,7 +104,7 @@ fun BoxScope.AutoSizeTitleText(
 private fun AutoSizeTitleTextPreview(modifier: Modifier = Modifier) {
     WeatherTheme {
         Box(modifier = Modifier.fillMaxSize()) {
-            AutoSizeTitleText(
+            AnimatedAutoSizeTitleText(
                 modifier = modifier.padding(top = padding80),
                 visible = true,
                 enter = expandHorizontally(animationSpec = tween(durationMillis = 500)),

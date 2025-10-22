@@ -1,22 +1,18 @@
 package com.contraomnese.weather.home.presentation
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -32,19 +28,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -53,8 +46,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -62,6 +53,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -72,9 +64,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.contraomnese.weather.core.ui.widgets.AlertGpsDialog
-import com.contraomnese.weather.core.ui.widgets.AlertPermissionDialog
-import com.contraomnese.weather.core.ui.widgets.AutoSizeTitleText
+import com.contraomnese.weather.core.ui.widgets.GpsModeAlertDialog
+import com.contraomnese.weather.core.ui.widgets.PermissionAlertDialog
+import com.contraomnese.weather.core.ui.widgets.AnimatedCircleButton
+import com.contraomnese.weather.core.ui.widgets.AnimatedIcon
+import com.contraomnese.weather.core.ui.widgets.AnimatedAutoSizeTitleText
 import com.contraomnese.weather.core.ui.widgets.FavoriteItem
 import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
 import com.contraomnese.weather.core.ui.widgets.SearchTextField
@@ -84,27 +78,24 @@ import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.cornerRadius1
 import com.contraomnese.weather.design.theme.itemHeight160
 import com.contraomnese.weather.design.theme.itemHeight20
-import com.contraomnese.weather.design.theme.itemHeight64
 import com.contraomnese.weather.design.theme.itemThickness2
 import com.contraomnese.weather.design.theme.itemWidth56
 import com.contraomnese.weather.design.theme.itemWidth64
 import com.contraomnese.weather.design.theme.padding16
-import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.design.theme.space16
 import com.contraomnese.weather.design.theme.space8
-import com.contraomnese.weather.domain.weatherByLocation.model.LocationInfoDomainModel
+import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
+import com.contraomnese.weather.domain.weatherByLocation.model.Location
+import com.contraomnese.weather.presentation.architecture.collectEvent
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.toPersistentList
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 private const val ANIMATION_DURATION = 500
-
-private data class GpsState(
-    val isRequestToEnable: Boolean = false,
-    val isPermissionGranted: Boolean = false,
-    val isGpsEnabled: Boolean = false,
-)
 
 @Composable
 internal fun HomeRoute(
@@ -113,7 +104,8 @@ internal fun HomeRoute(
     onNavigateToAppSettings: () -> Unit,
 ) {
 
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -131,7 +123,8 @@ internal fun HomeRoute(
             else -> {
                 HomeScreen(
                     uiState = uiState,
-                    onEvent = viewModel::onEvent,
+                    eventFlow = viewModel.eventFlow,
+                    pushAction = viewModel::push,
                     onNavigateToWeatherByLocation = onNavigateToWeatherByLocation,
                     onNavigateToAppSettings = onNavigateToAppSettings
                 )
@@ -144,8 +137,9 @@ internal fun HomeRoute(
 @SuppressLint("MissingPermission")
 @Composable
 internal fun BoxScope.HomeScreen(
-    uiState: HomeUiState,
-    onEvent: (HomeEvent) -> Unit = {},
+    uiState: HomeScreenState,
+    eventFlow: Flow<HomeScreenEvent>,
+    pushAction: (HomeScreenAction) -> Unit = {},
     onNavigateToWeatherByLocation: (Int) -> Unit = { },
     onNavigateToAppSettings: () -> Unit = {},
 ) {
@@ -154,239 +148,224 @@ internal fun BoxScope.HomeScreen(
     val density = LocalDensity.current
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
-    var isSearchMode by remember { mutableStateOf(uiState.favoritesForecast.isNotEmpty()) }
+    var searchMode by remember { mutableStateOf(true) }
+    var gpsMode by remember { mutableStateOf(false) }
 
-    var gpsActivationState by remember {
-        mutableStateOf(
-            GpsState()
-        )
-    }
+    eventFlow.collectEvent { event ->
+        when (event) {
+            is HomeScreenEvent.SwitchGpsMode -> {
+                gpsMode = event.enabled
+            }
 
-    var showDialog by remember { mutableStateOf(false) }
+            is HomeScreenEvent.GetGpsLocation -> {
+                getGpsLocation(context, pushAction)
+            }
 
-    LaunchedEffect(gpsActivationState.isRequestToEnable) {
-        if (gpsActivationState.isRequestToEnable) {
-            delay(1000)
-            showDialog = true
-        } else {
-            showDialog = false
-        }
-    }
-
-    LaunchedEffect(uiState.favoritesForecast) {
-        if (uiState.favoritesForecast.isEmpty()) isSearchMode = false
-    }
-
-    LaunchedEffect(keyboardVisible) {
-        if (uiState.favoritesForecast.isEmpty()) {
-            isSearchMode = keyboardVisible
-        }
-    }
-
-    LaunchedEffect(gpsActivationState) {
-        if (gpsActivationState.isGpsEnabled) {
-            val fusedClient = LocationServices.getFusedLocationProviderClient(context)
-            try {
-                val location = fusedClient.getCurrentLocation(
-                    Priority.PRIORITY_HIGH_ACCURACY, null
-                )
-                location.addOnSuccessListener {
-                    if (it != null) {
-                        onEvent(HomeEvent.GpsLocationChanged(lat = it.latitude, lon = it.longitude))
-                    } else {
-                        Toast.makeText(context, "Can't find location", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            } catch (e: Exception) {
-                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+            is HomeScreenEvent.SwitchSearchMode -> {
+                searchMode = event.enabled
             }
         }
     }
 
-    LaunchedEffect(uiState.gpsLocation) {
-        uiState.gpsLocation?.let {
+    LaunchedEffect(keyboardVisible) {
+        if (uiState.favoritesForecast.isEmpty()) {
+            searchMode = keyboardVisible
+        }
+    }
+
+    LaunchedEffect(uiState.gps.location) {
+        uiState.gps.location?.let {
             onNavigateToWeatherByLocation(it.id)
         }
     }
 
     val topBarPadding by animateDpAsState(
-        targetValue = if (isSearchMode) 0.dp else with(density) { (screenHeight.toPx() / 2.5f).toDp() },
+        targetValue = if (searchMode) 0.dp else with(density) { (screenHeight.toPx() / 2.5f).toDp() },
         animationSpec = tween(durationMillis = ANIMATION_DURATION)
     )
 
-    AutoSizeTitleText(
+    TopTitleText(
         modifier = Modifier.padding(top = screenHeight / 4),
-        visible = !isSearchMode,
-        enter = expandVertically(animationSpec = tween(durationMillis = ANIMATION_DURATION)),
-        exit = shrinkVertically(animationSpec = tween(durationMillis = ANIMATION_DURATION)),
+        visible = !searchMode,
         title = stringResource(R.string.use_search_title),
         maxLines = 2
     )
 
     Column {
-        TopBar(
+        SearchBar(
             modifier = Modifier
                 .padding(top = topBarPadding),
-            uiState = uiState,
-            onEvent = onEvent,
-            isSearchMode = isSearchMode,
+            inputLocation = uiState.inputLocation,
+            isSearchMode = searchMode,
+            isSearching = uiState.isSearching,
+            pushAction = pushAction,
             onNavigateToAppSettings = onNavigateToAppSettings,
-            onPermissionRequest = {
-                gpsActivationState = gpsActivationState.copy(isRequestToEnable = true)
+            onGpsClickButton = {
+                pushAction(HomeScreenAction.SwitchGpsMode(true))
             }
         )
 
-        if (uiState.inputLocation.value.isNotEmpty()) {
-            MatchingLocations(uiState, onEvent, onNavigateToWeatherByLocation)
-        } else FavoritesLocations(uiState, onEvent, onNavigateToWeatherByLocation)
+        if (uiState.inputLocation.text.isNotEmpty() && searchMode) {
+            MatchingLocations(uiState.matchingLocations, uiState.favorites, pushAction, onNavigateToWeatherByLocation)
+        } else FavoritesLocations(uiState.favorites, uiState.favoritesForecast, pushAction, onNavigateToWeatherByLocation)
 
-        if (showDialog) {
-            AlertPermissionDialog(
-                onDismissRequest = { gpsActivationState = gpsActivationState.copy(isRequestToEnable = false) },
+        if (gpsMode) {
+            PermissionAlertDialog(
+                onDismissRequest = { pushAction(HomeScreenAction.SwitchGpsMode(false)) },
                 onPermissionGranted = { granted ->
-                    gpsActivationState = gpsActivationState.copy(isPermissionGranted = granted)
+                    pushAction(HomeScreenAction.AccessFineLocationPermissionGranted(granted))
                 },
                 deniedTitle = R.string.permission_location_denied_title,
                 firstTimeTitle = R.string.permission_location_first_time_title,
                 permission = android.Manifest.permission.ACCESS_FINE_LOCATION
             )
         }
-        if (gpsActivationState.isPermissionGranted && showDialog) {
-            AlertGpsDialog(
-                onDismissRequest = { gpsActivationState = gpsActivationState.copy(isRequestToEnable = false) },
-                onGpsEnabled = { enabled ->
-                    gpsActivationState = gpsActivationState.copy(isGpsEnabled = enabled)
+        if (uiState.gps.isPermissionGranted && gpsMode) {
+            GpsModeAlertDialog(
+                onDismissRequest = { gpsMode = false },
+                onGpsModeEnabled = { enabled ->
+                    pushAction(HomeScreenAction.DeviceGpsModeEnabled(enabled))
                 }
             )
         }
     }
-    AutoSizeTitleText(
+
+    BottomTitleText(
         modifier = Modifier.padding(bottom = screenHeight / 4),
-        alignment = Alignment.BottomEnd,
-        visible = !isSearchMode,
-        enter = expandVertically(
-            animationSpec = tween(durationMillis = ANIMATION_DURATION),
-            expandFrom = Alignment.Top
-        ),
-        exit = shrinkVertically(
-            animationSpec = tween(
-                durationMillis = ANIMATION_DURATION
-            ),
-            shrinkTowards = Alignment.Top
-        ),
+        visible = !searchMode,
         title = stringResource(R.string.use_gps_title),
-        textAlign = TextAlign.End,
         maxLines = 2
+    )
+}
+
+@Composable
+private fun BoxScope.TopTitleText(
+    modifier: Modifier = Modifier,
+    visible: Boolean,
+    enter: EnterTransition = expandVertically(
+        animationSpec = tween(durationMillis = ANIMATION_DURATION)
+    ),
+    exit: ExitTransition = shrinkVertically(
+        animationSpec = tween(durationMillis = ANIMATION_DURATION)
+    ),
+    title: String,
+    maxLines: Int,
+) {
+    AnimatedAutoSizeTitleText(
+        modifier = modifier,
+        visible = visible,
+        enter = enter,
+        exit = exit,
+        title = title,
+        maxLines = maxLines
+    )
+}
+
+@Composable
+private fun BoxScope.BottomTitleText(
+    modifier: Modifier = Modifier,
+    visible: Boolean,
+    enter: EnterTransition = expandVertically(
+        animationSpec = tween(durationMillis = ANIMATION_DURATION),
+        expandFrom = Alignment.Top
+    ),
+    exit: ExitTransition = shrinkVertically(
+        animationSpec = tween(
+            durationMillis = ANIMATION_DURATION
+        ),
+        shrinkTowards = Alignment.Top
+    ),
+    title: String,
+    textAlign: TextAlign = TextAlign.End,
+    maxLines: Int,
+) {
+    AnimatedAutoSizeTitleText(
+        modifier = modifier,
+        alignment = Alignment.BottomEnd,
+        visible = visible,
+        enter = enter,
+        exit = exit,
+        title = title,
+        textAlign = textAlign,
+        maxLines = maxLines
     )
 }
 
 
 @Composable
-private fun TopBar(
+private fun SearchBar(
     modifier: Modifier = Modifier,
-    uiState: HomeUiState,
-    onEvent: (HomeEvent) -> Unit,
+    inputLocation: TextFieldValue,
     isSearchMode: Boolean,
-    onPermissionRequest: (Boolean) -> Unit = {},
+    isSearching: Boolean,
+    pushAction: (HomeScreenAction) -> Unit = {},
+    onGpsClickButton: (Boolean) -> Unit = {},
     onNavigateToAppSettings: () -> Unit,
 ) {
     Column {
-        Row(
-            modifier = modifier
-                .padding(padding16)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            SearchTextField(
-                modifier = Modifier
-                    .weight(1f),
-                searchQuery = uiState.inputLocation.value,
-                onSearchQueryChanged = { onEvent(HomeEvent.InputLocationChanged(it)) },
-                isError = !uiState.inputLocation.isValidLocation(),
-                placeholder = stringResource(R.string.search),
-                leadingIcon = if (uiState.isSearching) {
-                    {
-                        LoadingIndicator(
-                            modifier =
-                                Modifier
-                                    .height(itemHeight20)
-                                    .aspectRatio(1f)
-                        )
-                    }
-                } else null,
-                trailingIcon = if (uiState.inputLocation.value.isEmpty()) {
-                    {
-                        IconButton(
-                            onClick = { },
-                        ) {
-                            Icon(
-                                imageVector = WeatherIcons.Map,
-                                contentDescription = null
-                            )
-                        }
-                    }
-                } else null
-            )
-            AnimatedVisibility(
-                visible = isSearchMode,
-                enter = expandHorizontally(animationSpec = tween(durationMillis = ANIMATION_DURATION)),
-                exit = shrinkHorizontally(animationSpec = tween(durationMillis = ANIMATION_DURATION))
-            ) {
-                Icon(
-                    modifier = Modifier
-                        .padding(start = padding8)
-                        .clickable { onNavigateToAppSettings() },
-                    imageVector = WeatherIcons.Settings,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                )
-            }
-        }
-        AnimatedVisibility(
-            visible = !isSearchMode,
-            enter = fadeIn(animationSpec = tween(durationMillis = ANIMATION_DURATION)),
-            exit = fadeOut(animationSpec = tween(durationMillis = ANIMATION_DURATION))
-        ) {
-            val interactionSource = remember { MutableInteractionSource() }
-            val pressed by interactionSource.collectIsPressedAsState()
-            val scale by animateFloatAsState(if (pressed) 0.85f else 1f)
-
-            Box(modifier = Modifier.fillMaxWidth()) {
-                IconButton(
-                    modifier = Modifier
-                        .size(itemHeight64)
-                        .graphicsLayer(scaleX = scale, scaleY = scale)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
-                        .clickable(
-                            interactionSource = interactionSource,
-                            indication = ripple(
-                                bounded = true,
-                                radius = itemHeight64,
-                                color = MaterialTheme.colorScheme.secondary.copy(alpha = 1f)
-                            )
-                        ) { }
-                        .align(Alignment.Center),
-                    onClick = { onPermissionRequest(true) },
-                    interactionSource = interactionSource,
-                ) {
-                    Icon(
-                        imageVector = WeatherIcons.GPS,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }
-        }
+        TopBar(modifier, inputLocation, pushAction, isSearching, isSearchMode, onNavigateToAppSettings)
+        GpsButton(isSearchMode, onGpsClickButton)
     }
 
 }
 
 @Composable
+private fun GpsButton(
+    isSearchMode: Boolean,
+    onGetGpsClickButton: (Boolean) -> Unit,
+) {
+    AnimatedCircleButton(isSearchMode, onGetGpsClickButton, ANIMATION_DURATION)
+}
+
+@Composable
+private fun TopBar(
+    modifier: Modifier,
+    inputLocation: TextFieldValue,
+    pushAction: (HomeScreenAction) -> Unit,
+    isSearching: Boolean,
+    isSearchMode: Boolean,
+    onNavigateToAppSettings: () -> Unit,
+) {
+    Row(
+        modifier = modifier
+            .padding(padding16)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        SearchTextField(
+            modifier = Modifier
+                .weight(1f),
+            searchQuery = inputLocation,
+            onSearchQueryChanged = { pushAction(HomeScreenAction.InputLocation(it)) },
+            isError = !inputLocation.hasValidLocation(),
+            placeholder = stringResource(R.string.search),
+            leadingIcon = if (isSearching) {
+                {
+                    LoadingIndicator(
+                        modifier = Modifier
+                            .height(itemHeight20)
+                            .aspectRatio(1f)
+                    )
+                }
+            } else null,
+            trailingIcon = if (inputLocation.text.isEmpty()) {
+                {
+                    IconButton(onClick = { }) {
+                        Icon(imageVector = WeatherIcons.Map, contentDescription = null)
+                    }
+                }
+            } else null
+        )
+        AnimatedIcon(isSearchMode, onNavigateToAppSettings, ANIMATION_DURATION)
+    }
+}
+
+@Composable
 private fun MatchingLocations(
-    uiState: HomeUiState,
-    onEvent: (HomeEvent) -> Unit = {},
+    locations: ImmutableList<Location>,
+    favorites: ImmutableList<Location>,
+    pushAction: (HomeScreenAction) -> Unit = {},
     onNavigateToWeatherByLocation: (Int) -> Unit = {},
 ) {
 
@@ -396,7 +375,7 @@ private fun MatchingLocations(
             .wrapContentHeight(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        uiState.matchingLocations.forEach { location ->
+        locations.forEach { location ->
             Row(
                 modifier = Modifier
                     .clickable {
@@ -418,22 +397,21 @@ private fun MatchingLocations(
                                 color = MaterialTheme.colorScheme.onSurface,
                             )
                         ) {
-                            if (location.city.isNotEmpty()) {
-                                append("${location.city}, ")
-                            }
-
+                            location.city?.let {
+                                append("${it}, ")
+                            } ?: ""
                         }
                         withStyle(
                             MaterialTheme.typography.labelMedium.toSpanStyle().copy(
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
                             )
                         ) {
-                            if (location.state.isNotEmpty()) {
-                                append("${location.state}, ")
-                            }
-                            if (location.country.isNotEmpty()) {
-                                append(location.country)
-                            }
+                            location.state?.let {
+                                append("${it}, ")
+                            } ?: ""
+                            location.country?.let {
+                                append(it)
+                            } ?: ""
                         }
                     },
                     maxLines = 3,
@@ -450,15 +428,15 @@ private fun MatchingLocations(
                 IconButton(
                     modifier = Modifier.width(itemWidth56),
                     onClick = {
-                        if (uiState.favorites.any { it.id == location.id }) {
-                            onEvent(HomeEvent.RemoveFavorite(location.id))
+                        if (favorites.any { it.id == location.id }) {
+                            pushAction(HomeScreenAction.RemoveFavorite(location.id))
                         } else {
-                            onEvent(HomeEvent.AddFavorite(location.id))
+                            pushAction(HomeScreenAction.AddFavorite(location.id))
                         }
                     }
                 ) {
                     Icon(
-                        imageVector = if (uiState.favorites.any { it.id == location.id }) WeatherIcons.RemoveFavorite else WeatherIcons.AddFavorite,
+                        imageVector = if (favorites.any { it.id == location.id }) WeatherIcons.RemoveFavorite else WeatherIcons.AddFavorite,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
                     )
@@ -475,7 +453,7 @@ private fun MatchingLocations(
                     .fillMaxWidth()
             )
         }
-        OpenWebsiteLink(
+        LocationApiLink(
             modifier = Modifier
                 .padding(vertical = padding16)
                 .fillMaxWidth()
@@ -489,8 +467,9 @@ private fun MatchingLocations(
 
 @Composable
 private fun FavoritesLocations(
-    uiState: HomeUiState,
-    onEvent: (HomeEvent) -> Unit,
+    favorites: ImmutableList<Location>,
+    favoritesForecast: ImmutableMap<Int, Forecast>,
+    pushAction: (HomeScreenAction) -> Unit = {},
     onNavigateToWeatherByLocation: (Int) -> Unit,
 ) {
     LazyColumn(
@@ -500,27 +479,27 @@ private fun FavoritesLocations(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(space16),
     ) {
-        items(uiState.favorites, key = { location -> location.id }) { location ->
-            val favoriteForecast = uiState.favoritesForecast[location.id]
+        items(favorites, key = { location -> location.id }) { location ->
+            val favoriteForecast = favoritesForecast[location.id]
             favoriteForecast?.let {
                 FavoriteItem(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(itemHeight160),
-                    locationName = it.locationInfo.name,
-                    locationCountry = it.locationInfo.country,
-                    timeZone = it.locationInfo.timeZone,
-                    temperature = it.currentInfo.temperature,
-                    maxTemperature = it.forecastInfo.today.maxTemperature,
-                    minTemperature = it.forecastInfo.today.minTemperature,
-                    conditionText = it.currentInfo.conditionText,
-                    condition = it.currentInfo.condition,
+                    locationName = it.location.city,
+                    locationCountry = it.location.country,
+                    timeZone = it.location.timeZone,
+                    temperature = it.today.temperature,
+                    maxTemperature = it.forecast.today.maxTemperature,
+                    minTemperature = it.forecast.today.minTemperature,
+                    conditionText = it.today.conditionText,
+                    condition = it.today.condition,
                     onTapClicked = {
                         onNavigateToWeatherByLocation(
                             location.id
                         )
                     },
-                    onDeleteClicked = { onEvent(HomeEvent.RemoveFavorite(location.id)) }
+                    onDeleteClicked = { pushAction(HomeScreenAction.RemoveFavorite(location.id)) }
                 )
             }
         }
@@ -534,7 +513,7 @@ private fun FavoritesLocations(
 }
 
 @Composable
-private fun OpenWebsiteLink(modifier: Modifier, url: String, description: String) {
+private fun LocationApiLink(modifier: Modifier, url: String, description: String) {
     val context = LocalContext.current
 
     val annotatedText = buildAnnotatedString {
@@ -564,29 +543,51 @@ private fun OpenWebsiteLink(modifier: Modifier, url: String, description: String
     )
 }
 
+@SuppressLint("MissingPermission")
+private fun getGpsLocation(
+    context: Context,
+    pushAction: (HomeScreenAction) -> Unit,
+) {
+    val fusedClient = LocationServices.getFusedLocationProviderClient(context)
+    try {
+        val location = fusedClient.getCurrentLocation(
+            Priority.PRIORITY_HIGH_ACCURACY, null
+        )
+        location.addOnSuccessListener {
+            if (it != null) {
+                pushAction(HomeScreenAction.UpdateGpsLocation(lat = it.latitude, lon = it.longitude))
+            } else {
+                Toast.makeText(context, "Can't find location", Toast.LENGTH_SHORT).show()
+            }
+        }
+    } catch (e: Exception) {
+        Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+    }
+}
+
 @Preview(showBackground = false, showSystemUi = false, device = "id:pixel_5")
 @Composable
 private fun HomeScreenPreview() {
-    val uiState = HomeUiState(
+    val uiState = HomeScreenState(
         matchingLocations = listOf(
-            LocationInfoDomainModel.EMPTY.copy(
+            Location.EMPTY.copy(
                 city = "Москва",
                 state = "Московская область",
                 country = "Россия"
             ),
-            LocationInfoDomainModel.EMPTY.copy(
+            Location.EMPTY.copy(
                 city = "Москоу",
                 state = "Айдахо",
                 country = "США"
             )
         ).toPersistentList(),
         favorites = listOf(
-            LocationInfoDomainModel.EMPTY.copy(
+            Location.EMPTY.copy(
                 city = "Москва",
                 state = "Московская область",
                 country = "Россия"
             ),
-            LocationInfoDomainModel.EMPTY.copy(
+            Location.EMPTY.copy(
                 city = "Москоу",
                 state = "Айдахо",
                 country = "США"
@@ -602,7 +603,8 @@ private fun HomeScreenPreview() {
                 .padding(WindowInsets.statusBars.asPaddingValues())
         ) {
             HomeScreen(
-                uiState
+                uiState,
+                eventFlow = flowOf()
             )
         }
 

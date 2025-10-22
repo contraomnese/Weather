@@ -15,8 +15,8 @@ import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemThickness1
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding32
-import com.contraomnese.weather.domain.weatherByLocation.model.internal.CompactWeatherCondition
-import com.contraomnese.weather.domain.weatherByLocation.model.internal.ForecastHour
+import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
+import com.contraomnese.weather.domain.weatherByLocation.model.ForecastHour
 import kotlin.random.Random
 
 

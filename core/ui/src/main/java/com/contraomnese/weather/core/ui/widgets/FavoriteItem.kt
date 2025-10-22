@@ -50,8 +50,8 @@ import com.contraomnese.weather.design.theme.itemWidth56
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.design.theme.space8
-import com.contraomnese.weather.domain.weatherByLocation.model.internal.CompactWeatherCondition
-import com.contraomnese.weather.domain.weatherByLocation.model.internal.LocationDateTime
+import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
+import com.contraomnese.weather.domain.weatherByLocation.model.LocationDateTime
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone

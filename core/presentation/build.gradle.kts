@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -40,6 +41,7 @@ dependencies {
 
     implementation(libs.bundles.core)
     implementation(libs.bundles.presentation)
+    implementation(libs.bundles.koin)
     testImplementation(libs.bundles.test)
     androidTestImplementation(libs.bundles.androidTest)
 }

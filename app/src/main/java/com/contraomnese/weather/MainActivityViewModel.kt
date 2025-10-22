@@ -1,63 +1,39 @@
 package com.contraomnese.weather
 
-import androidx.compose.runtime.Immutable
+import androidx.lifecycle.viewModelScope
 import com.contraomnese.weather.domain.home.usecase.AddFavoriteUseCase
 import com.contraomnese.weather.domain.home.usecase.ObserveFavoritesUseCase
-import com.contraomnese.weather.domain.weatherByLocation.model.LocationInfoDomainModel
-import com.contraomnese.weather.presentation.architecture.BaseViewModel
-import com.contraomnese.weather.presentation.architecture.UiState
-import com.contraomnese.weather.presentation.notification.NotificationMonitor
-import com.contraomnese.weather.presentation.usecase.UseCaseExecutorProvider
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toPersistentList
-import kotlinx.coroutines.flow.Flow
+import com.contraomnese.weather.presentation.architecture.MviModel
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 
-@Immutable
-internal sealed interface MainActivityEvent {
-    data object NotLoading : MainActivityEvent
-    data class AddFavorite(val locationId: Int) : MainActivityEvent
-}
-
-internal data class MainActivityUiState(
-    override val isLoading: Boolean = true,
-    val favorites: ImmutableList<LocationInfoDomainModel> = persistentListOf(),
-) : UiState {
-
-    override fun loading(): UiState = copy(isLoading = true)
-}
 
 internal class MainActivityViewModel(
-    notificationMonitor: NotificationMonitor,
-    useCaseExecutorProvider: UseCaseExecutorProvider,
     private val observeFavoritesUseCase: ObserveFavoritesUseCase,
     private val addFavoriteUseCase: AddFavoriteUseCase,
-) : BaseViewModel<MainActivityUiState, MainActivityEvent>(useCaseExecutorProvider, notificationMonitor) {
-
-    init {
-        observe(observeFavoritesUseCase, ::onFavoritesUpdate, ::provideException)
+) : MviModel<MainActivityAction, MainActivityEffect, MainActivityEvent, MainActivityState>(
+    tag = "MainActivity",
+    defaultState = MainActivityState.DEFAULT
+) {
+    override suspend fun bootstrap() {
+        observeFavoritesUseCase()
+            .onEach {
+                push(MainActivityEffect.FavoritesUpdated(it))
+            }
+            .stateIn(viewModelScope)
     }
 
-    override fun initialState(): MainActivityUiState = MainActivityUiState(isLoading = true)
-
-    override fun onEvent(event: MainActivityEvent) {
-        when (event) {
-            is MainActivityEvent.AddFavorite -> onFavoriteAdded(event.locationId)
-            MainActivityEvent.NotLoading -> updateViewState { copy(isLoading = false) }
-        }
+    override fun reducer(effect: MainActivityEffect, previousState: MainActivityState): MainActivityState = when (effect) {
+        is MainActivityEffect.NotLoading -> previousState.copy(isLoading = false)
+        is MainActivityEffect.FavoritesUpdated -> previousState.setFavorites(effect.favorites)
     }
 
-    val notificationEvents: Flow<Int> = observeNotificationEvents()
-
-    private fun onFavoritesUpdate(newFavorites: List<LocationInfoDomainModel>) {
-        updateViewState { copy(favorites = newFavorites.toPersistentList()) }
+    override suspend fun actor(action: MainActivityAction) = when (action) {
+        is MainActivityAction.AddFavorite -> processFavoriteAdd(action.locationId)
+        MainActivityAction.NotLoading -> push(MainActivityEffect.NotLoading)
     }
 
-    private fun onFavoriteAdded(locationId: Int) {
-        execute(
-            addFavoriteUseCase,
-            locationId,
-            onException = ::provideException
-        )
+    private suspend fun processFavoriteAdd(locationId: Int) {
+        addFavoriteUseCase(locationId)
     }
 }

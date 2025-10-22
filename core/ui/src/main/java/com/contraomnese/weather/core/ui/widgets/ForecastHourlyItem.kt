@@ -20,7 +20,7 @@ import com.contraomnese.weather.design.theme.itemHeight20
 import com.contraomnese.weather.design.theme.itemHeight26
 import com.contraomnese.weather.design.theme.itemWidth40
 import com.contraomnese.weather.design.theme.padding16
-import com.contraomnese.weather.domain.weatherByLocation.model.internal.CompactWeatherCondition
+import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
 
 @Composable
 fun ForecastHourlyItem(

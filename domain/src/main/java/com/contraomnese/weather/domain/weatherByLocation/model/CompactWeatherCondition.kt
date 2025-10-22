@@ -1,4 +1,4 @@
-package com.contraomnese.weather.domain.weatherByLocation.model.internal
+package com.contraomnese.weather.domain.weatherByLocation.model
 
 enum class CompactWeatherCondition {
     CLEAR, PARTLY_CLOUDY, CLOUDY, FOG, RAIN, SNOW, THUNDER, SLEET;

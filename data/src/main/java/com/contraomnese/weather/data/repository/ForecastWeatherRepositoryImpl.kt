@@ -6,7 +6,7 @@ import com.contraomnese.weather.data.network.models.WeatherErrorResponse
 import com.contraomnese.weather.data.network.parsers.parseOrThrowError
 import com.contraomnese.weather.data.storage.db.WeatherDatabase
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
-import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeatherDomainModel
+import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 import com.contraomnese.weather.domain.weatherByLocation.repository.ForecastWeatherRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,7 +31,7 @@ class ForecastWeatherRepositoryImpl(
     private val settingsFlow = appSettingsRepository.settings
         .shareIn(CoroutineScope(Dispatchers.IO), SharingStarted.Eagerly, 1)
 
-    override fun observeBy(locationId: Int): Flow<ForecastWeatherDomainModel?> {
+    override fun observeBy(locationId: Int): Flow<Forecast?> {
         return combine(
             weatherDatabase.forecastDao().observeForecastBy(locationId),
             settingsFlow
@@ -54,7 +54,7 @@ class ForecastWeatherRepositoryImpl(
         weatherDatabase.forecastDao()
             .updateForecastForLocation(
                 locationId = location.networkId,
-                locationName = location.city,
+                locationName = location.city ?: location.name,
                 forecastResponse = response
             )
     }
