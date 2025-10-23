@@ -2,9 +2,7 @@ package com.contraomnese.weather.weatherByLocation.presentation
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -50,59 +48,40 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.contraomnese.weather.core.ui.utils.handleHorizontalDragEnd
 import com.contraomnese.weather.core.ui.utils.toPx
-import com.contraomnese.weather.core.ui.widgets.AirQualityItem
-import com.contraomnese.weather.core.ui.widgets.CollapsableContainer
-import com.contraomnese.weather.core.ui.widgets.CollapsableContainerWithAnimatedHeader
-import com.contraomnese.weather.core.ui.widgets.ForecastDailyColumn
-import com.contraomnese.weather.core.ui.widgets.ForecastHourlyLazyRow
-import com.contraomnese.weather.core.ui.widgets.HumidityItem
 import com.contraomnese.weather.core.ui.widgets.ImageBackgroundWithGradient
 import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
-import com.contraomnese.weather.core.ui.widgets.PressureItem
-import com.contraomnese.weather.core.ui.widgets.RainfallItem
-import com.contraomnese.weather.core.ui.widgets.SunriseItem
 import com.contraomnese.weather.core.ui.widgets.TitleSection
-import com.contraomnese.weather.core.ui.widgets.UvIndexItem
 import com.contraomnese.weather.core.ui.widgets.WeatherBottomBar
 import com.contraomnese.weather.core.ui.widgets.WeatherSnackBarHost
-import com.contraomnese.weather.core.ui.widgets.WindItem
 import com.contraomnese.weather.design.theme.itemHeight150
 import com.contraomnese.weather.design.theme.itemHeight300
 import com.contraomnese.weather.design.theme.itemHeight32
 import com.contraomnese.weather.design.theme.itemWidth64
-import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding32
 import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.design.theme.space32
 import com.contraomnese.weather.design.theme.space8
-import com.contraomnese.weather.domain.app.model.PrecipitationUnit
-import com.contraomnese.weather.domain.app.model.PressureUnit
-import com.contraomnese.weather.domain.app.model.TemperatureUnit
-import com.contraomnese.weather.domain.app.model.WindSpeedUnit
+import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
 import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 import com.contraomnese.weather.presentation.architecture.collectEvent
-import com.contraomnese.weather.weatherByLocation.presentation.data.AqiSection
-import com.contraomnese.weather.weatherByLocation.presentation.data.DailyForecastSection
-import com.contraomnese.weather.weatherByLocation.presentation.data.HourlyForecastSection
-import com.contraomnese.weather.weatherByLocation.presentation.data.HumiditySection
-import com.contraomnese.weather.weatherByLocation.presentation.data.PressureSection
-import com.contraomnese.weather.weatherByLocation.presentation.data.RainfallSection
-import com.contraomnese.weather.weatherByLocation.presentation.data.SunriseSection
-import com.contraomnese.weather.weatherByLocation.presentation.data.UVIndexSection
-import com.contraomnese.weather.weatherByLocation.presentation.data.WeatherSection
-import com.contraomnese.weather.weatherByLocation.presentation.data.WindSection
+import com.contraomnese.weather.weatherByLocation.presentation.sections.AqiSection
+import com.contraomnese.weather.weatherByLocation.presentation.sections.DailyForecastSection
+import com.contraomnese.weather.weatherByLocation.presentation.sections.HourlyForecastSection
+import com.contraomnese.weather.weatherByLocation.presentation.sections.HumiditySection
+import com.contraomnese.weather.weatherByLocation.presentation.sections.PressureSection
+import com.contraomnese.weather.weatherByLocation.presentation.sections.RainfallSection
+import com.contraomnese.weather.weatherByLocation.presentation.sections.SunriseSection
+import com.contraomnese.weather.weatherByLocation.presentation.sections.UVIndexSection
+import com.contraomnese.weather.weatherByLocation.presentation.sections.WindSection
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -159,7 +138,6 @@ internal fun WeatherRoute(
                 )
 
                 else -> {
-
                     val coroutineScope = rememberCoroutineScope()
                     var offsetX by remember { mutableFloatStateOf(0f) }
                     val screenWidth = LocalConfiguration.current.screenWidthDp.dp.toPx()
@@ -167,7 +145,9 @@ internal fun WeatherRoute(
                     val scaleAnimated = remember { Animatable(1f) }
                     val alphaAnimated = remember { Animatable(1f) }
 
-                    AnimatedBackground(condition = uiState.weather!!.today.condition)
+                    uiState.weather?.let {
+                        AnimatedBackground(condition = it.today.condition)
+                    }
 
                     Box(
                         modifier = Modifier
@@ -175,26 +155,18 @@ internal fun WeatherRoute(
                             .pointerInput(currentFavoriteIndex) {
                                 detectHorizontalDragGestures(
                                     onDragEnd = {
-                                        when {
-                                            offsetX > screenWidth * 0.25f && currentFavoriteIndex > 0 -> {
-                                                val prevFavoriteIndex = currentFavoriteIndex - 1
-                                                pushAction(WeatherScreenAction.SwapFavorite(prevFavoriteIndex))
-                                                AnimateMove(coroutineScope, scaleAnimated, alphaAnimated)
-                                            }
-
-                                            offsetX < -screenWidth * 0.25f && currentFavoriteIndex < uiState.favorites.lastIndex -> {
-                                                val nextFavoriteIndex = currentFavoriteIndex + 1
-                                                pushAction(WeatherScreenAction.SwapFavorite(nextFavoriteIndex))
-                                                AnimateMove(coroutineScope, scaleAnimated, alphaAnimated)
-                                            }
-                                        }
-                                        coroutineScope.launch {
-                                            animate(
-                                                initialValue = offsetX,
-                                                targetValue = 0f,
-                                                animationSpec = tween(600)
-                                            ) { value, _ -> offsetX = value }
-                                        }
+                                        handleHorizontalDragEnd(
+                                            offset = offsetX,
+                                            onOffsetChange = { offsetX = it },
+                                            screenWidth = screenWidth,
+                                            currentFavoriteIndex = currentFavoriteIndex,
+                                            lastFavoriteIndex = uiState.favorites.lastIndex,
+                                            coroutineScope = coroutineScope,
+                                            scaleAnimated = scaleAnimated,
+                                            alphaAnimated = alphaAnimated,
+                                            onDragNext = { pushAction(WeatherScreenAction.SwapFavorite(currentFavoriteIndex + 1)) },
+                                            onDragPrev = { pushAction(WeatherScreenAction.SwapFavorite(currentFavoriteIndex - 1)) }
+                                        )
                                     },
                                     onHorizontalDrag = { _, dragAmount ->
                                         offsetX += dragAmount
@@ -203,8 +175,13 @@ internal fun WeatherRoute(
                             }
                     ) {
                         key(currentFavoriteIndex) {
+
+                            requireNotNull(uiState.weather)
+                            requireNotNull(uiState.appSettings)
+
                             WeatherScreen(
-                                uiState = uiState,
+                                weather = requireNotNull(uiState.weather),
+                                appSettings = requireNotNull(uiState.appSettings),
                                 modifier = Modifier
                                     .offset { IntOffset(offsetX.roundToInt(), 0) }
                                     .graphicsLayer {
@@ -224,10 +201,9 @@ internal fun WeatherRoute(
 @Composable
 internal fun WeatherScreen(
     modifier: Modifier = Modifier,
-    uiState: WeatherScreenState,
+    weather: Forecast,
+    appSettings: AppSettings,
 ) {
-    requireNotNull(uiState.weather)
-    requireNotNull(uiState.appSettings)
 
     val lazyListState = rememberLazyListState()
 
@@ -236,7 +212,7 @@ internal fun WeatherScreen(
 
     var currentTitleBoxHeight by remember { mutableFloatStateOf(maxTitleBoxHeightPx) }
 
-    val progress by remember(currentTitleBoxHeight) {
+    val titleBoxHeightProgress by remember(currentTitleBoxHeight) {
         derivedStateOf {
             ((currentTitleBoxHeight - minTitleBoxHeightPx) /
                     (maxTitleBoxHeightPx - minTitleBoxHeightPx))
@@ -256,7 +232,7 @@ internal fun WeatherScreen(
                 HourlyForecastSection(),
                 DailyForecastSection(),
                 AqiSection(),
-                SunriseSection(isDay = uiState.weather.today.isDay),
+                SunriseSection(isDay = weather.today.isDay),
                 UVIndexSection(),
                 WindSection(),
                 HumiditySection(),
@@ -421,12 +397,12 @@ internal fun WeatherScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(with(LocalDensity.current) { currentTitleBoxHeight.toDp() }),
-            location = uiState.weather.location.city,
-            currentTemp = uiState.weather.today.temperature,
-            feelsLikeTemp = uiState.weather.today.feelsLikeTemperature,
-            maxTemp = uiState.weather.forecast.today.maxTemperature,
-            minTemp = uiState.weather.forecast.today.minTemperature,
-            condition = uiState.weather.today.conditionText,
+            location = weather.location.city,
+            currentTemp = weather.today.temperature,
+            feelsLikeTemp = weather.today.feelsLikeTemperature,
+            maxTemp = weather.forecast.today.maxTemperature,
+            minTemp = weather.forecast.today.minTemperature,
+            condition = weather.today.conditionText,
         )
         LazyColumn(
             modifier = Modifier
@@ -446,64 +422,13 @@ internal fun WeatherScreen(
                     }
                 }
 
-                when (section) {
-                    is HourlyForecastSection,
-                        -> HourlyForecastSection(headerSectionHeight, section, uiState.weather, progress, measureContainerHeight)
-
-                    is DailyForecastSection,
-                        -> DailyForecastSection(
-                        headerSectionHeight,
-                        section,
-                        measureContainerHeight,
-                        uiState.weather,
-                        uiState.appSettings.temperatureUnit
-                    )
-
-                    is AqiSection,
-                        -> AqiSection(headerSectionHeight, section, measureContainerHeight, uiState.weather)
-
-                    is SunriseSection,
-                        -> SunriseSection(headerSectionHeight, section, measureContainerHeight, uiState.weather)
-
-                    is UVIndexSection,
-                        -> UvIndexSection(headerSectionHeight, section, measureContainerHeight, uiState.weather)
-
-                    is WindSection,
-                        -> WindSection(
-                        headerSectionHeight,
-                        section,
-                        measureContainerHeight,
-                        uiState.weather,
-                        uiState.appSettings.windSpeedUnit
-                    )
-
-                    is HumiditySection,
-                        -> HumiditySection(
-                        headerSectionHeight,
-                        section,
-                        measureContainerHeight,
-                        uiState.weather,
-                        uiState.appSettings.temperatureUnit
-                    )
-
-                    is RainfallSection,
-                        -> RainfallSection(
-                        headerSectionHeight,
-                        section,
-                        measureContainerHeight,
-                        uiState.weather,
-                        uiState.appSettings.precipitationUnit
-                    )
-
-                    is PressureSection,
-                        -> PressureSection(
-                        headerSectionHeight,
-                        section,
-                        measureContainerHeight,
-                        uiState.weather,
-                        uiState.appSettings.pressureUnit
-                    )
-                }
+                section.Render(
+                    headerSectionHeight = headerSectionHeight,
+                    weather = weather,
+                    appSettings = appSettings,
+                    measureContainerHeight = measureContainerHeight,
+                    progress = titleBoxHeightProgress
+                )
             }
             item {
                 Spacer(
@@ -517,246 +442,7 @@ internal fun WeatherScreen(
 }
 
 @Composable
-private fun HourlyForecastSection(
-    headerSectionHeight: Dp,
-    section: HourlyForecastSection,
-    weather: Forecast,
-    progress: Float,
-    measureContainerHeight: (Int) -> Unit,
-) {
-    CollapsableContainerWithAnimatedHeader(
-        minHeaderHeight = headerSectionHeight,
-        currentBodyHeight = section.bodyHeight,
-        headerTitle = stringResource(section.title),
-        headerIcon = section.icon,
-        alertTitle = weather.alerts.alerts.firstOrNull(),
-        progress = progress,
-        onContentMeasured = measureContainerHeight
-    ) {
-        ForecastHourlyLazyRow(
-            modifier = Modifier.padding(horizontal = padding16, vertical = padding8),
-            items = weather.forecast.hours
-        )
-    }
-}
-
-@Composable
-private fun DailyForecastSection(
-    headerSectionHeight: Dp,
-    section: DailyForecastSection,
-    measureContainerHeight: (Int) -> Unit,
-    weather: Forecast,
-    temperatureUnit: TemperatureUnit,
-) {
-    CollapsableContainer(
-        headerHeight = headerSectionHeight,
-        headerTitle = stringResource(section.title),
-        headerIcon = section.icon,
-        currentBodyHeight = section.bodyHeight,
-        onContentMeasured = measureContainerHeight
-    ) {
-        ForecastDailyColumn(
-            modifier = Modifier.padding(horizontal = padding16),
-            items = weather.forecast.days,
-            currentTemperature = weather.today.temperature.toInt(),
-            temperatureUnit = temperatureUnit
-        )
-    }
-}
-
-@Composable
-private fun AqiSection(
-    headerSectionHeight: Dp,
-    section: WeatherSection,
-    measureContainerHeight: (Int) -> Unit,
-    weather: Forecast,
-) {
-    CollapsableContainer(
-        headerHeight = headerSectionHeight,
-        headerTitle = stringResource(section.title),
-        headerIcon = section.icon,
-        currentBodyHeight = section.bodyHeight,
-        onContentMeasured = measureContainerHeight
-    ) {
-        AirQualityItem(
-            modifier = Modifier.padding(horizontal = padding16, vertical = padding8),
-            aqiIndex = weather.today.airQuality.aqiIndex,
-            coLevel = weather.today.airQuality.coLevel,
-            no2Level = weather.today.airQuality.no2Level,
-            o3Level = weather.today.airQuality.o3Level,
-            so2Level = weather.today.airQuality.so2Level,
-            pm25Level = weather.today.airQuality.pm25Level,
-            pm10Level = weather.today.airQuality.pm10Level,
-        )
-    }
-}
-
-@Composable
-private fun SunriseSection(
-    headerSectionHeight: Dp,
-    section: SunriseSection,
-    measureContainerHeight: (Int) -> Unit,
-    weather: Forecast,
-) {
-    val today = weather.forecast.today
-    val location = weather.location
-
-    val sunrise = today.sunrise
-    val sunset = today.sunset
-    val isDay = weather.today.isDay
-
-    if (sunrise != null && sunset != null) {
-        CollapsableContainer(
-            headerHeight = headerSectionHeight,
-            headerTitle = stringResource(section.title),
-            headerIcon = section.icon,
-            currentBodyHeight = section.bodyHeight,
-            onContentMeasured = measureContainerHeight
-        ) {
-            SunriseItem(
-                modifier = Modifier.padding(horizontal = padding16, vertical = padding8),
-                sunriseTime = sunrise,
-                sunsetTime = sunset,
-                timeZone = location.timeZone,
-                isDay = isDay
-            )
-        }
-    }
-}
-
-@Composable
-private fun UvIndexSection(
-    headerSectionHeight: Dp,
-    section: UVIndexSection,
-    measureContainerHeight: (Int) -> Unit,
-    weather: Forecast,
-) {
-    val today = weather.today
-
-    CollapsableContainer(
-        headerHeight = headerSectionHeight,
-        headerTitle = stringResource(section.title),
-        headerIcon = section.icon,
-        currentBodyHeight = section.bodyHeight,
-        onContentMeasured = measureContainerHeight
-    ) {
-        UvIndexItem(
-            modifier = Modifier.padding(horizontal = padding16, vertical = padding8),
-            index = today.uvIndex.value
-        )
-    }
-}
-
-@Composable
-private fun WindSection(
-    headerSectionHeight: Dp,
-    section: WindSection,
-    measureContainerHeight: (Int) -> Unit,
-    weather: Forecast,
-    windSpeedUnit: WindSpeedUnit,
-) {
-    val today = weather.today
-
-    CollapsableContainer(
-        headerHeight = headerSectionHeight,
-        headerTitle = stringResource(section.title),
-        headerIcon = section.icon,
-        currentBodyHeight = section.bodyHeight,
-        onContentMeasured = measureContainerHeight
-    ) {
-        WindItem(
-            modifier = Modifier.padding(horizontal = padding16, vertical = padding8),
-            windSpeed = today.windSpeed,
-            gustSpeed = today.gustSpeed,
-            degree = today.windDegree,
-            direction = today.windDirection,
-            windSpeedUnit = windSpeedUnit
-        )
-    }
-}
-
-@Composable
-private fun HumiditySection(
-    headerSectionHeight: Dp,
-    section: HumiditySection,
-    measureContainerHeight: (Int) -> Unit,
-    weather: Forecast,
-    temperatureUnit: TemperatureUnit,
-) {
-    val today = weather.today
-
-    CollapsableContainer(
-        headerHeight = headerSectionHeight,
-        headerTitle = stringResource(section.title),
-        headerIcon = section.icon,
-        currentBodyHeight = section.bodyHeight,
-        onContentMeasured = measureContainerHeight
-    ) {
-        HumidityItem(
-            modifier = Modifier.padding(horizontal = padding16, vertical = padding8),
-            humidity = today.humidity,
-            dewPoint = today.dewPoint,
-            temperatureUnit = temperatureUnit
-        )
-    }
-}
-
-@Composable
-private fun RainfallSection(
-    headerSectionHeight: Dp,
-    section: RainfallSection,
-    measureContainerHeight: (Int) -> Unit,
-    weather: Forecast,
-    precipitationUnit: PrecipitationUnit,
-) {
-    val today = weather.today
-
-    CollapsableContainer(
-        headerHeight = headerSectionHeight,
-        headerTitle = stringResource(section.title),
-        headerIcon = section.icon,
-        currentBodyHeight = section.bodyHeight,
-        onContentMeasured = measureContainerHeight
-    ) {
-        RainfallItem(
-            modifier = Modifier.padding(horizontal = padding16, vertical = padding8),
-            rainfallBeforeNow = today.rainfallBeforeNow,
-            rainfallAfterNow = today.rainfallAfterNow,
-            rainfallNow = today.rainfallNow,
-            isRainingExpected = today.isRainingExpected,
-            maxRainfall = today.maxRainfall,
-            precipitationUnit = precipitationUnit
-        )
-    }
-}
-
-@Composable
-private fun PressureSection(
-    headerSectionHeight: Dp,
-    section: PressureSection,
-    measureContainerHeight: (Int) -> Unit,
-    weather: Forecast,
-    pressureUnit: PressureUnit,
-) {
-    val today = weather.today
-
-    CollapsableContainer(
-        headerHeight = headerSectionHeight,
-        headerTitle = stringResource(section.title),
-        headerIcon = section.icon,
-        currentBodyHeight = section.bodyHeight,
-        onContentMeasured = measureContainerHeight
-    ) {
-        PressureItem(
-            modifier = Modifier.padding(horizontal = padding16, vertical = padding8),
-            value = today.pressure,
-            pressureUnit = pressureUnit
-        )
-    }
-}
-
-@Composable
-fun AnimatedBackground(condition: CompactWeatherCondition) {
+private fun AnimatedBackground(condition: CompactWeatherCondition) {
     Crossfade(
         targetState = condition,
         animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing),
@@ -766,21 +452,3 @@ fun AnimatedBackground(condition: CompactWeatherCondition) {
     }
 }
 
-private fun AnimateMove(
-    coroutineScope: CoroutineScope,
-    scaleAnimatable: Animatable<Float, AnimationVector1D>,
-    alphaAnimatable: Animatable<Float, AnimationVector1D>,
-) {
-    coroutineScope.launch {
-        launch {
-            scaleAnimatable.animateTo(0.8f, tween(300))
-        }
-        launch {
-            alphaAnimatable.snapTo(0f)
-        }
-        launch {
-            scaleAnimatable.animateTo(1f, tween(300))
-            alphaAnimatable.animateTo(1f, tween(600))
-        }
-    }
-}
