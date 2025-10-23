@@ -2,6 +2,7 @@ package com.contraomnese.weather.weatherByLocation.presentation
 
 import androidx.lifecycle.viewModelScope
 import com.contraomnese.weather.domain.app.usecase.ObserveAppSettingsUseCase
+import com.contraomnese.weather.domain.home.usecase.AddFavoriteUseCase
 import com.contraomnese.weather.domain.home.usecase.ObserveFavoritesUseCase
 import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveForecastWeatherUseCase
 import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateForecastWeatherUseCase
@@ -18,6 +19,7 @@ internal class WeatherViewModel(
     private val observeForecastWeatherUseCase: ObserveForecastWeatherUseCase,
     private val updateForecastWeatherUseCase: UpdateForecastWeatherUseCase,
     private val observeFavoritesUseCase: ObserveFavoritesUseCase,
+    private val addFavoriteUseCase: AddFavoriteUseCase,
     private val navLocationId: Int,
 ) : MviModel<WeatherScreenAction, WeatherScreenEffect, WeatherScreenEvent, WeatherScreenState>(
     defaultState = WeatherScreenState.default(navLocationId),
@@ -63,13 +65,18 @@ internal class WeatherViewModel(
     }
 
     override suspend fun actor(action: WeatherScreenAction) = when (action) {
-        is WeatherScreenAction.ClickButtonBack -> push(WeatherScreenEvent.NavigateToBack)
+        is WeatherScreenAction.NavigateToHome -> push(WeatherScreenEvent.NavigateToHome)
         is WeatherScreenAction.SwapFavorite -> processSwapFavorite(action.index)
+        is WeatherScreenAction.AddFavorite -> processFavoriteAdd(action.locationId)
     }
 
     private fun processSwapFavorite(index: Int) {
         val currentLocationId = stateFlow.value.favorites[index].id
         if (currentLocationId != stateFlow.value.locationId)
             push(WeatherScreenEffect.LocationUpdated(currentLocationId))
+    }
+
+    private suspend fun processFavoriteAdd(locationId: Int) {
+        addFavoriteUseCase(locationId)
     }
 }

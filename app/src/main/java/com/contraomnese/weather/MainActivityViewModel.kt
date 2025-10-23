@@ -4,8 +4,8 @@ import androidx.lifecycle.viewModelScope
 import com.contraomnese.weather.domain.home.usecase.AddFavoriteUseCase
 import com.contraomnese.weather.domain.home.usecase.ObserveFavoritesUseCase
 import com.contraomnese.weather.presentation.architecture.MviModel
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
 
 
 internal class MainActivityViewModel(
@@ -20,7 +20,7 @@ internal class MainActivityViewModel(
             .onEach {
                 push(MainActivityEffect.FavoritesUpdated(it))
             }
-            .stateIn(viewModelScope)
+            .launchIn(viewModelScope)
     }
 
     override fun reducer(effect: MainActivityEffect, previousState: MainActivityState): MainActivityState = when (effect) {
@@ -30,7 +30,7 @@ internal class MainActivityViewModel(
 
     override suspend fun actor(action: MainActivityAction) = when (action) {
         is MainActivityAction.AddFavorite -> processFavoriteAdd(action.locationId)
-        MainActivityAction.NotLoading -> push(MainActivityEffect.NotLoading)
+        is MainActivityAction.LottieAnimationFinished -> push(MainActivityEffect.NotLoading)
     }
 
     private suspend fun processFavoriteAdd(locationId: Int) {

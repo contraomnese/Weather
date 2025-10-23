@@ -13,15 +13,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
@@ -35,6 +31,7 @@ import com.contraomnese.weather.navigation.WeatherHost
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.KoinAndroidContext
 
+private const val LOTTIE_ASSET_NAME = "loading_lottie.json"
 
 class MainActivity : ComponentActivity() {
 
@@ -58,7 +55,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun SplashScreen(visible: Boolean, onFinish: () -> Unit) {
-    val composition by rememberLottieComposition(LottieCompositionSpec.Asset("loading_lottie.json"))
+    val composition by rememberLottieComposition(LottieCompositionSpec.Asset(LOTTIE_ASSET_NAME))
 
     val progress by animateLottieCompositionAsState(
         composition,
@@ -92,19 +89,14 @@ fun SplashScreen(visible: Boolean, onFinish: () -> Unit) {
 @Composable
 internal fun WeatherApp(viewModel: MainActivityViewModel) {
 
-    val context = LocalContext.current
-    val snackBarHostState = remember { SnackbarHostState() }
-
     val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
 
     Crossfade(targetState = uiState.isLoading, animationSpec = tween(1000)) { loading ->
         if (loading) {
-            SplashScreen(uiState.isLoading) { viewModel.push(MainActivityAction.NotLoading) }
+            SplashScreen(uiState.isLoading) { viewModel.push(MainActivityAction.LottieAnimationFinished) }
         } else {
             WeatherHost(
-                snackBarHostState = remember { SnackbarHostState() },
-                uiState = uiState,
-                pushAction = viewModel::push
+                uiState = uiState
             )
         }
     }

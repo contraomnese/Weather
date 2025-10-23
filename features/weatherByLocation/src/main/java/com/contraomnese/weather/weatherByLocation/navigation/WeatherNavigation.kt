@@ -7,7 +7,6 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.contraomnese.weather.presentation.architecture.MviDestination
-import com.contraomnese.weather.presentation.architecture.*
 import com.contraomnese.weather.weatherByLocation.di.weatherModule
 import com.contraomnese.weather.weatherByLocation.presentation.WeatherRoute
 import com.contraomnese.weather.weatherByLocation.presentation.WeatherViewModel
@@ -27,8 +26,9 @@ fun NavController.navigateToWeatherByLocation(
     navigate(WeatherByLocationDestination(id = id), navOptions)
 }
 
-fun interface WeatherByLocationNavigator {
+interface WeatherByLocationNavigator {
     fun onNavigateBack()
+    fun onNavigateToHome()
 }
 
 @OptIn(KoinExperimentalAPI::class)
@@ -51,7 +51,8 @@ fun NavGraphBuilder.weatherByLocation(
         WeatherRoute(
             viewModel = viewModel,
             eventFlow = viewModel.eventFlow,
-            pushAction = viewModel::push
+            pushAction = viewModel::push,
+            onNavigateToHome = externalNavigator::onNavigateToHome
         )
     }
 }

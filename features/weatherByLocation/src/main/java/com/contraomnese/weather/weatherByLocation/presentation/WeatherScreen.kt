@@ -11,17 +11,24 @@ import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsIgnoringVisibility
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -35,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -61,6 +69,8 @@ import com.contraomnese.weather.core.ui.widgets.RainfallItem
 import com.contraomnese.weather.core.ui.widgets.SunriseItem
 import com.contraomnese.weather.core.ui.widgets.TitleSection
 import com.contraomnese.weather.core.ui.widgets.UvIndexItem
+import com.contraomnese.weather.core.ui.widgets.WeatherBottomBar
+import com.contraomnese.weather.core.ui.widgets.WeatherSnackBarHost
 import com.contraomnese.weather.core.ui.widgets.WindItem
 import com.contraomnese.weather.design.theme.itemHeight150
 import com.contraomnese.weather.design.theme.itemHeight300
@@ -75,8 +85,8 @@ import com.contraomnese.weather.domain.app.model.PrecipitationUnit
 import com.contraomnese.weather.domain.app.model.PressureUnit
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import com.contraomnese.weather.domain.app.model.WindSpeedUnit
-import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
+import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 import com.contraomnese.weather.presentation.architecture.collectEvent
 import com.contraomnese.weather.weatherByLocation.presentation.data.AqiSection
 import com.contraomnese.weather.weatherByLocation.presentation.data.DailyForecastSection
@@ -96,96 +106,117 @@ import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun WeatherRoute(
     viewModel: WeatherViewModel,
     eventFlow: Flow<WeatherScreenEvent>,
     pushAction: (WeatherScreenAction) -> Unit,
+    onNavigateToHome: () -> Unit,
 ) {
+
+    val snackBarHostState = remember { SnackbarHostState() }
 
     val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
 
     eventFlow.collectEvent { event ->
         when (event) {
-            is WeatherScreenEvent.NavigateToBack -> TODO()
+            is WeatherScreenEvent.NavigateToHome -> onNavigateToHome()
             is WeatherScreenEvent.ShowError -> TODO()
-            is WeatherScreenEvent.SwapFavoriteGetWeather -> pushAction(WeatherScreenAction.SwapFavorite(event.index))
         }
     }
 
     val backgroundModifier = if (uiState.isLoading) Modifier.background(MaterialTheme.colorScheme.background) else Modifier
+    val currentFavoriteIndex = uiState.favorites.indexOfFirst { it.id == uiState.locationId }
 
-    val coroutineScope = rememberCoroutineScope()
-    var offsetX by remember { mutableFloatStateOf(0f) }
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp.toPx()
-
-    val scaleAnimated = remember { Animatable(1f) }
-    val alphaAnimated = remember { Animatable(1f) }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .then(backgroundModifier)
-    ) {
-
-        if (!uiState.isLoading) {
-
-            val favoriteIndex = uiState.favorites.indexOfFirst { it.id == uiState.locationId }
-
-            AnimatedBackground(condition = uiState.weather!!.today.condition)
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .pointerInput(favoriteIndex) {
-                        detectHorizontalDragGestures(
-                            onDragEnd = {
-                                when {
-                                    offsetX > screenWidth * 0.25f && favoriteIndex > 0 -> {
-                                        val prevFavoriteIndex = favoriteIndex - 1
-                                        pushAction(WeatherScreenAction.SwapFavorite(prevFavoriteIndex))
-                                        AnimateMove(coroutineScope, scaleAnimated, alphaAnimated)
-                                    }
-
-                                    offsetX < -screenWidth * 0.25f && favoriteIndex < uiState.favorites.lastIndex -> {
-                                        val nextFavoriteIndex = favoriteIndex + 1
-                                        pushAction(WeatherScreenAction.SwapFavorite(nextFavoriteIndex))
-                                        AnimateMove(coroutineScope, scaleAnimated, alphaAnimated)
-                                    }
-                                }
-                                coroutineScope.launch {
-                                    animate(
-                                        initialValue = offsetX,
-                                        targetValue = 0f,
-                                        animationSpec = tween(600)
-                                    ) { value, _ -> offsetX = value }
-                                }
-                            },
-                            onHorizontalDrag = { _, dragAmount ->
-                                offsetX += dragAmount
-                            }
-                        )
-                    }
+    Scaffold(
+        modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBarsIgnoringVisibility),
+        snackbarHost = { WeatherSnackBarHost(snackBarHostState) },
+        bottomBar = {
+            WeatherBottomBar(
+                favorites = uiState.favorites.map { it.id },
+                currentFavoriteIndex = currentFavoriteIndex,
+                onHomeButtonClicked = onNavigateToHome,
             ) {
-                key(favoriteIndex) {
-                    WeatherScreen(
-                        uiState = uiState,
+                pushAction(WeatherScreenAction.AddFavorite(uiState.locationId))
+            }
+        },
+        contentWindowInsets = WindowInsets.navigationBars,
+        containerColor = Color.Transparent,
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .then(backgroundModifier)
+        ) {
+
+            when {
+                uiState.isLoading -> LoadingIndicator(
+                    Modifier
+                        .align(Alignment.Center)
+                        .width(itemWidth64)
+                )
+
+                else -> {
+
+                    val coroutineScope = rememberCoroutineScope()
+                    var offsetX by remember { mutableFloatStateOf(0f) }
+                    val screenWidth = LocalConfiguration.current.screenWidthDp.dp.toPx()
+
+                    val scaleAnimated = remember { Animatable(1f) }
+                    val alphaAnimated = remember { Animatable(1f) }
+
+                    AnimatedBackground(condition = uiState.weather!!.today.condition)
+
+                    Box(
                         modifier = Modifier
-                            .offset { IntOffset(offsetX.roundToInt(), 0) }
-                            .graphicsLayer {
-                                scaleX = scaleAnimated.value
-                                scaleY = scaleAnimated.value
-                                alpha = alphaAnimated.value
+                            .fillMaxSize()
+                            .pointerInput(currentFavoriteIndex) {
+                                detectHorizontalDragGestures(
+                                    onDragEnd = {
+                                        when {
+                                            offsetX > screenWidth * 0.25f && currentFavoriteIndex > 0 -> {
+                                                val prevFavoriteIndex = currentFavoriteIndex - 1
+                                                pushAction(WeatherScreenAction.SwapFavorite(prevFavoriteIndex))
+                                                AnimateMove(coroutineScope, scaleAnimated, alphaAnimated)
+                                            }
+
+                                            offsetX < -screenWidth * 0.25f && currentFavoriteIndex < uiState.favorites.lastIndex -> {
+                                                val nextFavoriteIndex = currentFavoriteIndex + 1
+                                                pushAction(WeatherScreenAction.SwapFavorite(nextFavoriteIndex))
+                                                AnimateMove(coroutineScope, scaleAnimated, alphaAnimated)
+                                            }
+                                        }
+                                        coroutineScope.launch {
+                                            animate(
+                                                initialValue = offsetX,
+                                                targetValue = 0f,
+                                                animationSpec = tween(600)
+                                            ) { value, _ -> offsetX = value }
+                                        }
+                                    },
+                                    onHorizontalDrag = { _, dragAmount ->
+                                        offsetX += dragAmount
+                                    }
+                                )
                             }
-                    )
+                    ) {
+                        key(currentFavoriteIndex) {
+                            WeatherScreen(
+                                uiState = uiState,
+                                modifier = Modifier
+                                    .offset { IntOffset(offsetX.roundToInt(), 0) }
+                                    .graphicsLayer {
+                                        scaleX = scaleAnimated.value
+                                        scaleY = scaleAnimated.value
+                                        alpha = alphaAnimated.value
+                                    }
+                            )
+                        }
+                    }
                 }
             }
-        } else {
-            LoadingIndicator(
-                Modifier
-                    .align(Alignment.Center)
-                    .width(itemWidth64)
-            )
         }
     }
 }

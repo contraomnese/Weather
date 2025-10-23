@@ -4,7 +4,6 @@ import com.contraomnese.weather.presentation.architecture.MviEvent
 
 
 internal sealed interface WeatherScreenEvent : MviEvent {
-    data object NavigateToBack : WeatherScreenEvent
-    data class SwapFavoriteGetWeather(val index: Int) : WeatherScreenEvent
+    data object NavigateToHome : WeatherScreenEvent
     data class ShowError(val message: String?) : WeatherScreenEvent
 }

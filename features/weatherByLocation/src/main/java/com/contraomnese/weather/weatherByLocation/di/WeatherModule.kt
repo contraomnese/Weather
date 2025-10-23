@@ -16,6 +16,7 @@ internal val weatherModule
                 observeForecastWeatherUseCase = get(),
                 observeAppSettingsUseCase = get(),
                 observeFavoritesUseCase = get(),
+                addFavoriteUseCase = get(),
                 navLocationId = locationId
             )
         }
