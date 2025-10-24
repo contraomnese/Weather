@@ -3,12 +3,16 @@ package com.contraomnese.weather.appsettings.presentation
 import androidx.lifecycle.viewModelScope
 import com.contraomnese.weather.domain.app.usecase.ObserveAppSettingsUseCase
 import com.contraomnese.weather.domain.app.usecase.UpdateAppSettingsUseCase
+import com.contraomnese.weather.domain.cleanarchitecture.exception.logPrefix
+import com.contraomnese.weather.domain.cleanarchitecture.exception.notInitialize
 import com.contraomnese.weather.presentation.architecture.MviModel
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 
 
 internal class AppSettingsViewModel(
@@ -20,13 +24,18 @@ internal class AppSettingsViewModel(
 ) {
 
     override suspend fun bootstrap() {
-        push(AppSettingsEffect.SettingsUpdated(observeAppSettingsUseCase().first()))
-
         stateFlow
+            .onStart {
+                push(AppSettingsEffect.SettingsUpdated(observeAppSettingsUseCase().first()))
+            }
             .map { it.appSettings }
             .distinctUntilChanged()
             .onEach {
                 updateAppSettingsUseCase(it)
+                    .onFailure { cause -> push(AppSettingsEvent.HandleError(cause)) }
+            }
+            .catch {
+                push(AppSettingsEvent.HandleError(notInitialize(logPrefix("Bootstrap failed"), it)))
             }
             .launchIn(viewModelScope)
     }

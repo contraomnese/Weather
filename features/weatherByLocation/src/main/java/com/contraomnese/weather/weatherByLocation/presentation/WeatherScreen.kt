@@ -26,6 +26,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -47,6 +48,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -70,6 +72,7 @@ import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
 import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 import com.contraomnese.weather.presentation.architecture.collectEvent
+import com.contraomnese.weather.presentation.utils.handleError
 import com.contraomnese.weather.weatherByLocation.presentation.sections.AqiSection
 import com.contraomnese.weather.weatherByLocation.presentation.sections.DailyForecastSection
 import com.contraomnese.weather.weatherByLocation.presentation.sections.HourlyForecastSection
@@ -85,6 +88,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun WeatherRoute(
@@ -93,7 +97,7 @@ internal fun WeatherRoute(
     pushAction: (WeatherScreenAction) -> Unit,
     onNavigateToHome: () -> Unit,
 ) {
-
+    val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
 
     val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
@@ -101,7 +105,10 @@ internal fun WeatherRoute(
     eventFlow.collectEvent { event ->
         when (event) {
             is WeatherScreenEvent.NavigateToHome -> onNavigateToHome()
-            is WeatherScreenEvent.ShowError -> TODO()
+            is WeatherScreenEvent.HandleError -> snackBarHostState.showSnackbar(
+                message = event.cause.handleError(context),
+                duration = SnackbarDuration.Short
+            )
         }
     }
 

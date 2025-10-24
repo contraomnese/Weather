@@ -1,5 +1,8 @@
 package com.contraomnese.weather.presentation.architecture
 
+import com.contraomnese.weather.presentation.utils.retryIfError
+import com.contraomnese.weather.presentation.utils.supervisorHandler
+import com.contraomnese.weather.presentation.utils.supervisorLaunch
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,8 +24,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import com.contraomnese.weather.presentation.utils.retryIfError
-import com.contraomnese.weather.presentation.utils.supervisorLaunch
 
 internal class MviViewModel<Action : MviAction, Effect : MviEffect, Event : MviEvent, State : MviState>(
     private val tag: String,
@@ -58,7 +59,7 @@ internal class MviViewModel<Action : MviAction, Effect : MviEffect, Event : MviE
         bufferStateFlow
             .onStart { logger.log(defaultState) }
             .onStart {
-                scope.launch {
+                scope.launch(dispatcher + supervisorHandler(logger::logUnknown)) {
                     actionChannel
                         .receiveAsFlow()
                         .onEach(logger::log)

@@ -6,4 +6,7 @@
     <string name="wrong_request_domain_exception">Неверные данные. Попробуйте ещё раз.</string>
     <string name="unknown_domain_exception">Ой! Что-то пошло не так..</string>
     <string name="unforeseen_internal_exception">Ого! Непредвиденная ошибка.</string>
+    <string name="rate_limit_exception">Ого! Слишком много запросов. Попробуйте позже.</string>
+    <string name="operation_failed">К сожалению не удалось выполнить операцию.</string>
+    <string name="not_initialize">При загрузке данных получена непредвиденная ошибка. Попробуйте еще раз.</string>
 </resources>

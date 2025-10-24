@@ -18,12 +18,13 @@ fun FavoriteEntity.toDomain() = Location(
     )
 )
 
-fun MatchingLocationEntity.toEntity() = FavoriteEntity(
-    locationId = networkId,
-    city = city,
-    state = state,
-    country = country,
-    latitude = latitude,
-    longitude = longitude
-)
+fun MatchingLocationEntity.toEntity() =
+    FavoriteEntity(
+        locationId = networkId,
+        city = city,
+        state = state,
+        country = country,
+        latitude = latitude,
+        longitude = longitude
+    )
 

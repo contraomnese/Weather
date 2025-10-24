@@ -18,6 +18,7 @@ import com.contraomnese.weather.domain.home.repository.LocationsRepository
 import com.contraomnese.weather.domain.weatherByLocation.repository.ForecastWeatherRepository
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import kotlinx.coroutines.Dispatchers
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
@@ -107,14 +108,27 @@ val dataModule = module {
     single<WeatherApi> { get<Retrofit>(named(WEATHER)).create(WeatherApi::class.java) }
     single<LocationsApi> { get<Retrofit>(named(LOCATIONS)).create(LocationsApi::class.java) }
 
-    single<LocationsRepository> { LocationsRepositoryImpl(weatherDatabase = get(), locationsApi = get(), errorConverter = get()) }
+    single<LocationsRepository> {
+        LocationsRepositoryImpl(
+            weatherDatabase = get(),
+            locationsApi = get(),
+            errorConverter = get(),
+            dispatcher = Dispatchers.IO
+        )
+    }
     single<ForecastWeatherRepository> {
         ForecastWeatherRepositoryImpl(
             api = get(),
             appSettingsRepository = get(),
             weatherDatabase = get(),
-            errorConverter = get()
+            errorConverter = get(),
+            dispatcher = Dispatchers.IO
         )
     }
-    single<AppSettingsRepository> { AppSettingsRepositoryImpl(storage = get()) }
+    single<AppSettingsRepository> {
+        AppSettingsRepositoryImpl(
+            storage = get(),
+            dispatcher = Dispatchers.IO
+        )
+    }
 }

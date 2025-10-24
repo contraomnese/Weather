@@ -3,7 +3,6 @@ package com.contraomnese.weather.home.presentation
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -64,13 +63,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.contraomnese.weather.core.ui.widgets.GpsModeAlertDialog
-import com.contraomnese.weather.core.ui.widgets.PermissionAlertDialog
+import com.contraomnese.weather.core.ui.widgets.AnimatedAutoSizeTitleText
 import com.contraomnese.weather.core.ui.widgets.AnimatedCircleButton
 import com.contraomnese.weather.core.ui.widgets.AnimatedIcon
-import com.contraomnese.weather.core.ui.widgets.AnimatedAutoSizeTitleText
 import com.contraomnese.weather.core.ui.widgets.FavoriteItem
+import com.contraomnese.weather.core.ui.widgets.GpsModeAlertDialog
 import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
+import com.contraomnese.weather.core.ui.widgets.PermissionAlertDialog
 import com.contraomnese.weather.core.ui.widgets.SearchTextField
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.icons.WeatherIcons
@@ -164,6 +163,8 @@ internal fun BoxScope.HomeScreen(
             is HomeScreenEvent.SwitchSearchMode -> {
                 searchMode = event.enabled
             }
+
+            is HomeScreenEvent.HandleError -> TODO()
         }
     }
 

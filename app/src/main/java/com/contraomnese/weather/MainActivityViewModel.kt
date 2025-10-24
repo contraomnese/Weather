@@ -4,6 +4,8 @@ import androidx.lifecycle.viewModelScope
 import com.contraomnese.weather.domain.home.usecase.AddFavoriteUseCase
 import com.contraomnese.weather.domain.home.usecase.ObserveFavoritesUseCase
 import com.contraomnese.weather.presentation.architecture.MviModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -20,6 +22,7 @@ internal class MainActivityViewModel(
             .onEach {
                 push(MainActivityEffect.FavoritesUpdated(it))
             }
+            .flowOn(Dispatchers.IO)
             .launchIn(viewModelScope)
     }
 

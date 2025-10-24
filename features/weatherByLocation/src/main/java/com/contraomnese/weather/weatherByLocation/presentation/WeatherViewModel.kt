@@ -2,12 +2,15 @@ package com.contraomnese.weather.weatherByLocation.presentation
 
 import androidx.lifecycle.viewModelScope
 import com.contraomnese.weather.domain.app.usecase.ObserveAppSettingsUseCase
+import com.contraomnese.weather.domain.cleanarchitecture.exception.logPrefix
+import com.contraomnese.weather.domain.cleanarchitecture.exception.notInitialize
 import com.contraomnese.weather.domain.home.usecase.AddFavoriteUseCase
 import com.contraomnese.weather.domain.home.usecase.ObserveFavoritesUseCase
 import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveForecastWeatherUseCase
 import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateForecastWeatherUseCase
 import com.contraomnese.weather.presentation.architecture.MviModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
@@ -47,6 +50,9 @@ internal class WeatherViewModel(
                         )
                     } ?: updateForecastWeatherUseCase(navLocationId)
                 }
+                    .catch {
+                        push(WeatherScreenEvent.HandleError(notInitialize(logPrefix("Bootstrap failed"), it)))
+                    }
             }
             .launchIn(
                 scope = viewModelScope
@@ -78,5 +84,6 @@ internal class WeatherViewModel(
 
     private suspend fun processFavoriteAdd(locationId: Int) {
         addFavoriteUseCase(locationId)
+            .onFailure { push(WeatherScreenEvent.HandleError(it)) }
     }
 }

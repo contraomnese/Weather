@@ -2,12 +2,13 @@ package com.contraomnese.weather.data.network.parsers
 
 import android.util.Log
 import com.contraomnese.weather.data.network.models.LocationsErrorResponse
-import com.contraomnese.weather.domain.cleanarchitecture.exception.ApiUnavailableDomainException
-import com.contraomnese.weather.domain.cleanarchitecture.exception.AuthorizationDomainException
-import com.contraomnese.weather.domain.cleanarchitecture.exception.LocationNotFoundDomainException
-import com.contraomnese.weather.domain.cleanarchitecture.exception.RateLimitedDomainException
-import com.contraomnese.weather.domain.cleanarchitecture.exception.RequestDomainException
-import com.contraomnese.weather.domain.cleanarchitecture.exception.UnknownDomainException
+import com.contraomnese.weather.domain.cleanarchitecture.exception.apiUnavailable
+import com.contraomnese.weather.domain.cleanarchitecture.exception.badRequest
+import com.contraomnese.weather.domain.cleanarchitecture.exception.logPrefix
+import com.contraomnese.weather.domain.cleanarchitecture.exception.notFound
+import com.contraomnese.weather.domain.cleanarchitecture.exception.rateLimitExceeded
+import com.contraomnese.weather.domain.cleanarchitecture.exception.unauthorized
+import com.contraomnese.weather.domain.cleanarchitecture.exception.unknown
 import okhttp3.ResponseBody
 import retrofit2.Converter
 import retrofit2.Response
@@ -30,12 +31,12 @@ fun <T> Response<T>.parseOrThrowError(converter: Converter<ResponseBody, Locatio
         val result = "HTTP ${code()}: $errorMessage"
         Log.d("LocationsParser", result)
         when (this.code()) {
-            400 -> throw RequestDomainException(result)
-            401 -> throw AuthorizationDomainException(result)
-            403 -> throw ApiUnavailableDomainException(result)
-            404 -> throw LocationNotFoundDomainException(result)
-            429 -> throw RateLimitedDomainException(result)
-            else -> throw UnknownDomainException(result)
+            400 -> throw badRequest(logPrefix(result))
+            401 -> throw unauthorized(logPrefix(result))
+            403 -> throw apiUnavailable(logPrefix(result))
+            404 -> throw notFound(logPrefix(result))
+            429 -> throw rateLimitExceeded(logPrefix(result))
+            else -> throw unknown(logPrefix(result))
         }
     }
 }

@@ -2,12 +2,13 @@ package com.contraomnese.weather.domain.app.usecase
 
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
-import com.contraomnese.weather.domain.cleanarchitecture.coroutine.CoroutineContextProvider
-import com.contraomnese.weather.domain.cleanarchitecture.usecase.background.withRequest.BackgroundExecutingUseCaseWithRequest
 
-class UpdateAppSettingsUseCase(
+fun interface UpdateAppSettingsUseCase {
+    suspend operator fun invoke(request: AppSettings): Result<Unit>
+}
+
+class UpdateAppSettingsUseCaseImpl(
     private val repository: AppSettingsRepository,
-    coroutineContextProvider: CoroutineContextProvider,
-) : BackgroundExecutingUseCaseWithRequest<AppSettings, Unit>(coroutineContextProvider) {
-    override suspend fun executeInBackground(request: AppSettings) = repository.updateSettings(request)
+) : UpdateAppSettingsUseCase {
+    override suspend fun invoke(request: AppSettings): Result<Unit> = repository.updateSettings(request)
 }

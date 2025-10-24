@@ -8,5 +8,8 @@
     <string name="wrong_request_domain_exception">Wrong data. Try again.</string>
     <string name="unknown_domain_exception">Oops! Something went wrong..</string>
     <string name="unforeseen_internal_exception">Wow! Unforeseen error.</string>
+    <string name="rate_limit_exception">Wow! Too many requests. Try again later.</string>
+    <string name="operation_failed">Unfortunately, the operation could not be completed.</string>
+    <string name="not_initialize">An unexpected error occurred while loading data. Please try again.</string>
 
 </resources>

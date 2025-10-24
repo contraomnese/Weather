@@ -1,12 +1,13 @@
 package com.contraomnese.weather.domain.home.usecase
 
-import com.contraomnese.weather.domain.cleanarchitecture.coroutine.CoroutineContextProvider
-import com.contraomnese.weather.domain.cleanarchitecture.usecase.background.withRequest.BackgroundExecutingUseCaseWithRequest
 import com.contraomnese.weather.domain.home.repository.LocationsRepository
 
-class RemoveFavoriteUseCase(
+fun interface RemoveFavoriteUseCase {
+    suspend operator fun invoke(request: Int): Result<Unit>
+}
+
+class RemoveFavoriteUseCaseImpl(
     private val repository: LocationsRepository,
-    coroutineContextProvider: CoroutineContextProvider,
-) : BackgroundExecutingUseCaseWithRequest<Int, Unit>(coroutineContextProvider) {
-    override suspend fun executeInBackground(request: Int) = repository.deleteFavorite(request)
+) : RemoveFavoriteUseCase {
+    override suspend fun invoke(request: Int): Result<Unit> = repository.deleteFavorite(request)
 }

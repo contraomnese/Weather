@@ -1,6 +1,7 @@
 package com.contraomnese.weather.presentation.utils
 
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -11,7 +12,7 @@ fun <T> Flow<T>.retryIfError(): Flow<T> =
     retryWhen { _, _ -> true }
 
 fun supervisorHandler(onError: (Throwable) -> Unit) =
-    CoroutineExceptionHandler { _, t -> onError(t) } + SupervisorJob()
+    CoroutineExceptionHandler { _, t -> onError(t) } + SupervisorJob() + Dispatchers.IO
 
 suspend fun supervisorLaunch(
     onError: (Throwable) -> Unit,

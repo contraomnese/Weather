@@ -6,16 +6,20 @@ import com.contraomnese.weather.data.network.models.WeatherErrorResponse
 import com.contraomnese.weather.data.network.parsers.parseOrThrowError
 import com.contraomnese.weather.data.storage.db.WeatherDatabase
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
+import com.contraomnese.weather.domain.cleanarchitecture.exception.databaseError
+import com.contraomnese.weather.domain.cleanarchitecture.exception.logPrefix
+import com.contraomnese.weather.domain.cleanarchitecture.exception.operationFailed
 import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 import com.contraomnese.weather.domain.weatherByLocation.repository.ForecastWeatherRepository
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import retrofit2.Converter
 
@@ -26,10 +30,11 @@ class ForecastWeatherRepositoryImpl(
     private val appSettingsRepository: AppSettingsRepository,
     private val weatherDatabase: WeatherDatabase,
     private val errorConverter: Converter<ResponseBody, WeatherErrorResponse>,
+    private val dispatcher: CoroutineDispatcher,
 ) : ForecastWeatherRepository {
 
     private val settingsFlow = appSettingsRepository.settings
-        .shareIn(CoroutineScope(Dispatchers.IO), SharingStarted.Eagerly, 1)
+        .shareIn(CoroutineScope(dispatcher), SharingStarted.Eagerly, 1)
 
     override fun observeBy(locationId: Int): Flow<Forecast?> {
         return combine(
@@ -41,21 +46,40 @@ class ForecastWeatherRepositoryImpl(
             } else {
                 entity.toDomain(settings)
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(dispatcher)
     }
 
-    override suspend fun updateBy(locationId: Int) {
+    override suspend fun updateBy(locationId: Int): Result<Unit> {
 
-        val location = weatherDatabase.matchingLocationsDao().getLocation(locationId)
+        val location = try {
+            withContext(dispatcher) {
+                weatherDatabase.matchingLocationsDao().getLocation(locationId)
+            }
+        } catch (throwable: Throwable) {
+            return Result.failure(databaseError(logPrefix("Get location from database failed"), throwable))
+        }
 
-        val response =
-            api.getForecastWeather(query = location.toPoint(), lang = settingsFlow.first().language.value)
-                .parseOrThrowError(errorConverter)
-        weatherDatabase.forecastDao()
-            .updateForecastForLocation(
-                locationId = location.networkId,
-                locationName = location.city ?: location.name,
-                forecastResponse = response
-            )
+        val response = try {
+            withContext(dispatcher) {
+                api.getForecastWeather(query = location.toPoint(), lang = settingsFlow.first().language.value)
+                    .parseOrThrowError(errorConverter)
+            }
+        } catch (cause: Throwable) {
+            return Result.failure(cause)
+        }
+
+        return try {
+            withContext(dispatcher) {
+                weatherDatabase.forecastDao()
+                    .updateForecastForLocation(
+                        locationId = location.networkId,
+                        locationName = location.city ?: location.name,
+                        forecastResponse = response
+                    )
+            }
+            Result.success(Unit)
+        } catch (throwable: Throwable) {
+            Result.failure(operationFailed(logPrefix("Impossible save new forecast in database"), throwable))
+        }
     }
 }

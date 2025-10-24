@@ -7,7 +7,7 @@ import androidx.compose.ui.unit.Dp
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 
-internal sealed interface WeatherSection {
+internal interface WeatherSection {
 
     val bodyHeight: Float?
     val bodyMaxHeight: Float?

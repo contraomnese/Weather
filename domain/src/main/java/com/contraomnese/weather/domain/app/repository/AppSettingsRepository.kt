@@ -7,6 +7,6 @@ interface AppSettingsRepository {
 
     val settings: Flow<AppSettings>
 
-    suspend fun updateSettings(settings: AppSettings)
+    suspend fun updateSettings(settings: AppSettings): Result<Unit>
 
 }
