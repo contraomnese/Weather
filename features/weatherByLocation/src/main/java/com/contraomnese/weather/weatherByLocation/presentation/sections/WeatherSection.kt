@@ -2,6 +2,7 @@ package com.contraomnese.weather.weatherByLocation.presentation.sections
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import com.contraomnese.weather.domain.app.model.AppSettings
@@ -9,16 +10,16 @@ import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 
 internal interface WeatherSection {
 
-    val bodyHeight: Float?
+    val bodyHeight: MutableState<Float>?
     val bodyMaxHeight: Float?
     val icon: ImageVector
 
     @get:StringRes
     val title: Int
 
-    fun copyWithBodyHeight(newHeight: Float): WeatherSection
+    fun initBodyHeight(newHeight: Float): WeatherSection
 
-    operator fun component1(): Float? = bodyHeight
+    operator fun component1(): MutableState<Float>? = bodyHeight
     operator fun component2(): Float? = bodyMaxHeight
 
     @Composable

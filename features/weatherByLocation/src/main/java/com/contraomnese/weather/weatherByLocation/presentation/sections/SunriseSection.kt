@@ -2,6 +2,8 @@ package com.contraomnese.weather.weatherByLocation.presentation.sections
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -16,18 +18,21 @@ import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 
 data class SunriseSection(
-    override val bodyHeight: Float? = null,
-    override val bodyMaxHeight: Float? = bodyHeight,
+    override val bodyHeight: MutableState<Float>? = null,
+    override val bodyMaxHeight: Float? = bodyHeight?.value,
     override val icon: ImageVector = WeatherIcons.Sunrise,
     val isDay: Boolean,
     override val title: Int = when (isDay) {
         true -> R.string.day_title
         false -> R.string.night_title
     },
-) :
-    WeatherSection {
-    override fun copyWithBodyHeight(newHeight: Float) =
-        copy(bodyHeight = newHeight, bodyMaxHeight = bodyMaxHeight ?: newHeight)
+) : WeatherSection {
+
+    override fun initBodyHeight(newHeight: Float) =
+        copy(
+            bodyHeight = mutableFloatStateOf(newHeight),
+            bodyMaxHeight = bodyMaxHeight ?: newHeight
+        )
 
     @Composable
     override fun Render(
@@ -49,7 +54,7 @@ data class SunriseSection(
                 headerHeight = headerSectionHeight,
                 headerTitle = stringResource(title),
                 headerIcon = icon,
-                currentBodyHeight = bodyHeight,
+                currentBodyHeight = bodyHeight?.value,
                 onContentMeasured = measureContainerHeight
             ) {
                 SunriseItem(

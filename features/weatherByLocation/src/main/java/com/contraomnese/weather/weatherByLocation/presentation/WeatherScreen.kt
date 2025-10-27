@@ -30,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -79,8 +80,6 @@ import com.contraomnese.weather.weatherByLocation.presentation.sections.Rainfall
 import com.contraomnese.weather.weatherByLocation.presentation.sections.SunriseSection
 import com.contraomnese.weather.weatherByLocation.presentation.sections.UVIndexSection
 import com.contraomnese.weather.weatherByLocation.presentation.sections.WindSection
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.Flow
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -208,6 +207,7 @@ internal fun WeatherScreen(
 ) {
 
     val lazyListState = rememberLazyListState()
+    val density = LocalDensity.current
 
     val minTitleBoxHeightPx = itemHeight150.toPx()
     val maxTitleBoxHeightPx = itemHeight300.toPx()
@@ -228,19 +228,17 @@ internal fun WeatherScreen(
     val maxVisibleSectionOffset = headerSectionHeight.toPx() + sectionVerticalSpacing.toPx()
     var currentVisibleSectionIndex by remember { mutableIntStateOf(0) }
 
-    var sections by remember {
-        mutableStateOf(
-            persistentListOf(
-                HourlyForecastSection(),
-                DailyForecastSection(),
-                AqiSection(),
-                SunriseSection(isDay = weather.today.isDay),
-                UVIndexSection(),
-                WindSection(),
-                HumiditySection(),
-                RainfallSection(),
-                PressureSection()
-            )
+    val sections = remember {
+        mutableStateListOf(
+            HourlyForecastSection(),
+            DailyForecastSection(),
+            AqiSection(),
+            SunriseSection(isDay = weather.today.isDay),
+            UVIndexSection(),
+            WindSection(),
+            HumiditySection(),
+            RainfallSection(),
+            PressureSection()
         )
     }
 
@@ -248,18 +246,19 @@ internal fun WeatherScreen(
         mutableStateOf(
             object : NestedScrollConnection {
 
+                private fun isLastItemVisible(): Boolean {
+                    val lastItem = lazyListState.layoutInfo.visibleItemsInfo.last()
+                    val isLastItemVisible = lastItem.index == sections.size &&
+                            (lastItem.offset + lastItem.size) <= lazyListState.layoutInfo.viewportEndOffset
+
+                    return isLastItemVisible
+                }
+
                 override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
 
                     if (available.y == 0f) return Offset.Zero
 
-                    // disable scroll when last item is visible
-                    val lastItem = lazyListState.layoutInfo.let {
-                        it.visibleItemsInfo.firstOrNull { lastItem ->
-                            lastItem.index == sections.size &&
-                                    lastItem.offset + lastItem.size > it.viewportEndOffset
-                        }
-                    }
-                    if (lastItem != null && available.y < 0) {
+                    if (isLastItemVisible() && available.y < 0) {
                         return Offset(0f, available.y)
                     }
                     // end block
@@ -297,16 +296,15 @@ internal fun WeatherScreen(
                         sections.drop(currentVisibleSectionIndex + 1)
                             .forEachIndexed { nextIndex, section ->
                                 val (bodyHeight, maxHeight) = section
-                                if (bodyHeight != maxHeight) {
-                                    val newHeight = (bodyHeight!! + availableScrollResult).coerceIn(0f, maxHeight)
+                                if (bodyHeight?.value != maxHeight) {
+                                    val newHeight = (bodyHeight?.value!! + availableScrollResult).coerceIn(0f, maxHeight)
 
-                                    sections = sections.mapIndexed { idx, sec ->
-                                        val targetIdx = nextIndex + currentVisibleSectionIndex + 1
-                                        if (idx == targetIdx) {
-                                            sec.copyWithBodyHeight(newHeight)
-                                        } else sec
-                                    }.toPersistentList()
-                                    val consumedScrollYByBody = newHeight - bodyHeight
+                                    // NEW CODE
+                                    val targetIdx = nextIndex + currentVisibleSectionIndex + 1
+                                    val consumedScrollYByBody = newHeight - bodyHeight.value
+                                    sections[targetIdx].bodyHeight?.value = newHeight
+                                    // END NEW CODE
+
                                     consumedResult += consumedScrollYByBody
                                     availableScrollResult -= consumedScrollYByBody
 
@@ -341,22 +339,35 @@ internal fun WeatherScreen(
 
                     val nextCollapseContainerOffset = nextCollapseContainer?.offset?.toFloat() ?: Float.POSITIVE_INFINITY
 
+                    if (isLastItemVisible()) {
+                        val (currentBodyHeight, maxBodyHeight) = sections[currentVisibleSectionIndex]
+                        val newBodyHeight = (currentBodyHeight?.value!! + availableScrollResult).coerceIn(0f, maxBodyHeight)
+                        val consumedScrollYByBody = newBodyHeight - currentBodyHeight.value
+                        val lastItem = lazyListState.layoutInfo.visibleItemsInfo.last()
+                        if (consumedScrollYByBody != 0f && lastItem.offset + lastItem.size + consumedScrollYByBody < lazyListState.layoutInfo.viewportEndOffset) {
+                            val mustConsumed = lastItem.size - (lazyListState.layoutInfo.viewportEndOffset - lastItem.offset)
+                            sections[currentVisibleSectionIndex].bodyHeight?.value =
+                                (currentBodyHeight.value - mustConsumed).coerceIn(0f, maxBodyHeight)
+                            consumedResult += mustConsumed
+                            Offset(0f, consumedResult)
+                        }
+                    }
+
                     // checking that current container's body is expanded
                     val (currentBodyHeight, maxBodyHeight) = sections[currentVisibleSectionIndex]
-                    val newBodyHeight = (currentBodyHeight!! + availableScrollResult).coerceIn(0f, maxBodyHeight)
-                    sections = sections.mapIndexed { idx, type ->
-                        if (idx == currentVisibleSectionIndex) {
-                            type.copyWithBodyHeight(newBodyHeight)
-                        } else type
-                    }.toPersistentList()
-                    val consumedScrollYByBody = newBodyHeight - currentBodyHeight
+                    val newBodyHeight = (currentBodyHeight?.value!! + availableScrollResult).coerceIn(0f, maxBodyHeight)
+                    val consumedScrollYByBody = newBodyHeight - currentBodyHeight.value
+                    // NEW CODE
+                    sections[currentVisibleSectionIndex].bodyHeight?.value = newBodyHeight
+                    // END NEW CODE
+
                     consumedResult += consumedScrollYByBody
                     availableScrollResult -= consumedScrollYByBody
 
                     // make sure we don't steal more scroll than needed to show a new container when scrolling UP
                     if (newBodyHeight == 0f && availableScrollResult < 0 && abs(availableScrollResult + consumedResult) > nextCollapseContainerOffset) {
                         val exactOffsetConsumed = consumedResult + availableScrollResult + nextCollapseContainerOffset
-                        if (currentVisibleSectionIndex < sections.size - 1) currentVisibleSectionIndex++
+                        if (!isLastItemVisible()) currentVisibleSectionIndex++
                         return Offset(0f, exactOffsetConsumed)
                     }
                     // make sure we don't steal more scroll than needed to show a new container when scrolling DOWN
@@ -374,7 +385,7 @@ internal fun WeatherScreen(
                     val availableScroll = available.y
 
                     val firstSection = sections.first()
-                    if (firstSection.bodyHeight != firstSection.bodyMaxHeight) return Offset(0f, availableScroll)
+                    if (firstSection.bodyHeight?.value != firstSection.bodyMaxHeight) return Offset(0f, availableScroll)
                     // steal scroll to change title height
                     if (availableScroll > 0 && currentVisibleSectionIndex == 0) {
                         val prevTitleBoxHeight = currentTitleBoxHeight
@@ -417,10 +428,12 @@ internal fun WeatherScreen(
         ) {
             items(sections) { section ->
 
-                val measureContainerHeight: (Int) -> Unit = {
+                val measureContainerHeight: (Int) -> Unit = { measureBodyHeight ->
                     if (section.bodyHeight == null) {
-                        sections =
-                            sections.map { sec -> if (section == sec) sec.copyWithBodyHeight(it.toFloat()) else sec }.toPersistentList()
+                        val currentSectionIndex = sections.indexOf(section)
+                        if (currentSectionIndex >= 0) {
+                            sections[currentSectionIndex] = sections[currentSectionIndex].initBodyHeight(measureBodyHeight.toFloat())
+                        }
                     }
                 }
 
