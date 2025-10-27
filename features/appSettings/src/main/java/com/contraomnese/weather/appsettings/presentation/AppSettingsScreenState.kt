@@ -13,7 +13,7 @@ internal data class AppSettingsScreenState(
     override val isLoading: Boolean = false,
     val appSettings: AppSettings = AppSettings(),
 ) : MviState {
-    fun setAppSettings(appSettings: AppSettings): AppSettingsScreenState = copy(appSettings = appSettings)
+    fun setAppSettings(appSettings: AppSettings): AppSettingsScreenState = copy(appSettings = appSettings, isLoading = false)
 
     fun setTemperatureUnit(temperatureUnit: TemperatureUnit): AppSettingsScreenState =
         copy(appSettings = appSettings.copy(temperatureUnit = temperatureUnit))

@@ -9,25 +9,21 @@ import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.navigationBarsIgnoringVisibility
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -53,6 +49,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.contraomnese.weather.core.ui.composition.LocalSnackbarHostState
 import com.contraomnese.weather.core.ui.utils.handleHorizontalDragEnd
 import com.contraomnese.weather.core.ui.utils.toPx
 import com.contraomnese.weather.core.ui.widgets.ImageBackgroundWithGradient
@@ -89,7 +86,6 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun WeatherRoute(
     viewModel: WeatherViewModel,
@@ -98,7 +94,7 @@ internal fun WeatherRoute(
     onNavigateToHome: () -> Unit,
 ) {
     val context = LocalContext.current
-    val snackBarHostState = remember { SnackbarHostState() }
+    val snackBarHostState = LocalSnackbarHostState.current
 
     val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
 
@@ -116,7 +112,7 @@ internal fun WeatherRoute(
     val currentFavoriteIndex = uiState.favorites.indexOfFirst { it.id == uiState.locationId }
 
     Scaffold(
-        modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBarsIgnoringVisibility),
+        modifier = Modifier.then(backgroundModifier),
         snackbarHost = { WeatherSnackBarHost(snackBarHostState) },
         bottomBar = {
             WeatherBottomBar(
@@ -134,7 +130,6 @@ internal fun WeatherRoute(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .then(backgroundModifier)
         ) {
 
             when {

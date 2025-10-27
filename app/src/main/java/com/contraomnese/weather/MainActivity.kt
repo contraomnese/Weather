@@ -96,7 +96,8 @@ internal fun WeatherApp(viewModel: MainActivityViewModel) {
             SplashScreen(uiState.isLoading) { viewModel.push(MainActivityAction.LottieAnimationFinished) }
         } else {
             WeatherHost(
-                uiState = uiState
+                uiState = uiState,
+                eventFlow = viewModel.eventFlow
             )
         }
     }

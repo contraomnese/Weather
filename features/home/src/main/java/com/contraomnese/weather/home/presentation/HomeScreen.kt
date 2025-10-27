@@ -36,6 +36,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -63,6 +66,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.contraomnese.weather.core.ui.composition.LocalSnackbarHostState
 import com.contraomnese.weather.core.ui.widgets.AnimatedAutoSizeTitleText
 import com.contraomnese.weather.core.ui.widgets.AnimatedCircleButton
 import com.contraomnese.weather.core.ui.widgets.AnimatedIcon
@@ -71,6 +75,7 @@ import com.contraomnese.weather.core.ui.widgets.GpsModeAlertDialog
 import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
 import com.contraomnese.weather.core.ui.widgets.PermissionAlertDialog
 import com.contraomnese.weather.core.ui.widgets.SearchTextField
+import com.contraomnese.weather.core.ui.widgets.WeatherSnackBarHost
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.icons.WeatherIcons
 import com.contraomnese.weather.design.theme.WeatherTheme
@@ -86,6 +91,7 @@ import com.contraomnese.weather.design.theme.space8
 import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 import com.contraomnese.weather.domain.weatherByLocation.model.Location
 import com.contraomnese.weather.presentation.architecture.collectEvent
+import com.contraomnese.weather.presentation.utils.handleError
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import kotlinx.collections.immutable.ImmutableList
@@ -103,30 +109,37 @@ internal fun HomeRoute(
     onNavigateToAppSettings: () -> Unit,
 ) {
 
+    val snackBarHostState = LocalSnackbarHostState.current
     val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(WindowInsets.statusBars.asPaddingValues())
-    ) {
-        when {
-            uiState.isLoading ->
-                LoadingIndicator(
-                    Modifier
-                        .align(Alignment.Center)
-                        .width(itemWidth64)
-                )
+    Scaffold(
+        snackbarHost = { WeatherSnackBarHost(snackBarHostState) },
+        contentWindowInsets = WindowInsets.statusBars,
+        containerColor = MaterialTheme.colorScheme.background,
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            when {
+                uiState.isLoading ->
+                    LoadingIndicator(
+                        Modifier
+                            .align(Alignment.Center)
+                            .width(itemWidth64)
+                    )
 
-            else -> {
-                HomeScreen(
-                    uiState = uiState,
-                    eventFlow = viewModel.eventFlow,
-                    pushAction = viewModel::push,
-                    onNavigateToWeatherByLocation = onNavigateToWeatherByLocation,
-                    onNavigateToAppSettings = onNavigateToAppSettings
-                )
+                else -> {
+                    HomeScreen(
+                        uiState = uiState,
+                        eventFlow = viewModel.eventFlow,
+                        pushAction = viewModel::push,
+                        snackBarHostState = snackBarHostState,
+                        onNavigateToWeatherByLocation = onNavigateToWeatherByLocation,
+                        onNavigateToAppSettings = onNavigateToAppSettings
+                    )
+                }
             }
         }
     }
@@ -139,6 +152,7 @@ internal fun BoxScope.HomeScreen(
     uiState: HomeScreenState,
     eventFlow: Flow<HomeScreenEvent>,
     pushAction: (HomeScreenAction) -> Unit = {},
+    snackBarHostState: SnackbarHostState,
     onNavigateToWeatherByLocation: (Int) -> Unit = { },
     onNavigateToAppSettings: () -> Unit = {},
 ) {
@@ -147,30 +161,33 @@ internal fun BoxScope.HomeScreen(
     val density = LocalDensity.current
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
-    var searchMode by remember { mutableStateOf(true) }
-    var gpsMode by remember { mutableStateOf(false) }
+    var searchBarOnTop by remember { mutableStateOf(true) }
+    var gpsModeEnabled by remember { mutableStateOf(false) }
 
     eventFlow.collectEvent { event ->
         when (event) {
             is HomeScreenEvent.SwitchGpsMode -> {
-                gpsMode = event.enabled
+                gpsModeEnabled = event.enabled
             }
 
             is HomeScreenEvent.GetGpsLocation -> {
                 getGpsLocation(context, pushAction)
             }
 
-            is HomeScreenEvent.SwitchSearchMode -> {
-                searchMode = event.enabled
+            is HomeScreenEvent.SwitchSearchBarPosition -> {
+                searchBarOnTop = event.onTop
             }
 
-            is HomeScreenEvent.HandleError -> TODO()
+            is HomeScreenEvent.HandleError -> snackBarHostState.showSnackbar(
+                message = event.cause.handleError(context),
+                duration = SnackbarDuration.Short
+            )
         }
     }
 
     LaunchedEffect(keyboardVisible) {
         if (uiState.favoritesForecast.isEmpty()) {
-            searchMode = keyboardVisible
+            searchBarOnTop = keyboardVisible
         }
     }
 
@@ -181,13 +198,13 @@ internal fun BoxScope.HomeScreen(
     }
 
     val topBarPadding by animateDpAsState(
-        targetValue = if (searchMode) 0.dp else with(density) { (screenHeight.toPx() / 2.5f).toDp() },
+        targetValue = if (searchBarOnTop) 0.dp else with(density) { (screenHeight.toPx() / 2.5f).toDp() },
         animationSpec = tween(durationMillis = ANIMATION_DURATION)
     )
 
     TopTitleText(
         modifier = Modifier.padding(top = screenHeight / 4),
-        visible = !searchMode,
+        visible = !searchBarOnTop,
         title = stringResource(R.string.use_search_title),
         maxLines = 2
     )
@@ -197,7 +214,7 @@ internal fun BoxScope.HomeScreen(
             modifier = Modifier
                 .padding(top = topBarPadding),
             inputLocation = uiState.inputLocation,
-            isSearchMode = searchMode,
+            isSearchMode = searchBarOnTop,
             isSearching = uiState.isSearching,
             pushAction = pushAction,
             onNavigateToAppSettings = onNavigateToAppSettings,
@@ -206,11 +223,11 @@ internal fun BoxScope.HomeScreen(
             }
         )
 
-        if (uiState.inputLocation.text.isNotEmpty() && searchMode) {
+        if (uiState.inputLocation.text.isNotEmpty() && searchBarOnTop) {
             MatchingLocations(uiState.matchingLocations, uiState.favorites, pushAction, onNavigateToWeatherByLocation)
         } else FavoritesLocations(uiState.favorites, uiState.favoritesForecast, pushAction, onNavigateToWeatherByLocation)
 
-        if (gpsMode) {
+        if (gpsModeEnabled) {
             PermissionAlertDialog(
                 onDismissRequest = { pushAction(HomeScreenAction.SwitchGpsMode(false)) },
                 onPermissionGranted = { granted ->
@@ -221,9 +238,9 @@ internal fun BoxScope.HomeScreen(
                 permission = android.Manifest.permission.ACCESS_FINE_LOCATION
             )
         }
-        if (uiState.gps.isPermissionGranted && gpsMode) {
+        if (uiState.gps.isPermissionGranted && gpsModeEnabled) {
             GpsModeAlertDialog(
-                onDismissRequest = { gpsMode = false },
+                onDismissRequest = { gpsModeEnabled = false },
                 onGpsModeEnabled = { enabled ->
                     pushAction(HomeScreenAction.DeviceGpsModeEnabled(enabled))
                 }
@@ -233,7 +250,7 @@ internal fun BoxScope.HomeScreen(
 
     BottomTitleText(
         modifier = Modifier.padding(bottom = screenHeight / 4),
-        visible = !searchMode,
+        visible = !searchBarOnTop,
         title = stringResource(R.string.use_gps_title),
         maxLines = 2
     )
@@ -605,7 +622,8 @@ private fun HomeScreenPreview() {
         ) {
             HomeScreen(
                 uiState,
-                eventFlow = flowOf()
+                eventFlow = flowOf(),
+                snackBarHostState = remember { SnackbarHostState() }
             )
         }
 

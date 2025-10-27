@@ -2,29 +2,37 @@ package com.contraomnese.weather.appsettings.presentation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.contraomnese.weather.core.ui.composition.LocalSnackbarHostState
+import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
+import com.contraomnese.weather.core.ui.widgets.WeatherSnackBarHost
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
+import com.contraomnese.weather.design.theme.itemWidth64
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding4
 import com.contraomnese.weather.design.theme.padding8
@@ -34,6 +42,7 @@ import com.contraomnese.weather.domain.app.model.PressureUnit
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import com.contraomnese.weather.domain.app.model.WindSpeedUnit
 import com.contraomnese.weather.presentation.architecture.collectEvent
+import com.contraomnese.weather.presentation.utils.handleError
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -43,20 +52,49 @@ internal fun AppSettingsRoute(
     pushAction: (AppSettingsAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val snackBarHostState = LocalSnackbarHostState.current
 
     val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
 
     eventFlow.collectEvent { event ->
         when (event) {
-            else -> {}
+            is AppSettingsEvent.HandleError -> snackBarHostState.showSnackbar(
+                message = event.cause.handleError(context),
+                duration = SnackbarDuration.Short
+            )
         }
     }
 
-    AppSettingsScreen(
-        uiState = uiState,
-        pushAction = pushAction,
-        modifier = modifier
-    )
+    Scaffold(
+        modifier = modifier,
+        snackbarHost = { WeatherSnackBarHost(snackBarHostState) },
+        contentWindowInsets = WindowInsets.statusBars,
+        containerColor = MaterialTheme.colorScheme.background,
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            when {
+                uiState.isLoading ->
+                    LoadingIndicator(
+                        Modifier
+                            .align(Alignment.Center)
+                            .width(itemWidth64)
+                    )
+
+                else -> {
+                    AppSettingsScreen(
+                        uiState = uiState,
+                        pushAction = pushAction,
+                    )
+                }
+            }
+        }
+    }
+
 }
 
 @Composable
@@ -70,8 +108,7 @@ private fun AppSettingsScreen(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = padding16)
-            .padding(WindowInsets.statusBars.asPaddingValues()),
+            .padding(horizontal = padding16),
         verticalArrangement = Arrangement.spacedBy(padding8)
     ) {
         RadioGroup(
