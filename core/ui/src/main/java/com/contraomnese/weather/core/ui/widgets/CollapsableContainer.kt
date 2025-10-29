@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -74,10 +75,12 @@ fun CollapsableContainer(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .onGloballyPositioned { coordinates ->
+                    onContentMeasured(coordinates.size.height)
+                }
                 .clipToBounds()
                 .layout { measurable, constraints ->
                     val placeable = measurable.measure(constraints)
-                    onContentMeasured(placeable.height)
                     val visibleHeight = currentBodyHeight?.toInt() ?: placeable.height
 
                     val offsetY = (placeable.height - visibleHeight).coerceAtLeast(0)
