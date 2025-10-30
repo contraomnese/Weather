@@ -16,12 +16,12 @@ import com.contraomnese.weather.data.storage.db.forecast.dao.LocationWithForecas
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import com.contraomnese.weather.domain.weatherByLocation.model.AlertsWeather
-import com.contraomnese.weather.domain.weatherByLocation.model.Weather
-import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeather
+import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
 import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastLocation
-import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
+import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeather
 import com.contraomnese.weather.domain.weatherByLocation.model.UvIndex
+import com.contraomnese.weather.domain.weatherByLocation.model.Weather
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.datetime.TimeZone
@@ -98,7 +98,8 @@ fun LocationWithForecasts.toDomain(appSettings: AppSettings): Forecast {
             hours = forecastHours.map { it.toDomain(appSettings) }.toPersistentList()
         ),
         alerts = AlertsWeather(
-            alerts = forecastAlert.map { it.desc }.toPersistentList()
+            alerts = forecastAlert.filter { it.desc.isNotEmpty() }.map { it.desc.replaceFirstChar { char -> char.uppercaseChar() } }
+                .toPersistentList()
         )
     )
 }

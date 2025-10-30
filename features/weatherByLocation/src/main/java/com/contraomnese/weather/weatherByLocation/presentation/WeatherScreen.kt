@@ -264,7 +264,7 @@ internal fun WeatherScreen(
                     var consumedResult = 0f
                     var availableScrollResult = available.y
                     val currentVisibleSection = lazyListState.layoutInfo.visibleItemsInfo.first()
-                    val nextSection = lazyListState.layoutInfo.visibleItemsInfo[1]
+                    val nextSection = lazyListState.layoutInfo.visibleItemsInfo.getOrNull(1)
                     val lastSection = lazyListState.layoutInfo.visibleItemsInfo.last()
 
                     // steal scroll to change title height
@@ -323,10 +323,13 @@ internal fun WeatherScreen(
                         availableScrollResult -= consumedScrollYByBody
 
                         // make sure we don't steal more scroll than needed to show a new container when scrolling UP
-                        if (newBodyHeight == 0f && availableScrollResult < 0 && abs(available.y) > nextSection.offset) {
-                            val exactOffsetConsumed = consumedResult + availableScrollResult + nextSection.offset
-                            return Offset(0f, exactOffsetConsumed)
+                        nextSection?.let { nextSection ->
+                            if (newBodyHeight == 0f && availableScrollResult < 0 && abs(available.y) > nextSection.offset) {
+                                val exactOffsetConsumed = consumedResult + availableScrollResult + nextSection.offset
+                                return Offset(0f, exactOffsetConsumed)
+                            }
                         }
+
                         // make sure we don't steal more scroll than needed to show a new container when scrolling DOWN
                         if (newBodyHeight == maxBodyHeight && (currentVisibleSection.offset + availableScrollResult) > maxVisibleSectionOffset) {
                             val exactOffsetConsumed =

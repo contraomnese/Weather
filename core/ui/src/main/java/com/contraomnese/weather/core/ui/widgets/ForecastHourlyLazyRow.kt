@@ -6,13 +6,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.contraomnese.weather.design.theme.WeatherTheme
-import com.contraomnese.weather.design.theme.itemThickness1
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding32
 import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
@@ -29,10 +26,6 @@ fun ForecastHourlyLazyRow(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(padding16)
     ) {
-        HorizontalDivider(
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
-            thickness = itemThickness1,
-        )
         LazyRow(
             modifier = Modifier
                 .wrapContentHeight()
