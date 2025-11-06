@@ -10,8 +10,11 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
@@ -27,6 +30,7 @@ import com.contraomnese.weather.weatherByLocation.navigation.WeatherByLocationDe
 import com.contraomnese.weather.weatherByLocation.navigation.weatherByLocation
 import kotlinx.coroutines.flow.Flow
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun WeatherHost(
     navController: NavHostController = rememberNavController(),
@@ -51,7 +55,11 @@ internal fun WeatherHost(
         } ?: HomeDestination
     }
     CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier
+            .semantics {
+                testTagsAsResourceId = true
+            }
+            .fillMaxSize()) {
             NavHost(
                 navController = navController,
                 startDestination = startDestination,

@@ -52,6 +52,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.TextLinkStyles
@@ -216,6 +217,7 @@ internal fun BoxScope.HomeScreen(
     Column {
         SearchBar(
             modifier = Modifier
+                .testTag("search_bar")
                 .padding(top = topBarPadding),
             inputLocation = uiState.inputLocation,
             isSearchMode = searchBarOnTop,
@@ -393,6 +395,7 @@ private fun MatchingLocations(
 
     Column(
         modifier = Modifier
+            .testTag("matching_locations")
             .padding(horizontal = padding16)
             .wrapContentHeight(),
         horizontalAlignment = Alignment.CenterHorizontally

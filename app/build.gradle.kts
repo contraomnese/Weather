@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.devtools.ksp)
+    alias(libs.plugins.baselineprofile)
 }
 
 val weatherApiKey: String = gradleLocalProperties(rootDir, providers).getProperty("WEATHER_API_KEY")
@@ -50,6 +51,7 @@ android {
             buildConfigField("String", "LOCATION_API_KEY", "\"${locationApiKey}\"")
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            buildConfigField("boolean", "DEBUG", "false")
         }
     }
     compileOptions {
@@ -85,13 +87,16 @@ dependencies {
     implementation(project(":features:weatherByLocation"))
     implementation(project(":features:appSettings"))
 
+    val composeBom = platform(libs.androidx.compose.bom)
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
+
     implementation(libs.material)
     implementation(libs.bundles.koin)
     implementation(libs.bundles.core)
     implementation(libs.bundles.navigation)
     implementation(libs.bundles.presentation)
     implementation(libs.bundles.compose)
-    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.ui)
     implementation(libs.bundles.network)
     implementation(libs.bundles.room)
@@ -102,7 +107,11 @@ dependencies {
 
     testImplementation(libs.bundles.test)
     testRuntimeOnly(libs.junit.jupiter.engine)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.bundles.androidTest)
     debugImplementation(libs.bundles.composeDebug)
+
+    implementation(libs.androidx.runtime.tracing)
+    implementation(libs.androidx.profileinstaller)
+    "baselineProfile"(project(":baselineprofile"))
+    implementation(libs.androidx.tracing.perfetto)
 }
