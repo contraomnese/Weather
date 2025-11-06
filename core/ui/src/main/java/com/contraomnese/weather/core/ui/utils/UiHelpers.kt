@@ -59,12 +59,12 @@ fun handleHorizontalDragEnd(
     alphaAnimated: Animatable<Float, AnimationVector1D>,
 ) {
     when {
-        offset > screenWidth * 0.25f && currentFavoriteIndex > 0 -> {
+        offset > screenWidth * 0.15f && currentFavoriteIndex > 0 -> {
             onDragPrev()
             animateDrag(coroutineScope, scaleAnimated, alphaAnimated)
         }
 
-        offset < -screenWidth * 0.25f && currentFavoriteIndex < lastFavoriteIndex -> {
+        offset < -screenWidth * 0.15f && currentFavoriteIndex < lastFavoriteIndex -> {
             onDragNext()
             animateDrag(coroutineScope, scaleAnimated, alphaAnimated)
         }

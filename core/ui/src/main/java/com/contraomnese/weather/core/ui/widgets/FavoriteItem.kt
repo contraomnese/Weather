@@ -1,5 +1,6 @@
 package com.contraomnese.weather.core.ui.widgets
 
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -24,7 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,10 +50,9 @@ import com.contraomnese.weather.design.theme.itemWidth56
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.design.theme.space8
-import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
 import com.contraomnese.weather.domain.weatherByLocation.model.LocationDateTime
-import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
@@ -64,25 +63,19 @@ fun FavoriteItem(
     locationCountry: String,
     timeZone: TimeZone,
     conditionText: String,
-    condition: CompactWeatherCondition,
+    @DrawableRes backgroundResIdByCondition: Int,
     temperature: String,
     maxTemperature: String,
     minTemperature: String,
+    currentTime: Instant,
     onTapClicked: () -> Unit,
     onDeleteClicked: () -> Unit,
 ) {
 
     var deleteVisible by remember { mutableStateOf(false) }
 
-    var localTime by remember { mutableStateOf("") }
-
-    LaunchedEffect(timeZone) {
-        while (true) {
-            val instant = Clock.System.now().toLocalDateTime(timeZone)
-            localTime = LocationDateTime(instant).toLocalTime()
-            val millisToNextMinute = 60_000L - instant.second * 1000
-            delay(millisToNextMinute)
-        }
+    val localTime = remember(currentTime, timeZone) {
+        LocationDateTime(currentTime.toLocalDateTime(timeZone)).toLocalTime()
     }
 
     Row(
@@ -116,7 +109,7 @@ fun FavoriteItem(
             shape = RoundedCornerShape(cornerRadius16),
             color = MaterialTheme.colorScheme.surface
         ) {
-            ImageBackground(condition = condition)
+            ImageBackground(backgroundResId = backgroundResIdByCondition)
             BodySection(locationName, localTime, locationCountry, temperature, conditionText, maxTemperature, minTemperature)
         }
         AnimatedVisibility(
@@ -273,10 +266,11 @@ fun FavoriteItemPreview() {
             locationCountry = "USA USA USA USA USA USA USA USA USA USA",
             timeZone = TimeZone.of("Europe/Moscow"),
             conditionText = "Ясно Ясно Ясно Ясно Ясно Ясно",
-            condition = CompactWeatherCondition.CLEAR,
+            backgroundResIdByCondition = R.drawable.clear,
             temperature = "21",
             maxTemperature = "25",
             minTemperature = "16",
+            currentTime = Clock.System.now(),
             onTapClicked = {},
             onDeleteClicked = {}
         )

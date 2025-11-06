@@ -44,6 +44,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -88,6 +89,7 @@ import com.contraomnese.weather.design.theme.itemWidth64
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.space16
 import com.contraomnese.weather.design.theme.space8
+import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
 import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 import com.contraomnese.weather.domain.weatherByLocation.model.Location
 import com.contraomnese.weather.presentation.architecture.collectEvent
@@ -97,8 +99,10 @@ import com.google.android.gms.location.Priority
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.datetime.Clock
 
 private const val ANIMATION_DURATION = 500
 
@@ -161,7 +165,7 @@ internal fun BoxScope.HomeScreen(
     val density = LocalDensity.current
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
-    var searchBarOnTop by remember { mutableStateOf(true) }
+    var searchBarOnTop by remember { mutableStateOf(uiState.favorites.isNotEmpty()) }
     var gpsModeEnabled by remember { mutableStateOf(false) }
 
     eventFlow.collectEvent { event ->
@@ -174,7 +178,7 @@ internal fun BoxScope.HomeScreen(
                 getGpsLocation(context, pushAction)
             }
 
-            is HomeScreenEvent.SwitchSearchBarPosition -> {
+            is HomeScreenEvent.OnSearchBarTop -> {
                 searchBarOnTop = event.onTop
             }
 
@@ -186,7 +190,7 @@ internal fun BoxScope.HomeScreen(
     }
 
     LaunchedEffect(keyboardVisible) {
-        if (uiState.favoritesForecast.isEmpty()) {
+        if (uiState.favorites.isEmpty()) {
             searchBarOnTop = keyboardVisible
         }
     }
@@ -490,6 +494,25 @@ private fun FavoritesLocations(
     pushAction: (HomeScreenAction) -> Unit = {},
     onNavigateToWeatherByLocation: (Int) -> Unit,
 ) {
+    val drawableBackgroundRes = remember(favorites) {
+        mapOf(
+            CompactWeatherCondition.CLEAR to R.drawable.clear,
+            CompactWeatherCondition.PARTLY_CLOUDY to R.drawable.partly_cloud,
+            CompactWeatherCondition.CLOUDY to R.drawable.overcast,
+            CompactWeatherCondition.FOG to R.drawable.fog,
+            CompactWeatherCondition.RAIN to R.drawable.rain,
+            CompactWeatherCondition.SNOW to R.drawable.snow,
+            CompactWeatherCondition.THUNDER to R.drawable.thunder,
+        )
+    }
+
+    val currentTime by produceState(initialValue = Clock.System.now()) {
+        while (true) {
+            value = Clock.System.now()
+            delay(60_000L)
+        }
+    }
+
     LazyColumn(
         modifier = Modifier
             .padding(horizontal = padding16)
@@ -499,6 +522,7 @@ private fun FavoritesLocations(
     ) {
         items(favorites, key = { location -> location.id }) { location ->
             val favoriteForecast = favoritesForecast[location.id]
+
             favoriteForecast?.let {
                 FavoriteItem(
                     modifier = Modifier
@@ -511,12 +535,13 @@ private fun FavoritesLocations(
                     maxTemperature = it.forecast.today.maxTemperature,
                     minTemperature = it.forecast.today.minTemperature,
                     conditionText = it.today.conditionText,
-                    condition = it.today.condition,
+                    backgroundResIdByCondition = drawableBackgroundRes.getValue(it.today.condition),
                     onTapClicked = {
                         onNavigateToWeatherByLocation(
                             location.id
                         )
                     },
+                    currentTime = currentTime,
                     onDeleteClicked = { pushAction(HomeScreenAction.RemoveFavorite(location.id)) }
                 )
             }

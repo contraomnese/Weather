@@ -103,6 +103,7 @@ private fun AppSettingsScreen(
     uiState: AppSettingsScreenState,
     pushAction: (AppSettingsAction) -> Unit,
 ) {
+    requireNotNull(uiState.appSettings)
 
     Column(
         modifier = modifier

@@ -11,6 +11,8 @@ import com.contraomnese.weather.domain.app.model.PressureUnit
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import com.contraomnese.weather.domain.app.model.WindSpeedUnit
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.util.Locale
 
@@ -39,16 +41,18 @@ class AppSettingsStorageImpl(private val context: Context) : AppSettingsStorage 
                 temperatureUnit = prefs[Keys.TEMPERATURE_UNIT] ?: TemperatureUnit.Celsius.name,
                 pressureUnit = prefs[Keys.PRESSURE_UNIT] ?: PressureUnit.MmHg.name
             )
-        }
+        }.distinctUntilChanged()
 
 
     override suspend fun saveSettings(entity: AppSettingsEntity) {
-        context.appSettingsDataStore.edit { prefs ->
-            prefs[Keys.LANGUAGE] = entity.language
-            prefs[Keys.SPEED_UNIT] = entity.speedUnit
-            prefs[Keys.PRECIPITATION_UNIT] = entity.precipitationUnit
-            prefs[Keys.TEMPERATURE_UNIT] = entity.temperatureUnit
-            prefs[Keys.PRESSURE_UNIT] = entity.pressureUnit
+        if (getSettings().first() != entity) {
+            context.appSettingsDataStore.edit { prefs ->
+                prefs[Keys.LANGUAGE] = entity.language
+                prefs[Keys.SPEED_UNIT] = entity.speedUnit
+                prefs[Keys.PRECIPITATION_UNIT] = entity.precipitationUnit
+                prefs[Keys.TEMPERATURE_UNIT] = entity.temperatureUnit
+                prefs[Keys.PRESSURE_UNIT] = entity.pressureUnit
+            }
         }
     }
 }

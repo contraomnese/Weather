@@ -11,7 +11,6 @@ import com.contraomnese.weather.weatherByLocation.navigation.navigateToWeatherBy
 fun NavHostController.homeNavigator() = object : HomeNavigator {
 
     override fun onNavigateToWeatherByLocation(id: Int) {
-        popBackStack()
         navigateToWeatherByLocation(id = id)
     }
 

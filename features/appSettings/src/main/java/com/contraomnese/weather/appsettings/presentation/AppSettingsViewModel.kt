@@ -8,6 +8,7 @@ import com.contraomnese.weather.domain.cleanarchitecture.exception.notInitialize
 import com.contraomnese.weather.presentation.architecture.MviModel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -29,6 +30,7 @@ internal class AppSettingsViewModel(
                 push(AppSettingsEffect.SettingsUpdated(observeAppSettingsUseCase().first()))
             }
             .map { it.appSettings }
+            .filterNotNull()
             .distinctUntilChanged()
             .onEach {
                 updateAppSettingsUseCase(it)

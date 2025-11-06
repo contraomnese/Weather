@@ -11,21 +11,21 @@ import com.contraomnese.weather.presentation.architecture.MviState
 @Immutable
 internal data class AppSettingsScreenState(
     override val isLoading: Boolean = false,
-    val appSettings: AppSettings = AppSettings(),
+    val appSettings: AppSettings? = null,
 ) : MviState {
     fun setAppSettings(appSettings: AppSettings): AppSettingsScreenState = copy(appSettings = appSettings, isLoading = false)
 
     fun setTemperatureUnit(temperatureUnit: TemperatureUnit): AppSettingsScreenState =
-        copy(appSettings = appSettings.copy(temperatureUnit = temperatureUnit))
+        copy(appSettings = appSettings!!.copy(temperatureUnit = temperatureUnit))
 
     fun setPressureUnit(pressureUnit: PressureUnit): AppSettingsScreenState =
-        copy(appSettings = appSettings.copy(pressureUnit = pressureUnit))
+        copy(appSettings = appSettings!!.copy(pressureUnit = pressureUnit))
 
     fun setPrecipitationUnit(precipitationUnit: PrecipitationUnit): AppSettingsScreenState =
-        copy(appSettings = appSettings.copy(precipitationUnit = precipitationUnit))
+        copy(appSettings = appSettings!!.copy(precipitationUnit = precipitationUnit))
 
     fun setWindSpeedUnit(windSpeedUnit: WindSpeedUnit): AppSettingsScreenState =
-        copy(appSettings = appSettings.copy(windSpeedUnit = windSpeedUnit))
+        copy(appSettings = appSettings!!.copy(windSpeedUnit = windSpeedUnit))
 
     companion object {
         val DEFAULT = AppSettingsScreenState(isLoading = true)

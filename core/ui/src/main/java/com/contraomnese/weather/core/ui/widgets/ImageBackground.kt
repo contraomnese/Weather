@@ -1,47 +1,42 @@
 package com.contraomnese.weather.core.ui.widgets
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight160
-import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
 
 @Composable
 fun ImageBackground(
     modifier: Modifier = Modifier,
-    condition: CompactWeatherCondition,
+    @DrawableRes backgroundResId: Int,
 ) {
+    val context = LocalContext.current
 
-    val drawableBackgroundRes = when (condition) {
-        CompactWeatherCondition.CLEAR -> R.drawable.clear
-        CompactWeatherCondition.PARTLY_CLOUDY -> R.drawable.partly_cloud
-        CompactWeatherCondition.CLOUDY -> R.drawable.overcast
-        CompactWeatherCondition.FOG -> R.drawable.fog
-        CompactWeatherCondition.RAIN -> R.drawable.rain
-        CompactWeatherCondition.SNOW -> R.drawable.snow
-        CompactWeatherCondition.THUNDER -> R.drawable.thunder
-        CompactWeatherCondition.SLEET -> R.drawable.sleet
+    val imageBitmap = remember(backgroundResId) {
+        ImageBitmap.imageResource(context.resources, backgroundResId)
     }
 
-    Box(modifier = modifier.fillMaxSize()) {
-
-        Image(
-            painter = painterResource(id = drawableBackgroundRes),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            alpha = 0.5f,
-            modifier = Modifier.fillMaxSize(),
-        )
-    }
+    Image(
+        bitmap = imageBitmap,
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = modifier
+            .fillMaxSize()
+            .graphicsLayer { alpha = 0.45f },
+    )
 }
 
 
@@ -49,8 +44,11 @@ fun ImageBackground(
 @Composable
 private fun ImageBackgroundPreview() {
     WeatherTheme {
-        ImageBackground(modifier = Modifier
-            .height(itemHeight160)
-            .fillMaxWidth(), condition = CompactWeatherCondition.CLEAR)
+        ImageBackground(
+            modifier = Modifier
+                .height(itemHeight160)
+                .fillMaxWidth(),
+            backgroundResId = R.drawable.clear
+        )
     }
 }

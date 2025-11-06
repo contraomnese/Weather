@@ -56,9 +56,6 @@ internal class HomeViewModel(
         stateFlow
             .map { it.favorites }
             .distinctUntilChanged()
-            .onEach { newFavorites ->
-                push(HomeScreenEvent.SwitchSearchBarPosition(newFavorites.isNotEmpty()))
-            }
             .flatMapLatest { newFavorites ->
                 if (newFavorites.isEmpty()) {
                     emptyFlow()

@@ -48,7 +48,7 @@ internal class WeatherViewModel(
                                 favorites = favorites
                             )
                         )
-                    } ?: updateForecastWeatherUseCase(navLocationId)
+                    } ?: updateForecastWeatherUseCase(locationId)
                 }
                     .catch {
                         push(WeatherScreenEvent.HandleError(notInitialize(logPrefix("Bootstrap failed"), it)))
