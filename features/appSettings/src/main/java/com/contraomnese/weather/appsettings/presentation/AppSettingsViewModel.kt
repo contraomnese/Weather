@@ -3,8 +3,8 @@ package com.contraomnese.weather.appsettings.presentation
 import androidx.lifecycle.viewModelScope
 import com.contraomnese.weather.domain.app.usecase.ObserveAppSettingsUseCase
 import com.contraomnese.weather.domain.app.usecase.UpdateAppSettingsUseCase
-import com.contraomnese.weather.domain.cleanarchitecture.exception.logPrefix
-import com.contraomnese.weather.domain.cleanarchitecture.exception.notInitialize
+import com.contraomnese.weather.domain.exceptions.logPrefix
+import com.contraomnese.weather.domain.exceptions.notInitialize
 import com.contraomnese.weather.presentation.architecture.MviModel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged

@@ -5,9 +5,9 @@ import com.contraomnese.weather.data.mappers.appSettings.toEntity
 import com.contraomnese.weather.data.storage.memory.api.AppSettingsStorage
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
-import com.contraomnese.weather.domain.cleanarchitecture.exception.databaseError
-import com.contraomnese.weather.domain.cleanarchitecture.exception.logPrefix
-import com.contraomnese.weather.domain.cleanarchitecture.exception.operationFailed
+import com.contraomnese.weather.domain.exceptions.databaseError
+import com.contraomnese.weather.domain.exceptions.logPrefix
+import com.contraomnese.weather.domain.exceptions.operationFailed
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
