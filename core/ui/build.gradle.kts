@@ -31,9 +31,6 @@ android {
     buildFeatures {
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composecompiler.get()
-    }
 }
 
 tasks.withType<Test>().configureEach {
@@ -45,17 +42,16 @@ dependencies {
     implementation(project(":core:design"))
     implementation(project(":domain"))
 
-    implementation(libs.bundles.core)
-    implementation(libs.bundles.koin)
+    val composeBom = platform(libs.androidx.compose.bom)
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
+
+    implementation(libs.bundles.android)
+    implementation(libs.bundles.core.common)
     implementation(libs.bundles.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.bundles.presentation)
-    implementation(libs.bundles.ui)
-    implementation(libs.bundles.navigation)
 
     testImplementation(libs.bundles.test)
     testRuntimeOnly(libs.junit.jupiter.engine)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.bundles.androidTest)
     debugImplementation(libs.bundles.composeDebug)
 }

@@ -34,7 +34,7 @@ tasks.withType<Test>().configureEach {
 }
 
 dependencies {
-    implementation(libs.bundles.core)
+    implementation(libs.bundles.core.common)
     testImplementation(libs.bundles.test)
     testRuntimeOnly(libs.junit.jupiter.engine)
 }

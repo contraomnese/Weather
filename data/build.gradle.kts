@@ -39,13 +39,13 @@ dependencies {
     implementation(project(":domain"))
 
     implementation(libs.bundles.koin)
-    implementation(libs.bundles.core)
+    implementation(libs.bundles.core.common)
     implementation(libs.bundles.network)
     implementation(libs.bundles.room)
     implementation(libs.bundles.datastore)
+    implementation(libs.androidx.core.ktx)
     ksp(libs.androidx.room.compiler)
 
     testImplementation(libs.bundles.test)
     testRuntimeOnly(libs.junit.jupiter.engine)
-    androidTestImplementation(libs.bundles.androidTest)
 }

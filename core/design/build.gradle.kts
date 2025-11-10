@@ -31,14 +31,14 @@ android {
     buildFeatures {
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composecompiler.get()
-    }
 }
 
 dependencies {
 
+    val composeBom = platform(libs.androidx.compose.bom)
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.bundles.compose)
-    implementation(platform(libs.androidx.compose.bom))
 }

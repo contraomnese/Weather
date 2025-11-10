@@ -39,9 +39,11 @@ dependencies {
 
     implementation(project(":domain"))
 
-    implementation(libs.bundles.core)
-    implementation(libs.bundles.presentation)
+    implementation(libs.bundles.android)
     implementation(libs.bundles.koin)
+    implementation(libs.bundles.core.common)
+    implementation(libs.bundles.presentation)
+
     testImplementation(libs.bundles.test)
     androidTestImplementation(libs.bundles.androidTest)
 }

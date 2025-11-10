@@ -62,11 +62,11 @@ android {
         buildConfig = true
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composecompiler.get()
-    }
     kotlinOptions {
         jvmTarget = "11"
+    }
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
     }
 }
 
@@ -91,13 +91,16 @@ dependencies {
     implementation(composeBom)
     androidTestImplementation(composeBom)
 
+    "baselineProfile"(project(":baselineprofile"))
+    implementation(libs.bundles.profiler)
+
     implementation(libs.material)
     implementation(libs.bundles.koin)
-    implementation(libs.bundles.core)
+    implementation(libs.bundles.android)
+    implementation(libs.bundles.core.common)
     implementation(libs.bundles.navigation)
     implementation(libs.bundles.presentation)
     implementation(libs.bundles.compose)
-    implementation(libs.bundles.ui)
     implementation(libs.bundles.network)
     implementation(libs.bundles.room)
     ksp(libs.androidx.room.compiler)
@@ -109,9 +112,4 @@ dependencies {
     testRuntimeOnly(libs.junit.jupiter.engine)
     androidTestImplementation(libs.bundles.androidTest)
     debugImplementation(libs.bundles.composeDebug)
-
-    implementation(libs.androidx.runtime.tracing)
-    implementation(libs.androidx.profileinstaller)
-    "baselineProfile"(project(":baselineprofile"))
-    implementation(libs.androidx.tracing.perfetto)
 }

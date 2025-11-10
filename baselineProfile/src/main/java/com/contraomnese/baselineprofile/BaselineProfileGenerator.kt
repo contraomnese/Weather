@@ -1,6 +1,7 @@
 package com.contraomnese.baselineprofile
 
 import android.annotation.SuppressLint
+import android.view.KeyEvent
 import androidx.benchmark.macro.MacrobenchmarkScope
 import androidx.benchmark.macro.junit4.BaselineProfileRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -46,7 +47,6 @@ class BaselineProfileGenerator {
     @SuppressLint("NewApi")
     @Test
     fun generate() {
-        // The application id for the running build variant is read from the instrumentation arguments.
         rule.collect(
             packageName = InstrumentationRegistry.getArguments().getString("targetAppId")
                 ?: throw Exception("targetAppId not passed as instrumentation runner arg"),
@@ -54,29 +54,18 @@ class BaselineProfileGenerator {
             // See: https://d.android.com/topic/performance/baselineprofiles/dex-layout-optimizations
             includeInStartupProfile = true
         ) {
-            // This block defines the app's critical user journey. Here we are interested in
-            // optimizing for app startup. But you can also navigate and scroll through your most important UI.
-
-            // Start default activity for your app
             pressHome()
             startActivityAndWait()
-
-            // TODO Write more interactions to optimize advanced journeys of your app.
-            // For example:
-            // 1. Wait until the content is asynchronously loaded
-            // 2. Scroll the feed content
-            // 3. Navigate to detail screen
-
-            // Check UiAutomator documentation for more information how to interact with the app.
-            // https://d.android.com/training/testing/other-components/ui-automator
+            waitForAsyncContent()
         }
     }
 
-    fun MacrobenchmarkScope.waitForAsyncContent() {
+    private fun MacrobenchmarkScope.waitForAsyncContent() {
         device.wait(Until.hasObject(By.res("search_bar")), 5_000)
         val searchBar = device.findObject(By.res("search_bar"))
         searchBar.click()
-        // Wait until a snack collection item within the list is rendered.
-        searchBar.wait(Until.hasObject(By.res("snack_collection")), 5_000)
+        device.pressKeyCode(KeyEvent.KEYCODE_M)
+        device.pressEnter()
+        device.wait(Until.hasObject(By.res("matching_locations")), 5_000)
     }
 }
