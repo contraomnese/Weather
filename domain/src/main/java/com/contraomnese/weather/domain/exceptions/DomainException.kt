@@ -1,4 +1,4 @@
-package com.contraomnese.weather.domain.cleanarchitecture.exception
+package com.contraomnese.weather.domain.exceptions
 
 sealed class DomainException(
     message: String?,

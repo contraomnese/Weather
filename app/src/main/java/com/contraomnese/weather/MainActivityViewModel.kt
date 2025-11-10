@@ -1,8 +1,8 @@
 package com.contraomnese.weather
 
 import androidx.lifecycle.viewModelScope
-import com.contraomnese.weather.domain.cleanarchitecture.exception.logPrefix
-import com.contraomnese.weather.domain.cleanarchitecture.exception.notInitialize
+import com.contraomnese.weather.domain.exceptions.logPrefix
+import com.contraomnese.weather.domain.exceptions.notInitialize
 import com.contraomnese.weather.domain.home.usecase.AddFavoriteUseCase
 import com.contraomnese.weather.domain.home.usecase.ObserveFavoritesUseCase
 import com.contraomnese.weather.presentation.architecture.MviModel

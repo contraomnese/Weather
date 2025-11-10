@@ -2,13 +2,13 @@ package com.contraomnese.weather.data.network.parsers
 
 import android.util.Log
 import com.contraomnese.weather.data.network.models.LocationsErrorResponse
-import com.contraomnese.weather.domain.cleanarchitecture.exception.apiUnavailable
-import com.contraomnese.weather.domain.cleanarchitecture.exception.badRequest
-import com.contraomnese.weather.domain.cleanarchitecture.exception.logPrefix
-import com.contraomnese.weather.domain.cleanarchitecture.exception.notFound
-import com.contraomnese.weather.domain.cleanarchitecture.exception.rateLimitExceeded
-import com.contraomnese.weather.domain.cleanarchitecture.exception.unauthorized
-import com.contraomnese.weather.domain.cleanarchitecture.exception.unknown
+import com.contraomnese.weather.domain.exceptions.apiUnavailable
+import com.contraomnese.weather.domain.exceptions.badRequest
+import com.contraomnese.weather.domain.exceptions.logPrefix
+import com.contraomnese.weather.domain.exceptions.notFound
+import com.contraomnese.weather.domain.exceptions.rateLimitExceeded
+import com.contraomnese.weather.domain.exceptions.unauthorized
+import com.contraomnese.weather.domain.exceptions.unknown
 import okhttp3.ResponseBody
 import retrofit2.Converter
 import retrofit2.Response

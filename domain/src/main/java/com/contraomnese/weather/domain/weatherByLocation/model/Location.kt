@@ -13,6 +13,11 @@ data class Location(
             id = 0,
             geo = LocationCoordinates.EMPTY
         )
+
+        fun fromGeo(id: Int, latitude: Double, longitude: Double) = Location(
+            id = id,
+            geo = LocationCoordinates.from(latitude, longitude)
+        )
     }
 }
 

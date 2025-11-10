@@ -1,7 +1,7 @@
 package com.contraomnese.weather.presentation.utils
 
 import android.content.Context
-import com.contraomnese.weather.domain.cleanarchitecture.exception.DomainException
+import com.contraomnese.weather.domain.exceptions.DomainException
 import com.contraomnese.weather.presentation.R
 
 fun provideException(exception: DomainException): Int {

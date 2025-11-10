@@ -8,9 +8,9 @@ import com.contraomnese.weather.data.network.api.LocationsApi
 import com.contraomnese.weather.data.network.models.LocationsErrorResponse
 import com.contraomnese.weather.data.network.parsers.parseOrThrowError
 import com.contraomnese.weather.data.storage.db.WeatherDatabase
-import com.contraomnese.weather.domain.cleanarchitecture.exception.databaseError
-import com.contraomnese.weather.domain.cleanarchitecture.exception.logPrefix
-import com.contraomnese.weather.domain.cleanarchitecture.exception.operationFailed
+import com.contraomnese.weather.domain.exceptions.databaseError
+import com.contraomnese.weather.domain.exceptions.logPrefix
+import com.contraomnese.weather.domain.exceptions.operationFailed
 import com.contraomnese.weather.domain.home.repository.LocationsRepository
 import com.contraomnese.weather.domain.weatherByLocation.model.Location
 import kotlinx.coroutines.CoroutineDispatcher
