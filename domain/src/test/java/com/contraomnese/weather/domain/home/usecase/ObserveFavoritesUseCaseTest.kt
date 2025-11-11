@@ -29,10 +29,10 @@ class ObserveFavoritesUseCaseTest {
     private lateinit var useCase: ObserveFavoritesUseCase
     private val repository = mockk<LocationsRepository>()
 
-    private val expectedLocationFirst = Location.fromGeo(FIRST_LOCATION_ID, FIRST_LOCATION_LATITUDE, FIRST_LOCATION_LONGITUDE)
-    private val expectedLocationSecond = Location.fromGeo(SECOND_LOCATION_ID, SECOND_LOCATION_LATITUDE, SECOND_LOCATION_LONGITUDE)
-    private val expectedDataOne = listOf(expectedLocationFirst)
-    private val expectedDataTwo = listOf(expectedLocationFirst, expectedLocationSecond)
+    private val expectedFirstItem = Location.fromGeo(FIRST_LOCATION_ID, FIRST_LOCATION_LATITUDE, FIRST_LOCATION_LONGITUDE)
+    private val expectedSecondItem = Location.fromGeo(SECOND_LOCATION_ID, SECOND_LOCATION_LATITUDE, SECOND_LOCATION_LONGITUDE)
+    private val expectedDataOne = listOf(expectedFirstItem)
+    private val expectedDataTwo = listOf(expectedFirstItem, expectedSecondItem)
     private val expectedException = RuntimeException("DB access error")
 
     @BeforeEach
