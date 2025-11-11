@@ -18,7 +18,6 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
     compileOptions {
@@ -39,7 +38,6 @@ dependencies {
     implementation(project(":domain"))
 
     implementation(libs.bundles.koin)
-    implementation(libs.bundles.core.common)
     implementation(libs.bundles.network)
     implementation(libs.bundles.room)
     implementation(libs.bundles.datastore)

@@ -93,11 +93,13 @@ interface ForecastDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAlerts(alerts: List<ForecastAlertEntity>)
 
+    @Transaction
     @Query("SELECT * FROM forecast_location WHERE location_id = :locationId")
     suspend fun getForecastBy(locationId: Int): LocationWithForecasts
 
+    @Transaction
     @Query("SELECT * FROM forecast_location WHERE location_id = :locationId")
-    fun observeForecastBy(locationId: Int): Flow<LocationWithForecasts>
+    fun observeForecastBy(locationId: Int): Flow<LocationWithForecasts?>
 
     @Query("DELETE FROM forecast_location WHERE location_id = :locationId")
     suspend fun deleteForecastForLocation(locationId: Int)

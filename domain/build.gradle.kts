@@ -17,7 +17,6 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
     compileOptions {
@@ -34,7 +33,7 @@ tasks.withType<Test>().configureEach {
 }
 
 dependencies {
-    implementation(libs.bundles.core.common)
+    api(libs.bundles.core.common)
     testImplementation(libs.bundles.test)
     testRuntimeOnly(libs.junit.jupiter.engine)
 }

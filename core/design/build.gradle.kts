@@ -18,7 +18,6 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
     compileOptions {
@@ -36,9 +35,10 @@ android {
 dependencies {
 
     val composeBom = platform(libs.androidx.compose.bom)
-    implementation(composeBom)
-    androidTestImplementation(composeBom)
+    api(composeBom)
 
     implementation(libs.androidx.core.ktx)
-    implementation(libs.bundles.compose)
+    api(libs.bundles.compose)
+
+    androidTestImplementation(composeBom)
 }

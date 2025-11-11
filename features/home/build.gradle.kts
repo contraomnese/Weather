@@ -46,17 +46,6 @@ dependencies {
     implementation(project(":core:presentation"))
     implementation(project(":domain"))
 
-    val composeBom = platform(libs.androidx.compose.bom)
-    implementation(composeBom)
-    androidTestImplementation(composeBom)
-
-    implementation(libs.bundles.koin)
-    implementation(libs.bundles.core.common)
-    implementation(libs.bundles.navigation)
-    implementation(libs.bundles.presentation)
-    implementation(libs.bundles.compose)
-    implementation(libs.play.services.location)
-
     testImplementation(libs.bundles.test)
     testRuntimeOnly(libs.junit.jupiter.engine)
     androidTestImplementation(libs.bundles.androidTest)

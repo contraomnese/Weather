@@ -3,6 +3,7 @@ package com.contraomnese.weather.data.storage.db.forecast.entities
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
@@ -12,7 +13,8 @@ import androidx.room.PrimaryKey
         parentColumns = [ForecastLocationEntity.ID],
         childColumns = [ForecastAlertEntity.FORECAST_LOCATION_ID],
         onDelete = ForeignKey.CASCADE
-    )]
+    )],
+    indices = [Index(value = [ForecastAlertEntity.FORECAST_LOCATION_ID], name = "forecast_alert_forecast_location_id")]
 )
 data class ForecastAlertEntity(
     @PrimaryKey(autoGenerate = true) val id: Int? = null,

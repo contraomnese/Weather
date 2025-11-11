@@ -18,7 +18,6 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
     compileOptions {
@@ -40,15 +39,8 @@ tasks.withType<Test>().configureEach {
 dependencies {
 
     implementation(project(":core:design"))
+    implementation(project(":core:presentation"))
     implementation(project(":domain"))
-
-    val composeBom = platform(libs.androidx.compose.bom)
-    implementation(composeBom)
-    androidTestImplementation(composeBom)
-
-    implementation(libs.bundles.android)
-    implementation(libs.bundles.core.common)
-    implementation(libs.bundles.compose)
 
     testImplementation(libs.bundles.test)
     testRuntimeOnly(libs.junit.jupiter.engine)

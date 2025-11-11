@@ -45,13 +45,14 @@ android {
         }
         release {
             signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            buildConfigField("boolean", "DEBUG", "false")
             buildConfigField("String", "WEATHER_API_KEY", "\"${weatherApiKey}\"")
             buildConfigField("String", "WEATHER_API_BASE_URL", "\"${weatherApiBaseUrl}\"")
             buildConfigField("String", "LOCATION_API_BASE_URL", "\"${locationApiBaseUrl}\"")
             buildConfigField("String", "LOCATION_API_KEY", "\"${locationApiKey}\"")
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            buildConfigField("boolean", "DEBUG", "false")
         }
     }
     compileOptions {
@@ -87,20 +88,10 @@ dependencies {
     implementation(project(":features:weatherByLocation"))
     implementation(project(":features:appSettings"))
 
-    val composeBom = platform(libs.androidx.compose.bom)
-    implementation(composeBom)
-    androidTestImplementation(composeBom)
-
     "baselineProfile"(project(":baselineprofile"))
     implementation(libs.bundles.profiler)
 
     implementation(libs.material)
-    implementation(libs.bundles.koin)
-    implementation(libs.bundles.android)
-    implementation(libs.bundles.core.common)
-    implementation(libs.bundles.navigation)
-    implementation(libs.bundles.presentation)
-    implementation(libs.bundles.compose)
     implementation(libs.bundles.network)
     implementation(libs.bundles.room)
     ksp(libs.androidx.room.compiler)
