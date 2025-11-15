@@ -12,7 +12,7 @@ fun provideException(exception: DomainException): Int {
         is DomainException.BadRequest -> R.string.wrong_request_domain_exception
         is DomainException.NotFound -> R.string.weather_for_location_not_found_domain_exception
         is DomainException.RateLimitExceeded -> R.string.rate_limit_exception
-        is DomainException.DatabaseError, is DomainException.OperationFailed -> R.string.operation_failed
+        is DomainException.StorageError, is DomainException.OperationFailed -> R.string.operation_failed
         is DomainException.InitializeError -> R.string.not_initialize
     }
 }

@@ -42,7 +42,7 @@ class ObserveAppSettingsUseCaseTest {
 
     @Test
     fun `given repository returns flow with app settings`() = runTest {
-        coEvery { repository.settings } returns flow {
+        coEvery { repository.observe() } returns flow {
             delay(200)
             emit(expectedFirstItem)
             delay(500)
@@ -56,13 +56,13 @@ class ObserveAppSettingsUseCaseTest {
         assertNotNull(actualResult[1])
         assertEquals(expectedFirstItem, actualResult[0])
         assertEquals(expectedSecondItem, actualResult[1])
-        coVerify(exactly = 1) { repository.settings }
+        coVerify(exactly = 1) { repository.observe() }
         confirmVerified(repository)
     }
 
     @Test
     fun `given repository throws exception when invoke is called then flow throws error`() = runTest {
-        coEvery { repository.settings } returns flow {
+        coEvery { repository.observe() } returns flow {
             throw expectedException
         }
         val actualException = assertThrows<RuntimeException> {
@@ -70,7 +70,7 @@ class ObserveAppSettingsUseCaseTest {
         }
 
         assertEquals(expectedException.message, actualException.message)
-        coVerify(exactly = 1) { repository.settings }
+        coVerify(exactly = 1) { repository.observe() }
         confirmVerified(repository)
     }
 }

@@ -8,9 +8,9 @@ import com.contraomnese.weather.data.network.api.LocationsApi
 import com.contraomnese.weather.data.network.models.LocationsErrorResponse
 import com.contraomnese.weather.data.network.parsers.parseOrThrowError
 import com.contraomnese.weather.data.storage.db.WeatherDatabase
-import com.contraomnese.weather.domain.exceptions.databaseError
 import com.contraomnese.weather.domain.exceptions.logPrefix
 import com.contraomnese.weather.domain.exceptions.operationFailed
+import com.contraomnese.weather.domain.exceptions.storageError
 import com.contraomnese.weather.domain.home.repository.LocationsRepository
 import com.contraomnese.weather.domain.weatherByLocation.model.Location
 import kotlinx.coroutines.CoroutineDispatcher
@@ -35,7 +35,7 @@ class LocationsRepositoryImpl(
                 weatherDatabase.favoritesDao().getFavorites()
             }
         } catch (throwable: Throwable) {
-            return Result.failure(databaseError(logPrefix("Impossible get favorites from database"), throwable))
+            return Result.failure(storageError(logPrefix("Impossible get favorites from database"), throwable))
         }
 
         return try {
@@ -59,7 +59,7 @@ class LocationsRepositoryImpl(
                 weatherDatabase.matchingLocationsDao().getLocation(locationId)
             }
         } catch (throwable: Throwable) {
-            return Result.failure(databaseError(logPrefix("Get location from database failed"), throwable))
+            return Result.failure(storageError(logPrefix("Get location from database failed"), throwable))
         }
 
         val favoriteEntity = try {
@@ -74,7 +74,7 @@ class LocationsRepositoryImpl(
             }
             Result.success(Unit)
         } catch (throwable: Throwable) {
-            Result.failure(databaseError(logPrefix("Impossible add favorite to database"), throwable))
+            Result.failure(storageError(logPrefix("Impossible add favorite to database"), throwable))
         }
     }
 
@@ -84,7 +84,7 @@ class LocationsRepositoryImpl(
                 weatherDatabase.favoritesDao().removeFavorite(id)
                 Result.success(Unit)
             } catch (throwable: Throwable) {
-                Result.failure(databaseError(logPrefix("Impossible remove favorite to database"), throwable))
+                Result.failure(storageError(logPrefix("Impossible remove favorite to database"), throwable))
             }
         }
     }

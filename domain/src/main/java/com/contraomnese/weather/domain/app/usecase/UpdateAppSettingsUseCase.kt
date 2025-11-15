@@ -10,5 +10,5 @@ fun interface UpdateAppSettingsUseCase {
 class UpdateAppSettingsUseCaseImpl(
     private val repository: AppSettingsRepository,
 ) : UpdateAppSettingsUseCase {
-    override suspend fun invoke(request: AppSettings): Result<Unit> = repository.updateSettings(request)
+    override suspend fun invoke(request: AppSettings): Result<Unit> = repository.update(request)
 }

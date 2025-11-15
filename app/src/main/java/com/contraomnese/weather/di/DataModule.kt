@@ -1,6 +1,8 @@
 package com.contraomnese.weather.di
 
 import com.contraomnese.weather.BuildConfig
+import com.contraomnese.weather.data.mappers.BiDirectMapper
+import com.contraomnese.weather.data.mappers.appSettings.AppSettingsMapper
 import com.contraomnese.weather.data.network.api.LocationsApi
 import com.contraomnese.weather.data.network.api.WeatherApi
 import com.contraomnese.weather.data.network.interceptors.LocationsInterceptor
@@ -12,7 +14,9 @@ import com.contraomnese.weather.data.repository.ForecastWeatherRepositoryImpl
 import com.contraomnese.weather.data.repository.LocationsRepositoryImpl
 import com.contraomnese.weather.data.storage.db.WeatherDatabase
 import com.contraomnese.weather.data.storage.memory.api.AppSettingsStorage
+import com.contraomnese.weather.data.storage.memory.models.AppSettingsEntity
 import com.contraomnese.weather.data.storage.memory.store.AppSettingsStorageImpl
+import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
 import com.contraomnese.weather.domain.home.repository.LocationsRepository
 import com.contraomnese.weather.domain.weatherByLocation.repository.ForecastWeatherRepository
@@ -102,6 +106,8 @@ val dataModule = module {
         }
     }
 
+    single<BiDirectMapper<AppSettingsEntity, AppSettings>> { AppSettingsMapper() }
+
     single<WeatherDatabase> { WeatherDatabase.create(context = get()) }
     single<AppSettingsStorage> { AppSettingsStorageImpl(context = get()) }
 
@@ -128,6 +134,7 @@ val dataModule = module {
     single<AppSettingsRepository> {
         AppSettingsRepositoryImpl(
             storage = get(),
+            mapper = get(),
             dispatcher = Dispatchers.IO
         )
     }

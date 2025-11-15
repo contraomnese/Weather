@@ -6,9 +6,9 @@ import com.contraomnese.weather.data.network.models.WeatherErrorResponse
 import com.contraomnese.weather.data.network.parsers.parseOrThrowError
 import com.contraomnese.weather.data.storage.db.WeatherDatabase
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
-import com.contraomnese.weather.domain.exceptions.databaseError
 import com.contraomnese.weather.domain.exceptions.logPrefix
 import com.contraomnese.weather.domain.exceptions.operationFailed
+import com.contraomnese.weather.domain.exceptions.storageError
 import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 import com.contraomnese.weather.domain.weatherByLocation.repository.ForecastWeatherRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -33,7 +33,7 @@ class ForecastWeatherRepositoryImpl(
     private val dispatcher: CoroutineDispatcher,
 ) : ForecastWeatherRepository {
 
-    private val settingsFlow = appSettingsRepository.settings
+    private val settingsFlow = appSettingsRepository.observe()
         .shareIn(CoroutineScope(dispatcher), SharingStarted.Eagerly, 1)
 
     override fun observeBy(locationId: Int): Flow<Forecast?> {
@@ -56,7 +56,7 @@ class ForecastWeatherRepositoryImpl(
                 weatherDatabase.matchingLocationsDao().getLocation(locationId)
             }
         } catch (throwable: Throwable) {
-            return Result.failure(databaseError(logPrefix("Get location from database failed"), throwable))
+            return Result.failure(storageError(logPrefix("Get location from database failed"), throwable))
         }
 
         val response = try {

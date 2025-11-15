@@ -10,7 +10,7 @@ sealed class DomainException(
     data class NotFound(val msg: String?, val err: Throwable? = null) : DomainException(msg, err)
     data class BadRequest(val msg: String?, val err: Throwable? = null) : DomainException(msg, err)
     data class OperationFailed(val msg: String?, val err: Throwable? = null) : DomainException(msg, err)
-    data class DatabaseError(val msg: String?, val err: Throwable? = null) : DomainException(msg, err)
+    data class StorageError(val msg: String?, val err: Throwable? = null) : DomainException(msg, err)
     data class InitializeError(val msg: String?, val err: Throwable? = null) : DomainException(msg, err)
     data class Unknown(val msg: String?, val err: Throwable? = null) : DomainException(msg, err)
 }
@@ -33,8 +33,8 @@ fun badRequest(message: String, cause: Throwable? = null) =
 fun operationFailed(message: String, cause: Throwable? = null) =
     DomainException.OperationFailed(message, cause)
 
-fun databaseError(message: String, cause: Throwable? = null) =
-    DomainException.DatabaseError(message, cause)
+fun storageError(message: String, cause: Throwable? = null) =
+    DomainException.StorageError(message, cause)
 
 fun unknown(message: String, cause: Throwable? = null) =
     DomainException.Unknown(message, cause)

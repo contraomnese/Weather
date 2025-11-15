@@ -32,23 +32,23 @@ class UpdateAppSettingsUseCaseTest {
 
     @Test
     fun `given repository returns success result when invoke is called then returns Unit`() = runTest {
-        coEvery { repository.updateSettings(request) } returns Result.success(Unit)
+        coEvery { repository.update(request) } returns Result.success(Unit)
         val actualResult = useCase(request)
 
         val actualData = actualResult.assertIsSuccess()
         assertEquals(expectedData, actualData)
-        coVerify(exactly = 1) { repository.updateSettings(request) }
+        coVerify(exactly = 1) { repository.update(request) }
         confirmVerified(repository)
     }
 
     @Test
     fun `given repository returns failure result when invoke is called then throws exception`() = runTest {
-        coEvery { repository.updateSettings(request) } returns Result.failure(expectedException)
+        coEvery { repository.update(request) } returns Result.failure(expectedException)
         val actualResult = useCase(request)
 
         val actualException = actualResult.assertIsFailure()
         assertEquals(expectedException.message, actualException.message)
-        coVerify(exactly = 1) { repository.updateSettings(request) }
+        coVerify(exactly = 1) { repository.update(request) }
         confirmVerified(repository)
     }
 }

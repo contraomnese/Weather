@@ -11,5 +11,5 @@ fun interface ObserveAppSettingsUseCase {
 class ObserveAppSettingsUseCaseImpl(
     private val repository: AppSettingsRepository,
 ) : ObserveAppSettingsUseCase {
-    override fun invoke(): Flow<AppSettings> = repository.settings
+    override fun invoke(): Flow<AppSettings> = repository.observe()
 }
