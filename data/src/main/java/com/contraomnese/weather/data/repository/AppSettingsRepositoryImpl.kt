@@ -21,9 +21,9 @@ class AppSettingsRepositoryImpl(
 ) : AppSettingsRepository {
 
     override fun observeSettings(): Flow<AppSettings> =
-        storage.observe().map { mapper.toDomain(it) }.flowOn(dispatcher)
+        storage.observeSettings().map { mapper.toDomain(it) }.flowOn(dispatcher)
 
-    override suspend fun getSettings(): Result<AppSettings> = withContext(dispatcher) {
+    override fun getSettings(): Result<AppSettings> =
         try {
             val entity = storage.getSettings()
             val result = mapper.toDomain(entity)
@@ -36,12 +36,12 @@ class AppSettingsRepositoryImpl(
                 }
             )
         }
-    }
+
 
     override suspend fun updateSettings(settings: AppSettings): Result<Unit> = withContext(dispatcher) {
         try {
             val entity = mapper.toEntity(settings)
-            storage.save(entity)
+            storage.saveSettings(entity)
             Result.success(Unit)
         } catch (exception: Exception) {
             Result.failure(

@@ -15,7 +15,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import java.util.Locale
@@ -35,26 +34,30 @@ class AppSettingsStorageImpl(
         val PRESSURE_UNIT = stringPreferencesKey("pressure_unit")
     }
 
-    private val settings = context.appSettingsDataStore.data
+    private lateinit var settings: AppSettingsEntity
+
+    private val _settings = context.appSettingsDataStore.data
         .map { prefs ->
             val languageValue = prefs[Keys.LANGUAGE]
                 ?: Locale.getDefault().language
 
-            AppSettingsEntity(
+            settings = AppSettingsEntity(
                 language = languageValue,
                 speedUnit = prefs[Keys.SPEED_UNIT] ?: WindSpeedUnit.Kph.name,
                 precipitationUnit = prefs[Keys.PRECIPITATION_UNIT] ?: PrecipitationUnit.Millimeters.name,
                 temperatureUnit = prefs[Keys.TEMPERATURE_UNIT] ?: TemperatureUnit.Celsius.name,
                 pressureUnit = prefs[Keys.PRESSURE_UNIT] ?: PressureUnit.MmHg.name
             )
+            settings
         }
         .shareIn(CoroutineScope(dispatcher), SharingStarted.Eagerly, 1)
 
-    override fun observe(): Flow<AppSettingsEntity> = settings.distinctUntilChanged()
 
-    override suspend fun getSettings() = settings.first()
+    override fun observeSettings(): Flow<AppSettingsEntity> = _settings.distinctUntilChanged()
 
-    override suspend fun save(entity: AppSettingsEntity) {
+    override fun getSettings() = settings
+
+    override suspend fun saveSettings(entity: AppSettingsEntity) {
         if (getSettings() != entity) {
             context.appSettingsDataStore.edit { prefs ->
                 prefs[Keys.LANGUAGE] = entity.language

@@ -91,7 +91,7 @@ val dataModule = module {
 
 
     single<WeatherInterceptor> {
-        WeatherInterceptor(apiKey = BuildConfig.WEATHER_API_KEY)
+        WeatherInterceptor(apiKey = BuildConfig.WEATHER_API_KEY, appSettingsStorage = get())
     }
 
     single<LocationsInterceptor> { LocationsInterceptor(apiKey = BuildConfig.LOCATION_API_KEY) }

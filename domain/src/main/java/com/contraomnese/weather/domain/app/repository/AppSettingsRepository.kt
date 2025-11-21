@@ -7,7 +7,7 @@ interface AppSettingsRepository {
 
     fun observeSettings(): Flow<AppSettings>
 
-    suspend fun getSettings(): Result<AppSettings>
+    fun getSettings(): Result<AppSettings>
 
     suspend fun updateSettings(settings: AppSettings): Result<Unit>
 

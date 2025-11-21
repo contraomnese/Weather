@@ -4,7 +4,7 @@ import com.contraomnese.weather.data.storage.memory.models.AppSettingsEntity
 import kotlinx.coroutines.flow.Flow
 
 interface AppSettingsStorage {
-    fun observe(): Flow<AppSettingsEntity>
-    suspend fun getSettings(): AppSettingsEntity
-    suspend fun save(entity: AppSettingsEntity)
+    fun observeSettings(): Flow<AppSettingsEntity>
+    fun getSettings(): AppSettingsEntity
+    suspend fun saveSettings(entity: AppSettingsEntity)
 }
