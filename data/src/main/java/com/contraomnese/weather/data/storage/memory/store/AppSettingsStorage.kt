@@ -10,15 +10,22 @@ import com.contraomnese.weather.domain.app.model.PrecipitationUnit
 import com.contraomnese.weather.domain.app.model.PressureUnit
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import com.contraomnese.weather.domain.app.model.WindSpeedUnit
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 import java.util.Locale
 
 val Context.appSettingsDataStore by preferencesDataStore("app_settings")
 
-class AppSettingsStorageImpl(private val context: Context) : AppSettingsStorage {
+class AppSettingsStorageImpl(
+    private val context: Context,
+    private val dispatcher: CoroutineDispatcher,
+) : AppSettingsStorage {
 
     private object Keys {
         val LANGUAGE = stringPreferencesKey("language")
@@ -28,9 +35,8 @@ class AppSettingsStorageImpl(private val context: Context) : AppSettingsStorage 
         val PRESSURE_UNIT = stringPreferencesKey("pressure_unit")
     }
 
-    override fun getSettings(): Flow<AppSettingsEntity> =
-
-        context.appSettingsDataStore.data.map { prefs ->
+    private val settings = context.appSettingsDataStore.data
+        .map { prefs ->
             val languageValue = prefs[Keys.LANGUAGE]
                 ?: Locale.getDefault().language
 
@@ -41,11 +47,15 @@ class AppSettingsStorageImpl(private val context: Context) : AppSettingsStorage 
                 temperatureUnit = prefs[Keys.TEMPERATURE_UNIT] ?: TemperatureUnit.Celsius.name,
                 pressureUnit = prefs[Keys.PRESSURE_UNIT] ?: PressureUnit.MmHg.name
             )
-        }.distinctUntilChanged()
+        }
+        .shareIn(CoroutineScope(dispatcher), SharingStarted.Eagerly, 1)
 
+    override fun observe(): Flow<AppSettingsEntity> = settings.distinctUntilChanged()
 
-    override suspend fun saveSettings(entity: AppSettingsEntity) {
-        if (getSettings().first() != entity) {
+    override suspend fun getSettings() = settings.first()
+
+    override suspend fun save(entity: AppSettingsEntity) {
+        if (getSettings() != entity) {
             context.appSettingsDataStore.edit { prefs ->
                 prefs[Keys.LANGUAGE] = entity.language
                 prefs[Keys.SPEED_UNIT] = entity.speedUnit

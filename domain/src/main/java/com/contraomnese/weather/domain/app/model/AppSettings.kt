@@ -11,7 +11,20 @@ data class AppSettings(
 )
 
 @JvmInline
-value class Language(val value: String)
+value class Language(val value: String) {
+    init {
+        require(isValid(value)) {
+            "Invalid language code: '$value'. Expected ISO-639-1 lowercase code (e.g. 'en', 'ru')"
+        }
+    }
+
+    companion object {
+        private val regex = "^[a-z]{2}$".toRegex()
+
+        fun isValid(code: String): Boolean =
+            regex.matches(code)
+    }
+}
 
 enum class WindSpeedUnit { Kph, Mph, Ms }
 enum class PrecipitationUnit { Millimeters, Inches }

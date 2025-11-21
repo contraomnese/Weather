@@ -109,7 +109,7 @@ val dataModule = module {
     single<BiDirectMapper<AppSettingsEntity, AppSettings>> { AppSettingsMapper() }
 
     single<WeatherDatabase> { WeatherDatabase.create(context = get()) }
-    single<AppSettingsStorage> { AppSettingsStorageImpl(context = get()) }
+    single<AppSettingsStorage> { AppSettingsStorageImpl(context = get(), dispatcher = Dispatchers.IO) }
 
     single<WeatherApi> { get<Retrofit>(named(WEATHER)).create(WeatherApi::class.java) }
     single<LocationsApi> { get<Retrofit>(named(LOCATIONS)).create(LocationsApi::class.java) }

@@ -47,16 +47,177 @@ class AppSettingsRepositoryTest {
     }
 
     @Test
-    fun `given repository returns success result when update is called and save settings returns Unit`() =
+    fun `given repository returns flow when observe is called then return correct item`() = runTest(dispatcher) {
+
+        val expectedData = settings
+
+        every { mapper.toDomain(entity) } returns settings
+        coEvery { storage.observe() } returns flowOf(entity)
+
+        val actualData = repository.observeSettings().first()
+
+        assertEquals(expectedData, actualData)
+        coVerify(exactly = 1) { mapper.toDomain(entity) }
+        coVerify(exactly = 1) { storage.observe() }
+        confirmVerified(storage, mapper)
+    }
+
+    @Test
+    fun `given repository returns flow when observe settings is called then correctly maps multiple items`() =
+        runTest(dispatcher) {
+
+            val expectedData = listOf(firstSettingsItem, secondSettingsItem)
+
+            every { mapper.toDomain(firstSettingsEntityItem) } returns firstSettingsItem
+            every { mapper.toDomain(secondSettingsEntityItem) } returns secondSettingsItem
+            coEvery { storage.observe() } returns flowOf(
+                firstSettingsEntityItem,
+                secondSettingsEntityItem
+            )
+
+            val actualData = repository.observeSettings().toList()
+
+            assertEquals(expectedData.size, actualData.size)
+            assertEquals(expectedData[0], actualData[0])
+            assertEquals(expectedData[1], actualData[1])
+            coVerify(exactly = expectedData.size) { mapper.toDomain(any<AppSettingsEntity>()) }
+            coVerify(exactly = 1) { storage.observe() }
+            confirmVerified(storage, mapper)
+        }
+
+    @Test
+    fun `given repository completes without emissions when observe settings is called`() = runTest(dispatcher) {
+
+        coEvery { storage.observe() } returns emptyFlow()
+
+        val actualData = repository.observeSettings().toList()
+
+        assertTrue(actualData.isEmpty())
+        coVerify(exactly = 1) { storage.observe() }
+        confirmVerified(storage, mapper)
+    }
+
+    @Test
+    fun `given repository returns flow when observe settings is called then throws exception`() = runTest(dispatcher) {
+
+        val expectedException = storageException
+
+        coEvery { storage.observe() } returns flow {
+            throw expectedException
+        }
+
+        val actualException = assertFailsWith<Exception> {
+            repository.observeSettings().toList()
+        }
+
+        assertEquals(expectedException, actualException.cause ?: actualException)
+        assertEquals(expectedException.message, actualException.cause?.message ?: actualException.message)
+
+        verify(exactly = 0) { mapper.toDomain(entity) }
+        coVerify(exactly = 1) { storage.observe() }
+        confirmVerified(storage, mapper)
+    }
+
+    @Test
+    fun `given repository returns flow when observe is called then throws mapping exception`() = runTest(dispatcher) {
+
+        val expectedException = mappingException
+
+        every { mapper.toDomain(entity) } throws expectedException
+        coEvery { storage.observe() } returns flow { emit(entity) }
+
+        val actualException = assertFailsWith<Exception> {
+            repository.observeSettings().toList()
+        }
+
+        assertEquals(expectedException, actualException.cause ?: actualException)
+        assertEquals(expectedException.message, actualException.cause?.message ?: actualException.message)
+
+        verify(exactly = 1) { mapper.toDomain(entity) }
+        coVerify(exactly = 1) { storage.observe() }
+        confirmVerified(storage, mapper)
+    }
+
+    @Test
+    fun `given repository returns success result when get settings is called then returns correct settings`() =
+        runTest(dispatcher) {
+
+            val expectedData = settings
+            val slot = slot<AppSettingsEntity>()
+
+            coEvery { storage.getSettings() } returns entity
+            every { mapper.toDomain(capture(slot)) } returns settings
+
+            val actualResult = repository.getSettings()
+
+            val actualData = actualResult.assertIsSuccess()
+            assertEquals(expectedData, actualData)
+
+            val captured = slot.captured
+            assertEquals(entity.language, captured.language)
+            assertEquals(entity.speedUnit, captured.speedUnit)
+            assertEquals(entity.temperatureUnit, captured.temperatureUnit)
+            assertEquals(entity.precipitationUnit, captured.precipitationUnit)
+            assertEquals(entity.pressureUnit, captured.pressureUnit)
+
+            coVerifyOrder {
+                storage.getSettings()
+                mapper.toDomain(any())
+            }
+
+            confirmVerified(storage, mapper)
+        }
+
+    @Test
+    fun `given repository returns failure result when get settings is called then throws storage exception`() =
+        runTest(dispatcher) {
+
+            val expectedException = DomainException.StorageError(null, storageException)
+
+            coEvery { storage.getSettings() } throws storageException
+
+            val actualResult = repository.getSettings()
+            val actualException = actualResult.assertIsFailure()
+
+            assertEquals(expectedException::class.java, actualException::class.java)
+            assertEquals(expectedException.err, actualException.cause)
+
+            coVerify(exactly = 1) { storage.getSettings() }
+            verify(exactly = 0) { mapper.toDomain(any()) }
+            confirmVerified(storage, mapper)
+        }
+
+    @Test
+    fun `given repository returns failure result when get settings is called then throws mapping exception`() =
+        runTest(dispatcher) {
+
+            val expectedException = DomainException.OperationFailed(null, mappingException)
+
+            coEvery { storage.getSettings() } returns entity
+            every { mapper.toDomain(entity) } throws mappingException
+
+            val actualResult = repository.getSettings()
+            val actualException = actualResult.assertIsFailure()
+
+            assertEquals(expectedException::class.java, actualException::class.java)
+            assertEquals(expectedException.err, actualException.cause)
+
+            coVerify(exactly = 1) { storage.getSettings() }
+            verify(exactly = 1) { mapper.toDomain(entity) }
+            confirmVerified(storage, mapper)
+        }
+
+    @Test
+    fun `given repository returns success result when update settings is called then returns Unit`() =
         runTest(dispatcher) {
 
             val expectedData = Unit
             val slot = slot<AppSettingsEntity>()
 
             every { mapper.toEntity(request) } returns entity
-            coEvery { storage.saveSettings(capture(slot)) } returns Unit
+            coEvery { storage.save(capture(slot)) } returns Unit
 
-            val actualResult = repository.update(request)
+            val actualResult = repository.updateSettings(request)
 
             val actualData = actualResult.assertIsSuccess()
             assertEquals(expectedData, actualData)
@@ -70,149 +231,57 @@ class AppSettingsRepositoryTest {
 
             coVerifyOrder {
                 mapper.toEntity(request)
-                storage.saveSettings(any())
+                storage.save(any())
             }
 
             confirmVerified(storage, mapper)
         }
 
     @Test
-    fun `given repository returns failure result when update is called then throws mapping exception`() =
+    fun `given repository returns failure result when update settings is called then throws mapping exception`() =
         runTest(dispatcher) {
 
             val expectedException = DomainException.OperationFailed(null, mappingException)
 
             every { mapper.toEntity(request) } throws mappingException
 
-            val actualResult = repository.update(request)
+            val actualResult = repository.updateSettings(request)
             val actualException = actualResult.assertIsFailure()
 
             assertEquals(expectedException::class.java, actualException::class.java)
             assertEquals(expectedException.err, actualException.cause)
 
             coVerify(exactly = 1) { mapper.toEntity(request) }
-            coVerify(exactly = 0) { storage.saveSettings(any()) }
+            coVerify(exactly = 0) { storage.save(any()) }
             confirmVerified(storage, mapper)
         }
 
     @Test
-    fun `given repository returns failure result when update is called then throws database exception`() =
+    fun `given repository returns failure result when update setting is called then throws storage exception`() =
         runTest(dispatcher) {
 
-            val expectedException = DomainException.StorageError(null, databaseException)
+            val expectedException = DomainException.StorageError(null, storageException)
 
             every { mapper.toEntity(request) } returns entity
-            coEvery { storage.saveSettings(entity) } throws databaseException
+            coEvery { storage.save(entity) } throws storageException
 
-            val actualResult = repository.update(request)
+            val actualResult = repository.updateSettings(request)
             val actualException = actualResult.assertIsFailure()
 
             assertEquals(expectedException::class.java, actualException::class.java)
             assertEquals(expectedException.err, actualException.cause)
 
             verify(exactly = 1) { mapper.toEntity(request) }
-            coVerify(exactly = 1) { storage.saveSettings(entity) }
+            coVerify(exactly = 1) { storage.save(entity) }
             confirmVerified(storage, mapper)
         }
-
-    @Test
-    fun `given repository returns flow when observe is called then return correct item`() = runTest(dispatcher) {
-
-        val expectedData = settings
-
-        every { mapper.toDomain(entity) } returns settings
-        coEvery { storage.getSettings() } returns flowOf(entity)
-
-        val actualData = repository.observe().first()
-
-        assertEquals(expectedData, actualData)
-        coVerify(exactly = 1) { mapper.toDomain(entity) }
-        coVerify(exactly = 1) { storage.getSettings() }
-        confirmVerified(storage, mapper)
-    }
-
-    @Test
-    fun `given repository returns flow when observe is called then correctly maps multiple items`() =
-        runTest(dispatcher) {
-
-            val expectedData = listOf(firstSettingsItem, secondSettingsItem)
-
-            every { mapper.toDomain(firstSettingsEntityItem) } returns firstSettingsItem
-            every { mapper.toDomain(secondSettingsEntityItem) } returns secondSettingsItem
-            coEvery { storage.getSettings() } returns flowOf(
-                firstSettingsEntityItem,
-                secondSettingsEntityItem
-            )
-
-            val actualData = repository.observe().toList()
-
-            assertEquals(expectedData.size, actualData.size)
-            assertEquals(expectedData[0], actualData[0])
-            assertEquals(expectedData[1], actualData[1])
-            coVerify(exactly = expectedData.size) { mapper.toDomain(any<AppSettingsEntity>()) }
-            coVerify(exactly = 1) { storage.getSettings() }
-            confirmVerified(storage, mapper)
-        }
-
-    @Test
-    fun `given repository completes without emissions when observe is called`() = runTest(dispatcher) {
-
-        coEvery { storage.getSettings() } returns emptyFlow()
-
-        val actualData = repository.observe().toList()
-
-        assertTrue(actualData.isEmpty())
-        coVerify(exactly = 1) { storage.getSettings() }
-        confirmVerified(storage, mapper)
-    }
-
-    @Test
-    fun `given repository returns flow with when observe is called then throws exception`() = runTest(dispatcher) {
-
-        val expectedException = databaseException
-
-        coEvery { storage.getSettings() } returns flow {
-            throw expectedException
-        }
-
-        val actualException = assertFailsWith<Exception> {
-            repository.observe().toList()
-        }
-
-        assertEquals(expectedException, actualException.cause ?: actualException)
-        assertEquals(expectedException.message, actualException.cause?.message ?: actualException.message)
-
-        verify(exactly = 0) { mapper.toDomain(entity) }
-        coVerify(exactly = 1) { storage.getSettings() }
-        confirmVerified(storage, mapper)
-    }
-
-    @Test
-    fun `given repository returns flow when observe is called then throws mapping exception`() = runTest(dispatcher) {
-
-        val expectedException = mappingException
-
-        every { mapper.toDomain(entity) } throws expectedException
-        coEvery { storage.getSettings() } returns flow { emit(entity) }
-
-        val actualException = assertFailsWith<Exception> {
-            repository.observe().toList()
-        }
-
-        assertEquals(expectedException, actualException.cause ?: actualException)
-        assertEquals(expectedException.message, actualException.cause?.message ?: actualException.message)
-
-        verify(exactly = 1) { mapper.toDomain(entity) }
-        coVerify(exactly = 1) { storage.getSettings() }
-        confirmVerified(storage, mapper)
-    }
 
     @Test
     fun `given repository rethrow errors when update is called`() = runTest(dispatcher) {
         every { mapper.toEntity(any()) } throws expectedError
 
         assertFailsWith<OutOfMemoryError> {
-            repository.update(settings)
+            repository.updateSettings(settings)
         }
     }
 
@@ -220,7 +289,7 @@ class AppSettingsRepositoryTest {
         private val settings = AppSettingsStub.generate()
         private val entity = AppSettingsStub.map(settings)
         private val mappingException = IllegalArgumentException()
-        private val databaseException = RuntimeException("Database error")
+        private val storageException = RuntimeException("Storage error")
         private val expectedError = OutOfMemoryError("boom")
         private val firstSettingsItem = AppSettingsStub.generate("ru", pressureUnit = PressureUnit.GPa)
         private val firstSettingsEntityItem = AppSettingsStub.map(firstSettingsItem)

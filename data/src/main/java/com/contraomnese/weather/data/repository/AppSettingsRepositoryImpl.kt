@@ -20,19 +20,34 @@ class AppSettingsRepositoryImpl(
     private val dispatcher: CoroutineDispatcher,
 ) : AppSettingsRepository {
 
-    override fun observe(): Flow<AppSettings> =
-        storage.getSettings().map { mapper.toDomain(it) }.flowOn(dispatcher)
+    override fun observeSettings(): Flow<AppSettings> =
+        storage.observe().map { mapper.toDomain(it) }.flowOn(dispatcher)
 
-    override suspend fun update(settings: AppSettings): Result<Unit> = withContext(dispatcher) {
+    override suspend fun getSettings(): Result<AppSettings> = withContext(dispatcher) {
+        try {
+            val entity = storage.getSettings()
+            val result = mapper.toDomain(entity)
+            Result.success(result)
+        } catch (exception: Exception) {
+            Result.failure(
+                when (exception) {
+                    is IllegalArgumentException -> operationFailed(logPrefix("Mapping failed: cannot convert AppSettings"), exception)
+                    else -> storageError(logPrefix("Storage failure during saving Settings"), exception)
+                }
+            )
+        }
+    }
+
+    override suspend fun updateSettings(settings: AppSettings): Result<Unit> = withContext(dispatcher) {
         try {
             val entity = mapper.toEntity(settings)
-            storage.saveSettings(entity)
+            storage.save(entity)
             Result.success(Unit)
         } catch (exception: Exception) {
             Result.failure(
                 when (exception) {
-                    is IllegalArgumentException -> operationFailed(logPrefix("Converting error"), exception)
-                    else -> storageError(logPrefix("Storage saving error"), exception)
+                    is IllegalArgumentException -> operationFailed(logPrefix("Mapping failed: cannot convert AppSettings"), exception)
+                    else -> storageError(logPrefix("Storage failure during saving Settings"), exception)
                 }
             )
         }

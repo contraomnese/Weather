@@ -5,8 +5,10 @@ import kotlinx.coroutines.flow.Flow
 
 interface AppSettingsRepository {
 
-    fun observe(): Flow<AppSettings>
+    fun observeSettings(): Flow<AppSettings>
 
-    suspend fun update(settings: AppSettings): Result<Unit>
+    suspend fun getSettings(): Result<AppSettings>
+
+    suspend fun updateSettings(settings: AppSettings): Result<Unit>
 
 }
