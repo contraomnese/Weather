@@ -7,10 +7,13 @@ import com.contraomnese.weather.domain.weatherByLocation.model.Location
 import com.contraomnese.weather.presentation.architecture.MviState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.collections.immutable.toPersistentMap
+import kotlinx.collections.immutable.toPersistentSet
 
 internal data class Gps(
     val location: Location? = null,
@@ -25,14 +28,14 @@ internal data class HomeScreenState(
     val inputLocation: TextFieldValue = TextFieldValue(),
     val gps: Gps = Gps(),
     val matchingLocations: ImmutableList<Location> = persistentListOf(),
-    val favorites: ImmutableList<Location> = persistentListOf(),
+    val favorites: ImmutableSet<Location> = persistentSetOf(),
     val favoritesForecast: ImmutableMap<Int, Forecast> = persistentMapOf(),
 ) : MviState {
 
     private fun cleanFavorites(): HomeScreenState = copy(
         isLoading = false,
         isSearching = false,
-        favorites = persistentListOf(),
+        favorites = persistentSetOf(),
         favoritesForecast = persistentMapOf()
     )
 
@@ -50,7 +53,7 @@ internal data class HomeScreenState(
         copy(matchingLocations = locations.toPersistentList(), isSearching = false)
 
     fun setFavorites(favorites: List<Location>): HomeScreenState =
-        if (favorites.isNotEmpty()) copy(favorites = favorites.toPersistentList(), isLoading = false) else cleanFavorites()
+        if (favorites.isNotEmpty()) copy(favorites = favorites.toPersistentSet(), isLoading = false) else cleanFavorites()
 
     fun setFavoritesForecast(newFavoritesForecast: Map<Int, Forecast>): HomeScreenState =
         copy(favoritesForecast = newFavoritesForecast.toPersistentMap())

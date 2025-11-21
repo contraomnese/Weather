@@ -99,7 +99,9 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.toPersistentSet
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -388,7 +390,7 @@ private fun TopBar(
 @Composable
 private fun MatchingLocations(
     locations: ImmutableList<Location>,
-    favorites: ImmutableList<Location>,
+    favorites: ImmutableSet<Location>,
     pushAction: (HomeScreenAction) -> Unit = {},
     onNavigateToWeatherByLocation: (Int) -> Unit = {},
 ) {
@@ -492,7 +494,7 @@ private fun MatchingLocations(
 
 @Composable
 private fun FavoritesLocations(
-    favorites: ImmutableList<Location>,
+    favorites: ImmutableSet<Location>,
     favoritesForecast: ImmutableMap<Int, Forecast>,
     pushAction: (HomeScreenAction) -> Unit = {},
     onNavigateToWeatherByLocation: (Int) -> Unit,
@@ -523,7 +525,7 @@ private fun FavoritesLocations(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(space16),
     ) {
-        items(favorites, key = { location -> location.id }) { location ->
+        items(favorites.toList(), key = { location -> location.id }) { location ->
             val favoriteForecast = favoritesForecast[location.id]
 
             favoriteForecast?.let {
@@ -627,7 +629,7 @@ private fun HomeScreenPreview() {
                 country = "США"
             )
         ).toPersistentList(),
-        favorites = listOf(
+        favorites = setOf(
             Location.EMPTY.copy(
                 city = "Москва",
                 state = "Московская область",
@@ -638,7 +640,7 @@ private fun HomeScreenPreview() {
                 state = "Айдахо",
                 country = "США"
             )
-        ).toPersistentList()
+        ).toPersistentSet()
     )
 
     WeatherTheme {
