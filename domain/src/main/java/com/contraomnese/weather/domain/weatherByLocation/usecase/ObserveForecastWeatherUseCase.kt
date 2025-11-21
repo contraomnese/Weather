@@ -12,6 +12,6 @@ class ObserveForecastWeatherUseCaseImpl(
     private val repository: ForecastWeatherRepository,
 ) : ObserveForecastWeatherUseCase {
 
-    override fun invoke(request: Int): Flow<Forecast?> = repository.observeBy(request)
+    override fun invoke(request: Int): Flow<Forecast?> = repository.getForecastByLocationId(request)
 
 }

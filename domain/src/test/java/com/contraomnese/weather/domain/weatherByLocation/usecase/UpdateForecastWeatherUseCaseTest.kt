@@ -18,7 +18,7 @@ class UpdateForecastWeatherUseCaseTest {
     private lateinit var useCase: UpdateForecastWeatherUseCase
     private val repository = mockk<ForecastWeatherRepository>()
     private val request = 1
-    private val expectedData = Unit
+    private val expectedData = 1
     private val expectedException = SQLiteException("Database doesn't exist")
 
     @BeforeEach
@@ -27,24 +27,24 @@ class UpdateForecastWeatherUseCaseTest {
     }
 
     @Test
-    fun `given repository returns success result when invoke is called then returns Unit`() = runTest {
-        coEvery { repository.updateBy(request) } returns Result.success(Unit)
+    fun `given repository returns success result when invoke is called then returns updated location id`() = runTest {
+        coEvery { repository.refreshForecastByLocationId(request) } returns Result.success(expectedData)
         val actualResult = useCase(request)
 
         val actualData = actualResult.assertIsSuccess()
         assertEquals(expectedData, actualData)
-        coVerify(exactly = 1) { repository.updateBy(request) }
+        coVerify(exactly = 1) { repository.refreshForecastByLocationId(request) }
         confirmVerified(repository)
     }
 
     @Test
     fun `given repository returns failure result when invoke is called then throws exception`() = runTest {
-        coEvery { repository.updateBy(request) } returns Result.failure(expectedException)
+        coEvery { repository.refreshForecastByLocationId(request) } returns Result.failure(expectedException)
         val actualResult = useCase(request)
 
         val actualException = actualResult.assertIsFailure()
         assertEquals(expectedException.message, actualException.message)
-        coVerify(exactly = 1) { repository.updateBy(request) }
+        coVerify(exactly = 1) { repository.refreshForecastByLocationId(request) }
         confirmVerified(repository)
     }
 

@@ -34,7 +34,7 @@ class ObserveForecastWeatherUseCaseTest {
 
     @Test
     fun `given repository returns flow with list of forecast weather`() = runTest {
-        coEvery { repository.observeBy(request) } returns flow {
+        coEvery { repository.getForecastByLocationId(request) } returns flow {
             delay(200)
             emit(expectedFirstItem)
             delay(500)
@@ -47,16 +47,14 @@ class ObserveForecastWeatherUseCaseTest {
         assertNotNull(actualResult[1])
         assertEquals(expectedFirstItem, actualResult[0])
         assertEquals(expectedSecondItem, actualResult[1])
-        coVerify(exactly = 1) { repository.observeBy(request) }
+        coVerify(exactly = 1) { repository.getForecastByLocationId(request) }
         confirmVerified(repository)
     }
 
     @Test
     fun `given repository returns flow with list of null`() = runTest {
-        coEvery { repository.observeBy(request) } returns flow {
-            delay(200)
+        coEvery { repository.getForecastByLocationId(request) } returns flow {
             emit(null)
-            delay(500)
             emit(null)
         }
         val actualResult = useCase(request).toList()
@@ -64,13 +62,13 @@ class ObserveForecastWeatherUseCaseTest {
         assertEquals(FORECAST_SIZE, actualResult.size)
         assertNull(actualResult[0])
         assertNull(actualResult[1])
-        coVerify(exactly = 1) { repository.observeBy(request) }
+        coVerify(exactly = 1) { repository.getForecastByLocationId(request) }
         confirmVerified(repository)
     }
 
     @Test
     fun `given repository throws exception when invoke is called then flow throws error`() = runTest {
-        coEvery { repository.observeBy(request) } returns flow {
+        coEvery { repository.getForecastByLocationId(request) } returns flow {
             throw expectedException
         }
         val actualException = assertThrows<RuntimeException> {
@@ -78,7 +76,7 @@ class ObserveForecastWeatherUseCaseTest {
         }
 
         assertEquals(expectedException.message, actualException.message)
-        coVerify(exactly = 1) { repository.observeBy(request) }
+        coVerify(exactly = 1) { repository.getForecastByLocationId(request) }
         confirmVerified(repository)
     }
 }

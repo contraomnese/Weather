@@ -2,9 +2,11 @@ package com.contraomnese.weather.data.repository
 
 import com.contraomnese.weather.data.mappers.forecast.toDomain
 import com.contraomnese.weather.data.network.api.WeatherApi
+import com.contraomnese.weather.data.network.models.ForecastResponse
 import com.contraomnese.weather.data.network.models.WeatherErrorResponse
 import com.contraomnese.weather.data.network.parsers.parseOrThrowError
 import com.contraomnese.weather.data.storage.db.WeatherDatabase
+import com.contraomnese.weather.data.storage.db.locations.entities.MatchingLocationEntity
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
 import com.contraomnese.weather.domain.exceptions.logPrefix
 import com.contraomnese.weather.domain.exceptions.operationFailed
@@ -12,18 +14,15 @@ import com.contraomnese.weather.domain.exceptions.storageError
 import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 import com.contraomnese.weather.domain.weatherByLocation.repository.ForecastWeatherRepository
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import retrofit2.Converter
-
-private const val FORECAST_REFRESH_TIME = 1800000L
+import java.util.concurrent.ConcurrentHashMap
 
 class ForecastWeatherRepositoryImpl(
     private val api: WeatherApi,
@@ -31,55 +30,80 @@ class ForecastWeatherRepositoryImpl(
     private val weatherDatabase: WeatherDatabase,
     private val errorConverter: Converter<ResponseBody, WeatherErrorResponse>,
     private val dispatcher: CoroutineDispatcher,
+    private val updateMutex: MutableMap<Int, Mutex> = ConcurrentHashMap(),
 ) : ForecastWeatherRepository {
 
-    private val settingsFlow = appSettingsRepository.observe()
-        .shareIn(CoroutineScope(dispatcher), SharingStarted.Eagerly, 1)
-
-    override fun observeBy(locationId: Int): Flow<Forecast?> {
+    override fun getForecastByLocationId(id: Int): Flow<Forecast?> {
         return combine(
-            weatherDatabase.forecastDao().observeForecastBy(locationId),
-            settingsFlow
+            weatherDatabase.forecastDao().observeForecastBy(id),
+            appSettingsRepository.observeSettings()
         ) { entity, settings ->
-            if (entity == null || System.currentTimeMillis() - entity.location.lastUpdated > FORECAST_REFRESH_TIME) {
-                null
-            } else {
-                entity.toDomain(settings)
+            Pair(entity, settings)
+        }
+            .map { (entity, settings) ->
+                entity?.toDomain(settings)
             }
-        }.flowOn(dispatcher)
+            .flowOn(dispatcher)
     }
 
-    override suspend fun updateBy(locationId: Int): Result<Unit> {
+    override suspend fun refreshForecastByLocationId(id: Int): Result<Int> {
+        val mutex = updateMutex.computeIfAbsent(id) { Mutex() }
 
-        val location = try {
-            withContext(dispatcher) {
-                weatherDatabase.matchingLocationsDao().getLocation(locationId)
+        return if (mutex.tryLock()) {
+            try {
+                updateForecast(id)
+            } finally {
+                mutex.unlock()
             }
-        } catch (throwable: Throwable) {
-            return Result.failure(storageError(logPrefix("Get location from database failed"), throwable))
-        }
-
-        val response = try {
-            withContext(dispatcher) {
-                api.getForecastWeather(query = location.toPoint(), lang = settingsFlow.first().language.value)
-                    .parseOrThrowError(errorConverter)
-            }
-        } catch (cause: Throwable) {
-            return Result.failure(cause)
-        }
-
-        return try {
-            withContext(dispatcher) {
-                weatherDatabase.forecastDao()
-                    .updateForecastForLocation(
-                        locationId = location.networkId,
-                        locationName = location.city ?: location.name,
-                        forecastResponse = response
-                    )
-            }
-            Result.success(Unit)
-        } catch (throwable: Throwable) {
-            Result.failure(operationFailed(logPrefix("Impossible save new forecast in database"), throwable))
+        } else {
+            Result.failure(operationFailed(logPrefix("Refreshing already launch for this location id")))
         }
     }
+
+    private suspend fun updateForecast(locationId: Int): Result<Int> {
+
+        val location = getMatchingLocation(locationId).getOrElse {
+            return Result.failure(it)
+        }
+
+        val forecast = getForecast(query = location.toPoint()).getOrElse {
+            return Result.failure(it)
+        }
+
+        return updatingForecast(
+            id = location.networkId,
+            name = location.city ?: location.name,
+            forecast = forecast
+        ).fold(
+            onSuccess = { Result.success(locationId) },
+            onFailure = { Result.failure(it) }
+        )
+    }
+
+    private suspend fun getMatchingLocation(locationId: Int): Result<MatchingLocationEntity> = withContext(dispatcher) {
+        try {
+            Result.success(weatherDatabase.matchingLocationsDao().getLocation(locationId))
+        } catch (cause: Exception) {
+            Result.failure(storageError(logPrefix("Current location didn't find in database"), cause))
+        }
+    }
+
+    private suspend fun getForecast(query: String) = withContext(dispatcher) {
+        try {
+            Result.success(api.getForecastWeather(query = query).parseOrThrowError(errorConverter))
+        } catch (cause: Exception) {
+            Result.failure(cause)
+        }
+    }
+
+    private suspend fun updatingForecast(id: Int, name: String, forecast: ForecastResponse) = withContext(dispatcher) {
+        try {
+            Result.success(
+                weatherDatabase.forecastDao().updateForecastForLocation(locationId = id, locationName = name, forecastResponse = forecast)
+            )
+        } catch (cause: Exception) {
+            Result.failure(operationFailed(logPrefix("Impossible save new forecast in database"), cause))
+        }
+    }
+
 }

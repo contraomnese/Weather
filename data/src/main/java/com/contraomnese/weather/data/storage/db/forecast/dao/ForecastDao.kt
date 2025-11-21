@@ -95,7 +95,7 @@ interface ForecastDao {
 
     @Transaction
     @Query("SELECT * FROM forecast_location WHERE location_id = :locationId")
-    suspend fun getForecastBy(locationId: Int): LocationWithForecasts
+    suspend fun getForecastBy(locationId: Int): LocationWithForecasts?
 
     @Transaction
     @Query("SELECT * FROM forecast_location WHERE location_id = :locationId")
