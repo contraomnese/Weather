@@ -7,8 +7,8 @@ targetSdk = "35"
 
 # plugins
 agp = "8.10.1"
-org-jetbrains-kotlin-android = "2.1.20"
-devtools-ksp = "2.1.20-1.0.32"
+kotlin = "2.1.20"
+ksp = "2.1.20-1.0.32"
 baselineprofile = "1.4.0"
 
 # DI
@@ -161,11 +161,12 @@ androidx-perfetto-tracing = { group = "androidx.tracing", name = "tracing-perfet
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "org-jetbrains-kotlin-android" }
-kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "org-jetbrains-kotlin-android" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "org-jetbrains-kotlin-android" }
-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "devtools-ksp" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 baselineprofile = { id = "androidx.baselineprofile", version.ref = "baselineprofile" }
 android-test = { id = "com.android.test", version.ref = "agp" }
 

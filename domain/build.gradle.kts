@@ -1,31 +1,11 @@
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.jvm)
+    `java-library`
+    `java-test-fixtures`
 }
 
-android {
-    namespace = "com.contraomnese.weather.domain"
-    compileSdk = libs.versions.compileSdk.get().toInt()
-
-    defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
-    }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
-    }
+kotlin {
+    jvmToolchain(11)
 }
 
 tasks.withType<Test>().configureEach {
@@ -34,6 +14,8 @@ tasks.withType<Test>().configureEach {
 
 dependencies {
     api(libs.bundles.core.common)
+
     testImplementation(libs.bundles.test)
     testRuntimeOnly(libs.junit.jupiter.engine)
+    testFixturesImplementation(libs.bundles.test)
 }

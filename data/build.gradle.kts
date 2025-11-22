@@ -7,6 +7,7 @@ plugins {
 android {
     namespace = "com.contraomnese.weather.data"
     compileSdk = libs.versions.compileSdk.get().toInt()
+    testFixtures.enable = true
 
     defaultConfig {
         minSdk = libs.versions.minSdk.get().toInt()
@@ -35,7 +36,7 @@ tasks.withType<Test>().configureEach {
 
 dependencies {
 
-    implementation(project(":domain"))
+    api(project(":domain"))
 
     implementation(libs.bundles.koin)
     implementation(libs.bundles.network)
@@ -44,6 +45,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     ksp(libs.androidx.room.compiler)
 
+    testImplementation(testFixtures(project(":domain")))
     testImplementation(libs.bundles.test)
     testRuntimeOnly(libs.junit.jupiter.engine)
 }
