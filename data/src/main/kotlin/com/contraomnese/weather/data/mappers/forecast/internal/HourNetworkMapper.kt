@@ -1,7 +1,7 @@
 package com.contraomnese.weather.data.mappers.forecast.internal
 
 import com.contraomnese.weather.data.network.models.HourNetwork
-import com.contraomnese.weather.data.storage.db.forecast.entities.HourlyForecastEntity
+import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastHourEntity
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
@@ -10,7 +10,7 @@ import kotlin.math.roundToInt
 
 private const val IS_DAY = 1
 
-internal fun HourlyForecastEntity.toDomain(appSettings: AppSettings): ForecastHour {
+internal fun ForecastHourEntity.toDomain(appSettings: AppSettings): ForecastHour {
     return ForecastHour(
         temperature = when (appSettings.temperatureUnit) {
             TemperatureUnit.Celsius -> tempC.roundToInt().toString()
@@ -22,8 +22,8 @@ internal fun HourlyForecastEntity.toDomain(appSettings: AppSettings): ForecastHo
     )
 }
 
-internal fun HourNetwork.toEntity(forecastDayId: Int) = HourlyForecastEntity(
-    forecastDayId = forecastDayId,
+internal fun HourNetwork.toEntity(forecastDayId: Int) = ForecastHourEntity(
+    forecastDailyId = forecastDayId,
     timeEpoch = timeEpoch,
     time = time,
     tempC = tempC,

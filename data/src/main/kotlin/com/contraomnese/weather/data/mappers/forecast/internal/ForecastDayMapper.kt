@@ -2,8 +2,8 @@ package com.contraomnese.weather.data.mappers.forecast.internal
 
 import com.contraomnese.weather.data.network.models.ForecastDayNetwork
 import com.contraomnese.weather.data.parsers.DateTimeParser
-import com.contraomnese.weather.data.storage.db.forecast.dao.ForecastDayWithDetails
-import com.contraomnese.weather.data.storage.db.forecast.entities.DayEntity
+import com.contraomnese.weather.data.storage.db.forecast.dao.DailyForecastData
+import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDailyEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDayEntity
 import com.contraomnese.weather.data.utils.getDayOfWeek
 import com.contraomnese.weather.data.utils.getNumberOfMonth
@@ -15,7 +15,7 @@ import com.contraomnese.weather.domain.weatherByLocation.model.ForecastDay
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastToday
 import kotlin.math.roundToInt
 
-internal fun ForecastDayWithDetails.toForecastTodayDomain(appSettings: AppSettings): ForecastToday {
+internal fun DailyForecastData.toForecastTodayDomain(appSettings: AppSettings): ForecastToday {
 
     return ForecastToday(
         maxTemperature = when (appSettings.temperatureUnit) {
@@ -39,7 +39,7 @@ internal fun ForecastDayWithDetails.toForecastTodayDomain(appSettings: AppSettin
     )
 }
 
-internal fun ForecastDayWithDetails.toForecastDayDomain(appSettings: AppSettings): ForecastDay {
+internal fun DailyForecastData.toForecastDayDomain(appSettings: AppSettings): ForecastDay {
     return ForecastDay(
         dayNumber = getNumberOfMonth(forecast.dateEpoch),
         dayName = getDayOfWeek(forecast.dateEpoch),
@@ -59,17 +59,17 @@ internal fun ForecastDayWithDetails.toForecastDayDomain(appSettings: AppSettings
     )
 }
 
-internal fun ForecastDayNetwork.toForecastDayEntity(locationId: Int): ForecastDayEntity {
+internal fun ForecastDayNetwork.toForecastDayEntity(locationId: Int): ForecastDailyEntity {
 
-    return ForecastDayEntity(
+    return ForecastDailyEntity(
         forecastLocationId = locationId,
         date = date,
         dateEpoch = dateEpoch,
     )
 }
 
-internal fun ForecastDayNetwork.toEntity(forecastDayId: Int) = DayEntity(
-    forecastDayId = forecastDayId,
+internal fun ForecastDayNetwork.toEntity(forecastDayId: Int) = ForecastDayEntity(
+    forecastDailyId = forecastDayId,
     maxTempC = day.maxTempC,
     minTempC = day.minTempC,
     maxTempF = day.maxTempF,

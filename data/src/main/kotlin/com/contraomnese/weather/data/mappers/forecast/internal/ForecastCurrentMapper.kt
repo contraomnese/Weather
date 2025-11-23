@@ -1,8 +1,8 @@
 package com.contraomnese.weather.data.mappers.forecast.internal
 
 import com.contraomnese.weather.data.network.models.ForecastCurrentNetwork
-import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastCurrentEntity
-import com.contraomnese.weather.data.storage.db.forecast.entities.HourlyForecastEntity
+import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastHourEntity
+import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastTodayEntity
 import com.contraomnese.weather.data.utils.toMs
 import com.contraomnese.weather.domain.app.model.PrecipitationUnit
 import com.contraomnese.weather.domain.app.model.PressureUnit
@@ -12,7 +12,7 @@ import kotlin.math.roundToInt
 
 private const val MM_IN_INCH = 25.4
 
-internal fun ForecastCurrentNetwork.toEntity(forecastLocationId: Int) = ForecastCurrentEntity(
+internal fun ForecastCurrentNetwork.toEntity(forecastLocationId: Int) = ForecastTodayEntity(
     forecastLocationId = forecastLocationId,
     tempC = tempC,
     tempF = tempF,
@@ -53,14 +53,14 @@ internal fun ForecastCurrentNetwork.toEntity(forecastLocationId: Int) = Forecast
     lastUpdatedEpoch = lastUpdatedEpoch,
 )
 
-internal fun ForecastCurrentEntity.toTemperatureDomain(temperatureUnit: TemperatureUnit): String {
+internal fun ForecastTodayEntity.toTemperatureDomain(temperatureUnit: TemperatureUnit): String {
     return when (temperatureUnit) {
         TemperatureUnit.Celsius -> this.tempC.roundToInt().toString()
         TemperatureUnit.Fahrenheit -> this.tempF.roundToInt().toString()
     }
 }
 
-internal fun ForecastCurrentEntity.toWindDomain(windSpeedUnit: WindSpeedUnit): String {
+internal fun ForecastTodayEntity.toWindDomain(windSpeedUnit: WindSpeedUnit): String {
     return when (windSpeedUnit) {
         WindSpeedUnit.Kph -> this.windKph.roundToInt().toString()
         WindSpeedUnit.Mph -> this.windMph.roundToInt().toString()
@@ -68,7 +68,7 @@ internal fun ForecastCurrentEntity.toWindDomain(windSpeedUnit: WindSpeedUnit): S
     }
 }
 
-internal fun ForecastCurrentEntity.toGustDomain(windSpeedUnit: WindSpeedUnit): String {
+internal fun ForecastTodayEntity.toGustDomain(windSpeedUnit: WindSpeedUnit): String {
     return when (windSpeedUnit) {
         WindSpeedUnit.Kph -> this.gustKph.roundToInt().toString()
         WindSpeedUnit.Mph -> this.gustMph.roundToInt().toString()
@@ -76,21 +76,21 @@ internal fun ForecastCurrentEntity.toGustDomain(windSpeedUnit: WindSpeedUnit): S
     }
 }
 
-internal fun ForecastCurrentEntity.toPressureDomain(pressureUnit: PressureUnit): Int {
+internal fun ForecastTodayEntity.toPressureDomain(pressureUnit: PressureUnit): Int {
     return when (pressureUnit) {
         PressureUnit.MmHg -> (this.pressureIn * MM_IN_INCH).roundToInt()
         PressureUnit.GPa -> this.pressureMb.roundToInt()
     }
 }
 
-internal fun ForecastCurrentEntity.toDewPoint(temperatureUnit: TemperatureUnit): Int {
+internal fun ForecastTodayEntity.toDewPoint(temperatureUnit: TemperatureUnit): Int {
     return when (temperatureUnit) {
         TemperatureUnit.Celsius -> this.dewPointC.roundToInt()
         TemperatureUnit.Fahrenheit -> this.dewPointF.roundToInt()
     }
 }
 
-internal fun HourlyForecastEntity.toPrecipitationDomain(precipitationUnit: PrecipitationUnit): Double {
+internal fun ForecastHourEntity.toPrecipitationDomain(precipitationUnit: PrecipitationUnit): Double {
     return when (precipitationUnit) {
         PrecipitationUnit.Millimeters -> this.precipMm
         PrecipitationUnit.Inches -> this.precipIn

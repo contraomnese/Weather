@@ -9,16 +9,16 @@ import androidx.room.PrimaryKey
 @Entity(
     tableName = ForecastAstroEntity.TABLE_NAME,
     foreignKeys = [ForeignKey(
-        entity = ForecastDayEntity::class,
-        parentColumns = [ForecastDayEntity.ID],
-        childColumns = [ForecastAstroEntity.FORECAST_DAY_ID],
+        entity = ForecastDailyEntity::class,
+        parentColumns = [ForecastDailyEntity.ID],
+        childColumns = [ForecastAstroEntity.FORECAST_DAILY_ID],
         onDelete = ForeignKey.CASCADE
     )],
-    indices = [Index(value = [ForecastAstroEntity.FORECAST_DAY_ID], name = "forecast_astro_forecast_day_id")]
+    indices = [Index(value = [ForecastAstroEntity.FORECAST_DAILY_ID], name = "forecast_astro_forecast_daily_id")]
 )
 data class ForecastAstroEntity(
     @PrimaryKey(autoGenerate = true) val id: Int? = null,
-    @ColumnInfo(name = FORECAST_DAY_ID) val forecastDayId: Int,
+    @ColumnInfo(name = FORECAST_DAILY_ID) val forecastDailyId: Int,
     @ColumnInfo(name = SUNRISE) val sunrise: String,
     @ColumnInfo(name = SUNSET) val sunset: String,
     @ColumnInfo(name = MOONRISE) val moonrise: String,
@@ -30,7 +30,7 @@ data class ForecastAstroEntity(
 ) {
     companion object {
         const val TABLE_NAME = "forecast_astro"
-        const val FORECAST_DAY_ID = "forecast_day_id"
+        const val FORECAST_DAILY_ID = "forecast_daily_id"
         const val SUNRISE = "sunrise"
         const val SUNSET = "sunset"
         const val MOONRISE = "moonrise"

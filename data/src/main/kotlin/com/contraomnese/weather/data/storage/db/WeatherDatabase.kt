@@ -5,13 +5,13 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.contraomnese.weather.data.storage.db.forecast.dao.ForecastDao
-import com.contraomnese.weather.data.storage.db.forecast.entities.DayEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastAlertEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastAstroEntity
-import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastCurrentEntity
+import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDailyEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDayEntity
+import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastHourEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastLocationEntity
-import com.contraomnese.weather.data.storage.db.forecast.entities.HourlyForecastEntity
+import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastTodayEntity
 import com.contraomnese.weather.data.storage.db.locations.dao.FavoritesDao
 import com.contraomnese.weather.data.storage.db.locations.dao.MatchingLocationsDao
 import com.contraomnese.weather.data.storage.db.locations.entities.FavoriteEntity
@@ -24,11 +24,11 @@ const val DATABASE_NAME = "contraomnese_weather_app.sqlite3"
     entities = [
         FavoriteEntity::class,
         ForecastLocationEntity::class,
-        ForecastCurrentEntity::class,
+        ForecastTodayEntity::class,
+        ForecastDailyEntity::class,
         ForecastDayEntity::class,
-        DayEntity::class,
         ForecastAstroEntity::class,
-        HourlyForecastEntity::class,
+        ForecastHourEntity::class,
         ForecastAlertEntity::class,
         MatchingLocationEntity::class
     ],

@@ -11,62 +11,61 @@ import com.contraomnese.weather.data.mappers.forecast.internal.toEntity
 import com.contraomnese.weather.data.mappers.forecast.internal.toForecastDayEntity
 import com.contraomnese.weather.data.mappers.location.toEntity
 import com.contraomnese.weather.data.network.models.ForecastResponse
-import com.contraomnese.weather.data.storage.db.forecast.entities.DayEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastAlertEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastAstroEntity
-import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastCurrentEntity
+import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDailyEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDayEntity
+import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastHourEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastLocationEntity
-import com.contraomnese.weather.data.storage.db.forecast.entities.HourlyForecastEntity
+import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastTodayEntity
 import kotlinx.coroutines.flow.Flow
 
-data class LocationWithForecasts(
+data class ForecastData(
     @Embedded val location: ForecastLocationEntity,
 
     @Relation(
-        entity = ForecastCurrentEntity::class,
+        entity = ForecastTodayEntity::class,
         parentColumn = ForecastLocationEntity.ID,
-        entityColumn = ForecastCurrentEntity.FORECAST_LOCATION_ID
+        entityColumn = ForecastTodayEntity.FORECAST_LOCATION_ID
     )
-    val forecastCurrent: ForecastCurrentEntity,
+    val todayForecast: ForecastTodayEntity,
 
     @Relation(
-        entity = ForecastDayEntity::class,
+        entity = ForecastDailyEntity::class,
         parentColumn = ForecastLocationEntity.ID,
-        entityColumn = ForecastDayEntity.FORECAST_LOCATION_ID
+        entityColumn = ForecastDailyEntity.FORECAST_LOCATION_ID
     )
-    val forecastDays: List<ForecastDayWithDetails>,
+    val dailyForecast: List<DailyForecastData>,
 
     @Relation(
         entity = ForecastAlertEntity::class,
         parentColumn = ForecastLocationEntity.ID,
         entityColumn = ForecastAlertEntity.FORECAST_LOCATION_ID
     )
-    val forecastAlert: List<ForecastAlertEntity>,
+    val alerts: List<ForecastAlertEntity>,
+)
 
-    )
-
-data class ForecastDayWithDetails(
+data class DailyForecastData(
     @Embedded
-    val forecast: ForecastDayEntity,
+    val forecast: ForecastDailyEntity,
 
     @Relation(
-        parentColumn = ForecastDayEntity.ID,
-        entityColumn = DayEntity.FORECAST_DAY_ID
+        parentColumn = ForecastDailyEntity.ID,
+        entityColumn = ForecastDayEntity.FORECAST_DAILY_ID
     )
-    val day: DayEntity,
+    val day: ForecastDayEntity,
 
     @Relation(
-        parentColumn = ForecastDayEntity.ID,
-        entityColumn = ForecastAstroEntity.FORECAST_DAY_ID
+        parentColumn = ForecastDailyEntity.ID,
+        entityColumn = ForecastAstroEntity.FORECAST_DAILY_ID
     )
     val astro: ForecastAstroEntity,
 
     @Relation(
-        parentColumn = ForecastDayEntity.ID,
-        entityColumn = HourlyForecastEntity.FORECAST_DAY_ID
+        parentColumn = ForecastDailyEntity.ID,
+        entityColumn = ForecastHourEntity.FORECAST_DAILY_ID
     )
-    val hour: List<HourlyForecastEntity>,
+    val hour: List<ForecastHourEntity>,
 )
 
 @Dao
@@ -76,30 +75,30 @@ interface ForecastDao {
     suspend fun insertForecastLocation(location: ForecastLocationEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertForecastCurrent(current: ForecastCurrentEntity)
+    suspend fun insertForecastCurrent(current: ForecastTodayEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertForecastDay(day: ForecastDayEntity): Long
+    suspend fun insertForecastDay(day: ForecastDailyEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertDay(day: DayEntity)
+    suspend fun insertDay(day: ForecastDayEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAstro(astro: ForecastAstroEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertHourlyForecast(hours: List<HourlyForecastEntity>)
+    suspend fun insertHourlyForecast(hours: List<ForecastHourEntity>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAlerts(alerts: List<ForecastAlertEntity>)
 
     @Transaction
     @Query("SELECT * FROM forecast_location WHERE location_id = :locationId")
-    suspend fun getForecastBy(locationId: Int): LocationWithForecasts?
+    suspend fun getForecastBy(locationId: Int): ForecastData?
 
     @Transaction
     @Query("SELECT * FROM forecast_location WHERE location_id = :locationId")
-    fun observeForecastBy(locationId: Int): Flow<LocationWithForecasts?>
+    fun observeForecastBy(locationId: Int): Flow<ForecastData?>
 
     @Query("DELETE FROM forecast_location WHERE location_id = :locationId")
     suspend fun deleteForecastForLocation(locationId: Int)
