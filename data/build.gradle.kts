@@ -46,6 +46,7 @@ dependencies {
     ksp(libs.androidx.room.compiler)
 
     testImplementation(testFixtures(project(":domain")))
+    testFixturesImplementation(testFixtures(project(":domain")))
     testImplementation(libs.bundles.test)
     testRuntimeOnly(libs.junit.jupiter.engine)
 }

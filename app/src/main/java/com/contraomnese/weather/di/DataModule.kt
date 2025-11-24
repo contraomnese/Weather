@@ -2,7 +2,9 @@ package com.contraomnese.weather.di
 
 import com.contraomnese.weather.BuildConfig
 import com.contraomnese.weather.data.mappers.BiDirectMapper
+import com.contraomnese.weather.data.mappers.UniDirectMapper
 import com.contraomnese.weather.data.mappers.appSettings.AppSettingsMapper
+import com.contraomnese.weather.data.mappers.forecast.ForecastWeatherMapper
 import com.contraomnese.weather.data.network.api.LocationsApi
 import com.contraomnese.weather.data.network.api.WeatherApi
 import com.contraomnese.weather.data.network.interceptors.LocationsInterceptor
@@ -13,12 +15,14 @@ import com.contraomnese.weather.data.repository.AppSettingsRepositoryImpl
 import com.contraomnese.weather.data.repository.ForecastWeatherRepositoryImpl
 import com.contraomnese.weather.data.repository.LocationsRepositoryImpl
 import com.contraomnese.weather.data.storage.db.WeatherDatabase
+import com.contraomnese.weather.data.storage.db.forecast.dao.ForecastData
 import com.contraomnese.weather.data.storage.memory.api.AppSettingsStorage
 import com.contraomnese.weather.data.storage.memory.models.AppSettingsEntity
 import com.contraomnese.weather.data.storage.memory.store.AppSettingsStorageImpl
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
 import com.contraomnese.weather.domain.home.repository.LocationsRepository
+import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 import com.contraomnese.weather.domain.weatherByLocation.repository.ForecastWeatherRepository
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -107,6 +111,7 @@ val dataModule = module {
     }
 
     single<BiDirectMapper<AppSettingsEntity, AppSettings>> { AppSettingsMapper() }
+    single<UniDirectMapper<ForecastData, AppSettings, Forecast>> { ForecastWeatherMapper() }
 
     single<WeatherDatabase> { WeatherDatabase.create(context = get()) }
     single<AppSettingsStorage> { AppSettingsStorageImpl(context = get(), dispatcher = Dispatchers.IO) }
@@ -128,7 +133,8 @@ val dataModule = module {
             appSettingsRepository = get(),
             weatherDatabase = get(),
             errorConverter = get(),
-            dispatcher = Dispatchers.IO
+            dispatcher = Dispatchers.IO,
+            mapper = get()
         )
     }
     single<AppSettingsRepository> {

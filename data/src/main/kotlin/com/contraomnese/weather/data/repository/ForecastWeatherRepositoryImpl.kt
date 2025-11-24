@@ -1,12 +1,14 @@
 package com.contraomnese.weather.data.repository
 
-import com.contraomnese.weather.data.mappers.forecast.toDomain
+import com.contraomnese.weather.data.mappers.UniDirectMapper
 import com.contraomnese.weather.data.network.api.WeatherApi
 import com.contraomnese.weather.data.network.models.ForecastResponse
 import com.contraomnese.weather.data.network.models.WeatherErrorResponse
 import com.contraomnese.weather.data.network.parsers.parseOrThrowError
 import com.contraomnese.weather.data.storage.db.WeatherDatabase
+import com.contraomnese.weather.data.storage.db.forecast.dao.ForecastData
 import com.contraomnese.weather.data.storage.db.locations.entities.MatchingLocationEntity
+import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
 import com.contraomnese.weather.domain.exceptions.logPrefix
 import com.contraomnese.weather.domain.exceptions.operationFailed
@@ -31,6 +33,7 @@ class ForecastWeatherRepositoryImpl(
     private val errorConverter: Converter<ResponseBody, WeatherErrorResponse>,
     private val dispatcher: CoroutineDispatcher,
     private val updateMutex: MutableMap<Int, Mutex> = ConcurrentHashMap(),
+    private val mapper: UniDirectMapper<ForecastData, AppSettings, Forecast>,
 ) : ForecastWeatherRepository {
 
     override fun getForecastByLocationId(id: Int): Flow<Forecast?> {
@@ -41,7 +44,8 @@ class ForecastWeatherRepositoryImpl(
             Pair(entity, settings)
         }
             .map { (entity, settings) ->
-                entity?.toDomain(settings)
+                val model = entity?.let { mapper.toDomain(it, settings) }
+                model
             }
             .flowOn(dispatcher)
     }
@@ -69,7 +73,6 @@ class ForecastWeatherRepositoryImpl(
         val forecast = getForecast(query = location.toPoint()).getOrElse {
             return Result.failure(it)
         }
-
         return updatingForecast(
             id = location.networkId,
             name = location.city ?: location.name,

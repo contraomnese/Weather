@@ -11,8 +11,8 @@ interface BiDirectMapper<E, M> {
 /**
  * Unidirectional mapper for one-way transformations, e.g. API → Domain.
  */
-interface UniDirectMapper<in E, out M> {
-    fun toDomain(entity: E): M
+interface UniDirectMapper<in E, in C, out M> {
+    fun toDomain(entity: E, context: C): M
 }
 
 fun <E, M> BiDirectMapper<E, M>.toDomainList(entities: List<E>): List<M> =
@@ -21,5 +21,5 @@ fun <E, M> BiDirectMapper<E, M>.toDomainList(entities: List<E>): List<M> =
 fun <E, M> BiDirectMapper<E, M>.toEntityList(models: List<M>): List<E> =
     models.map { toEntity(it) }
 
-fun <E, M> UniDirectMapper<E, M>.toDomainList(entities: List<E>): List<M> =
-    entities.map { toDomain(it) }
+fun <E, C, M> UniDirectMapper<E, C, M>.toDomainList(entities: List<E>, context: C): List<M> =
+    entities.map { toDomain(it, context) }

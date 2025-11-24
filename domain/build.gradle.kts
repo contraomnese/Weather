@@ -18,4 +18,6 @@ dependencies {
     testImplementation(libs.bundles.test)
     testRuntimeOnly(libs.junit.jupiter.engine)
     testFixturesImplementation(libs.bundles.test)
+    testFixturesImplementation(libs.bundles.core.common)
+    testFixturesImplementation("org.jetbrains.kotlin:kotlin-reflect")
 }
