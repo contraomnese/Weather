@@ -87,6 +87,7 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinx-immutable" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
 
 # navigation
 navigation = { group = "androidx.navigation", name = "navigation-compose" }
@@ -193,6 +194,7 @@ core-common = [
     "kotlinx-coroutines-core",
     "kotlinx-serialization-json",
     "kotlinx-datetime",
+    "kotlin-reflect"
 ]
 
 # Navigation

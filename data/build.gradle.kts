@@ -47,6 +47,7 @@ dependencies {
 
     testImplementation(testFixtures(project(":domain")))
     testFixturesImplementation(testFixtures(project(":domain")))
+    testFixturesImplementation(libs.bundles.core.common)
     testImplementation(libs.bundles.test)
     testRuntimeOnly(libs.junit.jupiter.engine)
 }

@@ -20,7 +20,7 @@ import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 
 object MockForecastReal {
-    fun get() = Forecast(
+    fun take() = Forecast(
         alerts = AlertsWeather(
             alerts = listOf(
                 "Порывы до 15",

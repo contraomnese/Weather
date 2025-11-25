@@ -1,8 +1,5 @@
 package com.contraomnese.weather.domain.weatherByLocation.model
 
-import kotlinx.collections.immutable.ImmutableList
-
-
 data class Weather(
     val temperature: String,
     val feelsLikeTemperature: String,
@@ -19,8 +16,8 @@ data class Weather(
     val dewPoint: Int,
     val pressure: Int,
     val isRainingExpected: Boolean,
-    val rainfallBeforeNow: ImmutableList<Double>,
-    val rainfallAfterNow: ImmutableList<Double>,
+    val rainfallBeforeNow: List<Double>,
+    val rainfallAfterNow: List<Double>,
     val rainfallNow: Double,
     val maxRainfall: Double,
 )

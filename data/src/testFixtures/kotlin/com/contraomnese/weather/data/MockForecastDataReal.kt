@@ -1,22 +1,20 @@
-package com.contraomnese.weather.data.repository
+package com.contraomnese.weather.data
 
-import com.contraomnese.weather.data.network.models.AlertNetwork
-import com.contraomnese.weather.data.network.models.AstroNetwork
-import com.contraomnese.weather.data.network.models.DayNetwork
-import com.contraomnese.weather.data.network.models.ForecastAirQuality
-import com.contraomnese.weather.data.network.models.ForecastAlertsWeatherNetwork
-import com.contraomnese.weather.data.network.models.ForecastConditionNetwork
-import com.contraomnese.weather.data.network.models.ForecastCurrentNetwork
-import com.contraomnese.weather.data.network.models.ForecastDayNetwork
-import com.contraomnese.weather.data.network.models.ForecastLocationNetwork
-import com.contraomnese.weather.data.network.models.ForecastNetwork
-import com.contraomnese.weather.data.network.models.ForecastResponse
-import com.contraomnese.weather.data.network.models.HourNetwork
+import com.contraomnese.weather.data.storage.db.forecast.dao.DailyForecastData
+import com.contraomnese.weather.data.storage.db.forecast.dao.ForecastData
+import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastAlertEntity
+import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastAstroEntity
+import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDailyEntity
+import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDayEntity
+import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastHourEntity
+import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastLocationEntity
+import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastTodayEntity
 
-internal val mockForecastResponseReal = ForecastResponse(
-    alerts = ForecastAlertsWeatherNetwork(
-        alert = listOf(
-            AlertNetwork(
+object MockForecastDataReal {
+
+    fun take(): ForecastData = ForecastData(
+        alerts = listOf(
+            ForecastAlertEntity(
                 areas = "",
                 category = "Met",
                 certainty = "Likely",
@@ -24,14 +22,16 @@ internal val mockForecastResponseReal = ForecastResponse(
                 effective = "2025-11-23T17:58:00-00:00",
                 event = "Ветер",
                 expires = "2025-11-24T18:00:00-00:00",
+                forecastLocationId = 1,
                 headline = "Ветер",
+                id = 1,
                 instruction = "",
                 msgType = "Alert",
                 note = "",
                 severity = "Moderate",
                 urgency = "Immediate"
             ),
-            AlertNetwork(
+            ForecastAlertEntity(
                 areas = "",
                 category = "Met",
                 certainty = "Likely",
@@ -39,14 +39,16 @@ internal val mockForecastResponseReal = ForecastResponse(
                 effective = "2025-11-24T00:11:00-00:00",
                 event = "Ветер",
                 expires = "2025-11-24T18:00:00-00:00",
+                forecastLocationId = 1,
                 headline = "Ветер",
+                id = 2,
                 instruction = "",
                 msgType = "Update",
                 note = "",
                 severity = "Moderate",
                 urgency = "Immediate"
             ),
-            AlertNetwork(
+            ForecastAlertEntity(
                 areas = "",
                 category = "Met",
                 certainty = "Likely",
@@ -54,14 +56,16 @@ internal val mockForecastResponseReal = ForecastResponse(
                 effective = "2025-11-24T06:57:00-00:00",
                 event = "Гололедно - изморозевое отложение",
                 expires = "2025-11-25T18:00:00-00:00",
+                forecastLocationId = 1,
                 headline = "Гололедно - изморозевое отложение",
+                id = 3,
                 instruction = "",
                 msgType = "Alert",
                 note = "",
                 severity = "Moderate",
                 urgency = "Immediate"
             ),
-            AlertNetwork(
+            ForecastAlertEntity(
                 areas = "",
                 category = "Met",
                 certainty = "Likely",
@@ -69,14 +73,16 @@ internal val mockForecastResponseReal = ForecastResponse(
                 effective = "2025-11-24T06:57:00-00:00",
                 event = "Гололедно - изморозевое отложение",
                 expires = "2025-11-25T18:00:00-00:00",
+                forecastLocationId = 1,
                 headline = "Гололедно - изморозевое отложение",
+                id = 4,
                 instruction = "",
                 msgType = "Alert",
                 note = "",
                 severity = "Moderate",
                 urgency = "Immediate"
             ),
-            AlertNetwork(
+            ForecastAlertEntity(
                 areas = "",
                 category = "Met",
                 certainty = "Likely",
@@ -84,14 +90,16 @@ internal val mockForecastResponseReal = ForecastResponse(
                 effective = "2025-11-24T07:46:00-00:00",
                 event = "Гололедно - изморозевое отложение",
                 expires = "2025-11-26T06:00:00-00:00",
+                forecastLocationId = 1,
                 headline = "Гололедно - изморозевое отложение",
+                id = 5,
                 instruction = "",
                 msgType = "Update",
                 note = "",
                 severity = "Moderate",
                 urgency = "Immediate"
             ),
-            AlertNetwork(
+            ForecastAlertEntity(
                 areas = "",
                 category = "Met",
                 certainty = "Likely",
@@ -99,64 +107,21 @@ internal val mockForecastResponseReal = ForecastResponse(
                 effective = "2025-11-24T07:46:00-00:00",
                 event = "Гололедно - изморозевое отложение",
                 expires = "2025-11-26T06:00:00-00:00",
+                forecastLocationId = 1,
                 headline = "Гололедно - изморозевое отложение",
+                id = 6,
                 instruction = "",
                 msgType = "Update",
                 note = "",
                 severity = "Moderate",
                 urgency = "Immediate"
             )
-        )
-    ),
-    current = ForecastCurrentNetwork(
-        cloud = 75,
-        condition = ForecastConditionNetwork(
-            code = 1003,
-            icon = "//cdn.weatherapi.com/weather/64x64/night/116.png",
-            text = "Partly cloudy"
         ),
-        dewPointC = -0.2f,
-        dewPointF = 31.6f,
-        feelsLikeC = -1.7,
-        feelsLikeF = 29.0,
-        forecastAirQuality = ForecastAirQuality(
-            co = 640.85f,
-            gbDefraIndex = 7,
-            no2 = 59.05f,
-            o3 = 1.0f,
-            pm10 = 70.45f,
-            pm25 = 56.35f,
-            so2 = 44.25f,
-            usEpaIndex = 3
-        ),
-        gustKph = 30.6,
-        gustMph = 19.0,
-        heatIndexC = 2.5,
-        heatIndexF = 36.5,
-        humidity = 87,
-        isDay = 0,
-        lastUpdated = "2025-11-24 17:00",
-        lastUpdatedEpoch = 1763992800L,
-        precipIn = 0.0,
-        precipMm = 0.0,
-        pressureIn = 29.59,
-        pressureMb = 1002.0,
-        tempC = 3.1,
-        tempF = 37.6,
-        uv = 0.0,
-        visibilityKm = 10.0,
-        visibilityMiles = 6.0,
-        windChillC = -2.4,
-        windChillF = 27.6,
-        windDegree = 248,
-        windDir = "WSW",
-        windKph = 22.7,
-        windMph = 14.1
-    ),
-    forecast = ForecastNetwork(
-        forecastDay = listOf(
-            ForecastDayNetwork(
-                astro = AstroNetwork(
+        dailyForecast = listOf(
+            DailyForecastData(
+                astro = ForecastAstroEntity(
+                    forecastDailyId = 1,
+                    id = 1,
                     isMoonUp = 0,
                     isSunUp = 0,
                     moonIllumination = 12,
@@ -166,23 +131,20 @@ internal val mockForecastResponseReal = ForecastResponse(
                     sunrise = "08:23 AM",
                     sunset = "04:09 PM"
                 ),
-                date = "2025-11-24",
-                dateEpoch = 1763942400L,
-                day = DayNetwork(
+                day = ForecastDayEntity(
                     avgHumidity = 85,
                     avgTempC = 2.5,
                     avgTempF = 36.5,
                     avgVisKm = 7.9,
                     avgVisMiles = 4.0,
-                    condition = ForecastConditionNetwork(
-                        code = 1063,
-                        icon = "//cdn.weatherapi.com/weather/64x64/day/176.png",
-                        text = "Patchy rain nearby"
-                    ),
-                    dailyChanceOfRain = 97,
-                    dailyChanceOfSnow = 16,
-                    dailyWillItRain = 1,
-                    dailyWillItSnow = 0,
+                    conditionCode = 1063,
+                    conditionText = "Patchy rain nearby",
+                    dayChanceOfRain = 97,
+                    dayChanceOfSnow = 16,
+                    dayWillItRain = 1,
+                    dayWillItSnow = 0,
+                    forecastDailyId = 1,
+                    id = 1,
                     maxTempC = 5.4,
                     maxTempF = 41.7,
                     maxWindKph = 24.8,
@@ -194,25 +156,25 @@ internal val mockForecastResponseReal = ForecastResponse(
                     totalSnowCm = 0.0,
                     uv = 0.0
                 ),
+                forecast = ForecastDailyEntity(date = "2025-11-24", dateEpoch = 1763942400L, forecastLocationId = 1, id = 1),
                 hour = listOf(
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 87,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1198,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/311.png",
-                            text = "Light freezing rain"
-                        ),
+                        conditionCode = 1198,
+                        conditionText = "Light freezing rain",
                         dewPointC = -3.7,
                         dewPointF = 25.4,
                         feelsLikeC = -5.4,
                         feelsLikeF = 22.3,
+                        forecastDailyId = 1,
                         gustKph = 25.6,
                         gustMph = 15.9,
                         heatIndexC = -0.3,
                         heatIndexF = 31.4,
                         humidity = 78,
+                        id = 1,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.01,
@@ -235,24 +197,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 18.4,
                         windMph = 11.4
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 81,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1171,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/284.png",
-                            text = "Heavy freezing drizzle"
-                        ),
+                        conditionCode = 1171,
+                        conditionText = "Heavy freezing drizzle",
                         dewPointC = -3.1,
                         dewPointF = 26.4,
                         feelsLikeC = -5.4,
                         feelsLikeF = 22.2,
+                        forecastDailyId = 1,
                         gustKph = 27.4,
                         gustMph = 17.0,
                         heatIndexC = -0.2,
                         heatIndexF = 31.6,
                         humidity = 81,
+                        id = 2,
                         isDay = 0,
                         precipIn = 0.01,
                         precipMm = 0.17,
@@ -275,24 +236,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 19.4,
                         windMph = 12.1
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1009,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/122.png",
-                            text = "Overcast "
-                        ),
+                        conditionCode = 1009,
+                        conditionText = "Overcast ",
                         dewPointC = -3.0,
                         dewPointF = 26.6,
                         feelsLikeC = -5.4,
                         feelsLikeF = 22.4,
+                        forecastDailyId = 1,
                         gustKph = 31.9,
                         gustMph = 19.8,
                         heatIndexC = 0.2,
                         heatIndexF = 32.3,
                         humidity = 79,
+                        id = 3,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -315,24 +275,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 22.3,
                         windMph = 13.9
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 73,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1153,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/266.png",
-                            text = "Light drizzle"
-                        ),
+                        conditionCode = 1153,
+                        conditionText = "Light drizzle",
                         dewPointC = -2.1,
                         dewPointF = 28.1,
                         feelsLikeC = -5.0,
                         feelsLikeF = 22.9,
+                        forecastDailyId = 1,
                         gustKph = 33.9,
                         gustMph = 21.0,
                         heatIndexC = 0.5,
                         heatIndexF = 33.0,
                         humidity = 82,
+                        id = 4,
                         isDay = 0,
                         precipIn = 0.02,
                         precipMm = 0.58,
@@ -355,24 +314,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 23.4,
                         windMph = 14.5
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 66,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1153,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/266.png",
-                            text = "Light drizzle"
-                        ),
+                        conditionCode = 1153,
+                        conditionText = "Light drizzle",
                         dewPointC = -0.6,
                         dewPointF = 30.9,
                         feelsLikeC = -4.6,
                         feelsLikeF = 23.7,
+                        forecastDailyId = 1,
                         gustKph = 34.1,
                         gustMph = 21.2,
                         heatIndexC = 0.8,
                         heatIndexF = 33.5,
                         humidity = 90,
+                        id = 5,
                         isDay = 0,
                         precipIn = 0.01,
                         precipMm = 0.2,
@@ -395,24 +353,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 23.0,
                         windMph = 14.3
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1063,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/176.png",
-                            text = "Patchy rain nearby"
-                        ),
+                        conditionCode = 1063,
+                        conditionText = "Patchy rain nearby",
                         dewPointC = 0.5,
                         dewPointF = 32.8,
                         feelsLikeC = -3.9,
                         feelsLikeF = 25.0,
+                        forecastDailyId = 1,
                         gustKph = 35.9,
                         gustMph = 22.3,
                         heatIndexC = 1.4,
                         heatIndexF = 34.5,
                         humidity = 93,
+                        id = 6,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.09,
@@ -435,24 +392,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 23.4,
                         windMph = 14.5
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1009,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/122.png",
-                            text = "Overcast "
-                        ),
+                        conditionCode = 1009,
+                        conditionText = "Overcast ",
                         dewPointC = 1.4,
                         dewPointF = 34.5,
                         feelsLikeC = -3.2,
                         feelsLikeF = 26.3,
+                        forecastDailyId = 1,
                         gustKph = 37.3,
                         gustMph = 23.2,
                         heatIndexC = 2.0,
                         heatIndexF = 35.7,
                         humidity = 96,
+                        id = 7,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -475,24 +431,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 23.8,
                         windMph = 14.8
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1009,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/122.png",
-                            text = "Overcast "
-                        ),
+                        conditionCode = 1009,
+                        conditionText = "Overcast ",
                         dewPointC = 2.3,
                         dewPointF = 36.1,
                         feelsLikeC = -2.3,
                         feelsLikeF = 27.8,
+                        forecastDailyId = 1,
                         gustKph = 39.5,
                         gustMph = 24.6,
                         heatIndexC = 2.8,
                         heatIndexF = 37.0,
                         humidity = 97,
+                        id = 8,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -515,24 +470,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 24.8,
                         windMph = 15.4
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1009,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/122.png",
-                            text = "Overcast "
-                        ),
+                        conditionCode = 1009,
+                        conditionText = "Overcast ",
                         dewPointC = 3.2,
                         dewPointF = 37.7,
                         feelsLikeC = -0.9,
                         feelsLikeF = 30.3,
+                        forecastDailyId = 1,
                         gustKph = 37.4,
                         gustMph = 23.2,
                         heatIndexC = 3.7,
                         heatIndexF = 38.7,
                         humidity = 96,
+                        id = 9,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -555,24 +509,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 23.4,
                         windMph = 14.5
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1009,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/122.png",
-                            text = "Overcast "
-                        ),
+                        conditionCode = 1009,
+                        conditionText = "Overcast ",
                         dewPointC = 3.8,
                         dewPointF = 38.8,
                         feelsLikeC = 0.2,
                         feelsLikeF = 32.4,
+                        forecastDailyId = 1,
                         gustKph = 34.8,
                         gustMph = 21.6,
                         heatIndexC = 4.5,
                         heatIndexF = 40.1,
                         humidity = 95,
+                        id = 10,
                         isDay = 1,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -595,24 +548,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 22.0,
                         windMph = 13.6
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1153,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/266.png",
-                            text = "Light drizzle"
-                        ),
+                        conditionCode = 1153,
+                        conditionText = "Light drizzle",
                         dewPointC = 4.2,
                         dewPointF = 39.6,
                         feelsLikeC = 1.2,
                         feelsLikeF = 34.2,
+                        forecastDailyId = 1,
                         gustKph = 31.7,
                         gustMph = 19.7,
                         heatIndexC = 5.1,
                         heatIndexF = 41.3,
                         humidity = 94,
+                        id = 11,
                         isDay = 1,
                         precipIn = 0.01,
                         precipMm = 0.29,
@@ -635,24 +587,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 20.2,
                         windMph = 12.5
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1183,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/296.png",
-                            text = "Light rain"
-                        ),
+                        conditionCode = 1183,
+                        conditionText = "Light rain",
                         dewPointC = 4.5,
                         dewPointF = 40.0,
                         feelsLikeC = 1.6,
                         feelsLikeF = 34.9,
+                        forecastDailyId = 1,
                         gustKph = 30.7,
                         gustMph = 19.1,
                         heatIndexC = 5.4,
                         heatIndexF = 41.7,
                         humidity = 94,
+                        id = 12,
                         isDay = 1,
                         precipIn = 0.04,
                         precipMm = 0.98,
@@ -675,24 +626,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 19.4,
                         windMph = 12.1
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1153,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/266.png",
-                            text = "Light drizzle"
-                        ),
+                        conditionCode = 1153,
+                        conditionText = "Light drizzle",
                         dewPointC = 4.6,
                         dewPointF = 40.2,
                         feelsLikeC = 1.8,
                         feelsLikeF = 35.3,
+                        forecastDailyId = 1,
                         gustKph = 28.4,
                         gustMph = 17.6,
                         heatIndexC = 5.4,
                         heatIndexF = 41.7,
                         humidity = 94,
+                        id = 13,
                         isDay = 1,
                         precipIn = 0.01,
                         precipMm = 0.35,
@@ -715,24 +665,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 18.0,
                         windMph = 11.2
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1153,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/266.png",
-                            text = "Light drizzle"
-                        ),
+                        conditionCode = 1153,
+                        conditionText = "Light drizzle",
                         dewPointC = 4.5,
                         dewPointF = 40.1,
                         feelsLikeC = 1.8,
                         feelsLikeF = 35.3,
+                        forecastDailyId = 1,
                         gustKph = 24.8,
                         gustMph = 15.4,
                         heatIndexC = 5.2,
                         heatIndexF = 41.3,
                         humidity = 96,
+                        id = 14,
                         isDay = 1,
                         precipIn = 0.01,
                         precipMm = 0.29,
@@ -755,24 +704,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 15.8,
                         windMph = 9.8
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 81,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1063,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/176.png",
-                            text = "Patchy rain nearby"
-                        ),
+                        conditionCode = 1063,
+                        conditionText = "Patchy rain nearby",
                         dewPointC = 4.4,
                         dewPointF = 40.0,
                         feelsLikeC = 1.5,
                         feelsLikeF = 34.7,
+                        forecastDailyId = 1,
                         gustKph = 26.2,
                         gustMph = 16.3,
                         heatIndexC = 5.0,
                         heatIndexF = 41.0,
                         humidity = 96,
+                        id = 15,
                         isDay = 1,
                         precipIn = 0.0,
                         precipMm = 0.03,
@@ -795,24 +743,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 16.9,
                         windMph = 10.5
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 80,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1063,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/176.png",
-                            text = "Patchy rain nearby"
-                        ),
+                        conditionCode = 1063,
+                        conditionText = "Patchy rain nearby",
                         dewPointC = 4.3,
                         dewPointF = 39.7,
                         feelsLikeC = 1.3,
                         feelsLikeF = 34.3,
+                        forecastDailyId = 1,
                         gustKph = 25.3,
                         gustMph = 15.7,
                         heatIndexC = 4.8,
                         heatIndexF = 40.6,
                         humidity = 96,
+                        id = 16,
                         isDay = 1,
                         precipIn = 0.0,
                         precipMm = 0.01,
@@ -835,24 +782,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 16.6,
                         windMph = 10.3
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1009,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/122.png",
-                            text = "Overcast "
-                        ),
+                        conditionCode = 1009,
+                        conditionText = "Overcast ",
                         dewPointC = 2.3,
                         dewPointF = 36.1,
                         feelsLikeC = -0.2,
                         feelsLikeF = 31.6,
+                        forecastDailyId = 1,
                         gustKph = 26.3,
                         gustMph = 16.4,
                         heatIndexC = 3.9,
                         heatIndexF = 39.0,
                         humidity = 89,
+                        id = 17,
                         isDay = 1,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -875,24 +821,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 19.1,
                         windMph = 11.9
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 75,
-                        condition = ForecastConditionNetwork(
-                            code = 1003,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/116.png",
-                            text = "Partly cloudy"
-                        ),
+                        conditionCode = 1003,
+                        conditionText = "Partly cloudy",
                         dewPointC = -0.2,
                         dewPointF = 31.6,
                         feelsLikeC = -2.4,
                         feelsLikeF = 27.6,
+                        forecastDailyId = 1,
                         gustKph = 30.6,
                         gustMph = 19.0,
                         heatIndexC = 2.5,
                         heatIndexF = 36.5,
                         humidity = 87,
+                        id = 18,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -915,24 +860,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 22.7,
                         windMph = 14.1
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 70,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1063,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/176.png",
-                            text = "Patchy rain nearby"
-                        ),
+                        conditionCode = 1063,
+                        conditionText = "Patchy rain nearby",
                         dewPointC = -2.1,
                         dewPointF = 28.3,
                         feelsLikeC = -3.4,
                         feelsLikeF = 25.9,
+                        forecastDailyId = 1,
                         gustKph = 31.4,
                         gustMph = 19.5,
                         heatIndexC = 1.8,
                         heatIndexF = 35.3,
                         humidity = 75,
+                        id = 19,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.01,
@@ -955,24 +899,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 23.4,
                         windMph = 14.5
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 78,
                         chanceOfSnow = 0,
                         cloud = 93,
-                        condition = ForecastConditionNetwork(
-                            code = 1063,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/176.png",
-                            text = "Patchy rain nearby"
-                        ),
+                        conditionCode = 1063,
+                        conditionText = "Patchy rain nearby",
                         dewPointC = -3.8,
                         dewPointF = 25.2,
                         feelsLikeC = -4.3,
                         feelsLikeF = 24.3,
+                        forecastDailyId = 1,
                         gustKph = 32.9,
                         gustMph = 20.5,
                         heatIndexC = 1.2,
                         heatIndexF = 34.2,
                         humidity = 69,
+                        id = 20,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.01,
@@ -995,24 +938,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 24.5,
                         windMph = 15.2
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 82,
-                        condition = ForecastConditionNetwork(
-                            code = 1006,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/119.png",
-                            text = "Cloudy "
-                        ),
+                        conditionCode = 1006,
+                        conditionText = "Cloudy ",
                         dewPointC = -4.7,
                         dewPointF = 23.5,
                         feelsLikeC = -4.1,
                         feelsLikeF = 24.6,
+                        forecastDailyId = 1,
                         gustKph = 30.2,
                         gustMph = 18.7,
                         heatIndexC = 1.1,
                         heatIndexF = 34.0,
                         humidity = 65,
+                        id = 21,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -1035,24 +977,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 22.3,
                         windMph = 13.9
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1009,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/122.png",
-                            text = "Overcast "
-                        ),
+                        conditionCode = 1009,
+                        conditionText = "Overcast ",
                         dewPointC = -5.0,
                         dewPointF = 23.0,
                         feelsLikeC = -3.8,
                         feelsLikeF = 25.1,
+                        forecastDailyId = 1,
                         gustKph = 30.6,
                         gustMph = 19.0,
                         heatIndexC = 1.4,
                         heatIndexF = 34.5,
                         humidity = 62,
+                        id = 22,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -1075,24 +1016,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 22.3,
                         windMph = 13.9
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1009,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/122.png",
-                            text = "Overcast "
-                        ),
+                        conditionCode = 1009,
+                        conditionText = "Overcast ",
                         dewPointC = -4.7,
                         dewPointF = 23.5,
                         feelsLikeC = -3.6,
                         feelsLikeF = 25.5,
+                        forecastDailyId = 1,
                         gustKph = 30.1,
                         gustMph = 18.7,
                         heatIndexC = 1.5,
                         heatIndexF = 34.7,
                         humidity = 63,
+                        id = 23,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -1115,24 +1055,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 22.0,
                         windMph = 13.6
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 87,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1198,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/311.png",
-                            text = "Light freezing rain"
-                        ),
+                        conditionCode = 1198,
+                        conditionText = "Light freezing rain",
                         dewPointC = -3.1,
                         dewPointF = 26.4,
                         feelsLikeC = -4.6,
                         feelsLikeF = 23.7,
+                        forecastDailyId = 1,
                         gustKph = 29.2,
                         gustMph = 18.1,
                         heatIndexC = 0.7,
                         heatIndexF = 33.2,
                         humidity = 76,
+                        id = 24,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.01,
@@ -1156,8 +1095,10 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windMph = 13.4
                     )
                 )
-            ), ForecastDayNetwork(
-                astro = AstroNetwork(
+            ), DailyForecastData(
+                astro = ForecastAstroEntity(
+                    forecastDailyId = 2,
+                    id = 2,
                     isMoonUp = 0,
                     isSunUp = 0,
                     moonIllumination = 19,
@@ -1167,23 +1108,20 @@ internal val mockForecastResponseReal = ForecastResponse(
                     sunrise = "08:24 AM",
                     sunset = "04:08 PM"
                 ),
-                date = "2025-11-25",
-                dateEpoch = 1764028800L,
-                day = DayNetwork(
+                day = ForecastDayEntity(
                     avgHumidity = 78,
                     avgTempC = 0.2,
                     avgTempF = 32.4,
                     avgVisKm = 9.1,
                     avgVisMiles = 5.0,
-                    condition = ForecastConditionNetwork(
-                        code = 1219,
-                        icon = "//cdn.weatherapi.com/weather/64x64/day/332.png",
-                        text = "Moderate snow"
-                    ),
-                    dailyChanceOfRain = 79,
-                    dailyChanceOfSnow = 34,
-                    dailyWillItRain = 1,
-                    dailyWillItSnow = 0,
+                    conditionCode = 1219,
+                    conditionText = "Moderate snow",
+                    dayChanceOfRain = 79,
+                    dayChanceOfSnow = 34,
+                    dayWillItRain = 1,
+                    dayWillItSnow = 0,
+                    forecastDailyId = 2,
+                    id = 2,
                     maxTempC = 0.9,
                     maxTempF = 33.7,
                     maxWindKph = 19.8,
@@ -1195,25 +1133,25 @@ internal val mockForecastResponseReal = ForecastResponse(
                     totalSnowCm = 1.03,
                     uv = 0.1
                 ),
+                forecast = ForecastDailyEntity(date = "2025-11-25", dateEpoch = 1764028800L, forecastLocationId = 1, id = 2),
                 hour = listOf(
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 84,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1198,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/311.png",
-                            text = "Light freezing rain"
-                        ),
+                        conditionCode = 1198,
+                        conditionText = "Light freezing rain",
                         dewPointC = -3.4,
                         dewPointF = 25.9,
                         feelsLikeC = -4.5,
                         feelsLikeF = 23.8,
+                        forecastDailyId = 2,
                         gustKph = 26.7,
                         gustMph = 16.6,
                         heatIndexC = 0.5,
                         heatIndexF = 33.0,
                         humidity = 75,
+                        id = 25,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.01,
@@ -1236,24 +1174,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 19.8,
                         windMph = 12.3
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 89,
                         cloud = 98,
-                        condition = ForecastConditionNetwork(
-                            code = 1213,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/326.png",
-                            text = "Light snow"
-                        ),
+                        conditionCode = 1213,
+                        conditionText = "Light snow",
                         dewPointC = -3.7,
                         dewPointF = 25.4,
                         feelsLikeC = -4.7,
                         feelsLikeF = 23.6,
+                        forecastDailyId = 2,
                         gustKph = 26.2,
                         gustMph = 16.3,
                         heatIndexC = 0.4,
                         heatIndexF = 32.7,
                         humidity = 74,
+                        id = 26,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.02,
@@ -1276,24 +1213,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 19.4,
                         windMph = 12.1
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 87,
                         cloud = 75,
-                        condition = ForecastConditionNetwork(
-                            code = 1198,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/311.png",
-                            text = "Light freezing rain"
-                        ),
+                        conditionCode = 1198,
+                        conditionText = "Light freezing rain",
                         dewPointC = -3.7,
                         dewPointF = 25.4,
                         feelsLikeC = -4.9,
                         feelsLikeF = 23.2,
+                        forecastDailyId = 2,
                         gustKph = 25.2,
                         gustMph = 15.6,
                         heatIndexC = 0.1,
                         heatIndexF = 32.2,
                         humidity = 76,
+                        id = 27,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.01,
@@ -1316,31 +1252,30 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 18.7,
                         windMph = 11.6
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 78,
                         cloud = 79,
-                        condition = ForecastConditionNetwork(
-                            code = 1213,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/326.png",
-                            text = "Light snow"
-                        ),
+                        conditionCode = 1213,
+                        conditionText = "Light snow",
                         dewPointC = -3.7,
                         dewPointF = 25.3,
                         feelsLikeC = -5.0,
                         feelsLikeF = 23.0,
+                        forecastDailyId = 2,
                         gustKph = 24.6,
                         gustMph = 15.3,
-                        heatIndexC = -0.0,
+                        heatIndexC = 0.0,
                         heatIndexF = 32.0,
                         humidity = 76,
+                        id = 28,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.02,
                         pressureIn = 29.88,
                         pressureMb = 1012.0,
                         snowCm = 0.01,
-                        tempC = -0.0,
+                        tempC = 0.0,
                         tempF = 32.0,
                         time = "2025-11-25 03:00",
                         timeEpoch = 1764028800L,
@@ -1356,24 +1291,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 18.4,
                         windMph = 11.4
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 77,
                         cloud = 86,
-                        condition = ForecastConditionNetwork(
-                            code = 1198,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/311.png",
-                            text = "Light freezing rain"
-                        ),
+                        conditionCode = 1198,
+                        conditionText = "Light freezing rain",
                         dewPointC = -4.0,
                         dewPointF = 24.8,
                         feelsLikeC = -4.9,
                         feelsLikeF = 23.3,
+                        forecastDailyId = 2,
                         gustKph = 22.9,
                         gustMph = 14.2,
                         heatIndexC = -0.1,
                         heatIndexF = 31.9,
                         humidity = 75,
+                        id = 29,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.01,
@@ -1396,24 +1330,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 16.9,
                         windMph = 10.5
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 72,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1198,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/311.png",
-                            text = "Light freezing rain"
-                        ),
+                        conditionCode = 1198,
+                        conditionText = "Light freezing rain",
                         dewPointC = -4.3,
                         dewPointF = 24.4,
                         feelsLikeC = -4.7,
                         feelsLikeF = 23.5,
+                        forecastDailyId = 2,
                         gustKph = 21.7,
                         gustMph = 13.5,
                         heatIndexC = -0.1,
                         heatIndexF = 31.8,
                         humidity = 74,
+                        id = 30,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.01,
@@ -1436,24 +1369,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 15.8,
                         windMph = 9.8
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1009,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/122.png",
-                            text = "Overcast "
-                        ),
+                        conditionCode = 1009,
+                        conditionText = "Overcast ",
                         dewPointC = -4.5,
                         dewPointF = 24.0,
                         feelsLikeC = -5.0,
                         feelsLikeF = 23.1,
+                        forecastDailyId = 2,
                         gustKph = 22.6,
                         gustMph = 14.0,
                         heatIndexC = -0.3,
                         heatIndexF = 31.5,
                         humidity = 73,
+                        id = 31,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -1476,24 +1408,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 16.2,
                         windMph = 10.1
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1009,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/122.png",
-                            text = "Overcast "
-                        ),
+                        conditionCode = 1009,
+                        conditionText = "Overcast ",
                         dewPointC = -4.2,
                         dewPointF = 24.5,
                         feelsLikeC = -5.2,
                         feelsLikeF = 22.7,
+                        forecastDailyId = 2,
                         gustKph = 23.3,
                         gustMph = 14.5,
                         heatIndexC = -0.4,
                         heatIndexF = 31.4,
                         humidity = 75,
+                        id = 32,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -1516,24 +1447,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 16.6,
                         windMph = 10.3
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1009,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/122.png",
-                            text = "Overcast "
-                        ),
+                        conditionCode = 1009,
+                        conditionText = "Overcast ",
                         dewPointC = -3.9,
                         dewPointF = 25.1,
                         feelsLikeC = -4.9,
                         feelsLikeF = 23.2,
+                        forecastDailyId = 2,
                         gustKph = 21.3,
                         gustMph = 13.3,
                         heatIndexC = -0.3,
                         heatIndexF = 31.5,
                         humidity = 77,
+                        id = 33,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -1556,24 +1486,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 15.5,
                         windMph = 9.6
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 85,
-                        condition = ForecastConditionNetwork(
-                            code = 1006,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/119.png",
-                            text = "Cloudy "
-                        ),
+                        conditionCode = 1006,
+                        conditionText = "Cloudy ",
                         dewPointC = -3.9,
                         dewPointF = 24.9,
                         feelsLikeC = -4.9,
                         feelsLikeF = 23.3,
+                        forecastDailyId = 2,
                         gustKph = 21.2,
                         gustMph = 13.2,
                         heatIndexC = -0.3,
                         heatIndexF = 31.5,
                         humidity = 76,
+                        id = 34,
                         isDay = 1,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -1596,24 +1525,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 15.5,
                         windMph = 9.6
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 65,
-                        condition = ForecastConditionNetwork(
-                            code = 1006,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/119.png",
-                            text = "Cloudy "
-                        ),
+                        conditionCode = 1006,
+                        conditionText = "Cloudy ",
                         dewPointC = -4.0,
                         dewPointF = 24.7,
                         feelsLikeC = -4.6,
                         feelsLikeF = 23.8,
+                        forecastDailyId = 2,
                         gustKph = 21.2,
                         gustMph = 13.2,
                         heatIndexC = 0.0,
                         heatIndexF = 32.0,
                         humidity = 74,
+                        id = 35,
                         isDay = 1,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -1636,24 +1564,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 15.8,
                         windMph = 9.8
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 39,
-                        condition = ForecastConditionNetwork(
-                            code = 1003,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/116.png",
-                            text = "Partly Cloudy "
-                        ),
+                        conditionCode = 1003,
+                        conditionText = "Partly Cloudy ",
                         dewPointC = -4.3,
                         dewPointF = 24.3,
                         feelsLikeC = -4.0,
                         feelsLikeF = 24.7,
+                        forecastDailyId = 2,
                         gustKph = 21.1,
                         gustMph = 13.1,
                         heatIndexC = 0.4,
                         heatIndexF = 32.8,
                         humidity = 71,
+                        id = 36,
                         isDay = 1,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -1676,24 +1603,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 15.8,
                         windMph = 9.8
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 45,
-                        condition = ForecastConditionNetwork(
-                            code = 1003,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/116.png",
-                            text = "Partly Cloudy "
-                        ),
+                        conditionCode = 1003,
+                        conditionText = "Partly Cloudy ",
                         dewPointC = -4.5,
                         dewPointF = 23.9,
                         feelsLikeC = -3.4,
                         feelsLikeF = 25.9,
+                        forecastDailyId = 2,
                         gustKph = 19.9,
                         gustMph = 12.3,
                         heatIndexC = 0.8,
                         heatIndexF = 33.4,
                         humidity = 68,
+                        id = 37,
                         isDay = 1,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -1716,24 +1642,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 14.8,
                         windMph = 9.2
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 57,
-                        condition = ForecastConditionNetwork(
-                            code = 1003,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/116.png",
-                            text = "Partly Cloudy "
-                        ),
+                        conditionCode = 1003,
+                        conditionText = "Partly Cloudy ",
                         dewPointC = -4.4,
                         dewPointF = 24.1,
                         feelsLikeC = -2.9,
                         feelsLikeF = 26.8,
+                        forecastDailyId = 2,
                         gustKph = 17.7,
                         gustMph = 11.0,
                         heatIndexC = 0.9,
                         heatIndexF = 33.7,
                         humidity = 67,
+                        id = 38,
                         isDay = 1,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -1756,24 +1681,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 13.0,
                         windMph = 8.1
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 52,
-                        condition = ForecastConditionNetwork(
-                            code = 1003,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/116.png",
-                            text = "Partly Cloudy "
-                        ),
+                        conditionCode = 1003,
+                        conditionText = "Partly Cloudy ",
                         dewPointC = -4.1,
                         dewPointF = 24.7,
                         feelsLikeC = -2.6,
                         feelsLikeF = 27.2,
+                        forecastDailyId = 2,
                         gustKph = 15.8,
                         gustMph = 9.8,
                         heatIndexC = 0.8,
                         heatIndexF = 33.4,
                         humidity = 70,
+                        id = 39,
                         isDay = 1,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -1796,24 +1720,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 11.2,
                         windMph = 6.9
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 60,
-                        condition = ForecastConditionNetwork(
-                            code = 1003,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/116.png",
-                            text = "Partly Cloudy "
-                        ),
+                        conditionCode = 1003,
+                        conditionText = "Partly Cloudy ",
                         dewPointC = -3.7,
                         dewPointF = 25.3,
                         feelsLikeC = -2.8,
                         feelsLikeF = 26.9,
+                        forecastDailyId = 2,
                         gustKph = 14.7,
                         gustMph = 9.1,
                         heatIndexC = 0.4,
                         heatIndexF = 32.6,
                         humidity = 74,
+                        id = 40,
                         isDay = 1,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -1836,24 +1759,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 9.7,
                         windMph = 6.0
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 85,
-                        condition = ForecastConditionNetwork(
-                            code = 1006,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/119.png",
-                            text = "Cloudy "
-                        ),
+                        conditionCode = 1006,
+                        conditionText = "Cloudy ",
                         dewPointC = -3.4,
                         dewPointF = 26.0,
                         feelsLikeC = -2.9,
                         feelsLikeF = 26.7,
+                        forecastDailyId = 2,
                         gustKph = 14.8,
                         gustMph = 9.2,
                         heatIndexC = 0.3,
                         heatIndexF = 32.5,
                         humidity = 77,
+                        id = 41,
                         isDay = 1,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -1876,24 +1798,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 9.7,
                         windMph = 6.0
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 94,
-                        condition = ForecastConditionNetwork(
-                            code = 1009,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/122.png",
-                            text = "Overcast "
-                        ),
+                        conditionCode = 1009,
+                        conditionText = "Overcast ",
                         dewPointC = -3.0,
                         dewPointF = 26.6,
                         feelsLikeC = -2.5,
                         feelsLikeF = 27.6,
+                        forecastDailyId = 2,
                         gustKph = 13.1,
                         gustMph = 8.1,
                         heatIndexC = 0.4,
                         heatIndexF = 32.7,
                         humidity = 78,
+                        id = 42,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -1916,24 +1837,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 8.6,
                         windMph = 5.4
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 83,
-                        condition = ForecastConditionNetwork(
-                            code = 1006,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/119.png",
-                            text = "Cloudy "
-                        ),
+                        conditionCode = 1006,
+                        conditionText = "Cloudy ",
                         dewPointC = -2.5,
                         dewPointF = 27.5,
                         feelsLikeC = -2.0,
                         feelsLikeF = 28.4,
+                        forecastDailyId = 2,
                         gustKph = 11.3,
                         gustMph = 7.0,
                         heatIndexC = 0.5,
                         heatIndexF = 32.9,
                         humidity = 80,
+                        id = 43,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -1956,24 +1876,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 7.6,
                         windMph = 4.7
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 97,
-                        condition = ForecastConditionNetwork(
-                            code = 1009,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/122.png",
-                            text = "Overcast "
-                        ),
+                        conditionCode = 1009,
+                        conditionText = "Overcast ",
                         dewPointC = -2.0,
                         dewPointF = 28.4,
                         feelsLikeC = -2.2,
                         feelsLikeF = 28.0,
+                        forecastDailyId = 2,
                         gustKph = 11.9,
                         gustMph = 7.4,
                         heatIndexC = 0.4,
                         heatIndexF = 32.8,
                         humidity = 84,
+                        id = 44,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -1996,24 +1915,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 7.9,
                         windMph = 4.9
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 82,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1213,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/326.png",
-                            text = "Light snow"
-                        ),
+                        conditionCode = 1213,
+                        conditionText = "Light snow",
                         dewPointC = -1.5,
                         dewPointF = 29.3,
                         feelsLikeC = -2.2,
                         feelsLikeF = 28.0,
+                        forecastDailyId = 2,
                         gustKph = 11.7,
                         gustMph = 7.3,
                         heatIndexC = 0.4,
                         heatIndexF = 32.7,
                         humidity = 87,
+                        id = 45,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.04,
@@ -2036,24 +1954,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 7.9,
                         windMph = 4.9
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 85,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1219,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/332.png",
-                            text = "Moderate snow"
-                        ),
+                        conditionCode = 1219,
+                        conditionText = "Moderate snow",
                         dewPointC = -0.7,
                         dewPointF = 30.7,
                         feelsLikeC = -2.1,
                         feelsLikeF = 28.3,
+                        forecastDailyId = 2,
                         gustKph = 10.2,
                         gustMph = 6.4,
                         heatIndexC = 0.2,
                         heatIndexF = 32.4,
                         humidity = 93,
+                        id = 46,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.11,
@@ -2076,24 +1993,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 6.8,
                         windMph = 4.3
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 100,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1225,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/338.png",
-                            text = "Heavy snow"
-                        ),
+                        conditionCode = 1225,
+                        conditionText = "Heavy snow",
                         dewPointC = -0.1,
                         dewPointF = 31.7,
                         feelsLikeC = -1.7,
                         feelsLikeF = 29.0,
+                        forecastDailyId = 2,
                         gustKph = 8.5,
                         gustMph = 5.3,
                         heatIndexC = 0.2,
                         heatIndexF = 32.4,
                         humidity = 97,
+                        id = 47,
                         isDay = 0,
                         precipIn = 0.02,
                         precipMm = 0.52,
@@ -2116,24 +2032,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 5.8,
                         windMph = 3.6
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 100,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1225,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/338.png",
-                            text = "Heavy snow"
-                        ),
+                        conditionCode = 1225,
+                        conditionText = "Heavy snow",
                         dewPointC = 0.2,
                         dewPointF = 32.3,
                         feelsLikeC = -2.1,
                         feelsLikeF = 28.3,
+                        forecastDailyId = 2,
                         gustKph = 10.6,
                         gustMph = 6.6,
                         heatIndexC = 0.3,
                         heatIndexF = 32.6,
                         humidity = 99,
+                        id = 48,
                         isDay = 0,
                         precipIn = 0.03,
                         precipMm = 0.72,
@@ -2157,8 +2072,10 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windMph = 4.5
                     )
                 )
-            ), ForecastDayNetwork(
-                astro = AstroNetwork(
+            ), DailyForecastData(
+                astro = ForecastAstroEntity(
+                    forecastDailyId = 3,
+                    id = 3,
                     isMoonUp = 0,
                     isSunUp = 0,
                     moonIllumination = 27,
@@ -2168,23 +2085,20 @@ internal val mockForecastResponseReal = ForecastResponse(
                     sunrise = "08:26 AM",
                     sunset = "04:07 PM"
                 ),
-                date = "2025-11-26",
-                dateEpoch = 1764115200L,
-                day = DayNetwork(
+                day = ForecastDayEntity(
                     avgHumidity = 99,
                     avgTempC = 1.5,
                     avgTempF = 34.6,
                     avgVisKm = 1.3,
                     avgVisMiles = 0.0,
-                    condition = ForecastConditionNetwork(
-                        code = 1063,
-                        icon = "//cdn.weatherapi.com/weather/64x64/day/176.png",
-                        text = "Patchy rain nearby"
-                    ),
-                    dailyChanceOfRain = 87,
-                    dailyChanceOfSnow = 26,
-                    dailyWillItRain = 1,
-                    dailyWillItSnow = 0,
+                    conditionCode = 1063,
+                    conditionText = "Patchy rain nearby",
+                    dayChanceOfRain = 87,
+                    dayChanceOfSnow = 26,
+                    dayWillItRain = 1,
+                    dayWillItSnow = 0,
+                    forecastDailyId = 3,
+                    id = 3,
                     maxTempC = 1.9,
                     maxTempF = 35.5,
                     maxWindKph = 7.6,
@@ -2196,25 +2110,25 @@ internal val mockForecastResponseReal = ForecastResponse(
                     totalSnowCm = 1.92,
                     uv = 0.0
                 ),
+                forecast = ForecastDailyEntity(date = "2025-11-26", dateEpoch = 1764115200L, forecastLocationId = 1, id = 3),
                 hour = listOf(
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 100,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1225,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/338.png",
-                            text = "Heavy snow"
-                        ),
+                        conditionCode = 1225,
+                        conditionText = "Heavy snow",
                         dewPointC = 0.4,
                         dewPointF = 32.7,
                         feelsLikeC = -2.0,
                         feelsLikeF = 28.4,
+                        forecastDailyId = 3,
                         gustKph = 11.0,
                         gustMph = 6.8,
                         heatIndexC = 0.5,
                         heatIndexF = 32.9,
                         humidity = 99,
+                        id = 49,
                         isDay = 0,
                         precipIn = 0.01,
                         precipMm = 0.31,
@@ -2237,24 +2151,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 7.6,
                         windMph = 4.7
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 100,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1225,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/338.png",
-                            text = "Heavy snow"
-                        ),
+                        conditionCode = 1225,
+                        conditionText = "Heavy snow",
                         dewPointC = 0.6,
                         dewPointF = 33.0,
                         feelsLikeC = -1.5,
                         feelsLikeF = 29.4,
+                        forecastDailyId = 3,
                         gustKph = 9.3,
                         gustMph = 5.8,
                         heatIndexC = 0.7,
                         heatIndexF = 33.2,
                         humidity = 99,
+                        id = 50,
                         isDay = 0,
                         precipIn = 0.03,
                         precipMm = 0.73,
@@ -2277,24 +2190,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 6.5,
                         windMph = 4.0
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 100,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1225,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/338.png",
-                            text = "Heavy snow"
-                        ),
+                        conditionCode = 1225,
+                        conditionText = "Heavy snow",
                         dewPointC = 0.7,
                         dewPointF = 33.2,
                         feelsLikeC = -1.1,
                         feelsLikeF = 30.0,
+                        forecastDailyId = 3,
                         gustKph = 8.3,
                         gustMph = 5.1,
                         heatIndexC = 0.7,
                         heatIndexF = 33.3,
                         humidity = 100,
+                        id = 51,
                         isDay = 0,
                         precipIn = 0.03,
                         precipMm = 0.76,
@@ -2317,24 +2229,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 5.8,
                         windMph = 3.6
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 100,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1225,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/338.png",
-                            text = "Heavy snow"
-                        ),
+                        conditionCode = 1225,
+                        conditionText = "Heavy snow",
                         dewPointC = 0.7,
                         dewPointF = 33.3,
                         feelsLikeC = -0.9,
                         feelsLikeF = 30.4,
+                        forecastDailyId = 3,
                         gustKph = 7.7,
                         gustMph = 4.8,
                         heatIndexC = 0.8,
                         heatIndexF = 33.4,
                         humidity = 100,
+                        id = 52,
                         isDay = 0,
                         precipIn = 0.02,
                         precipMm = 0.5,
@@ -2357,24 +2268,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 5.4,
                         windMph = 3.4
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 100,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1219,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/332.png",
-                            text = "Moderate snow"
-                        ),
+                        conditionCode = 1219,
+                        conditionText = "Moderate snow",
                         dewPointC = 0.7,
                         dewPointF = 33.3,
                         feelsLikeC = -0.7,
                         feelsLikeF = 30.7,
+                        forecastDailyId = 3,
                         gustKph = 7.4,
                         gustMph = 4.6,
                         heatIndexC = 0.8,
                         heatIndexF = 33.4,
                         humidity = 99,
+                        id = 53,
                         isDay = 0,
                         precipIn = 0.01,
                         precipMm = 0.2,
@@ -2397,24 +2307,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 5.0,
                         windMph = 3.1
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 100,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1219,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/332.png",
-                            text = "Moderate snow"
-                        ),
+                        conditionCode = 1219,
+                        conditionText = "Moderate snow",
                         dewPointC = 0.7,
                         dewPointF = 33.3,
                         feelsLikeC = -0.8,
                         feelsLikeF = 30.5,
+                        forecastDailyId = 3,
                         gustKph = 8.0,
                         gustMph = 5.0,
                         heatIndexC = 0.8,
                         heatIndexF = 33.5,
                         humidity = 99,
+                        id = 54,
                         isDay = 0,
                         precipIn = 0.01,
                         precipMm = 0.15,
@@ -2437,24 +2346,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 5.4,
                         windMph = 3.4
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 77,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1204,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/317.png",
-                            text = "Light sleet"
-                        ),
+                        conditionCode = 1204,
+                        conditionText = "Light sleet",
                         dewPointC = 0.8,
                         dewPointF = 33.5,
                         feelsLikeC = -0.4,
                         feelsLikeF = 31.2,
+                        forecastDailyId = 3,
                         gustKph = 7.0,
                         gustMph = 4.4,
                         heatIndexC = 0.9,
                         heatIndexF = 33.6,
                         humidity = 100,
+                        id = 55,
                         isDay = 0,
                         precipIn = 0.01,
                         precipMm = 0.16,
@@ -2477,24 +2385,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 4.7,
                         windMph = 2.9
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 86,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1135,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/248.png",
-                            text = "Fog"
-                        ),
+                        conditionCode = 1135,
+                        conditionText = "Fog",
                         dewPointC = 0.9,
                         dewPointF = 33.6,
                         feelsLikeC = -0.5,
                         feelsLikeF = 31.0,
+                        forecastDailyId = 3,
                         gustKph = 7.6,
                         gustMph = 4.7,
                         heatIndexC = 1.0,
                         heatIndexF = 33.7,
                         humidity = 100,
+                        id = 56,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.09,
@@ -2517,24 +2424,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 5.0,
                         windMph = 3.1
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1135,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/248.png",
-                            text = "Fog"
-                        ),
+                        conditionCode = 1135,
+                        conditionText = "Fog",
                         dewPointC = 1.0,
                         dewPointF = 33.7,
                         feelsLikeC = 1.1,
                         feelsLikeF = 33.9,
+                        forecastDailyId = 3,
                         gustKph = 4.4,
                         gustMph = 2.7,
                         heatIndexC = 1.1,
                         heatIndexF = 33.9,
                         humidity = 99,
+                        id = 57,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -2557,24 +2463,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 2.9,
                         windMph = 1.8
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1135,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/248.png",
-                            text = "Fog"
-                        ),
+                        conditionCode = 1135,
+                        conditionText = "Fog",
                         dewPointC = 1.1,
                         dewPointF = 34.0,
                         feelsLikeC = 1.2,
                         feelsLikeF = 34.2,
+                        forecastDailyId = 3,
                         gustKph = 1.7,
                         gustMph = 1.0,
                         heatIndexC = 1.2,
                         heatIndexF = 34.2,
                         humidity = 99,
+                        id = 58,
                         isDay = 1,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -2597,24 +2502,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 1.1,
                         windMph = 0.7
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1135,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/248.png",
-                            text = "Fog"
-                        ),
+                        conditionCode = 1135,
+                        conditionText = "Fog",
                         dewPointC = 1.3,
                         dewPointF = 34.3,
                         feelsLikeC = 0.9,
                         feelsLikeF = 33.7,
+                        forecastDailyId = 3,
                         gustKph = 4.9,
                         gustMph = 3.1,
                         heatIndexC = 1.4,
                         heatIndexF = 34.5,
                         humidity = 99,
+                        id = 59,
                         isDay = 1,
                         precipIn = 0.0,
                         precipMm = 0.08,
@@ -2637,24 +2541,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 3.2,
                         windMph = 2.0
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1153,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/266.png",
-                            text = "Light drizzle"
-                        ),
+                        conditionCode = 1153,
+                        conditionText = "Light drizzle",
                         dewPointC = 1.4,
                         dewPointF = 34.4,
                         feelsLikeC = 0.8,
                         feelsLikeF = 33.5,
+                        forecastDailyId = 3,
                         gustKph = 5.5,
                         gustMph = 3.4,
                         heatIndexC = 1.5,
                         heatIndexF = 34.7,
                         humidity = 99,
+                        id = 60,
                         isDay = 1,
                         precipIn = 0.01,
                         precipMm = 0.18,
@@ -2677,24 +2580,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 3.6,
                         windMph = 2.2
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1153,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/266.png",
-                            text = "Light drizzle"
-                        ),
+                        conditionCode = 1153,
+                        conditionText = "Light drizzle",
                         dewPointC = 1.4,
                         dewPointF = 34.5,
                         feelsLikeC = 0.3,
                         feelsLikeF = 32.5,
+                        forecastDailyId = 3,
                         gustKph = 7.2,
                         gustMph = 4.5,
                         heatIndexC = 1.5,
                         heatIndexF = 34.8,
                         humidity = 99,
+                        id = 61,
                         isDay = 1,
                         precipIn = 0.01,
                         precipMm = 0.18,
@@ -2717,24 +2619,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 4.7,
                         windMph = 2.9
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1135,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/248.png",
-                            text = "Fog"
-                        ),
+                        conditionCode = 1135,
+                        conditionText = "Fog",
                         dewPointC = 1.4,
                         dewPointF = 34.6,
                         feelsLikeC = 0.2,
                         feelsLikeF = 32.3,
+                        forecastDailyId = 3,
                         gustKph = 7.8,
                         gustMph = 4.9,
                         heatIndexC = 1.6,
                         heatIndexF = 34.8,
                         humidity = 99,
+                        id = 62,
                         isDay = 1,
                         precipIn = 0.01,
                         precipMm = 0.14,
@@ -2757,24 +2658,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 5.0,
                         windMph = 3.1
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1135,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/248.png",
-                            text = "Fog"
-                        ),
+                        conditionCode = 1135,
+                        conditionText = "Fog",
                         dewPointC = 1.4,
                         dewPointF = 34.6,
                         feelsLikeC = -0.3,
                         feelsLikeF = 31.6,
+                        forecastDailyId = 3,
                         gustKph = 9.6,
                         gustMph = 6.0,
                         heatIndexC = 1.6,
                         heatIndexF = 34.9,
                         humidity = 99,
+                        id = 63,
                         isDay = 1,
                         precipIn = 0.0,
                         precipMm = 0.11,
@@ -2797,24 +2697,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 6.1,
                         windMph = 3.8
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 100,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1135,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/248.png",
-                            text = "Fog"
-                        ),
+                        conditionCode = 1135,
+                        conditionText = "Fog",
                         dewPointC = 1.5,
                         dewPointF = 34.7,
                         feelsLikeC = -0.3,
                         feelsLikeF = 31.4,
+                        forecastDailyId = 3,
                         gustKph = 10.2,
                         gustMph = 6.3,
                         heatIndexC = 1.7,
                         heatIndexF = 35.0,
                         humidity = 99,
+                        id = 64,
                         isDay = 1,
                         precipIn = 0.0,
                         precipMm = 0.08,
@@ -2837,24 +2736,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 6.5,
                         windMph = 4.0
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 68,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1135,
-                            icon = "//cdn.weatherapi.com/weather/64x64/day/248.png",
-                            text = "Fog"
-                        ),
+                        conditionCode = 1135,
+                        conditionText = "Fog",
                         dewPointC = 1.6,
                         dewPointF = 34.8,
                         feelsLikeC = -0.4,
                         feelsLikeF = 31.3,
+                        forecastDailyId = 3,
                         gustKph = 10.8,
                         gustMph = 6.7,
                         heatIndexC = 1.7,
                         heatIndexF = 35.1,
                         humidity = 99,
+                        id = 65,
                         isDay = 1,
                         precipIn = 0.0,
                         precipMm = 0.02,
@@ -2877,24 +2775,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 6.8,
                         windMph = 4.3
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 68,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1135,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/248.png",
-                            text = "Fog"
-                        ),
+                        conditionCode = 1135,
+                        conditionText = "Fog",
                         dewPointC = 1.6,
                         dewPointF = 35.0,
                         feelsLikeC = -0.1,
                         feelsLikeF = 31.8,
+                        forecastDailyId = 3,
                         gustKph = 10.4,
                         gustMph = 6.4,
                         heatIndexC = 1.8,
                         heatIndexF = 35.3,
                         humidity = 99,
+                        id = 66,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.01,
@@ -2917,24 +2814,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 6.5,
                         windMph = 4.0
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 76,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1135,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/248.png",
-                            text = "Fog"
-                        ),
+                        conditionCode = 1135,
+                        conditionText = "Fog",
                         dewPointC = 1.8,
                         dewPointF = 35.2,
                         feelsLikeC = 0.6,
                         feelsLikeF = 33.1,
+                        forecastDailyId = 3,
                         gustKph = 8.3,
                         gustMph = 5.2,
                         heatIndexC = 1.9,
                         heatIndexF = 35.5,
                         humidity = 99,
+                        id = 67,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.02,
@@ -2957,24 +2853,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 5.0,
                         windMph = 3.1
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 69,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1135,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/248.png",
-                            text = "Fog"
-                        ),
+                        conditionCode = 1135,
+                        conditionText = "Fog",
                         dewPointC = 2.0,
                         dewPointF = 35.5,
                         feelsLikeC = 0.9,
                         feelsLikeF = 33.7,
+                        forecastDailyId = 3,
                         gustKph = 7.9,
                         gustMph = 4.9,
                         heatIndexC = 2.1,
                         heatIndexF = 35.8,
                         humidity = 99,
+                        id = 68,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.02,
@@ -2997,24 +2892,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 4.7,
                         windMph = 2.9
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 87,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1135,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/248.png",
-                            text = "Fog"
-                        ),
+                        conditionCode = 1135,
+                        conditionText = "Fog",
                         dewPointC = 2.1,
                         dewPointF = 35.9,
                         feelsLikeC = 0.8,
                         feelsLikeF = 33.5,
+                        forecastDailyId = 3,
                         gustKph = 9.3,
                         gustMph = 5.7,
                         heatIndexC = 2.3,
                         heatIndexF = 36.1,
                         humidity = 99,
+                        id = 69,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.01,
@@ -3037,24 +2931,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 5.4,
                         windMph = 3.4
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1135,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/248.png",
-                            text = "Fog"
-                        ),
+                        conditionCode = 1135,
+                        conditionText = "Fog",
                         dewPointC = 2.3,
                         dewPointF = 36.1,
                         feelsLikeC = 0.9,
                         feelsLikeF = 33.5,
+                        forecastDailyId = 3,
                         gustKph = 10.0,
                         gustMph = 6.2,
                         heatIndexC = 2.4,
                         heatIndexF = 36.4,
                         humidity = 99,
+                        id = 70,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -3077,24 +2970,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 5.8,
                         windMph = 3.6
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 79,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1135,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/248.png",
-                            text = "Fog"
-                        ),
+                        conditionCode = 1135,
+                        conditionText = "Fog",
                         dewPointC = 2.4,
                         dewPointF = 36.2,
                         feelsLikeC = 1.1,
                         feelsLikeF = 33.9,
+                        forecastDailyId = 3,
                         gustKph = 10.2,
                         gustMph = 6.4,
                         heatIndexC = 2.6,
                         heatIndexF = 36.7,
                         humidity = 98,
+                        id = 71,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.01,
@@ -3117,24 +3009,23 @@ internal val mockForecastResponseReal = ForecastResponse(
                         windKph = 5.8,
                         windMph = 3.6
                     ),
-                    HourNetwork(
+                    ForecastHourEntity(
                         chanceOfRain = 0,
                         chanceOfSnow = 0,
                         cloud = 100,
-                        condition = ForecastConditionNetwork(
-                            code = 1135,
-                            icon = "//cdn.weatherapi.com/weather/64x64/night/248.png",
-                            text = "Fog"
-                        ),
+                        conditionCode = 1135,
+                        conditionText = "Fog",
                         dewPointC = 2.4,
                         dewPointF = 36.3,
                         feelsLikeC = 1.1,
                         feelsLikeF = 34.0,
+                        forecastDailyId = 3,
                         gustKph = 10.9,
                         gustMph = 6.8,
                         heatIndexC = 2.8,
                         heatIndexF = 37.0,
                         humidity = 97,
+                        id = 72,
                         isDay = 0,
                         precipIn = 0.0,
                         precipMm = 0.0,
@@ -3159,16 +3050,61 @@ internal val mockForecastResponseReal = ForecastResponse(
                     )
                 )
             )
+        ),
+        location = ForecastLocationEntity(
+            country = "Russia",
+            id = 1,
+            lastUpdated = 1763993042829L,
+            latitude = 55.752,
+            localtime = "2025-11-24 17:03",
+            localtimeEpoch = 1763993017L,
+            locationId = 193562371,
+            longitude = 37.616,
+            name = "Moscow",
+            region = "Moscow City",
+            timeZoneId = "Europe/Moscow"
+        ),
+        todayForecast = ForecastTodayEntity(
+            airQualityCo = 640.85f,
+            airQualityGbDefraIndex = 7,
+            airQualityNo2 = 59.05f,
+            airQualityO3 = 1.0f,
+            airQualityPm10 = 70.45f,
+            airQualityPm25 = 56.35f,
+            airQualitySo2 = 44.25f,
+            airQualityUsEpaIndex = 3,
+            cloud = 75,
+            conditionCode = 1003,
+            conditionText = "Partly cloudy",
+            dewPointC = -0.2f,
+            dewPointF = 31.6f,
+            feelsLikeC = -1.7,
+            feelsLikeF = 29.0,
+            forecastLocationId = 1,
+            gustKph = 30.6,
+            gustMph = 19.0,
+            heatIndexC = 2.5,
+            heatIndexF = 36.5,
+            humidity = 87,
+            id = 1,
+            isDay = 0,
+            lastUpdatedEpoch = 1763992800L,
+            precipIn = 0.0,
+            precipMm = 0.0,
+            pressureIn = 29.59,
+            pressureMb = 1002.0,
+            tempC = 3.1,
+            tempF = 37.6,
+            uv = 0.0,
+            visibilityKm = 10.0,
+            visibilityMiles = 6.0,
+            windChillC = -2.4,
+            windChillF = 27.6,
+            windDegree = 248,
+            windDir = "WSW",
+            windKph = 22.7,
+            windMph = 14.1
         )
-    ),
-    location = ForecastLocationNetwork(
-        country = "Russia",
-        lat = 55.752,
-        localtime = "2025-11-24 17:03",
-        localtimeEpoch = 1763993017L,
-        lon = 37.616,
-        name = "Москва",
-        region = "Moscow City",
-        timeZoneId = "Europe/Moscow"
     )
-)
+
+}

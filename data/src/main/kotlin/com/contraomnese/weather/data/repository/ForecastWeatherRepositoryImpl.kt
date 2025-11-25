@@ -44,8 +44,7 @@ class ForecastWeatherRepositoryImpl(
             Pair(entity, settings)
         }
             .map { (entity, settings) ->
-                val model = entity?.let { mapper.toDomain(it, settings) }
-                model
+                entity?.let { mapper.toDomain(it, settings) }
             }
             .flowOn(dispatcher)
     }

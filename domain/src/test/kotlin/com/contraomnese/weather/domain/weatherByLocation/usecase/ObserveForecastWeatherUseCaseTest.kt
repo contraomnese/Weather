@@ -101,9 +101,9 @@ class ObserveForecastWeatherUseCaseTest {
 
     companion object {
         private val locationId = LocationDomainFixtures.generateLocationId()
-        private val forecast = ForecastDomainFixtures.generate()
-        private val firstItem = ForecastDomainFixtures.generate()
-        private val secondItem = ForecastDomainFixtures.generate()
+        private val forecast = ForecastDomainFixtures.generateRandom()
+        private val firstItem = ForecastDomainFixtures.generateRandom()
+        private val secondItem = ForecastDomainFixtures.generateRandom()
         private val repositoryException = RuntimeException("Repository error")
     }
 }

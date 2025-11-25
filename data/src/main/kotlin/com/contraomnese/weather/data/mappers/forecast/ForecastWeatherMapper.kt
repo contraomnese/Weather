@@ -23,8 +23,6 @@ import com.contraomnese.weather.domain.weatherByLocation.model.ForecastLocation
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeather
 import com.contraomnese.weather.domain.weatherByLocation.model.UvIndex
 import com.contraomnese.weather.domain.weatherByLocation.model.Weather
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.collections.immutable.toPersistentList
 import kotlinx.datetime.TimeZone
 import kotlin.math.roundToInt
 
@@ -85,8 +83,8 @@ class ForecastWeatherMapper : UniDirectMapper<ForecastData, AppSettings, Forecas
                 windDegree = entity.todayForecast.windDegree,
                 pressure = entity.todayForecast.toPressureDomain(appSettings.pressureUnit),
                 isRainingExpected = entity.dailyForecast.first().day.dayWillItRain == DAILY_WILL_RAIN,
-                rainfallBeforeNow = rainfallBeforeNow.toImmutableList(),
-                rainfallAfterNow = rainfallAfterNow.toImmutableList(),
+                rainfallBeforeNow = rainfallBeforeNow,
+                rainfallAfterNow = rainfallAfterNow,
                 rainfallNow = rainfallNow,
                 maxRainfall = rainfallBeforeNow.plus(rainfallNow).plus(rainfallAfterNow).maxOrNull() ?: DEFAULT_RAINFALL,
                 humidity = entity.todayForecast.humidity,
@@ -96,12 +94,11 @@ class ForecastWeatherMapper : UniDirectMapper<ForecastData, AppSettings, Forecas
             ),
             forecast = ForecastWeather(
                 today = entity.dailyForecast.first().toForecastTodayDomain(appSettings),
-                days = entity.dailyForecast.map { it.toForecastDayDomain(appSettings) }.toPersistentList(),
-                hours = forecastHours.map { it.toDomain(appSettings) }.toPersistentList()
+                days = entity.dailyForecast.map { it.toForecastDayDomain(appSettings) },
+                hours = forecastHours.map { it.toDomain(appSettings) }
             ),
             alerts = AlertsWeather(
                 alerts = entity.alerts.filter { it.desc.isNotEmpty() }.map { it.desc.replaceFirstChar { char -> char.uppercaseChar() } }
-                    .toPersistentList()
             )
         )
     }

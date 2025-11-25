@@ -1,6 +1,5 @@
 package com.contraomnese.weather.domain.weatherByLocation.model
 
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.datetime.TimeZone
 
 data class Forecast(
@@ -23,10 +22,10 @@ data class ForecastLocation(
 
 data class ForecastWeather(
     val today: ForecastToday,
-    val hours: ImmutableList<ForecastHour>,
-    val days: ImmutableList<ForecastDay>,
+    val hours: List<ForecastHour>,
+    val days: List<ForecastDay>,
 )
 
 data class AlertsWeather(
-    val alerts: ImmutableList<String>,
+    val alerts: List<String>,
 )
