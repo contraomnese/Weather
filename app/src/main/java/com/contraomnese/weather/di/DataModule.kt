@@ -11,6 +11,8 @@ import com.contraomnese.weather.data.network.interceptors.LocationsInterceptor
 import com.contraomnese.weather.data.network.interceptors.WeatherInterceptor
 import com.contraomnese.weather.data.network.models.LocationsErrorResponse
 import com.contraomnese.weather.data.network.models.WeatherErrorResponse
+import com.contraomnese.weather.data.network.parsers.ApiParser
+import com.contraomnese.weather.data.network.parsers.ApiParserImpl
 import com.contraomnese.weather.data.repository.AppSettingsRepositoryImpl
 import com.contraomnese.weather.data.repository.ForecastWeatherRepositoryImpl
 import com.contraomnese.weather.data.repository.LocationsRepositoryImpl
@@ -93,6 +95,19 @@ val dataModule = module {
         get<Retrofit>(named(LOCATIONS)).responseBodyConverter(LocationsErrorResponse::class.java, emptyArray())
     }
 
+    single<ApiParser>(named(WEATHER)) {
+        ApiParserImpl(
+            converterFactory = GsonConverterFactory.create(get()),
+            retrofit = get<Retrofit>(named(WEATHER))
+        )
+    }
+
+    single<ApiParser>(named(LOCATIONS)) {
+        ApiParserImpl(
+            converterFactory = GsonConverterFactory.create(get()),
+            retrofit = get<Retrofit>(named(LOCATIONS))
+        )
+    }
 
     single<WeatherInterceptor> {
         WeatherInterceptor(apiKey = BuildConfig.WEATHER_API_KEY, appSettingsStorage = get())
@@ -122,17 +137,17 @@ val dataModule = module {
     single<LocationsRepository> {
         LocationsRepositoryImpl(
             weatherDatabase = get(),
+            apiParser = get(named(LOCATIONS)),
             locationsApi = get(),
-            errorConverter = get(),
             dispatcher = Dispatchers.IO
         )
     }
     single<ForecastWeatherRepository> {
         ForecastWeatherRepositoryImpl(
             api = get(),
+            apiParser = get(named(WEATHER)),
             appSettingsRepository = get(),
             weatherDatabase = get(),
-            errorConverter = get(),
             dispatcher = Dispatchers.IO,
             mapper = get()
         )

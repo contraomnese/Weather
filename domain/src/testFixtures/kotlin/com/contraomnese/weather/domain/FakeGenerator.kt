@@ -1,5 +1,6 @@
 package com.contraomnese.weather.domain
 
+import com.contraomnese.weather.domain.app.model.Language
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
@@ -35,6 +36,7 @@ fun generateFake(kClass: KClass<*>): Any {
         )
 
         TimeZone::class -> return TimeZone.currentSystemDefault()
+        Language::class -> return Language("en")
     }
 
     if (kClass.java.isEnum) {

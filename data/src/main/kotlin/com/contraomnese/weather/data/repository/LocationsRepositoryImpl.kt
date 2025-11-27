@@ -5,8 +5,7 @@ import com.contraomnese.weather.data.mappers.favorite.toEntity
 import com.contraomnese.weather.data.mappers.location.toDomain
 import com.contraomnese.weather.data.mappers.location.toEntity
 import com.contraomnese.weather.data.network.api.LocationsApi
-import com.contraomnese.weather.data.network.models.LocationsErrorResponse
-import com.contraomnese.weather.data.network.parsers.parseOrThrowError
+import com.contraomnese.weather.data.network.parsers.ApiParser
 import com.contraomnese.weather.data.storage.db.WeatherDatabase
 import com.contraomnese.weather.domain.exceptions.logPrefix
 import com.contraomnese.weather.domain.exceptions.operationFailed
@@ -18,13 +17,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import okhttp3.ResponseBody
-import retrofit2.Converter
 
 class LocationsRepositoryImpl(
     private val locationsApi: LocationsApi,
     private val weatherDatabase: WeatherDatabase,
-    private val errorConverter: Converter<ResponseBody, LocationsErrorResponse>,
+    private val apiParser: ApiParser,
     private val dispatcher: CoroutineDispatcher,
 ) : LocationsRepository {
 
@@ -93,7 +90,7 @@ class LocationsRepositoryImpl(
 
         val locations = try {
             withContext(dispatcher) {
-                locationsApi.getLocations(name).parseOrThrowError(errorConverter)
+                apiParser.parseOrThrowError(locationsApi.getLocations(name))
             }
         } catch (cause: Throwable) {
             return Result.failure(cause)
@@ -122,7 +119,7 @@ class LocationsRepositoryImpl(
 
         val location = try {
             withContext(dispatcher) {
-                locationsApi.getLocation(latitude = lat, longitude = lon).parseOrThrowError(errorConverter)
+                apiParser.parseOrThrowError(locationsApi.getLocation(latitude = lat, longitude = lon))
             }
         } catch (cause: Throwable) {
             return Result.failure(cause)

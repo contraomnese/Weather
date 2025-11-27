@@ -51,7 +51,7 @@ class UpdateAppSettingsUseCaseTest {
     }
 
     companion object {
-        private val settings = AppSettingsDomainFixtures.generate()
+        private val settings = AppSettingsDomainFixtures.generateRandom()
         private val repositoryException = RuntimeException("Repository error")
     }
 }

@@ -80,9 +80,9 @@ class ObserveAppSettingsUseCaseTest {
     }
 
     companion object {
-        private val settings = AppSettingsDomainFixtures.generate()
-        private val firstSettingsItem = AppSettingsDomainFixtures.generate()
-        private val secondSettingsItem = AppSettingsDomainFixtures.generate()
+        private val settings = AppSettingsDomainFixtures.generateRandom()
+        private val firstSettingsItem = AppSettingsDomainFixtures.generateRandom()
+        private val secondSettingsItem = AppSettingsDomainFixtures.generateRandom()
         private val repositoryException = RuntimeException("Repository error")
     }
 }

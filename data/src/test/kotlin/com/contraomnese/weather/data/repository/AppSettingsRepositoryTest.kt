@@ -1,5 +1,6 @@
 package com.contraomnese.weather.data.repository
 
+import app.cash.turbine.test
 import com.contraomnese.weather.data.AppSettingsDataFixtures
 import com.contraomnese.weather.data.mappers.appSettings.AppSettingsMapper
 import com.contraomnese.weather.data.storage.memory.api.AppSettingsStorage
@@ -74,11 +75,16 @@ class AppSettingsRepositoryTest {
                 secondSettingsEntityItem
             )
 
-            val actualData = repository.observeSettings().toList()
+            repository.observeSettings().test {
+                val item1 = awaitItem()
+                assertEquals(firstSettingsItem, item1)
 
-            assertEquals(expectedData.size, actualData.size)
-            assertEquals(expectedData[0], actualData[0])
-            assertEquals(expectedData[1], actualData[1])
+                val item2 = awaitItem()
+                assertEquals(secondSettingsItem, item2)
+
+                awaitComplete()
+            }
+
             coVerify(exactly = expectedData.size) { mapper.toDomain(any<AppSettingsEntity>()) }
             coVerify(exactly = 1) { storage.observeSettings() }
             confirmVerified(storage, mapper)
@@ -105,12 +111,12 @@ class AppSettingsRepositoryTest {
             throw expectedException
         }
 
-        val actualException = assertFailsWith<Exception> {
-            repository.observeSettings().toList()
-        }
+        repository.observeSettings().test {
+            val actualException = awaitError()
 
-        assertEquals(expectedException, actualException.cause ?: actualException)
-        assertEquals(expectedException.message, actualException.cause?.message ?: actualException.message)
+            assertEquals(expectedException, actualException.cause ?: actualException)
+            assertEquals(expectedException.message, actualException.cause?.message ?: actualException.message)
+        }
 
         verify(exactly = 0) { mapper.toDomain(entity) }
         coVerify(exactly = 1) { storage.observeSettings() }
@@ -125,12 +131,12 @@ class AppSettingsRepositoryTest {
         every { mapper.toDomain(entity) } throws expectedException
         coEvery { storage.observeSettings() } returns flow { emit(entity) }
 
-        val actualException = assertFailsWith<Exception> {
-            repository.observeSettings().toList()
-        }
+        repository.observeSettings().test {
+            val actualException = awaitError()
 
-        assertEquals(expectedException, actualException.cause ?: actualException)
-        assertEquals(expectedException.message, actualException.cause?.message ?: actualException.message)
+            assertEquals(expectedException, actualException.cause ?: actualException)
+            assertEquals(expectedException.message, actualException.cause?.message ?: actualException.message)
+        }
 
         verify(exactly = 1) { mapper.toDomain(entity) }
         coVerify(exactly = 1) { storage.observeSettings() }
@@ -285,14 +291,14 @@ class AppSettingsRepositoryTest {
     }
 
     companion object {
-        private val settings = AppSettingsDomainFixtures.generate()
+        private val settings = AppSettingsDomainFixtures.generateRandom()
         private val entity = AppSettingsDataFixtures.map(settings)
         private val mappingException = IllegalArgumentException()
         private val storageException = RuntimeException("Storage error")
         private val fatalError = OutOfMemoryError("boom")
-        private val firstSettingsItem = AppSettingsDomainFixtures.generate()
+        private val firstSettingsItem = AppSettingsDomainFixtures.generateRandom()
         private val firstSettingsEntityItem = AppSettingsDataFixtures.map(firstSettingsItem)
-        private val secondSettingsItem = AppSettingsDomainFixtures.generate()
+        private val secondSettingsItem = AppSettingsDomainFixtures.generateRandom()
         private val secondSettingsEntityItem = AppSettingsDataFixtures.map(secondSettingsItem)
     }
 

@@ -3,13 +3,13 @@ package com.contraomnese.weather.data.repository
 import com.contraomnese.weather.data.mappers.UniDirectMapper
 import com.contraomnese.weather.data.network.api.WeatherApi
 import com.contraomnese.weather.data.network.models.ForecastResponse
-import com.contraomnese.weather.data.network.models.WeatherErrorResponse
-import com.contraomnese.weather.data.network.parsers.parseOrThrowError
+import com.contraomnese.weather.data.network.parsers.ApiParser
 import com.contraomnese.weather.data.storage.db.WeatherDatabase
 import com.contraomnese.weather.data.storage.db.forecast.dao.ForecastData
 import com.contraomnese.weather.data.storage.db.locations.entities.MatchingLocationEntity
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
+import com.contraomnese.weather.domain.exceptions.badRequest
 import com.contraomnese.weather.domain.exceptions.logPrefix
 import com.contraomnese.weather.domain.exceptions.operationFailed
 import com.contraomnese.weather.domain.exceptions.storageError
@@ -22,15 +22,14 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
-import okhttp3.ResponseBody
-import retrofit2.Converter
+import retrofit2.Response
 import java.util.concurrent.ConcurrentHashMap
 
 class ForecastWeatherRepositoryImpl(
     private val api: WeatherApi,
+    private val apiParser: ApiParser,
     private val appSettingsRepository: AppSettingsRepository,
     private val weatherDatabase: WeatherDatabase,
-    private val errorConverter: Converter<ResponseBody, WeatherErrorResponse>,
     private val dispatcher: CoroutineDispatcher,
     private val updateMutex: MutableMap<Int, Mutex> = ConcurrentHashMap(),
     private val mapper: UniDirectMapper<ForecastData, AppSettings, Forecast>,
@@ -86,17 +85,25 @@ class ForecastWeatherRepositoryImpl(
         try {
             Result.success(weatherDatabase.matchingLocationsDao().getLocation(locationId))
         } catch (cause: Exception) {
-            Result.failure(storageError(logPrefix("Current location didn't find in database"), cause))
+            Result.failure(storageError(logPrefix("Current location didn't find in storage"), cause))
         }
     }
 
     private suspend fun getForecast(query: String) = withContext(dispatcher) {
         try {
-            Result.success(api.getForecastWeather(query = query).parseOrThrowError(errorConverter))
+            parseForecast(api.getForecastWeather(query = query))
+        } catch (cause: Exception) {
+            Result.failure(badRequest(logPrefix("Forecast not found"), cause))
+        }
+    }
+
+    private fun parseForecast(forecast: Response<ForecastResponse>) =
+        try {
+            Result.success(apiParser.parseOrThrowError(forecast))
         } catch (cause: Exception) {
             Result.failure(cause)
         }
-    }
+
 
     private suspend fun updatingForecast(id: Int, name: String, forecast: ForecastResponse) = withContext(dispatcher) {
         try {
@@ -104,7 +111,7 @@ class ForecastWeatherRepositoryImpl(
                 weatherDatabase.forecastDao().updateForecastForLocation(locationId = id, locationName = name, forecastResponse = forecast)
             )
         } catch (cause: Exception) {
-            Result.failure(operationFailed(logPrefix("Impossible save new forecast in database"), cause))
+            Result.failure(operationFailed(logPrefix("Impossible save new forecast to storage"), cause))
         }
     }
 
