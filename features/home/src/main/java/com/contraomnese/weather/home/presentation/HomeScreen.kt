@@ -508,6 +508,7 @@ private fun FavoritesLocations(
             CompactWeatherCondition.RAIN to R.drawable.rain,
             CompactWeatherCondition.SNOW to R.drawable.snow,
             CompactWeatherCondition.THUNDER to R.drawable.thunder,
+            CompactWeatherCondition.SLEET to R.drawable.sleet
         )
     }
 

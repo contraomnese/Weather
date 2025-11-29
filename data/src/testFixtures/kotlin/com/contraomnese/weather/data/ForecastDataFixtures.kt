@@ -1,7 +1,7 @@
 package com.contraomnese.weather.data
 
 import com.contraomnese.weather.data.network.models.ForecastResponse
-import com.contraomnese.weather.data.storage.db.forecast.dao.ForecastData
+import com.contraomnese.weather.data.storage.db.locations.dto.ForecastData
 import com.contraomnese.weather.domain.generateFake
 
 object ForecastDataFixtures {

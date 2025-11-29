@@ -1,7 +1,5 @@
 package com.contraomnese.weather.data
 
-import com.contraomnese.weather.data.storage.db.forecast.dao.DailyForecastData
-import com.contraomnese.weather.data.storage.db.forecast.dao.ForecastData
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastAlertEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastAstroEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDailyEntity
@@ -9,6 +7,8 @@ import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDayEnt
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastHourEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastLocationEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastTodayEntity
+import com.contraomnese.weather.data.storage.db.locations.dto.DailyForecastData
+import com.contraomnese.weather.data.storage.db.locations.dto.ForecastData
 
 object MockForecastDataReal {
 

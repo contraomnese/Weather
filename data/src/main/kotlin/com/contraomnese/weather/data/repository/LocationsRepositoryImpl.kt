@@ -1,9 +1,8 @@
 package com.contraomnese.weather.data.repository
 
-import com.contraomnese.weather.data.mappers.favorite.toDomain
-import com.contraomnese.weather.data.mappers.favorite.toEntity
-import com.contraomnese.weather.data.mappers.location.toDomain
-import com.contraomnese.weather.data.mappers.location.toEntity
+import com.contraomnese.weather.data.mappers.favorite.FavoriteMapper
+import com.contraomnese.weather.data.mappers.locations.toDomain
+import com.contraomnese.weather.data.mappers.locations.toEntity
 import com.contraomnese.weather.data.network.api.LocationsApi
 import com.contraomnese.weather.data.network.parsers.ApiParser
 import com.contraomnese.weather.data.storage.db.WeatherDatabase
@@ -20,8 +19,9 @@ import kotlinx.coroutines.withContext
 
 class LocationsRepositoryImpl(
     private val locationsApi: LocationsApi,
-    private val weatherDatabase: WeatherDatabase,
+    private val database: WeatherDatabase,
     private val apiParser: ApiParser,
+    private val favoriteMapper: FavoriteMapper = FavoriteMapper(),
     private val dispatcher: CoroutineDispatcher,
 ) : LocationsRepository {
 
@@ -29,59 +29,43 @@ class LocationsRepositoryImpl(
 
         val favorites = try {
             withContext(dispatcher) {
-                weatherDatabase.favoritesDao().getFavorites()
+                database.favoritesDao().getFavorites()
             }
-        } catch (throwable: Throwable) {
-            return Result.failure(storageError(logPrefix("Impossible get favorites from database"), throwable))
+        } catch (cause: Exception) {
+            return Result.failure(storageError(logPrefix("Impossible get favorites from database"), cause))
         }
 
         return try {
-            Result.success(favorites.map { it.toDomain() })
-        } catch (throwable: Throwable) {
-            Result.failure(operationFailed(logPrefix("Impossible convert locations from database"), throwable))
+            Result.success(favorites.map { favoriteMapper.toDomain(it) })
+        } catch (cause: Exception) {
+            Result.failure(operationFailed(logPrefix("Impossible convert locations from database"), cause))
         }
     }
 
     override fun observeFavorites(): Flow<List<Location>> =
-        weatherDatabase
+        database
             .favoritesDao()
             .observeFavorites()
-            .map { list -> list.map { it.toDomain() } }
+            .map { list -> list.map { favoriteMapper.toDomain(it) } }
             .flowOn(dispatcher)
 
-    override suspend fun addFavorite(locationId: Int): Result<Unit> {
+    override suspend fun addFavorite(locationId: Int): Result<Int> = withContext(dispatcher) {
 
-        val location = try {
-            withContext(dispatcher) {
-                weatherDatabase.matchingLocationsDao().getLocation(locationId)
-            }
-        } catch (throwable: Throwable) {
-            return Result.failure(storageError(logPrefix("Get location from database failed"), throwable))
-        }
-
-        val favoriteEntity = try {
-            location.toEntity()
-        } catch (throwable: Throwable) {
-            return Result.failure(operationFailed(logPrefix("Impossible convert location from database"), throwable))
-        }
-
-        return try {
-            withContext(dispatcher) {
-                weatherDatabase.favoritesDao().addFavorite(favoriteEntity)
-            }
-            Result.success(Unit)
-        } catch (throwable: Throwable) {
-            Result.failure(storageError(logPrefix("Impossible add favorite to database"), throwable))
+        try {
+            database.favoritesDao().addFavorite(locationId)
+            Result.success(locationId)
+        } catch (cause: Exception) {
+            Result.failure(storageError(logPrefix("Impossible add favorite to database"), cause))
         }
     }
 
     override suspend fun deleteFavorite(id: Int): Result<Unit> {
         return withContext(dispatcher) {
             try {
-                weatherDatabase.favoritesDao().removeFavorite(id)
+                database.favoritesDao().removeFavorite(id)
                 Result.success(Unit)
-            } catch (throwable: Throwable) {
-                Result.failure(storageError(logPrefix("Impossible remove favorite to database"), throwable))
+            } catch (cause: Exception) {
+                Result.failure(storageError(logPrefix("Impossible remove favorite to database"), cause))
             }
         }
     }
@@ -92,26 +76,26 @@ class LocationsRepositoryImpl(
             withContext(dispatcher) {
                 apiParser.parseOrThrowError(locationsApi.getLocations(name))
             }
-        } catch (cause: Throwable) {
+        } catch (cause: Exception) {
             return Result.failure(cause)
         }
 
         val result = try {
             val primary = locations.filter { it.type == "city" || it.type == "town" }
-            primary.ifEmpty {
-                locations
-            }.map { it.toEntity() }
-        } catch (throwable: Throwable) {
-            return Result.failure(operationFailed(logPrefix("Impossible convert locations from network"), throwable))
+            primary
+                .ifEmpty { locations }
+                .map { it.toEntity() }
+        } catch (cause: Exception) {
+            return Result.failure(operationFailed(logPrefix("Impossible convert locations from network"), cause))
         }
 
         return try {
             withContext(dispatcher) {
-                weatherDatabase.matchingLocationsDao().addLocations(result)
+                database.locationsDao().insertMatchingLocations(result)
             }
             Result.success(result.map { it.toDomain() })
-        } catch (throwable: Throwable) {
-            Result.failure(operationFailed(logPrefix("Impossible add matching locations to database"), throwable))
+        } catch (cause: Exception) {
+            Result.failure(operationFailed(logPrefix("Impossible add matching locations to database"), cause))
         }
     }
 
@@ -121,23 +105,23 @@ class LocationsRepositoryImpl(
             withContext(dispatcher) {
                 apiParser.parseOrThrowError(locationsApi.getLocation(latitude = lat, longitude = lon))
             }
-        } catch (cause: Throwable) {
+        } catch (cause: Exception) {
             return Result.failure(cause)
         }
 
         val result = try {
             location.toEntity()
-        } catch (throwable: Throwable) {
-            return Result.failure(operationFailed(logPrefix("Impossible convert location from network"), throwable))
+        } catch (cause: Exception) {
+            return Result.failure(operationFailed(logPrefix("Impossible convert location from network"), cause))
         }
 
         return try {
             withContext(dispatcher) {
-                weatherDatabase.matchingLocationsDao().addLocation(result)
+                database.locationsDao().insertMatchingLocation(result)
             }
             Result.success(result.toDomain())
-        } catch (throwable: Throwable) {
-            Result.failure(operationFailed(logPrefix("Impossible add matching location to database"), throwable))
+        } catch (cause: Exception) {
+            Result.failure(operationFailed(logPrefix("Impossible add matching location to database"), cause))
         }
     }
 }

@@ -4,21 +4,25 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastLocationEntity
 import com.contraomnese.weather.data.storage.db.locations.entities.MatchingLocationEntity
 
 @Dao
-interface MatchingLocationsDao {
+interface LocationsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addLocations(locations: List<MatchingLocationEntity>)
+    fun insertMatchingLocations(locations: List<MatchingLocationEntity>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addLocation(location: MatchingLocationEntity)
+    suspend fun insertForecastLocation(location: ForecastLocationEntity): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertMatchingLocation(location: MatchingLocationEntity)
 
     @Query("SELECT * FROM matching_locations WHERE network_id = :id")
-    fun getLocation(id: Int): MatchingLocationEntity
+    fun getMatchingLocation(id: Int): MatchingLocationEntity
 
     @Query("DELETE FROM matching_locations")
-    fun removeAll()
+    fun deleteAllMatchingLocations()
 
 }

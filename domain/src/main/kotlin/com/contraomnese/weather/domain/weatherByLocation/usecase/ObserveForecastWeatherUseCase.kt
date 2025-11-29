@@ -1,7 +1,7 @@
 package com.contraomnese.weather.domain.weatherByLocation.usecase
 
 import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
-import com.contraomnese.weather.domain.weatherByLocation.repository.ForecastWeatherRepository
+import com.contraomnese.weather.domain.weatherByLocation.repository.ForecastRepository
 import kotlinx.coroutines.flow.Flow
 
 fun interface ObserveForecastWeatherUseCase {
@@ -9,7 +9,7 @@ fun interface ObserveForecastWeatherUseCase {
 }
 
 class ObserveForecastWeatherUseCaseImpl(
-    private val repository: ForecastWeatherRepository,
+    private val repository: ForecastRepository,
 ) : ObserveForecastWeatherUseCase {
 
     override fun invoke(request: Int): Flow<Forecast?> = repository.getForecastByLocationId(request)

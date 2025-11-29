@@ -1,10 +1,6 @@
 package com.contraomnese.weather.di
 
 import com.contraomnese.weather.BuildConfig
-import com.contraomnese.weather.data.mappers.BiDirectMapper
-import com.contraomnese.weather.data.mappers.UniDirectMapper
-import com.contraomnese.weather.data.mappers.appSettings.AppSettingsMapper
-import com.contraomnese.weather.data.mappers.forecast.ForecastWeatherMapper
 import com.contraomnese.weather.data.network.api.LocationsApi
 import com.contraomnese.weather.data.network.api.WeatherApi
 import com.contraomnese.weather.data.network.interceptors.LocationsInterceptor
@@ -14,18 +10,16 @@ import com.contraomnese.weather.data.network.models.WeatherErrorResponse
 import com.contraomnese.weather.data.network.parsers.ApiParser
 import com.contraomnese.weather.data.network.parsers.ApiParserImpl
 import com.contraomnese.weather.data.repository.AppSettingsRepositoryImpl
-import com.contraomnese.weather.data.repository.ForecastWeatherRepositoryImpl
+import com.contraomnese.weather.data.repository.ForecastRepositoryImpl
 import com.contraomnese.weather.data.repository.LocationsRepositoryImpl
+import com.contraomnese.weather.data.repository.RoomTransactionProvider
+import com.contraomnese.weather.data.repository.TransactionProvider
 import com.contraomnese.weather.data.storage.db.WeatherDatabase
-import com.contraomnese.weather.data.storage.db.forecast.dao.ForecastData
 import com.contraomnese.weather.data.storage.memory.api.AppSettingsStorage
-import com.contraomnese.weather.data.storage.memory.models.AppSettingsEntity
 import com.contraomnese.weather.data.storage.memory.store.AppSettingsStorageImpl
-import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
 import com.contraomnese.weather.domain.home.repository.LocationsRepository
-import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
-import com.contraomnese.weather.domain.weatherByLocation.repository.ForecastWeatherRepository
+import com.contraomnese.weather.domain.weatherByLocation.repository.ForecastRepository
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.Dispatchers
@@ -125,10 +119,8 @@ val dataModule = module {
         }
     }
 
-    single<BiDirectMapper<AppSettingsEntity, AppSettings>> { AppSettingsMapper() }
-    single<UniDirectMapper<ForecastData, AppSettings, Forecast>> { ForecastWeatherMapper() }
-
     single<WeatherDatabase> { WeatherDatabase.create(context = get()) }
+
     single<AppSettingsStorage> { AppSettingsStorageImpl(context = get(), dispatcher = Dispatchers.IO) }
 
     single<WeatherApi> { get<Retrofit>(named(WEATHER)).create(WeatherApi::class.java) }
@@ -136,27 +128,28 @@ val dataModule = module {
 
     single<LocationsRepository> {
         LocationsRepositoryImpl(
-            weatherDatabase = get(),
+            database = get(),
             apiParser = get(named(LOCATIONS)),
             locationsApi = get(),
             dispatcher = Dispatchers.IO
         )
     }
-    single<ForecastWeatherRepository> {
-        ForecastWeatherRepositoryImpl(
+    single<ForecastRepository> {
+        ForecastRepositoryImpl(
             api = get(),
             apiParser = get(named(WEATHER)),
             appSettingsRepository = get(),
-            weatherDatabase = get(),
+            database = get(),
             dispatcher = Dispatchers.IO,
-            mapper = get()
+            transactionProvider = get(named(WEATHER))
         )
     }
     single<AppSettingsRepository> {
         AppSettingsRepositoryImpl(
             storage = get(),
-            mapper = get(),
             dispatcher = Dispatchers.IO
         )
     }
+
+    single<TransactionProvider>(named(WEATHER)) { RoomTransactionProvider(db = get<WeatherDatabase>()) }
 }

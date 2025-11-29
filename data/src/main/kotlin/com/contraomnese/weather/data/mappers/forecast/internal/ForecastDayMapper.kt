@@ -2,9 +2,9 @@ package com.contraomnese.weather.data.mappers.forecast.internal
 
 import com.contraomnese.weather.data.network.models.ForecastDayNetwork
 import com.contraomnese.weather.data.parsers.DateTimeParser
-import com.contraomnese.weather.data.storage.db.forecast.dao.DailyForecastData
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDailyEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDayEntity
+import com.contraomnese.weather.data.storage.db.locations.dto.DailyForecastData
 import com.contraomnese.weather.data.utils.getDayOfWeek
 import com.contraomnese.weather.data.utils.getNumberOfMonth
 import com.contraomnese.weather.domain.app.model.AppSettings

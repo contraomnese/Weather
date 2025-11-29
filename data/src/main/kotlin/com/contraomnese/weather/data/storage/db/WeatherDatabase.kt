@@ -13,7 +13,7 @@ import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastHourEn
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastLocationEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastTodayEntity
 import com.contraomnese.weather.data.storage.db.locations.dao.FavoritesDao
-import com.contraomnese.weather.data.storage.db.locations.dao.MatchingLocationsDao
+import com.contraomnese.weather.data.storage.db.locations.dao.LocationsDao
 import com.contraomnese.weather.data.storage.db.locations.entities.FavoriteEntity
 import com.contraomnese.weather.data.storage.db.locations.entities.MatchingLocationEntity
 
@@ -39,7 +39,7 @@ abstract class WeatherDatabase : RoomDatabase() {
 
     abstract fun favoritesDao(): FavoritesDao
     abstract fun forecastDao(): ForecastDao
-    abstract fun matchingLocationsDao(): MatchingLocationsDao
+    abstract fun locationsDao(): LocationsDao
 
     companion object {
         fun create(context: Context): WeatherDatabase {

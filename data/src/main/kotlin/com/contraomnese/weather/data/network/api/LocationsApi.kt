@@ -1,6 +1,6 @@
 package com.contraomnese.weather.data.network.api
 
-import com.contraomnese.weather.data.network.models.LocationNetwork
+import com.contraomnese.weather.data.network.models.MatchingLocationNetwork
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -13,13 +13,13 @@ interface LocationsApi {
         @Query("format") format: String = "json",
         @Query("addressdetails") addressDetails: Int = 1,
         @Query("normalizeaddress") normalizeAddress: Int = 1,
-    ): Response<List<LocationNetwork>>
+    ): Response<List<MatchingLocationNetwork>>
 
     @GET("reverse")
     suspend fun getLocation(
         @Query("lat") latitude: Double,
         @Query("lon") longitude: Double,
         @Query("format") format: String = "json",
-    ): Response<LocationNetwork>
+    ): Response<MatchingLocationNetwork>
 
 }

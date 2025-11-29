@@ -2,7 +2,7 @@ package com.contraomnese.weather.domain.weatherByLocation.usecase
 
 import com.contraomnese.weather.domain.ForecastDomainFixtures
 import com.contraomnese.weather.domain.LocationDomainFixtures
-import com.contraomnese.weather.domain.weatherByLocation.repository.ForecastWeatherRepository
+import com.contraomnese.weather.domain.weatherByLocation.repository.ForecastRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.confirmVerified
@@ -22,7 +22,7 @@ import kotlin.test.assertNull
 class ObserveForecastWeatherUseCaseTest {
 
     private lateinit var useCase: ObserveForecastWeatherUseCase
-    private val repository = mockk<ForecastWeatherRepository>()
+    private val repository = mockk<ForecastRepository>()
 
     @BeforeEach
     fun setUp() {

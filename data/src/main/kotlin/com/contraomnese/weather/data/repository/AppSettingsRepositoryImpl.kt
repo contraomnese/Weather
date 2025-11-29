@@ -1,8 +1,7 @@
 package com.contraomnese.weather.data.repository
 
-import com.contraomnese.weather.data.mappers.BiDirectMapper
+import com.contraomnese.weather.data.mappers.appSettings.AppSettingsMapper
 import com.contraomnese.weather.data.storage.memory.api.AppSettingsStorage
-import com.contraomnese.weather.data.storage.memory.models.AppSettingsEntity
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
 import com.contraomnese.weather.domain.exceptions.logPrefix
@@ -16,7 +15,7 @@ import kotlinx.coroutines.withContext
 
 class AppSettingsRepositoryImpl(
     private val storage: AppSettingsStorage,
-    private val mapper: BiDirectMapper<AppSettingsEntity, AppSettings>,
+    private val mapper: AppSettingsMapper = AppSettingsMapper(),
     private val dispatcher: CoroutineDispatcher,
 ) : AppSettingsRepository {
 

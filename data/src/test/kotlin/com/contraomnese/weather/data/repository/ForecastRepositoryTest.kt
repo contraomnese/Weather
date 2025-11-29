@@ -1,21 +1,34 @@
 package com.contraomnese.weather.data.repository
 
 import app.cash.turbine.test
+import com.contraomnese.weather.data.FakeTransactionProvider
 import com.contraomnese.weather.data.ForecastDataFixtures
+import com.contraomnese.weather.data.ForecastLocationDataFixtures
 import com.contraomnese.weather.data.MatchingLocationDataFixtures
-import com.contraomnese.weather.data.mappers.forecast.ForecastWeatherMapper
+import com.contraomnese.weather.data.mappers.forecast.internal.toEntity
+import com.contraomnese.weather.data.mappers.forecast.internal.toForecastDayEntity
+import com.contraomnese.weather.data.mappers.forecast.toDomain
+import com.contraomnese.weather.data.mappers.locations.toEntity
 import com.contraomnese.weather.data.network.api.WeatherApi
+import com.contraomnese.weather.data.network.models.AlertNetwork
+import com.contraomnese.weather.data.network.models.AstroNetwork
+import com.contraomnese.weather.data.network.models.ForecastCurrentNetwork
+import com.contraomnese.weather.data.network.models.ForecastDayNetwork
+import com.contraomnese.weather.data.network.models.ForecastLocationNetwork
+import com.contraomnese.weather.data.network.models.ForecastResponse
+import com.contraomnese.weather.data.network.models.HourNetwork
 import com.contraomnese.weather.data.network.parsers.ApiParser
 import com.contraomnese.weather.data.storage.db.WeatherDatabase
-import com.contraomnese.weather.data.storage.db.forecast.dao.ForecastData
+import com.contraomnese.weather.data.storage.db.locations.dto.ForecastData
 import com.contraomnese.weather.domain.AppSettingsDomainFixtures
 import com.contraomnese.weather.domain.ForecastDomainFixtures
 import com.contraomnese.weather.domain.LocationDomainFixtures
+import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
 import com.contraomnese.weather.domain.assertIsFailure
 import com.contraomnese.weather.domain.assertIsSuccess
 import com.contraomnese.weather.domain.exceptions.DomainException
-import com.contraomnese.weather.domain.weatherByLocation.repository.ForecastWeatherRepository
+import com.contraomnese.weather.domain.weatherByLocation.repository.ForecastRepository
 import io.mockk.Called
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -23,7 +36,8 @@ import io.mockk.coVerifyOrder
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.spyk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
@@ -31,6 +45,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
@@ -43,31 +58,51 @@ import kotlin.test.assertFalse
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(LogMockerExtension::class)
-class ForecastWeatherRepositoryTest {
+class ForecastRepositoryTest {
 
     private lateinit var originalLocale: Locale
-    private lateinit var repository: ForecastWeatherRepository
+    private lateinit var repository: ForecastRepository
     private val updateMutex: MutableMap<Int, Mutex> = ConcurrentHashMap()
 
     private val network = mockk<WeatherApi>()
     private val appSettingsRepository = mockk<AppSettingsRepository>()
-    private val storage = mockk<WeatherDatabase>()
+    private val storage = mockk<WeatherDatabase>(relaxed = true)
     private val apiParser = mockk<ApiParser>()
     private val dispatcher = UnconfinedTestDispatcher()
-    private val mapper = mockk<ForecastWeatherMapper>()
-    private val realMapper = spyk(ForecastWeatherMapper())
+    private val transactionProvider = FakeTransactionProvider()
 
     @BeforeEach
     fun setUp() {
-        repository = ForecastWeatherRepositoryImpl(
+        mockkStatic(ForecastData::toDomain)
+        mockkStatic(ForecastLocationNetwork::toEntity)
+        mockkStatic(AlertNetwork::toEntity)
+        mockkStatic(AstroNetwork::toEntity)
+        mockkStatic(ForecastCurrentNetwork::toEntity)
+        mockkStatic(ForecastDayNetwork::toForecastDayEntity)
+        mockkStatic(ForecastDayNetwork::toEntity)
+        mockkStatic(HourNetwork::toEntity)
+
+        repository = ForecastRepositoryImpl(
             api = network,
             appSettingsRepository = appSettingsRepository,
-            weatherDatabase = storage,
+            database = storage,
             apiParser = apiParser,
             dispatcher = dispatcher,
-            mapper = mapper,
-            updateMutex = updateMutex
+            updateMutex = updateMutex,
+            transactionProvider = transactionProvider
         )
+    }
+
+    @AfterEach
+    fun tearDown() {
+        unmockkStatic(ForecastData::toDomain)
+        unmockkStatic(ForecastLocationNetwork::toEntity)
+        unmockkStatic(AlertNetwork::toEntity)
+        unmockkStatic(AstroNetwork::toEntity)
+        unmockkStatic(ForecastCurrentNetwork::toEntity)
+        unmockkStatic(ForecastDayNetwork::toForecastDayEntity)
+        unmockkStatic(ForecastDayNetwork::toEntity)
+        unmockkStatic(HourNetwork::toEntity)
     }
 
     @Test
@@ -78,16 +113,6 @@ class ForecastWeatherRepositoryTest {
             val realForecastData = ForecastDataFixtures.generateReal()
             val realAppSettings = AppSettingsDomainFixtures.generateReal()
 
-            val repoWithRealMapper = ForecastWeatherRepositoryImpl(
-                api = network,
-                appSettingsRepository = appSettingsRepository,
-                weatherDatabase = storage,
-                apiParser = apiParser,
-                dispatcher = dispatcher,
-                mapper = realMapper,
-                updateMutex = updateMutex
-            )
-
             coEvery { storage.forecastDao().observeForecastBy(locationId) } returns flowOf(realForecastData)
             coEvery { appSettingsRepository.observeSettings() } returns flowOf(realAppSettings)
 
@@ -95,7 +120,7 @@ class ForecastWeatherRepositoryTest {
 
             try {
                 Locale.setDefault(Locale(realAppSettings.language.value))
-                repoWithRealMapper.getForecastByLocationId(locationId).test {
+                repository.getForecastByLocationId(locationId).test {
                     val item = awaitItem()
                     assertEquals(expectedData, item)
                     awaitComplete()
@@ -110,10 +135,14 @@ class ForecastWeatherRepositoryTest {
         runTest(dispatcher) {
 
             val expectedData = forecastFirstItem
+            val expectedForecast = forecastDataFirstItem
+            val expectedSettings = appSettingsFirstItem
 
-            coEvery { storage.forecastDao().observeForecastBy(locationId) } returns flowOf(forecastDataFirstItem)
-            coEvery { appSettingsRepository.observeSettings() } returns flowOf(appSettingsFirstItem)
-            every { mapper.toDomain(forecastDataFirstItem, appSettingsFirstItem) } returns expectedData
+            mockkStatic(ForecastData::toDomain)
+
+            coEvery { storage.forecastDao().observeForecastBy(locationId) } returns flowOf(expectedForecast)
+            coEvery { appSettingsRepository.observeSettings() } returns flowOf(expectedSettings)
+            every { any<ForecastData>().toDomain(any<AppSettings>()) } returns expectedData
 
             repository.getForecastByLocationId(locationId).test {
                 val item = awaitItem()
@@ -123,12 +152,10 @@ class ForecastWeatherRepositoryTest {
 
             coVerify(exactly = 1) { storage.forecastDao().observeForecastBy(locationId) }
             coVerify(exactly = 1) { appSettingsRepository.observeSettings() }
-            verify(exactly = 1) { mapper.toDomain(forecastDataFirstItem, appSettingsFirstItem) }
 
             coVerifyOrder {
                 storage.forecastDao().observeForecastBy(locationId)
                 appSettingsRepository.observeSettings()
-                mapper.toDomain(forecastDataFirstItem, appSettingsFirstItem)
             }
 
             confirmVerified(storage, appSettingsRepository)
@@ -149,7 +176,7 @@ class ForecastWeatherRepositoryTest {
                 awaitComplete()
             }
 
-            verify(exactly = 0) { mapper.toDomain(any<ForecastData>(), appSettingsFirstItem) }
+            verify(exactly = 0) { any<ForecastData>().toDomain(any<AppSettings>()) }
         }
 
     @Test
@@ -161,8 +188,8 @@ class ForecastWeatherRepositoryTest {
                 emit(forecastDataSecondItem)
             }
             coEvery { appSettingsRepository.observeSettings() } returns flowOf(appSettingsFirstItem)
-            every { mapper.toDomain(forecastDataFirstItem, appSettingsFirstItem) } returns forecastFirstItem
-            every { mapper.toDomain(forecastDataSecondItem, appSettingsFirstItem) } returns forecastSecondItem
+            every { forecastDataFirstItem.toDomain(appSettingsFirstItem) } returns forecastFirstItem
+            every { forecastDataSecondItem.toDomain(appSettingsFirstItem) } returns forecastSecondItem
 
             repository.getForecastByLocationId(locationId).test {
                 val item1 = awaitItem()
@@ -176,13 +203,13 @@ class ForecastWeatherRepositoryTest {
 
             coVerify(exactly = 1) { storage.forecastDao().observeForecastBy(locationId) }
             coVerify(exactly = 1) { appSettingsRepository.observeSettings() }
-            verify(exactly = 2) { mapper.toDomain(any<ForecastData>(), appSettingsFirstItem) }
+            verify(exactly = 2) { any<ForecastData>().toDomain(any<AppSettings>()) }
 
             coVerifyOrder {
                 storage.forecastDao().observeForecastBy(locationId)
                 appSettingsRepository.observeSettings()
-                mapper.toDomain(forecastDataFirstItem, appSettingsFirstItem)
-                mapper.toDomain(forecastDataSecondItem, appSettingsFirstItem)
+                forecastDataFirstItem.toDomain(appSettingsFirstItem)
+                forecastDataSecondItem.toDomain(appSettingsFirstItem)
             }
 
             confirmVerified(storage, appSettingsRepository)
@@ -196,14 +223,14 @@ class ForecastWeatherRepositoryTest {
 
             coEvery { storage.forecastDao().observeForecastBy(locationId) } returns flow { emit(forecastDataFirstItem) }
             coEvery { appSettingsRepository.observeSettings() } returns flowOf(appSettingsFirstItem)
-            every { mapper.toDomain(forecastDataFirstItem, appSettingsFirstItem) } throws expectedException
+            every { any<ForecastData>().toDomain(any<AppSettings>()) } throws mappingException
 
             repository.getForecastByLocationId(locationId).test {
                 val actualException = awaitError()
                 assertEquals(expectedException.message, actualException.message)
             }
 
-            verify(exactly = 1) { mapper.toDomain(forecastDataFirstItem, appSettingsFirstItem) }
+            verify(exactly = 1) { any<ForecastData>().toDomain(any<AppSettings>()) }
         }
 
     @Test
@@ -215,16 +242,9 @@ class ForecastWeatherRepositoryTest {
             val locationWithCity = matchingLocation.copy(city = locationNameFallback)
             val response = Response.success(forecastResponse)
 
-            coEvery { storage.matchingLocationsDao().getLocation(locationId) } returns locationWithCity
+            coEvery { storage.locationsDao().getMatchingLocation(locationId) } returns locationWithCity
             coEvery { network.getForecastWeather(matchingLocation.toPoint()) } returns response
             every { apiParser.parseOrThrowError(response) } returns forecastResponse
-            coEvery {
-                storage.forecastDao().updateForecastForLocation(
-                    locationId = matchingLocation.networkId,
-                    locationName = locationNameFallback,
-                    forecastResponse
-                )
-            } returns Unit
 
             val actualResult = repository.refreshForecastByLocationId(locationId)
 
@@ -232,29 +252,16 @@ class ForecastWeatherRepositoryTest {
 
             assertEquals(expectedData, actualData)
 
-            coVerify(exactly = 1) { storage.matchingLocationsDao().getLocation(locationId) }
+            coVerify(exactly = 1) { storage.locationsDao().getMatchingLocation(locationId) }
             coVerify(exactly = 1) { network.getForecastWeather(matchingLocation.toPoint()) }
             verify(exactly = 1) { apiParser.parseOrThrowError(response) }
-            coVerify(exactly = 1) {
-                storage.forecastDao().updateForecastForLocation(
-                    locationId = matchingLocation.networkId,
-                    locationName = locationNameFallback,
-                    forecastResponse
-                )
-            }
+            coVerify(exactly = 1) { storage.forecastDao().insertForecastLocation(match { it.name == "Fallback City" }) }
 
             coVerifyOrder {
-                storage.matchingLocationsDao().getLocation(locationId)
+                storage.locationsDao().getMatchingLocation(locationId)
                 network.getForecastWeather(matchingLocation.toPoint())
                 apiParser.parseOrThrowError(response)
-                storage.forecastDao().updateForecastForLocation(
-                    locationId = matchingLocation.networkId,
-                    locationName = locationNameFallback,
-                    forecastResponse
-                )
             }
-
-            confirmVerified(storage, network)
         }
 
     @Test
@@ -265,19 +272,15 @@ class ForecastWeatherRepositoryTest {
             val locationWithNullCity = matchingLocation.copy(city = null, name = locationNameFallback)
             val response = Response.success(forecastResponse)
 
-            coEvery { storage.matchingLocationsDao().getLocation(locationId) } returns locationWithNullCity
+            coEvery { storage.locationsDao().getMatchingLocation(locationId) } returns locationWithNullCity
             coEvery { network.getForecastWeather(any()) } returns response
             every { apiParser.parseOrThrowError(response) } returns forecastResponse
-            coEvery { storage.forecastDao().updateForecastForLocation(any(), any(), any()) } returns Unit
+            every { any<ForecastLocationNetwork>().toEntity(locationId) } returns forecastLocation
 
             repository.refreshForecastByLocationId(locationId)
 
             coVerify(exactly = 1) {
-                storage.forecastDao().updateForecastForLocation(
-                    locationId = any(),
-                    locationName = locationNameFallback,
-                    forecastResponse = any()
-                )
+                storage.forecastDao().insertForecastLocation(match { it.name == "Fallback Name" })
             }
         }
 
@@ -297,7 +300,7 @@ class ForecastWeatherRepositoryTest {
             assertEquals(expectedException::class.java, actualException::class.java)
             assertEquals(expectedException.err, actualException.cause)
 
-            coVerify(exactly = 0) { storage.matchingLocationsDao().getLocation(locationId) }
+            coVerify(exactly = 0) { storage.locationsDao().getMatchingLocation(locationId) }
 
             confirmVerified(storage)
         }
@@ -320,7 +323,7 @@ class ForecastWeatherRepositoryTest {
     fun `should mutex is unlock when refreshForecastByLocationId is called`() =
         runTest {
 
-            coEvery { storage.matchingLocationsDao().getLocation(locationId) } throws RuntimeException()
+            coEvery { storage.locationsDao().getMatchingLocation(locationId) } throws RuntimeException()
 
             repository.refreshForecastByLocationId(locationId)
 
@@ -335,7 +338,7 @@ class ForecastWeatherRepositoryTest {
 
             val expectedException = matchingLocationNotFoundException
 
-            coEvery { storage.matchingLocationsDao().getLocation(locationId) } throws storageException
+            coEvery { storage.locationsDao().getMatchingLocation(locationId) } throws storageException
 
             val actualResult = repository.refreshForecastByLocationId(locationId)
             val actualException = actualResult.assertIsFailure()
@@ -343,7 +346,7 @@ class ForecastWeatherRepositoryTest {
             assertEquals(expectedException::class.java, actualException::class.java)
             assertEquals(expectedException.err, actualException.cause)
 
-            coVerify(exactly = 1) { storage.matchingLocationsDao().getLocation(locationId) }
+            coVerify(exactly = 1) { storage.locationsDao().getMatchingLocation(locationId) }
         }
 
     @Test
@@ -352,7 +355,7 @@ class ForecastWeatherRepositoryTest {
 
             val expectedException = forecastNotFoundException
 
-            coEvery { storage.matchingLocationsDao().getLocation(locationId) } returns matchingLocation
+            coEvery { storage.locationsDao().getMatchingLocation(locationId) } returns matchingLocation
             coEvery { network.getForecastWeather(matchingLocation.toPoint()) } throws storageException
 
             val actualResult = repository.refreshForecastByLocationId(locationId)
@@ -371,7 +374,7 @@ class ForecastWeatherRepositoryTest {
             val expectedException = mappingException
             val response = Response.success(forecastResponse)
 
-            coEvery { storage.matchingLocationsDao().getLocation(locationId) } returns matchingLocation
+            coEvery { storage.locationsDao().getMatchingLocation(locationId) } returns matchingLocation
             coEvery { network.getForecastWeather(matchingLocation.toPoint()) } returns response
             every { apiParser.parseOrThrowError(response) } throws expectedException
 
@@ -384,15 +387,16 @@ class ForecastWeatherRepositoryTest {
         }
 
     @Test
-    fun `should return failure result with storage exception when forecast can't update in storage`() =
+    fun `should return failure result with mapper exception when forecast can't update in storage`() =
         runTest(dispatcher) {
 
-            val expectedException = forecastNotUpdatedException
+            val expectedException = forecastNotMapException
             val response = Response.success(forecastResponse)
-            coEvery { storage.matchingLocationsDao().getLocation(any()) } returns matchingLocation
+
+            coEvery { storage.locationsDao().getMatchingLocation(any()) } returns matchingLocation
             coEvery { network.getForecastWeather(any()) } returns response
-            every { apiParser.parseOrThrowError(response) } returns forecastResponse
-            coEvery { storage.forecastDao().updateForecastForLocation(any(), any(), any()) } throws storageException
+            every { apiParser.parseOrThrowError(any<Response<ForecastResponse>>()) } returns forecastResponse
+            every { any<ForecastLocationNetwork>().toEntity(matchingLocation.networkId) } throws mappingException
 
             val actualResult = repository.refreshForecastByLocationId(locationId)
             val actualException = actualResult.assertIsFailure()
@@ -400,7 +404,28 @@ class ForecastWeatherRepositoryTest {
             assertEquals(expectedException::class.java, actualException::class.java)
             assertEquals(expectedException.err, actualException.cause)
 
-            coVerify(exactly = 1) { storage.forecastDao().updateForecastForLocation(any(), any(), any()) }
+            verify(exactly = 1) { any<ForecastLocationNetwork>().toEntity(matchingLocation.networkId) }
+        }
+
+    @Test
+    fun `should return failure result with storage exception when forecast can't update in storage`() =
+        runTest(dispatcher) {
+
+            val expectedException = forecastNotUpdatedException
+            val response = Response.success(forecastResponse)
+
+            coEvery { storage.locationsDao().getMatchingLocation(any()) } returns matchingLocation
+            coEvery { network.getForecastWeather(any()) } returns response
+            every { apiParser.parseOrThrowError(any<Response<ForecastResponse>>()) } returns forecastResponse
+            coEvery { storage.forecastDao() } throws storageException
+
+            val actualResult = repository.refreshForecastByLocationId(locationId)
+            val actualException = actualResult.assertIsFailure()
+
+            assertEquals(expectedException::class.java, actualException::class.java)
+            assertEquals(expectedException.err, actualException.cause)
+
+            coVerify(exactly = 1) { storage.forecastDao() }
         }
 
 
@@ -414,12 +439,14 @@ class ForecastWeatherRepositoryTest {
         private val forecastSecondItem = ForecastDomainFixtures.generateRandom()
 
         private val matchingLocation = MatchingLocationDataFixtures.generateRandom()
+        private val forecastLocation = ForecastLocationDataFixtures.generateRandom()
         private val forecastResponse = ForecastDataFixtures.generateRandomForecastNetwork()
 
         private val mappingException = IllegalArgumentException("Mapping error")
         private val storageException = RuntimeException("Storage error")
         private val matchingLocationNotFoundException = DomainException.StorageError(null, storageException)
         private val forecastNotFoundException = DomainException.BadRequest(null, storageException)
+        private val forecastNotMapException = DomainException.OperationFailed(null, mappingException)
         private val forecastNotUpdatedException = DomainException.OperationFailed(null, storageException)
         private val updateForecastMutexBlockedException = DomainException.OperationFailed(null, null)
 

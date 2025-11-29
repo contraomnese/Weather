@@ -13,6 +13,14 @@ interface FavoritesDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addFavorite(favorite: FavoriteEntity)
 
+
+    @Query(
+        "INSERT INTO favorites (location_id, city, state, country, latitude, longitude) " +
+                "SELECT network_id, city, state, country, latitude, longitude " +
+                "FROM matching_locations WHERE network_id = :locationId"
+    )
+    suspend fun addFavorite(locationId: Int)
+
     @Query("SELECT * FROM favorites")
     suspend fun getFavorites(): List<FavoriteEntity>
 
