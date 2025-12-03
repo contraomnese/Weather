@@ -5,7 +5,7 @@ import com.contraomnese.weather.data.mappers.locations.toDomain
 import com.contraomnese.weather.data.mappers.locations.toEntity
 import com.contraomnese.weather.data.network.api.LocationsApi
 import com.contraomnese.weather.data.network.parsers.ApiParser
-import com.contraomnese.weather.data.storage.db.WeatherDatabase
+import com.contraomnese.weather.data.storage.db.WeatherAppDatabase
 import com.contraomnese.weather.domain.exceptions.logPrefix
 import com.contraomnese.weather.domain.exceptions.operationFailed
 import com.contraomnese.weather.domain.exceptions.storageError
@@ -19,7 +19,7 @@ import kotlinx.coroutines.withContext
 
 class LocationsRepositoryImpl(
     private val locationsApi: LocationsApi,
-    private val database: WeatherDatabase,
+    private val database: WeatherAppDatabase,
     private val apiParser: ApiParser,
     private val favoriteMapper: FavoriteMapper = FavoriteMapper(),
     private val dispatcher: CoroutineDispatcher,

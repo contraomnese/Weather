@@ -14,7 +14,7 @@ import com.contraomnese.weather.data.repository.ForecastRepositoryImpl
 import com.contraomnese.weather.data.repository.LocationsRepositoryImpl
 import com.contraomnese.weather.data.repository.RoomTransactionProvider
 import com.contraomnese.weather.data.repository.TransactionProvider
-import com.contraomnese.weather.data.storage.db.WeatherDatabase
+import com.contraomnese.weather.data.storage.db.WeatherAppDatabase
 import com.contraomnese.weather.data.storage.memory.api.AppSettingsStorage
 import com.contraomnese.weather.data.storage.memory.store.AppSettingsStorageImpl
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
@@ -119,7 +119,7 @@ val dataModule = module {
         }
     }
 
-    single<WeatherDatabase> { WeatherDatabase.create(context = get()) }
+    single<WeatherAppDatabase> { WeatherAppDatabase.create(context = get()) }
 
     single<AppSettingsStorage> { AppSettingsStorageImpl(context = get(), dispatcher = Dispatchers.IO) }
 
@@ -151,5 +151,5 @@ val dataModule = module {
         )
     }
 
-    single<TransactionProvider>(named(WEATHER)) { RoomTransactionProvider(db = get<WeatherDatabase>()) }
+    single<TransactionProvider>(named(WEATHER)) { RoomTransactionProvider(db = get<WeatherAppDatabase>()) }
 }

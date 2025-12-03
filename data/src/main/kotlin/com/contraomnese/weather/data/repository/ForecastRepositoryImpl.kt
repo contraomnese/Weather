@@ -7,7 +7,7 @@ import com.contraomnese.weather.data.mappers.locations.toEntity
 import com.contraomnese.weather.data.network.api.WeatherApi
 import com.contraomnese.weather.data.network.models.ForecastResponse
 import com.contraomnese.weather.data.network.parsers.ApiParser
-import com.contraomnese.weather.data.storage.db.WeatherDatabase
+import com.contraomnese.weather.data.storage.db.WeatherAppDatabase
 import com.contraomnese.weather.data.storage.db.locations.entities.MatchingLocationEntity
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
 import com.contraomnese.weather.domain.exceptions.badRequest
@@ -30,9 +30,9 @@ class ForecastRepositoryImpl(
     private val api: WeatherApi,
     private val apiParser: ApiParser,
     private val appSettingsRepository: AppSettingsRepository,
-    private val database: WeatherDatabase,
+    private val database: WeatherAppDatabase,
     private val dispatcher: CoroutineDispatcher,
-    private val updateMutex: MutableMap<Int, Mutex> = ConcurrentHashMap(),
+    private val refreshForecastLocks: MutableMap<Int, Mutex> = ConcurrentHashMap(),
     private val transactionProvider: TransactionProvider,
 ) : ForecastRepository {
 
@@ -50,7 +50,7 @@ class ForecastRepositoryImpl(
     }
 
     override suspend fun refreshForecastByLocationId(id: Int): Result<Int> {
-        val mutex = updateMutex.computeIfAbsent(id) { Mutex() }
+        val mutex = refreshForecastLocks.computeIfAbsent(id) { Mutex() }
 
         return if (mutex.tryLock()) {
             try {
@@ -64,39 +64,40 @@ class ForecastRepositoryImpl(
     }
 
     private suspend fun updateForecast(locationId: Int): Result<Int> {
+        return withContext(dispatcher) {
+            val location = getMatchingLocation(locationId).getOrElse {
+                return@withContext Result.failure(it)
+            }
 
-        val location = getMatchingLocation(locationId).getOrElse {
-            return Result.failure(it)
+            val forecast = getForecast(query = location.toPoint()).getOrElse {
+                return@withContext Result.failure(it)
+            }
+            return@withContext updatingForecast(
+                locationId = location.networkId,
+                locationName = location.city ?: location.name,
+                forecastResponse = forecast
+            ).fold(
+                onSuccess = { Result.success(locationId) },
+                onFailure = { Result.failure(it) }
+            )
         }
-
-        val forecast = getForecast(query = location.toPoint()).getOrElse {
-            return Result.failure(it)
-        }
-        return updatingForecast(
-            locationId = location.networkId,
-            locationName = location.city ?: location.name,
-            forecastResponse = forecast
-        ).fold(
-            onSuccess = { Result.success(locationId) },
-            onFailure = { Result.failure(it) }
-        )
     }
 
-    private suspend fun getMatchingLocation(locationId: Int): Result<MatchingLocationEntity> = withContext(dispatcher) {
+    private suspend fun getMatchingLocation(locationId: Int): Result<MatchingLocationEntity> =
         try {
             Result.success(database.locationsDao().getMatchingLocation(locationId))
         } catch (cause: Exception) {
             Result.failure(storageError(logPrefix("Current location didn't find in storage"), cause))
         }
-    }
 
-    private suspend fun getForecast(query: String) = withContext(dispatcher) {
+
+    private suspend fun getForecast(query: String) =
         try {
             parseForecast(api.getForecastWeather(query = query))
         } catch (cause: Exception) {
             Result.failure(badRequest(logPrefix("Forecast not found"), cause))
         }
-    }
+
 
     private fun parseForecast(forecast: Response<ForecastResponse>) =
         try {
@@ -107,29 +108,29 @@ class ForecastRepositoryImpl(
 
 
     private suspend fun updatingForecast(locationId: Int, locationName: String, forecastResponse: ForecastResponse) =
-        withContext(dispatcher) {
         try {
             transactionProvider.runWithTransaction {
-                val dao = database.forecastDao()
-                dao.deleteForecastLocation(locationId)
+                val locationsDao = database.locationsDao()
+                locationsDao.deleteForecastLocation(locationId)
 
                 val locationEntity = forecastResponse.location.toEntity(locationId).copy(name = locationName)
-                val forecastLocationId = dao.insertForecastLocation(locationEntity).toInt()
+                val forecastLocationId = locationsDao.insertForecastLocation(locationEntity).toInt()
 
-                dao.insertForecastCurrent(forecastResponse.current.toEntity(forecastLocationId))
-                dao.insertAlerts(forecastResponse.alerts.alert.map { it.toEntity(forecastLocationId) })
+                val forecastDao = database.forecastDao()
+                forecastDao.insertForecastCurrent(forecastResponse.current.toEntity(forecastLocationId))
+                forecastDao.insertAlerts(forecastResponse.alerts.alert.map { it.toEntity(forecastLocationId) })
 
                 forecastResponse.forecast.forecastDay.forEach { forecast ->
-                    val forecastDayId = dao.insertForecastDay(forecast.toForecastDayEntity(forecastLocationId)).toInt()
-                    dao.insertDay(forecast.toEntity(forecastDayId))
-                    dao.insertAstro(forecast.astro.toEntity(forecastDayId))
-                    dao.insertHourlyForecast(forecast.hour.map { it.toEntity(forecastDayId) })
+                    val forecastDayId = forecastDao.insertForecastDay(forecast.toForecastDayEntity(forecastLocationId)).toInt()
+                    forecastDao.insertDay(forecast.toEntity(forecastDayId))
+                    forecastDao.insertAstro(forecast.astro.toEntity(forecastDayId))
+                    forecastDao.insertHourlyForecast(forecast.hour.map { it.toEntity(forecastDayId) })
                 }
             }
             Result.success(Unit)
         } catch (cause: Exception) {
             Result.failure(operationFailed(logPrefix("Impossible save new forecast to storage"), cause))
         }
-    }
+
 
 }

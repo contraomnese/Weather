@@ -35,17 +35,17 @@ const val DATABASE_NAME = "contraomnese_weather_app.sqlite3"
     version = DATABASE_VERSION,
     exportSchema = false
 )
-abstract class WeatherDatabase : RoomDatabase() {
+abstract class WeatherAppDatabase : RoomDatabase() {
 
     abstract fun favoritesDao(): FavoritesDao
     abstract fun forecastDao(): ForecastDao
     abstract fun locationsDao(): LocationsDao
 
     companion object {
-        fun create(context: Context): WeatherDatabase {
+        fun create(context: Context): WeatherAppDatabase {
             return Room.databaseBuilder(
                 context = context,
-                klass = WeatherDatabase::class.java,
+                klass = WeatherAppDatabase::class.java,
                 name = DATABASE_NAME
             )
                 .createFromAsset(DATABASE_NAME)

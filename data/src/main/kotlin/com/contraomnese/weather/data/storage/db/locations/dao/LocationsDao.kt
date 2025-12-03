@@ -25,4 +25,7 @@ interface LocationsDao {
     @Query("DELETE FROM matching_locations")
     fun deleteAllMatchingLocations()
 
+    @Query("DELETE FROM forecast_location WHERE location_id = :locationId")
+    suspend fun deleteForecastLocation(locationId: Int)
+
 }
