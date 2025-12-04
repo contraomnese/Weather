@@ -29,13 +29,13 @@ class GetLocationUseCaseTest {
 
         val expectedData = location
 
-        coEvery { repository.getLocationByCoordinates(lat = lat, lon = lon) } returns Result.success(expectedData)
+        coEvery { repository.getLocationByCoordinates(latitude = lat, longitude = lon) } returns Result.success(expectedData)
 
         val actualResult = useCase(coordinates)
 
         val actualData = actualResult.assertIsSuccess()
         assertEquals(expectedData, actualData)
-        coVerify(exactly = 1) { repository.getLocationByCoordinates(lat = lat, lon = lon) }
+        coVerify(exactly = 1) { repository.getLocationByCoordinates(latitude = lat, longitude = lon) }
         confirmVerified(repository)
     }
 
@@ -44,14 +44,14 @@ class GetLocationUseCaseTest {
 
         val expectedException = repositoryException
 
-        coEvery { repository.getLocationByCoordinates(lat = lat, lon = lon) } returns Result.failure(expectedException)
+        coEvery { repository.getLocationByCoordinates(latitude = lat, longitude = lon) } returns Result.failure(expectedException)
 
         val actualResult = useCase(coordinates)
 
         val actualData = actualResult.assertIsFailure()
         assertNotNull(actualData)
         assertEquals(expectedException.message, actualData.message)
-        coVerify(exactly = 1) { repository.getLocationByCoordinates(lat = lat, lon = lon) }
+        coVerify(exactly = 1) { repository.getLocationByCoordinates(latitude = lat, longitude = lon) }
         confirmVerified(repository)
     }
 

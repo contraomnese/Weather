@@ -12,5 +12,5 @@ class GetLocationsUseCaseImpl(
     private val repository: LocationsRepository,
 ) : GetLocationsUseCase {
 
-    override suspend fun invoke(request: String): Result<List<Location>> = repository.getLocationsByLocationName(request)
+    override suspend fun invoke(request: String): Result<List<Location>> = repository.getLocationsByName(request)
 }

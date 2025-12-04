@@ -29,13 +29,13 @@ class GetLocationsUseCaseTest {
     fun `should return flow with correct item when invoke is called`() = runTest {
         val expectedData = location
 
-        coEvery { repository.getLocationsByLocationName(locationName) } returns Result.success(listOf(expectedData))
+        coEvery { repository.getLocationsByName(locationName) } returns Result.success(listOf(expectedData))
         val actualResult = useCase(locationName)
 
         val actualData = actualResult.assertIsSuccess().first()
 
         assertEquals(expectedData, actualData)
-        coVerify(exactly = 1) { repository.getLocationsByLocationName(locationName) }
+        coVerify(exactly = 1) { repository.getLocationsByName(locationName) }
         confirmVerified(repository)
     }
 
@@ -43,14 +43,14 @@ class GetLocationsUseCaseTest {
     fun `should return flow with correct multiple items when invoke is called`() = runTest {
         val expectedData = listOf(firstItem, secondItem)
 
-        coEvery { repository.getLocationsByLocationName(locationName) } returns Result.success(expectedData)
+        coEvery { repository.getLocationsByName(locationName) } returns Result.success(expectedData)
         val actualResult = useCase(locationName)
 
         val actualData = actualResult.assertIsSuccess()
         assertEquals(expectedData.size, actualData.size)
         assertEquals(expectedData[0], actualData[0])
         assertEquals(expectedData[1], actualData[1])
-        coVerify(exactly = 1) { repository.getLocationsByLocationName(locationName) }
+        coVerify(exactly = 1) { repository.getLocationsByName(locationName) }
         confirmVerified(repository)
     }
 
@@ -59,23 +59,23 @@ class GetLocationsUseCaseTest {
 
         val expectedData = emptyList<Location>()
 
-        coEvery { repository.getLocationsByLocationName(locationName) } returns Result.success(expectedData)
+        coEvery { repository.getLocationsByName(locationName) } returns Result.success(expectedData)
         val actualResult = useCase(locationName)
 
         val actualData = actualResult.assertIsSuccess()
         assertEquals(true, actualData.isEmpty())
-        coVerify(exactly = 1) { repository.getLocationsByLocationName(locationName) }
+        coVerify(exactly = 1) { repository.getLocationsByName(locationName) }
         confirmVerified(repository)
     }
 
     @Test
     fun `should return failure result with exception invoke is called`() = runTest {
-        coEvery { repository.getLocationsByLocationName(locationName) } returns Result.failure(repositoryException)
+        coEvery { repository.getLocationsByName(locationName) } returns Result.failure(repositoryException)
         val actualResult = useCase(locationName)
 
         val actualException = actualResult.assertIsFailure()
         assertEquals(repositoryException.message, actualException.message)
-        coVerify(exactly = 1) { repository.getLocationsByLocationName(locationName) }
+        coVerify(exactly = 1) { repository.getLocationsByName(locationName) }
         confirmVerified(repository)
     }
 

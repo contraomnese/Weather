@@ -13,5 +13,5 @@ class GetLocationUseCaseImpl(
 ) : GetLocationUseCase {
 
     override suspend fun invoke(request: LocationCoordinates): Result<Location> =
-        repository.getLocationByCoordinates(lat = request.latitude.value, lon = request.longitude.value)
+        repository.getLocationByCoordinates(latitude = request.latitude.value, longitude = request.longitude.value)
 }

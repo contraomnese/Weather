@@ -1,11 +1,15 @@
 package com.contraomnese.weather.data.repository
 
-import com.contraomnese.weather.data.mappers.favorite.FavoriteMapper
+import com.contraomnese.weather.data.mappers.favorite.toDomain
 import com.contraomnese.weather.data.mappers.locations.toDomain
 import com.contraomnese.weather.data.mappers.locations.toEntity
 import com.contraomnese.weather.data.network.api.LocationsApi
+import com.contraomnese.weather.data.network.models.MatchingLocationNetwork
 import com.contraomnese.weather.data.network.parsers.ApiParser
 import com.contraomnese.weather.data.storage.db.WeatherAppDatabase
+import com.contraomnese.weather.data.storage.db.locations.entities.FavoriteEntity
+import com.contraomnese.weather.data.storage.db.locations.entities.MatchingLocationEntity
+import com.contraomnese.weather.domain.exceptions.badRequest
 import com.contraomnese.weather.domain.exceptions.logPrefix
 import com.contraomnese.weather.domain.exceptions.operationFailed
 import com.contraomnese.weather.domain.exceptions.storageError
@@ -16,37 +20,24 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import retrofit2.Response
 
 class LocationsRepositoryImpl(
     private val locationsApi: LocationsApi,
     private val database: WeatherAppDatabase,
     private val apiParser: ApiParser,
-    private val favoriteMapper: FavoriteMapper = FavoriteMapper(),
     private val dispatcher: CoroutineDispatcher,
 ) : LocationsRepository {
 
-    override suspend fun getFavorites(): Result<List<Location>> {
-
-        val favorites = try {
-            withContext(dispatcher) {
-                database.favoritesDao().getFavorites()
-            }
-        } catch (cause: Exception) {
-            return Result.failure(storageError(logPrefix("Impossible get favorites from database"), cause))
-        }
-
-        return try {
-            Result.success(favorites.map { favoriteMapper.toDomain(it) })
-        } catch (cause: Exception) {
-            Result.failure(operationFailed(logPrefix("Impossible convert locations from database"), cause))
-        }
-    }
+    override suspend fun getFavorites(): Result<List<Location>> =
+        getFavoritesResult()
+            .mapCatching { entities -> entities.toDomain() }
 
     override fun observeFavorites(): Flow<List<Location>> =
         database
             .favoritesDao()
             .observeFavorites()
-            .map { list -> list.map { favoriteMapper.toDomain(it) } }
+            .map { favorites -> favorites.map { it.toDomain() } }
             .flowOn(dispatcher)
 
     override suspend fun addFavorite(locationId: Int): Result<Int> = withContext(dispatcher) {
@@ -55,73 +46,87 @@ class LocationsRepositoryImpl(
             database.favoritesDao().addFavorite(locationId)
             Result.success(locationId)
         } catch (cause: Exception) {
-            Result.failure(storageError(logPrefix("Impossible add favorite to database"), cause))
+            Result.failure(storageError(logPrefix("Impossible add favorite to storage"), cause))
         }
     }
 
-    override suspend fun deleteFavorite(id: Int): Result<Unit> {
-        return withContext(dispatcher) {
+    override suspend fun deleteFavorite(locationId: Int): Result<Int> = withContext(dispatcher) {
+        try {
+            database.favoritesDao().removeFavorite(locationId)
+            Result.success(locationId)
+        } catch (cause: Exception) {
+            Result.failure(storageError(logPrefix("Impossible remove favorite to storage"), cause))
+        }
+    }
+
+    override suspend fun getLocationsByName(query: String): Result<List<Location>> =
+        getMatchingLocations(query)
+            .mapCatching { network -> network.toEntity() }
+            .mapCatching { entities ->
+                insertMatchingLocations(entities)
+                entities.toDomain()
+            }
+
+    override suspend fun getLocationByCoordinates(latitude: Double, longitude: Double): Result<Location> =
+        getMatchingLocation(latitude = latitude, longitude = longitude)
+            .mapCatching { it.toEntity() }
+            .mapCatching { entity ->
+                insertMatchingLocation(entity)
+                entity.toDomain()
+            }
+
+    private suspend fun getFavoritesResult(): Result<List<FavoriteEntity>> =
+        withContext(dispatcher) {
             try {
-                database.favoritesDao().removeFavorite(id)
-                Result.success(Unit)
+                Result.success(database.favoritesDao().getFavorites())
             } catch (cause: Exception) {
-                Result.failure(storageError(logPrefix("Impossible remove favorite to database"), cause))
+                Result.failure(storageError(logPrefix("Impossible get favorites from storage"), cause))
             }
+        }
+
+    private suspend fun getMatchingLocations(query: String) = withContext(dispatcher) {
+        try {
+            parseMatchingLocations(locationsApi.getLocations(query))
+        } catch (cause: Exception) {
+            throw badRequest(logPrefix("Matching locations not found"), cause)
         }
     }
 
-    override suspend fun getLocationsByLocationName(name: String): Result<List<Location>> {
-
-        val locations = try {
-            withContext(dispatcher) {
-                apiParser.parseOrThrowError(locationsApi.getLocations(name))
-            }
+    private suspend fun getMatchingLocation(latitude: Double, longitude: Double) = withContext(dispatcher) {
+        try {
+            parseMatchingLocation(locationsApi.getLocation(latitude = latitude, longitude = longitude))
         } catch (cause: Exception) {
-            return Result.failure(cause)
-        }
-
-        val result = try {
-            val primary = locations.filter { it.type == "city" || it.type == "town" }
-            primary
-                .ifEmpty { locations }
-                .map { it.toEntity() }
-        } catch (cause: Exception) {
-            return Result.failure(operationFailed(logPrefix("Impossible convert locations from network"), cause))
-        }
-
-        return try {
-            withContext(dispatcher) {
-                database.locationsDao().insertMatchingLocations(result)
-            }
-            Result.success(result.map { it.toDomain() })
-        } catch (cause: Exception) {
-            Result.failure(operationFailed(logPrefix("Impossible add matching locations to database"), cause))
+            throw badRequest(logPrefix("Matching location not found"), cause)
         }
     }
 
-    override suspend fun getLocationByCoordinates(lat: Double, lon: Double): Result<Location> {
-
-        val location = try {
-            withContext(dispatcher) {
-                apiParser.parseOrThrowError(locationsApi.getLocation(latitude = lat, longitude = lon))
-            }
+    private fun parseMatchingLocations(matchingLocations: Response<List<MatchingLocationNetwork>>) =
+        try {
+            Result.success(apiParser.parseOrThrowError(matchingLocations))
         } catch (cause: Exception) {
-            return Result.failure(cause)
+            Result.failure(operationFailed(logPrefix("Impossible parse matching locations from network"), cause))
         }
 
-        val result = try {
-            location.toEntity()
+    private fun parseMatchingLocation(matchingLocation: Response<MatchingLocationNetwork>) =
+        try {
+            Result.success(apiParser.parseOrThrowError(matchingLocation))
         } catch (cause: Exception) {
-            return Result.failure(operationFailed(logPrefix("Impossible convert location from network"), cause))
+            Result.failure(operationFailed(logPrefix("Impossible parse matching location from network"), cause))
         }
 
-        return try {
-            withContext(dispatcher) {
-                database.locationsDao().insertMatchingLocation(result)
-            }
-            Result.success(result.toDomain())
+    private suspend fun insertMatchingLocations(locations: List<MatchingLocationEntity>) = withContext(dispatcher) {
+        try {
+            database.locationsDao().insertMatchingLocations(locations)
         } catch (cause: Exception) {
-            Result.failure(operationFailed(logPrefix("Impossible add matching location to database"), cause))
+            throw operationFailed(logPrefix("Impossible add matching locations to storage"), cause)
+        }
+    }
+
+    private suspend fun insertMatchingLocation(location: MatchingLocationEntity) = withContext(dispatcher) {
+        try {
+            database.locationsDao().insertMatchingLocation(location)
+        } catch (cause: Exception) {
+            throw operationFailed(logPrefix("Impossible add matching location to storage"), cause)
         }
     }
 }
