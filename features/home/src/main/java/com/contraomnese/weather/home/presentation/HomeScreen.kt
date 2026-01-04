@@ -49,6 +49,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -88,7 +90,6 @@ import com.contraomnese.weather.design.theme.itemThickness2
 import com.contraomnese.weather.design.theme.itemWidth56
 import com.contraomnese.weather.design.theme.itemWidth64
 import com.contraomnese.weather.design.theme.padding16
-import com.contraomnese.weather.design.theme.space16
 import com.contraomnese.weather.design.theme.space8
 import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
 import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
@@ -127,6 +128,16 @@ internal fun HomeRoute(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF3989BF),
+                            Color(0xFF317FB3),
+                            Color(0xFF2C72A1),
+                            Color(0xFF266289),
+                        ),
+                    )
+                )
                 .padding(innerPadding)
         ) {
             when {
@@ -189,19 +200,13 @@ internal fun BoxScope.HomeScreen(
                 message = event.cause.handleError(context),
                 duration = SnackbarDuration.Short
             )
+
+            is HomeScreenEvent.NavigateToGpsLocation -> onNavigateToWeatherByLocation(event.id)
         }
     }
 
     LaunchedEffect(keyboardVisible) {
-        if (uiState.favorites.isEmpty()) {
-            searchBarOnTop = keyboardVisible
-        }
-    }
-
-    LaunchedEffect(uiState.gps.location) {
-        uiState.gps.location?.let {
-            onNavigateToWeatherByLocation(it.id)
-        }
+        searchBarOnTop = keyboardVisible || uiState.favorites.isNotEmpty()
     }
 
     val topBarPadding by animateDpAsState(
@@ -524,7 +529,7 @@ private fun FavoritesLocations(
             .padding(horizontal = padding16)
             .wrapContentHeight(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(space16),
+        verticalArrangement = Arrangement.spacedBy(space8),
     ) {
         items(favorites.toList(), key = { location -> location.id }) { location ->
             val favoriteForecast = favoritesForecast[location.id]
@@ -555,7 +560,7 @@ private fun FavoritesLocations(
         item {
             Spacer(
                 modifier = Modifier
-                    .height(space16)
+                    .height(space8)
             )
         }
     }

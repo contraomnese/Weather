@@ -7,4 +7,5 @@ internal sealed interface HomeScreenEvent : MviEvent {
     data object GetGpsLocation : HomeScreenEvent
     data class OnSearchBarTop(val onTop: Boolean) : HomeScreenEvent
     data class HandleError(val cause: Throwable) : HomeScreenEvent
+    data class NavigateToGpsLocation(val id: Int) : HomeScreenEvent
 }

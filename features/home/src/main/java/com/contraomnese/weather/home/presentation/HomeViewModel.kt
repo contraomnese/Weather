@@ -47,6 +47,7 @@ internal class HomeViewModel(
         observeFavoritesUseCase()
             .onEach {
                 push(HomeScreenEffect.FavoritesUpdated(it))
+                if (it.isEmpty()) push(HomeScreenEvent.OnSearchBarTop(false))
             }
             .catch {
                 push(HomeScreenEvent.HandleError(notInitialize(logPrefix("Can't observe favorites"), it)))
@@ -117,7 +118,10 @@ internal class HomeViewModel(
     private suspend fun processGpsLocationChange(coordinates: LocationCoordinates) {
         getLocationUseCase(coordinates)
             .onFailure { push(HomeScreenEvent.HandleError(it)) }
-            .onSuccess { push(HomeScreenEffect.GpsLocationUpdated(it)) }
+            .onSuccess {
+                push(HomeScreenEffect.GpsLocationUpdated(it))
+                push(HomeScreenEvent.NavigateToGpsLocation(it.id))
+            }
 
     }
 
@@ -128,7 +132,9 @@ internal class HomeViewModel(
 
     private suspend fun processFavoriteRemove(locationId: Int) {
         removeFavoriteUseCase(locationId)
-            .onFailure { push(HomeScreenEvent.HandleError(it)) }
+            .onFailure {
+                push(HomeScreenEvent.HandleError(it))
+            }
     }
 
     private fun processSwitchGpsMode(enabled: Boolean) {

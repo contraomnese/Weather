@@ -1,8 +1,8 @@
 package com.contraomnese.weather.home.navigation
 
+import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.contraomnese.weather.home.di.homeModule
@@ -42,14 +42,13 @@ fun NavGraphBuilder.home(
     }
 }
 
-fun NavHostController.navigateToHome() {
-    popBackStack()
+fun NavController.navigateToHome() {
     navigate(
-        HomeDestination, navOptions = NavOptions
+        HomeDestination,
+        navOptions = NavOptions
             .Builder()
             .setLaunchSingleTop(true)
-            .setRestoreState(true)
-            .setPopUpTo(graph.findStartDestination().id, saveState = true, inclusive = false)
+            .setPopUpTo(graph.findStartDestination().id, inclusive = false)
             .build()
     )
 }

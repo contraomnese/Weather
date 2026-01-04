@@ -96,6 +96,7 @@ internal fun WeatherApp(viewModel: MainActivityViewModel = koinViewModel()) {
 
     val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
 
+
     Crossfade(targetState = uiState.isLoading, animationSpec = tween(1000)) { loading ->
         if (loading) {
             SplashScreen(uiState.isLoading) {
@@ -103,7 +104,7 @@ internal fun WeatherApp(viewModel: MainActivityViewModel = koinViewModel()) {
             }
         } else {
             WeatherHost(
-                uiState = uiState,
+                startDestination = uiState.startDestination,
                 eventFlow = viewModel.eventFlow
             )
         }
