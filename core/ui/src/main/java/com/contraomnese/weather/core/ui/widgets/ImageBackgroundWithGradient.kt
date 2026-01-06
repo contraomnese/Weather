@@ -1,89 +1,66 @@
 package com.contraomnese.weather.core.ui.widgets
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.graphics.drawable.toBitmap
-import com.contraomnese.weather.core.ui.utils.extractBottomColor
-import com.contraomnese.weather.design.R
+import coil.compose.SubcomposeAsyncImage
+import com.contraomnese.weather.core.ui.composition.LocalWeatherBackgrounds
+import com.contraomnese.weather.core.ui.composition.weatherBackgrounds
 import com.contraomnese.weather.design.theme.WeatherTheme
-import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
+import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
+
 
 @Composable
 fun ImageBackgroundWithGradient(
-    modifier: Modifier = Modifier,
-    condition: CompactWeatherCondition,
+    condition: WeatherCondition,
 ) {
+    val backgrounds = LocalWeatherBackgrounds.current
+    val extractedColor = backgrounds.getValue(condition).color
 
-    val context = LocalContext.current
+    SubcomposeAsyncImage(
+        model = backgrounds.getValue(condition).resId,
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .fillMaxSize()
+            .graphicsLayer {
+                translationY = -600f
+            },
+        alpha = 0.5f,
+        loading = {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(extractedColor)
+            )
+        },
+    )
 
-    var extractedColor by remember { mutableStateOf(Color.Black) }
-
-    val drawableBackgroundRes = when (condition) {
-        CompactWeatherCondition.CLEAR -> R.drawable.clear
-        CompactWeatherCondition.PARTLY_CLOUDY -> R.drawable.partly_cloud
-        CompactWeatherCondition.CLOUDY -> R.drawable.overcast
-        CompactWeatherCondition.FOG -> R.drawable.fog
-        CompactWeatherCondition.RAIN -> R.drawable.rain
-        CompactWeatherCondition.SNOW -> R.drawable.snow
-        CompactWeatherCondition.THUNDER -> R.drawable.thunder
-        CompactWeatherCondition.SLEET -> R.drawable.sleet
-    }
-
-    LaunchedEffect(drawableBackgroundRes) {
-        val bitmap = ResourcesCompat.getDrawable(context.resources, drawableBackgroundRes, context.theme)?.current?.toBitmap()
-        if (bitmap != null) {
-            extractedColor = extractBottomColor(bitmap)
-        }
-    }
-
-    Box(modifier = modifier.fillMaxSize()) {
-
-        Image(
-            painter = painterResource(id = drawableBackgroundRes),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxSize()
-                .graphicsLayer {
-                    translationY = -600f
-                },
-        )
-
-        Box(
-            modifier = Modifier
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color.Transparent,
-                            extractedColor,
-                            extractedColor
-                        ),
-                        startY = with(LocalDensity.current) { (400.dp).toPx() },
-                        endY = Float.POSITIVE_INFINITY
+    Box(
+        modifier = Modifier
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color.Transparent,
+                        extractedColor,
+                        extractedColor
                     ),
-                )
-                .fillMaxSize()
-        )
-    }
+                    startY = with(LocalDensity.current) { (400.dp).toPx() },
+                    endY = Float.POSITIVE_INFINITY
+                ),
+            )
+            .fillMaxSize()
+    )
 }
 
 
@@ -91,6 +68,8 @@ fun ImageBackgroundWithGradient(
 @Composable
 private fun ImageBackgroundWithGradientPreview() {
     WeatherTheme {
-        ImageBackgroundWithGradient(condition = CompactWeatherCondition.RAIN)
+        CompositionLocalProvider(LocalWeatherBackgrounds provides weatherBackgrounds) {
+            ImageBackgroundWithGradient(condition = WeatherCondition.SLEET)
+        }
     }
 }

@@ -31,7 +31,6 @@ fun NavHostController.weatherByLocationNavigator() = object : WeatherByLocationN
 
     override fun onNavigateToHome() {
         navigateSingleTopTo(HomeDestination)
-//        navigateToHome()
     }
 }
 

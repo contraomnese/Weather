@@ -25,14 +25,14 @@ import com.contraomnese.weather.design.theme.itemHeight64
 import com.contraomnese.weather.design.theme.itemWidth40
 import com.contraomnese.weather.design.theme.padding12
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
-import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
+import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
 
 @Composable
 fun ForecastDailyItem(
     modifier: Modifier = Modifier,
     dayNumber: String,
     dayName: String,
-    condition: CompactWeatherCondition,
+    condition: WeatherCondition,
     minTemperature: Int,
     maxTemperature: Int,
     maxRangeTemperature: Int,
@@ -94,7 +94,7 @@ private fun ForecastDailyItemPreview() {
         ForecastDailyItem(
             dayNumber = "22.06",
             dayName = "Чт",
-            condition = CompactWeatherCondition.CLEAR,
+            condition = WeatherCondition.CLEAR,
             minTemperature = 19,
             maxTemperature = 23,
             maxRangeTemperature = 25,

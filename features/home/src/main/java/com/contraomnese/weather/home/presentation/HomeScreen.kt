@@ -14,7 +14,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
@@ -26,11 +25,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.isImeVisible
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -41,16 +42,15 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -71,7 +71,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contraomnese.weather.core.ui.composition.LocalSnackbarHostState
-import com.contraomnese.weather.core.ui.widgets.AnimatedAutoSizeTitleText
+import com.contraomnese.weather.core.ui.composition.LocalWeatherBackgrounds
+import com.contraomnese.weather.core.ui.composition.weatherBackgrounds
 import com.contraomnese.weather.core.ui.widgets.AnimatedCircleButton
 import com.contraomnese.weather.core.ui.widgets.AnimatedIcon
 import com.contraomnese.weather.core.ui.widgets.FavoriteItem
@@ -91,7 +92,6 @@ import com.contraomnese.weather.design.theme.itemWidth56
 import com.contraomnese.weather.design.theme.itemWidth64
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.space8
-import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
 import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 import com.contraomnese.weather.domain.weatherByLocation.model.Location
 import com.contraomnese.weather.presentation.architecture.collectEvent
@@ -100,13 +100,10 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
-import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.toPersistentList
-import kotlinx.collections.immutable.toPersistentSet
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.datetime.Clock
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.datetime.Instant
 
 private const val ANIMATION_DURATION = 500
 
@@ -117,9 +114,20 @@ internal fun HomeRoute(
     onNavigateToAppSettings: () -> Unit,
 ) {
 
-    val snackBarHostState = LocalSnackbarHostState.current
     val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
 
+    val snackBarHostState = LocalSnackbarHostState.current
+
+    val backgroundBrush = remember {
+        Brush.verticalGradient(
+            colors = listOf(
+                Color(0xFF3989BF),
+                Color(0xFF317FB3),
+                Color(0xFF2C72A1),
+                Color(0xFF266289),
+            )
+        )
+    }
     Scaffold(
         snackbarHost = { WeatherSnackBarHost(snackBarHostState) },
         contentWindowInsets = WindowInsets.statusBars,
@@ -128,16 +136,7 @@ internal fun HomeRoute(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFF3989BF),
-                            Color(0xFF317FB3),
-                            Color(0xFF2C72A1),
-                            Color(0xFF266289),
-                        ),
-                    )
-                )
+                .background(brush = backgroundBrush)
                 .padding(innerPadding)
         ) {
             when {
@@ -148,55 +147,38 @@ internal fun HomeRoute(
                             .width(itemWidth64)
                     )
 
-                else -> {
-                    HomeScreen(
-                        uiState = uiState,
-                        eventFlow = viewModel.eventFlow,
-                        pushAction = viewModel::push,
-                        snackBarHostState = snackBarHostState,
-                        onNavigateToWeatherByLocation = onNavigateToWeatherByLocation,
-                        onNavigateToAppSettings = onNavigateToAppSettings
-                    )
-                }
+                else -> HomeScreen(
+                    uiState = uiState,
+                    snackBar = snackBarHostState,
+                    eventFlow = viewModel.eventFlow,
+                    pushAction = viewModel::push,
+                    onNavigateToWeatherByLocation = onNavigateToWeatherByLocation,
+                    onNavigateToAppSettings = onNavigateToAppSettings
+                )
             }
         }
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
-@SuppressLint("MissingPermission")
 @Composable
-internal fun BoxScope.HomeScreen(
+private fun HomeScreen(
     uiState: HomeScreenState,
     eventFlow: Flow<HomeScreenEvent>,
+    snackBar: SnackbarHostState,
     pushAction: (HomeScreenAction) -> Unit = {},
-    snackBarHostState: SnackbarHostState,
     onNavigateToWeatherByLocation: (Int) -> Unit = { },
     onNavigateToAppSettings: () -> Unit = {},
 ) {
     val context = LocalContext.current
-    val keyboardVisible = WindowInsets.isImeVisible
-    val density = LocalDensity.current
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-
-    var searchBarOnTop by remember { mutableStateOf(uiState.favorites.isNotEmpty()) }
-    var gpsModeEnabled by remember { mutableStateOf(false) }
 
     eventFlow.collectEvent { event ->
         when (event) {
-            is HomeScreenEvent.SwitchGpsMode -> {
-                gpsModeEnabled = event.enabled
-            }
 
             is HomeScreenEvent.GetGpsLocation -> {
                 getGpsLocation(context, pushAction)
             }
 
-            is HomeScreenEvent.OnSearchBarTop -> {
-                searchBarOnTop = event.onTop
-            }
-
-            is HomeScreenEvent.HandleError -> snackBarHostState.showSnackbar(
+            is HomeScreenEvent.HandleError -> snackBar.showSnackbar(
                 message = event.cause.handleError(context),
                 duration = SnackbarDuration.Short
             )
@@ -205,27 +187,95 @@ internal fun BoxScope.HomeScreen(
         }
     }
 
-    LaunchedEffect(keyboardVisible) {
-        searchBarOnTop = keyboardVisible || uiState.favorites.isNotEmpty()
+    when {
+        uiState.favorites.isEmpty() -> WelcomeScreen(
+            uiState = uiState,
+            pushAction = pushAction,
+            onNavigateToWeatherByLocation = onNavigateToWeatherByLocation,
+            onNavigateToAppSettings = onNavigateToAppSettings
+        )
+
+        else -> MainScreen(
+            uiState = uiState,
+            pushAction = pushAction,
+            onNavigateToWeatherByLocation = onNavigateToWeatherByLocation,
+            onNavigateToAppSettings = onNavigateToAppSettings
+        )
     }
+}
 
-    val topBarPadding by animateDpAsState(
-        targetValue = if (searchBarOnTop) 0.dp else with(density) { (screenHeight.toPx() / 2.5f).toDp() },
-        animationSpec = tween(durationMillis = ANIMATION_DURATION)
-    )
-
-    TopTitleText(
-        modifier = Modifier.padding(top = screenHeight / 4),
-        visible = !searchBarOnTop,
-        title = stringResource(R.string.use_search_title),
-        maxLines = 2
-    )
+@SuppressLint("MissingPermission")
+@Composable
+internal fun MainScreen(
+    uiState: HomeScreenState,
+    pushAction: (HomeScreenAction) -> Unit = {},
+    onNavigateToWeatherByLocation: (Int) -> Unit = { },
+    onNavigateToAppSettings: () -> Unit = {},
+) {
 
     Column {
         SearchBar(
-            modifier = Modifier
-                .testTag("search_bar")
-                .padding(top = topBarPadding),
+            modifier = Modifier.testTag("search_bar"),
+            inputLocation = uiState.inputLocation,
+            isSearchMode = true,
+            isSearching = uiState.isSearching,
+            pushAction = pushAction,
+            onNavigateToAppSettings = onNavigateToAppSettings,
+            onGpsClickButton = {
+                pushAction(HomeScreenAction.SwitchGpsMode(true))
+            }
+        )
+
+        if (uiState.inputLocation.text.isNotEmpty()) {
+            MatchingLocations(
+                uiState.matchingLocations,
+                uiState.favorites,
+                pushAction,
+                onNavigateToWeatherByLocation
+            )
+        } else FavoritesLocations(
+            uiState.currentTime,
+            uiState.favorites,
+            uiState.favoritesForecast,
+            pushAction,
+            onNavigateToWeatherByLocation
+        )
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@SuppressLint("MissingPermission")
+@Composable
+internal fun WelcomeScreen(
+    uiState: HomeScreenState,
+    pushAction: (HomeScreenAction) -> Unit = {},
+    onNavigateToWeatherByLocation: (Int) -> Unit = { },
+    onNavigateToAppSettings: () -> Unit = {},
+) {
+
+    val density = LocalDensity.current
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+
+    val searchBarOnTop = WindowInsets.isImeVisible
+
+    val topBarOffset by animateDpAsState(
+        targetValue = if (searchBarOnTop) 0.dp else screenHeight / 2.5f,
+        animationSpec = tween(ANIMATION_DURATION)
+    )
+
+//    TopTitleText(
+//        modifier = Modifier.padding(top = screenHeight / 4),
+//        visible = !searchBarOnTop,
+//        title = stringResource(R.string.use_search_title),
+//        maxLines = 2
+//    )
+
+    Column(
+        modifier = Modifier
+            .offset(y = topBarOffset)
+    ) {
+        SearchBar(
+            modifier = Modifier.testTag("search_bar"),
             inputLocation = uiState.inputLocation,
             isSearchMode = searchBarOnTop,
             isSearching = uiState.isSearching,
@@ -238,9 +288,15 @@ internal fun BoxScope.HomeScreen(
 
         if (uiState.inputLocation.text.isNotEmpty() && searchBarOnTop) {
             MatchingLocations(uiState.matchingLocations, uiState.favorites, pushAction, onNavigateToWeatherByLocation)
-        } else FavoritesLocations(uiState.favorites, uiState.favoritesForecast, pushAction, onNavigateToWeatherByLocation)
+        } else FavoritesLocations(
+            uiState.currentTime,
+            uiState.favorites,
+            uiState.favoritesForecast,
+            pushAction,
+            onNavigateToWeatherByLocation
+        )
 
-        if (gpsModeEnabled) {
+        if (uiState.gps.isGpsMode) {
             PermissionAlertDialog(
                 onDismissRequest = { pushAction(HomeScreenAction.SwitchGpsMode(false)) },
                 onPermissionGranted = { granted ->
@@ -251,9 +307,9 @@ internal fun BoxScope.HomeScreen(
                 permission = android.Manifest.permission.ACCESS_FINE_LOCATION
             )
         }
-        if (uiState.gps.isPermissionGranted && gpsModeEnabled) {
+        if (uiState.gps.isPermissionGranted && uiState.gps.isGpsMode) {
             GpsModeAlertDialog(
-                onDismissRequest = { gpsModeEnabled = false },
+                onDismissRequest = { pushAction(HomeScreenAction.DeviceGpsModeEnabled(false)) },
                 onGpsModeEnabled = { enabled ->
                     pushAction(HomeScreenAction.DeviceGpsModeEnabled(enabled))
                 }
@@ -261,16 +317,16 @@ internal fun BoxScope.HomeScreen(
         }
     }
 
-    BottomTitleText(
-        modifier = Modifier.padding(bottom = screenHeight / 4),
-        visible = !searchBarOnTop,
-        title = stringResource(R.string.use_gps_title),
-        maxLines = 2
-    )
+//    BottomTitleText(
+//        modifier = Modifier.padding(bottom = screenHeight / 4),
+//        visible = !searchBarOnTop,
+//        title = stringResource(R.string.use_gps_title),
+//        maxLines = 2
+//    )
 }
 
 @Composable
-private fun BoxScope.TopTitleText(
+private fun TopTitleText(
     modifier: Modifier = Modifier,
     visible: Boolean,
     enter: EnterTransition = expandVertically(
@@ -282,18 +338,18 @@ private fun BoxScope.TopTitleText(
     title: String,
     maxLines: Int,
 ) {
-    AnimatedAutoSizeTitleText(
-        modifier = modifier,
-        visible = visible,
-        enter = enter,
-        exit = exit,
-        title = title,
-        maxLines = maxLines
-    )
+//    AnimatedAutoSizeTitleText(
+//        modifier = modifier,
+//        visible = visible,
+//        enter = enter,
+//        exit = exit,
+//        title = title,
+//        maxLines = maxLines
+//    )
 }
 
 @Composable
-private fun BoxScope.BottomTitleText(
+private fun BottomTitleText(
     modifier: Modifier = Modifier,
     visible: Boolean,
     enter: EnterTransition = expandVertically(
@@ -310,16 +366,16 @@ private fun BoxScope.BottomTitleText(
     textAlign: TextAlign = TextAlign.End,
     maxLines: Int,
 ) {
-    AnimatedAutoSizeTitleText(
-        modifier = modifier,
-        alignment = Alignment.BottomEnd,
-        visible = visible,
-        enter = enter,
-        exit = exit,
-        title = title,
-        textAlign = textAlign,
-        maxLines = maxLines
-    )
+//    AnimatedAutoSizeTitleText(
+//        modifier = modifier,
+//        alignment = Alignment.BottomEnd,
+//        visible = visible,
+//        enter = enter,
+//        exit = exit,
+//        title = title,
+//        textAlign = textAlign,
+//        maxLines = maxLines
+//    )
 }
 
 
@@ -334,22 +390,23 @@ private fun SearchBar(
     onNavigateToAppSettings: () -> Unit,
 ) {
     Column {
-        TopBar(modifier, inputLocation, pushAction, isSearching, isSearchMode, onNavigateToAppSettings)
-        GpsButton(isSearchMode, onGpsClickButton)
+        TextSearchBar(modifier, inputLocation, pushAction, isSearching, isSearchMode, onNavigateToAppSettings)
+        GpsSearchButton(modifier, isSearchMode, onGpsClickButton)
     }
 
 }
 
 @Composable
-private fun GpsButton(
-    isSearchMode: Boolean,
-    onGetGpsClickButton: (Boolean) -> Unit,
+private fun GpsSearchButton(
+    modifier: Modifier = Modifier,
+    isVisible: Boolean,
+    onClick: (Boolean) -> Unit,
 ) {
-    AnimatedCircleButton(isSearchMode, onGetGpsClickButton, ANIMATION_DURATION)
+    AnimatedCircleButton(modifier, isVisible, onClick, ANIMATION_DURATION)
 }
 
 @Composable
-private fun TopBar(
+private fun TextSearchBar(
     modifier: Modifier,
     inputLocation: TextFieldValue,
     pushAction: (HomeScreenAction) -> Unit,
@@ -395,146 +452,168 @@ private fun TopBar(
 @Composable
 private fun MatchingLocations(
     locations: ImmutableList<Location>,
-    favorites: ImmutableSet<Location>,
+    favorites: ImmutableList<Location>,
     pushAction: (HomeScreenAction) -> Unit = {},
     onNavigateToWeatherByLocation: (Int) -> Unit = {},
 ) {
 
-    Column(
+    val locationsInFavorites = remember(locations, favorites) {
+        val favoriteIds = favorites.map { it.id }.toSet()
+        locations.associateWith { it.id in favoriteIds }
+    }
+
+    LazyColumn(
         modifier = Modifier
             .testTag("matching_locations")
             .padding(horizontal = padding16)
             .wrapContentHeight(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        locations.forEach { location ->
-            Row(
-                modifier = Modifier
-                    .clickable {
-                        onNavigateToWeatherByLocation(
-                            location.id,
-                        )
+        items(
+            items = locations,
+            key = { it.id }
+        ) { location ->
+            MatchLocation(
+                onClick = { onNavigateToWeatherByLocation.invoke(location.id) },
+                onFavoriteClick = {
+                    if (locationsInFavorites.getOrDefault(location, false)) {
+                        pushAction(HomeScreenAction.RemoveFavorite(location.id))
+                    } else {
+                        pushAction(HomeScreenAction.AddFavorite(location.id))
                     }
-                    .fillMaxWidth()
-                    .wrapContentHeight(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-
-                Text(
-                    modifier = Modifier.weight(1f, fill = false),
-                    text = buildAnnotatedString {
-                        withStyle(
-                            MaterialTheme.typography.labelMedium.toSpanStyle().copy(
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
-                        ) {
-                            location.city?.let {
-                                append("${it}, ")
-                            } ?: ""
-                        }
-                        withStyle(
-                            MaterialTheme.typography.labelMedium.toSpanStyle().copy(
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-                            )
-                        ) {
-                            location.state?.let {
-                                append("${it}, ")
-                            } ?: ""
-                            location.country?.let {
-                                append(it)
-                            } ?: ""
-                        }
-                    },
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        lineBreak = LineBreak.Paragraph
-                    ),
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-
-                Spacer(
-                    modifier = Modifier.width(space8)
-                )
-                IconButton(
-                    modifier = Modifier.width(itemWidth56),
-                    onClick = {
-                        if (favorites.any { it.id == location.id }) {
-                            pushAction(HomeScreenAction.RemoveFavorite(location.id))
-                        } else {
-                            pushAction(HomeScreenAction.AddFavorite(location.id))
-                        }
-                    }
-                ) {
-                    Icon(
-                        imageVector = if (favorites.any { it.id == location.id }) WeatherIcons.RemoveFavorite else WeatherIcons.AddFavorite,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
-                    )
-                }
-            }
-
-            Spacer(
-                modifier = Modifier
-                    .height(itemThickness2)
-                    .background(
-                        MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f),
-                        RoundedCornerShape(cornerRadius1)
-                    )
-                    .fillMaxWidth()
+                },
+                favoriteIcon =
+                    if (locationsInFavorites.getOrDefault(location, false)) WeatherIcons.RemoveFavorite
+                    else WeatherIcons.AddFavorite,
+                city = location.city,
+                country = location.country,
+                state = location.state
             )
         }
-        LocationApiLink(
-            modifier = Modifier
-                .padding(vertical = padding16)
-                .fillMaxWidth()
-                .align(Alignment.CenterHorizontally),
-            "https://locationiq.com",
-            "Search by LocationIQ.com"
-        )
-
+        item {
+            LocationApiLink(
+                modifier = Modifier
+                    .padding(vertical = padding16)
+                    .fillMaxWidth(),
+                "https://locationiq.com",
+                "Search by LocationIQ.com"
+            )
+        }
     }
 }
 
 @Composable
+private fun MatchLocation(
+    onClick: () -> Unit,
+    onFavoriteClick: () -> Unit,
+    favoriteIcon: ImageVector,
+    city: String?,
+    country: String?,
+    state: String?,
+) {
+
+    val cityStyle = MaterialTheme.typography.labelMedium.toSpanStyle().copy(
+        color = MaterialTheme.colorScheme.onSurface,
+    )
+
+    val stateStyle = MaterialTheme.typography.labelMedium.toSpanStyle().copy(
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+    )
+
+    val matchLocationText = remember(city, country, state) {
+        buildAnnotatedString {
+            withStyle(
+                cityStyle
+            ) {
+                city?.let {
+                    append("${it}, ")
+                } ?: ""
+            }
+            withStyle(
+                stateStyle
+            ) {
+                state?.let {
+                    append("${it}, ")
+                } ?: ""
+                country?.let {
+                    append(it)
+                } ?: ""
+            }
+        }
+    }
+
+    Row(
+        modifier = Modifier
+            .clickable { onClick() }
+            .fillMaxWidth()
+            .wrapContentHeight(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+
+        Text(
+            modifier = Modifier.weight(1f, fill = false),
+            text = matchLocationText,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.labelSmall.copy(
+                lineBreak = LineBreak.Paragraph
+            ),
+            color = MaterialTheme.colorScheme.onBackground
+        )
+
+        Spacer(
+            modifier = Modifier.width(space8)
+        )
+        IconButton(
+            modifier = Modifier.width(itemWidth56),
+            onClick = onFavoriteClick
+        ) {
+            Icon(
+                imageVector = favoriteIcon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+            )
+        }
+    }
+
+    Spacer(
+        modifier = Modifier
+            .height(itemThickness2)
+            .background(
+                MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f),
+                RoundedCornerShape(cornerRadius1)
+            )
+            .fillMaxWidth()
+    )
+}
+
+@Composable
 private fun FavoritesLocations(
-    favorites: ImmutableSet<Location>,
+    currentTime: Instant,
+    favorites: ImmutableList<Location>,
     favoritesForecast: ImmutableMap<Int, Forecast>,
     pushAction: (HomeScreenAction) -> Unit = {},
     onNavigateToWeatherByLocation: (Int) -> Unit,
 ) {
-    val drawableBackgroundRes = remember(favorites) {
-        mapOf(
-            CompactWeatherCondition.CLEAR to R.drawable.clear,
-            CompactWeatherCondition.PARTLY_CLOUDY to R.drawable.partly_cloud,
-            CompactWeatherCondition.CLOUDY to R.drawable.overcast,
-            CompactWeatherCondition.FOG to R.drawable.fog,
-            CompactWeatherCondition.RAIN to R.drawable.rain,
-            CompactWeatherCondition.SNOW to R.drawable.snow,
-            CompactWeatherCondition.THUNDER to R.drawable.thunder,
-            CompactWeatherCondition.SLEET to R.drawable.sleet
-        )
+    val listState = rememberSaveable(
+        saver = LazyListState.Saver
+    ) {
+        LazyListState()
     }
 
-    val currentTime by produceState(initialValue = Clock.System.now()) {
-        while (true) {
-            value = Clock.System.now()
-            delay(60_000L)
-        }
-    }
+    val backgrounds = LocalWeatherBackgrounds.current
 
     LazyColumn(
         modifier = Modifier
             .padding(horizontal = padding16)
-            .wrapContentHeight(),
+            .fillMaxSize(),
+        state = listState,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(space8),
     ) {
-        items(favorites.toList(), key = { location -> location.id }) { location ->
-            val favoriteForecast = favoritesForecast[location.id]
-
-            favoriteForecast?.let {
+        items(favorites, key = { location -> location.id }) { location ->
+            favoritesForecast[location.id]?.let {
                 FavoriteItem(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -546,7 +625,7 @@ private fun FavoritesLocations(
                     maxTemperature = it.forecast.today.maxTemperature,
                     minTemperature = it.forecast.today.minTemperature,
                     conditionText = it.today.conditionText,
-                    backgroundResIdByCondition = drawableBackgroundRes.getValue(it.today.condition),
+                    background = backgrounds.getValue(it.today.condition).resId,
                     onTapClicked = {
                         onNavigateToWeatherByLocation(
                             location.id
@@ -570,23 +649,25 @@ private fun FavoritesLocations(
 private fun LocationApiLink(modifier: Modifier, url: String, description: String) {
     val context = LocalContext.current
 
-    val annotatedText = buildAnnotatedString {
-        withLink(
-            link = LinkAnnotation.Url(
-                url = url,
-                styles = TextLinkStyles(
-                    style = MaterialTheme.typography.labelMedium.toSpanStyle().copy(
-                        color = MaterialTheme.colorScheme.onBackground,
-                        textDecoration = TextDecoration.Underline
-                    )
-                ),
-                linkInteractionListener = {
-                    val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                    context.startActivity(intent)
-                }
-            )
-        ) {
-            append(description)
+    val style = MaterialTheme.typography.labelMedium.toSpanStyle().copy(
+        color = MaterialTheme.colorScheme.onBackground,
+        textDecoration = TextDecoration.Underline
+    )
+
+    val annotatedText = remember(url, description) {
+        buildAnnotatedString {
+            withLink(
+                link = LinkAnnotation.Url(
+                    url = url,
+                    styles = TextLinkStyles(style = style),
+                    linkInteractionListener = {
+                        val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+                        context.startActivity(intent)
+                    }
+                )
+            ) {
+                append(description)
+            }
         }
     }
 
@@ -622,46 +703,27 @@ private fun getGpsLocation(
 @Preview(showBackground = false, showSystemUi = false, device = "id:pixel_5")
 @Composable
 private fun HomeScreenPreview() {
+
+    val snackbarHostState = remember { SnackbarHostState() }
     val uiState = HomeScreenState(
-        matchingLocations = listOf(
-            Location.EMPTY.copy(
-                city = "Москва",
-                state = "Московская область",
-                country = "Россия"
-            ),
-            Location.EMPTY.copy(
-                city = "Москоу",
-                state = "Айдахо",
-                country = "США"
-            )
-        ).toPersistentList(),
-        favorites = setOf(
-            Location.EMPTY.copy(
-                city = "Москва",
-                state = "Московская область",
-                country = "Россия"
-            ),
-            Location.EMPTY.copy(
-                city = "Москоу",
-                state = "Айдахо",
-                country = "США"
-            )
-        ).toPersistentSet()
+        matchingLocations = emptyList<Location>().toPersistentList(),
+        favorites = emptyList<Location>().toPersistentList()
     )
 
     WeatherTheme {
-        Box(
-            Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(WindowInsets.statusBars.asPaddingValues())
-        ) {
-            HomeScreen(
-                uiState,
-                eventFlow = flowOf(),
-                snackBarHostState = remember { SnackbarHostState() }
-            )
+        CompositionLocalProvider(LocalWeatherBackgrounds provides weatherBackgrounds) {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(WindowInsets.statusBars.asPaddingValues())
+            ) {
+                HomeScreen(
+                    uiState,
+                    eventFlow = emptyFlow(),
+                    snackbarHostState
+                )
+            }
         }
-
     }
 }

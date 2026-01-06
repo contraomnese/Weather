@@ -42,6 +42,7 @@ navigation-compose = "2.8.9"
 
 # ui
 material = "1.12.0"
+coil-compose = "2.4.0"
 
 # data
 retrofit2 = "2.9.0"
@@ -117,6 +118,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 androidx-compose-material-iconsExtended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil-compose" }
 
 # ui
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
@@ -226,7 +228,8 @@ compose = [
     "androidx-compose-material-iconsExtended",
     "androidx-runtime-android",
     "androidx-constraintlayout-compose",
-    "lottie-compose"
+    "lottie-compose",
+    "coil-compose"
 ]
 
 composeDebug = [

@@ -4,8 +4,8 @@ import com.contraomnese.weather.data.network.models.HourNetwork
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastHourEntity
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
-import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastHour
+import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
 import kotlin.math.roundToInt
 
 private const val IS_DAY = 1
@@ -16,7 +16,7 @@ internal fun ForecastHourEntity.toDomain(appSettings: AppSettings): ForecastHour
             TemperatureUnit.Celsius -> tempC.roundToInt().toString()
             TemperatureUnit.Fahrenheit -> tempF.roundToInt().toString()
         },
-        condition = CompactWeatherCondition.fromConditionCode(conditionCode),
+        condition = WeatherCondition.fromConditionCode(conditionCode),
         time = time.split(" ")[1],
         isDay = isDay == IS_DAY
     )

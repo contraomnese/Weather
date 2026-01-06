@@ -65,8 +65,8 @@ import com.contraomnese.weather.design.theme.padding32
 import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.design.theme.space8
 import com.contraomnese.weather.domain.app.model.AppSettings
-import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
 import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
+import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
 import com.contraomnese.weather.presentation.architecture.collectEvent
 import com.contraomnese.weather.presentation.utils.handleError
 import com.contraomnese.weather.weatherByLocation.presentation.sections.AqiSection
@@ -90,10 +90,12 @@ internal fun WeatherRoute(
     pushAction: (WeatherScreenAction) -> Unit,
     onNavigateToHome: () -> Unit,
 ) {
+
     val context = LocalContext.current
     val snackBarHostState = LocalSnackbarHostState.current
 
     val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
+
 
     eventFlow.collectEvent { event ->
         when (event) {
@@ -417,7 +419,7 @@ internal fun WeatherScreen(
 }
 
 @Composable
-private fun AnimatedBackground(condition: CompactWeatherCondition) {
+private fun AnimatedBackground(condition: WeatherCondition) {
     Crossfade(
         targetState = condition,
         animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing),

@@ -29,11 +29,13 @@ import com.contraomnese.weather.design.theme.itemHeight64
 
 @Composable
 fun AnimatedCircleButton(
+    modifier: Modifier = Modifier,
     visible: Boolean,
     onClick: (Boolean) -> Unit,
     animationDuration: Int = 500,
 ) {
     AnimatedVisibility(
+        modifier = modifier,
         visible = !visible,
         enter = fadeIn(animationSpec = tween(durationMillis = animationDuration)),
         exit = fadeOut(animationSpec = tween(durationMillis = animationDuration))

@@ -4,7 +4,7 @@ data class Weather(
     val temperature: String,
     val feelsLikeTemperature: String,
     val isDay: Boolean,
-    val condition: CompactWeatherCondition,
+    val condition: WeatherCondition,
     val conditionText: String,
     val airQuality: AirQuality,
     val uvIndex: UvIndex,

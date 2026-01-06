@@ -16,19 +16,19 @@ import com.contraomnese.weather.core.ui.canvas.SunIcon
 import com.contraomnese.weather.core.ui.canvas.ThunderCloudIcon
 import com.contraomnese.weather.core.ui.canvas.TwoCloudIcon
 import com.contraomnese.weather.design.theme.WeatherTheme
-import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
+import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
 
 @Composable
-fun ConditionsIcon(condition: CompactWeatherCondition, modifier: Modifier = Modifier, isNight: Boolean = false) {
+fun ConditionsIcon(condition: WeatherCondition, modifier: Modifier = Modifier, isNight: Boolean = false) {
     when (condition) {
-        CompactWeatherCondition.CLEAR -> if (isNight) MoonIcon(modifier) else SunIcon(modifier)
-        CompactWeatherCondition.PARTLY_CLOUDY -> PartlyCloudIcon(modifier)
-        CompactWeatherCondition.CLOUDY -> TwoCloudIcon(modifier)
-        CompactWeatherCondition.FOG -> FogIcon(modifier)
-        CompactWeatherCondition.RAIN -> RainCloudIcon(modifier)
-        CompactWeatherCondition.SNOW -> SnowCloudIcon(modifier)
-        CompactWeatherCondition.THUNDER -> ThunderCloudIcon(modifier)
-        CompactWeatherCondition.SLEET -> SleetCloudIcon(modifier)
+        WeatherCondition.CLEAR -> if (isNight) MoonIcon(modifier) else SunIcon(modifier)
+        WeatherCondition.PARTLY_CLOUDY -> PartlyCloudIcon(modifier)
+        WeatherCondition.CLOUDY -> TwoCloudIcon(modifier)
+        WeatherCondition.FOG -> FogIcon(modifier)
+        WeatherCondition.RAIN -> RainCloudIcon(modifier)
+        WeatherCondition.SNOW -> SnowCloudIcon(modifier)
+        WeatherCondition.THUNDER -> ThunderCloudIcon(modifier)
+        WeatherCondition.SLEET -> SleetCloudIcon(modifier)
     }
 }
 

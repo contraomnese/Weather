@@ -24,6 +24,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 
 internal class HomeViewModel(
     private val getLocationsUseCase: GetLocationsUseCase,
@@ -47,7 +49,6 @@ internal class HomeViewModel(
         observeFavoritesUseCase()
             .onEach {
                 push(HomeScreenEffect.FavoritesUpdated(it))
-                if (it.isEmpty()) push(HomeScreenEvent.OnSearchBarTop(false))
             }
             .catch {
                 push(HomeScreenEvent.HandleError(notInitialize(logPrefix("Can't observe favorites"), it)))
@@ -82,6 +83,13 @@ internal class HomeViewModel(
                 push(HomeScreenEvent.HandleError(notInitialize(logPrefix("Bootstrap failed"), it)))
             }
             .launchIn(viewModelScope)
+
+        viewModelScope.launch {
+            while (true) {
+                push(HomeScreenEffect.CurrentTimeUpdated(Clock.System.now()))
+                delay(60_000L)
+            }
+        }
     }
 
     override fun reducer(effect: HomeScreenEffect, previousState: HomeScreenState): HomeScreenState = when (effect) {
@@ -92,6 +100,7 @@ internal class HomeViewModel(
         is HomeScreenEffect.FavoritesForecastUpdated -> previousState.setFavoritesForecast(effect.favoritesForecast)
         is HomeScreenEffect.AccessFineLocationPermissionGranted -> previousState.setAccessFineLocationPermissionGranted(effect.isGranted)
         is HomeScreenEffect.GpsModeEnabled -> previousState.setGpsModeEnabled(effect.isEnabled)
+        is HomeScreenEffect.CurrentTimeUpdated -> previousState.setTime(effect.time)
     }
 
     override suspend fun actor(action: HomeScreenAction) = when (action) {
@@ -99,7 +108,7 @@ internal class HomeViewModel(
         is HomeScreenAction.UpdateGpsLocation -> processGpsLocationChange(LocationCoordinates.from(action.lat, action.lon))
         is HomeScreenAction.AddFavorite -> processFavoriteAdd(action.locationId)
         is HomeScreenAction.RemoveFavorite -> processFavoriteRemove(action.locationId)
-        is HomeScreenAction.SwitchGpsMode -> processSwitchGpsMode(action.enabled)
+        is HomeScreenAction.SwitchGpsMode -> processGpsModeEnabled(action.enabled)
         is HomeScreenAction.AccessFineLocationPermissionGranted -> processAccessFineLocationPermissionGranted(action.granted)
         is HomeScreenAction.DeviceGpsModeEnabled -> processGpsModeEnabled(action.enabled)
     }
@@ -135,10 +144,6 @@ internal class HomeViewModel(
             .onFailure {
                 push(HomeScreenEvent.HandleError(it))
             }
-    }
-
-    private fun processSwitchGpsMode(enabled: Boolean) {
-        push(HomeScreenEvent.SwitchGpsMode(enabled))
     }
 
     private suspend fun processAccessFineLocationPermissionGranted(isGranted: Boolean) {

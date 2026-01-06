@@ -20,13 +20,13 @@ import com.contraomnese.weather.design.theme.itemHeight20
 import com.contraomnese.weather.design.theme.itemHeight26
 import com.contraomnese.weather.design.theme.itemWidth40
 import com.contraomnese.weather.design.theme.padding16
-import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
+import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
 
 @Composable
 fun ForecastHourlyItem(
     modifier: Modifier = Modifier,
     time: String,
-    condition: CompactWeatherCondition,
+    condition: WeatherCondition,
     temperature: String,
     isNow: Boolean = false,
     isDay: Boolean = false,
@@ -58,7 +58,7 @@ private fun ForecastHourlyItemPreview() {
     WeatherTheme {
         ForecastHourlyItem(
             time = "02:00",
-            condition = CompactWeatherCondition.CLEAR,
+            condition = WeatherCondition.CLEAR,
             temperature = "19"
         )
     }
@@ -70,7 +70,7 @@ private fun ForecastHourlyItemNowPreview() {
     WeatherTheme {
         ForecastHourlyItem(
             time = "03:00",
-            condition = CompactWeatherCondition.CLEAR,
+            condition = WeatherCondition.CLEAR,
             temperature = "19",
             isNow = true
         )

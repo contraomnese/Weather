@@ -10,9 +10,9 @@ import com.contraomnese.weather.data.utils.getNumberOfMonth
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.model.PrecipitationUnit
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
-import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastDay
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastToday
+import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
 import kotlin.math.roundToInt
 
 internal fun DailyForecastData.toForecastTodayDomain(appSettings: AppSettings): ForecastToday {
@@ -51,7 +51,7 @@ internal fun DailyForecastData.toForecastDayDomain(appSettings: AppSettings): Fo
             TemperatureUnit.Celsius -> day.minTempC.roundToInt()
             TemperatureUnit.Fahrenheit -> day.minTempF.roundToInt()
         },
-        condition = CompactWeatherCondition.fromConditionCode(day.conditionCode),
+        condition = WeatherCondition.fromConditionCode(day.conditionCode),
         totalRainFull = when (appSettings.precipitationUnit) {
             PrecipitationUnit.Millimeters -> day.totalPrecipMm.roundToInt()
             PrecipitationUnit.Inches -> day.totalPrecipIn.roundToInt()

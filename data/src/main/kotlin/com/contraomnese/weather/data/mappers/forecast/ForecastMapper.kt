@@ -16,12 +16,12 @@ import com.contraomnese.weather.data.storage.db.locations.dto.ForecastData
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import com.contraomnese.weather.domain.weatherByLocation.model.AlertsWeather
-import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
 import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastLocation
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeather
 import com.contraomnese.weather.domain.weatherByLocation.model.UvIndex
 import com.contraomnese.weather.domain.weatherByLocation.model.Weather
+import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
 import kotlinx.datetime.TimeZone
 import kotlin.math.roundToInt
 
@@ -73,7 +73,7 @@ fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
                 TemperatureUnit.Fahrenheit -> todayForecast.feelsLikeF.roundToInt().toString()
             },
             isDay = todayForecast.isDay == IS_DAY,
-            condition = CompactWeatherCondition.fromConditionCode(todayForecast.conditionCode),
+            condition = WeatherCondition.fromConditionCode(todayForecast.conditionCode),
             conditionText = todayForecast.conditionText,
             windSpeed = todayForecast.toWindDomain(appSettings.windSpeedUnit),
             gustSpeed = todayForecast.toGustDomain(appSettings.windSpeedUnit),

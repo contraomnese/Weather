@@ -5,6 +5,6 @@ data class ForecastDay(
     val dayName: String,
     val maxTemperature: Int,
     val minTemperature: Int,
-    val condition: CompactWeatherCondition,
+    val condition: WeatherCondition,
     val totalRainFull: Int,
 )

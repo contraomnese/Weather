@@ -11,8 +11,8 @@ import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemThickness1
 import com.contraomnese.weather.design.theme.padding4
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
-import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastDay
+import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
 
 
 @Composable
@@ -65,7 +65,7 @@ private fun ForecastHourlyLazyRowPreview() {
                 ForecastDay(
                     dayNumber = "33.03",
                     dayName = "Mon",
-                    condition = CompactWeatherCondition.CLEAR,
+                    condition = WeatherCondition.CLEAR,
                     maxTemperature = maxTemperature.random(),
                     minTemperature = minTemperature.random(),
                     totalRainFull = 123,

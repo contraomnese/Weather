@@ -1,10 +1,10 @@
 package com.contraomnese.weather.domain.weatherByLocation.model
 
-enum class CompactWeatherCondition {
+enum class WeatherCondition {
     CLEAR, PARTLY_CLOUDY, CLOUDY, FOG, RAIN, SNOW, THUNDER, SLEET;
 
     companion object {
-        fun fromConditionCode(code: Int): CompactWeatherCondition {
+        fun fromConditionCode(code: Int): WeatherCondition {
             return when (code) {
                 1000 -> CLEAR
                 1003 -> PARTLY_CLOUDY

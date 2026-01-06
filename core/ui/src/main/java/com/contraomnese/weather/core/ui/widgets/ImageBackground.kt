@@ -7,17 +7,20 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import coil.compose.SubcomposeAsyncImage
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight160
@@ -28,6 +31,7 @@ fun ImageBackground(
     @DrawableRes backgroundResId: Int,
 ) {
 
+    val context = LocalContext.current
     val infiniteTransition = rememberInfiniteTransition(label = "background_pan_animation")
 
     val tx by infiniteTransition.animateFloat(
@@ -40,10 +44,9 @@ fun ImageBackground(
         label = "translation_x_value"
     )
 
-    Image(
-        painter = painterResource(backgroundResId),
+    SubcomposeAsyncImage(
+        model = backgroundResId,
         contentDescription = null,
-        contentScale = ContentScale.Crop,
         modifier = modifier
             .fillMaxSize()
             .graphicsLayer {
@@ -51,9 +54,23 @@ fun ImageBackground(
                 scaleY = 1.2f
 
                 translationX = tx
-
-                alpha = 0.45f
             },
+        alpha = 0.5f,
+        contentScale = ContentScale.Crop,
+        loading = {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.surface)
+            )
+        },
+        error = {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.surface)
+            )
+        }
     )
 }
 
@@ -66,7 +83,7 @@ private fun ImageBackgroundPreview() {
             modifier = Modifier
                 .height(itemHeight160)
                 .fillMaxWidth(),
-            backgroundResId = R.drawable.clear
+            backgroundResId = R.drawable.clear_compact
         )
     }
 }

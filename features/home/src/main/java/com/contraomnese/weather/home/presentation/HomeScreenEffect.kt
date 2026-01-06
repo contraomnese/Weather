@@ -4,6 +4,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 import com.contraomnese.weather.domain.weatherByLocation.model.Location
 import com.contraomnese.weather.presentation.architecture.MviEffect
+import kotlinx.datetime.Instant
 
 internal sealed interface HomeScreenEffect : MviEffect {
     data class InputLocationUpdated(val input: TextFieldValue) : HomeScreenEffect
@@ -13,4 +14,5 @@ internal sealed interface HomeScreenEffect : MviEffect {
     data class FavoritesForecastUpdated(val favoritesForecast: Map<Int, Forecast>) : HomeScreenEffect
     data class AccessFineLocationPermissionGranted(val isGranted: Boolean) : HomeScreenEffect
     data class GpsModeEnabled(val isEnabled: Boolean) : HomeScreenEffect
+    data class CurrentTimeUpdated(val time: Instant) : HomeScreenEffect
 }

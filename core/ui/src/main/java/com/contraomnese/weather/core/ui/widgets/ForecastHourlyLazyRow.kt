@@ -12,8 +12,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding32
-import com.contraomnese.weather.domain.weatherByLocation.model.CompactWeatherCondition
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastHour
+import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
 import kotlin.random.Random
 
 
@@ -54,7 +54,7 @@ private fun ForecastHourlyLazyRowPreview() {
             items = List(9) { index ->
                 ForecastHour(
                     time = "0${index}:00",
-                    condition = CompactWeatherCondition.CLEAR,
+                    condition = WeatherCondition.CLEAR,
                     temperature = "${index + index}",
                     isDay = Random.nextBoolean()
                 )

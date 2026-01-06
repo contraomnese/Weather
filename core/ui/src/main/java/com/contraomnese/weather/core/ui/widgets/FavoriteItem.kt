@@ -62,7 +62,7 @@ fun FavoriteItem(
     locationCountry: String,
     timeZone: TimeZone,
     conditionText: String,
-    @DrawableRes backgroundResIdByCondition: Int,
+    @DrawableRes background: Int,
     temperature: String,
     maxTemperature: String,
     minTemperature: String,
@@ -110,7 +110,7 @@ fun FavoriteItem(
             ),
             color = MaterialTheme.colorScheme.surface
         ) {
-            ImageBackground(backgroundResId = backgroundResIdByCondition)
+            ImageBackground(backgroundResId = background)
             BodySection(
                 locationName,
                 localTime,
@@ -278,7 +278,7 @@ fun FavoriteItemPreview() {
             locationCountry = "USA USA USA USA USA USA USA USA USA USA",
             timeZone = TimeZone.of("Europe/Moscow"),
             conditionText = "Ясно Ясно Ясно Ясно Ясно Ясно",
-            backgroundResIdByCondition = R.drawable.clear,
+            background = R.drawable.clear,
             temperature = "21",
             maxTemperature = "25",
             minTemperature = "16",
