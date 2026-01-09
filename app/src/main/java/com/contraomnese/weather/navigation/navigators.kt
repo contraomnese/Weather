@@ -1,6 +1,5 @@
 package com.contraomnese.weather.navigation
 
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.contraomnese.weather.appsettings.navigation.AppSettingsNavigator
 import com.contraomnese.weather.appsettings.navigation.navigateToAppSettings
@@ -38,10 +37,7 @@ fun NavHostController.appSettingsNavigator() = AppSettingsNavigator { popBackSta
 
 fun NavHostController.navigateSingleTopTo(route: Any) {
     navigate(route) {
-        popUpTo(this@navigateSingleTopTo.graph.findStartDestination().id) {
-            saveState = true
-            inclusive = false
-        }
+        popUpTo(route)
         launchSingleTop = true
         restoreState = true
     }

@@ -99,7 +99,7 @@ class ForecastRepositoryTest {
 
             try {
                 Locale.setDefault(Locale(realAppSettings.language.value))
-                repository.getForecastByLocationId(locationId).test {
+                repository.observeForecastByLocationId(locationId).test {
                     val item = awaitItem()
                     assertEquals(expectedData, item)
                     awaitComplete()
@@ -121,7 +121,7 @@ class ForecastRepositoryTest {
             coEvery { appSettingsRepository.observeSettings() } returns flowOf(expectedSettings)
             every { any<ForecastData>().toDomain(any<AppSettings>()) } returns expectedData
 
-            repository.getForecastByLocationId(locationId).test {
+            repository.observeForecastByLocationId(locationId).test {
                 val item = awaitItem()
                 assertEquals(expectedData, item)
                 awaitComplete()
@@ -148,7 +148,7 @@ class ForecastRepositoryTest {
             coEvery { forecastDao.observeForecastBy(locationId) } returns flowOf(null)
             coEvery { appSettingsRepository.observeSettings() } returns flowOf(appSettingsFirstItem)
 
-            repository.getForecastByLocationId(locationId).test {
+            repository.observeForecastByLocationId(locationId).test {
                 val item = awaitItem()
                 assertEquals(expectedData, item)
                 awaitComplete()
@@ -169,7 +169,7 @@ class ForecastRepositoryTest {
             every { forecastDataFirstItem.toDomain(appSettingsFirstItem) } returns forecastFirstItem
             every { forecastDataSecondItem.toDomain(appSettingsFirstItem) } returns forecastSecondItem
 
-            repository.getForecastByLocationId(locationId).test {
+            repository.observeForecastByLocationId(locationId).test {
                 val item1 = awaitItem()
                 assertEquals(forecastFirstItem, item1)
 
@@ -204,7 +204,7 @@ class ForecastRepositoryTest {
             coEvery { appSettingsRepository.observeSettings() } returns flowOf(appSettingsFirstItem)
             every { any<ForecastData>().toDomain(any<AppSettings>()) } throws mappingException
 
-            repository.getForecastByLocationId(locationId).test {
+            repository.observeForecastByLocationId(locationId).test {
                 val actualException = awaitError()
                 assertEquals(expectedException.message, actualException.message)
             }

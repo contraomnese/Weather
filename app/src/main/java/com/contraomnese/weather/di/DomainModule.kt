@@ -18,6 +18,8 @@ import com.contraomnese.weather.domain.home.usecase.RemoveFavoriteUseCase
 import com.contraomnese.weather.domain.home.usecase.RemoveFavoriteUseCaseImpl
 import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveForecastWeatherUseCase
 import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveForecastWeatherUseCaseImpl
+import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveForecastsWeatherUseCase
+import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveForecastsWeatherUseCaseImpl
 import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateForecastWeatherUseCase
 import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateForecastWeatherUseCaseImpl
 import org.koin.dsl.module
@@ -56,6 +58,11 @@ val domainModule = module {
     }
     factory<ObserveForecastWeatherUseCase> {
         ObserveForecastWeatherUseCaseImpl(
+            repository = get()
+        )
+    }
+    factory<ObserveForecastsWeatherUseCase> {
+        ObserveForecastsWeatherUseCaseImpl(
             repository = get()
         )
     }

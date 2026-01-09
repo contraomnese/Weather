@@ -105,6 +105,7 @@ internal class MviViewModel<Action : MviAction, Effect : MviEffect, Event : MviE
         actor: suspend (Action) -> Unit,
     ) = supervisorLaunch(
         onError = logger::logActor,
+        scope = scope,
         block = { actor(action) }
     )
 
@@ -112,6 +113,7 @@ internal class MviViewModel<Action : MviAction, Effect : MviEffect, Event : MviE
         bootstrap: suspend () -> Unit,
     ) = supervisorLaunch(
         onError = logger::logBootstrap,
+        scope = scope,
         block = { bootstrap(); logger.logBootstrap() }
     )
 }

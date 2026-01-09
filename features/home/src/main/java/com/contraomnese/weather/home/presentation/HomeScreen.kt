@@ -3,13 +3,10 @@ package com.contraomnese.weather.home.presentation
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.os.Trace
 import android.widget.Toast
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -53,7 +50,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.LinkAnnotation
@@ -67,6 +63,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -225,6 +222,7 @@ internal fun MainScreen(
                 pushAction(HomeScreenAction.SwitchGpsMode(true))
             }
         )
+        Trace.endSection()
 
         if (uiState.inputLocation.text.isNotEmpty()) {
             MatchingLocations(
@@ -252,8 +250,6 @@ internal fun WelcomeScreen(
     onNavigateToWeatherByLocation: (Int) -> Unit = { },
     onNavigateToAppSettings: () -> Unit = {},
 ) {
-
-    val density = LocalDensity.current
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
     val searchBarOnTop = WindowInsets.isImeVisible
@@ -263,16 +259,12 @@ internal fun WelcomeScreen(
         animationSpec = tween(ANIMATION_DURATION)
     )
 
-//    TopTitleText(
-//        modifier = Modifier.padding(top = screenHeight / 4),
-//        visible = !searchBarOnTop,
-//        title = stringResource(R.string.use_search_title),
-//        maxLines = 2
-//    )
-
     Column(
         modifier = Modifier
-            .offset(y = topBarOffset)
+            .offset {
+                val yPx = with(this) { topBarOffset.roundToPx() }
+                IntOffset(x = 0, y = yPx)
+            }
     ) {
         SearchBar(
             modifier = Modifier.testTag("search_bar"),
@@ -316,66 +308,6 @@ internal fun WelcomeScreen(
             )
         }
     }
-
-//    BottomTitleText(
-//        modifier = Modifier.padding(bottom = screenHeight / 4),
-//        visible = !searchBarOnTop,
-//        title = stringResource(R.string.use_gps_title),
-//        maxLines = 2
-//    )
-}
-
-@Composable
-private fun TopTitleText(
-    modifier: Modifier = Modifier,
-    visible: Boolean,
-    enter: EnterTransition = expandVertically(
-        animationSpec = tween(durationMillis = ANIMATION_DURATION)
-    ),
-    exit: ExitTransition = shrinkVertically(
-        animationSpec = tween(durationMillis = ANIMATION_DURATION)
-    ),
-    title: String,
-    maxLines: Int,
-) {
-//    AnimatedAutoSizeTitleText(
-//        modifier = modifier,
-//        visible = visible,
-//        enter = enter,
-//        exit = exit,
-//        title = title,
-//        maxLines = maxLines
-//    )
-}
-
-@Composable
-private fun BottomTitleText(
-    modifier: Modifier = Modifier,
-    visible: Boolean,
-    enter: EnterTransition = expandVertically(
-        animationSpec = tween(durationMillis = ANIMATION_DURATION),
-        expandFrom = Alignment.Top
-    ),
-    exit: ExitTransition = shrinkVertically(
-        animationSpec = tween(
-            durationMillis = ANIMATION_DURATION
-        ),
-        shrinkTowards = Alignment.Top
-    ),
-    title: String,
-    textAlign: TextAlign = TextAlign.End,
-    maxLines: Int,
-) {
-//    AnimatedAutoSizeTitleText(
-//        modifier = modifier,
-//        alignment = Alignment.BottomEnd,
-//        visible = visible,
-//        enter = enter,
-//        exit = exit,
-//        title = title,
-//        textAlign = textAlign,
-//        maxLines = maxLines
-//    )
 }
 
 

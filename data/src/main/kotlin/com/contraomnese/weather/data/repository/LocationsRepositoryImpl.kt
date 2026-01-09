@@ -55,7 +55,7 @@ class LocationsRepositoryImpl(
             database.favoritesDao().removeFavorite(locationId)
             Result.success(locationId)
         } catch (cause: Exception) {
-            Result.failure(storageError(logPrefix("Impossible remove favorite to storage"), cause))
+            Result.failure(storageError(logPrefix("Impossible remove favorite from storage"), cause))
         }
     }
 

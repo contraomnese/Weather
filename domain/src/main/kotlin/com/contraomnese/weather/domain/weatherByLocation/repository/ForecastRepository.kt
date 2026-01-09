@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface ForecastRepository {
 
     suspend fun refreshForecastByLocationId(id: Int): Result<Int>
-    fun getForecastByLocationId(id: Int): Flow<Forecast?>
+    fun observeForecastByLocationId(id: Int): Flow<Forecast?>
+    fun observeForecastsByLocationIds(ids: List<Int>): Flow<List<Forecast>>
 }
 

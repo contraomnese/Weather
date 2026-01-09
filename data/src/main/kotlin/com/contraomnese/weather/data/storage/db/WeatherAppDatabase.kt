@@ -18,7 +18,7 @@ import com.contraomnese.weather.data.storage.db.locations.entities.FavoriteEntit
 import com.contraomnese.weather.data.storage.db.locations.entities.MatchingLocationEntity
 
 private const val DATABASE_VERSION = 1
-const val DATABASE_NAME = "contraomnese_weather_app.sqlite3"
+const val DATABASE_NAME = "test_contraomnese_weather_app.sqlite3"
 
 @Database(
     entities = [

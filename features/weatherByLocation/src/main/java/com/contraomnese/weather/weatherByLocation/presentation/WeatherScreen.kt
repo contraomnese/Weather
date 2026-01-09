@@ -1,5 +1,8 @@
 package com.contraomnese.weather.weatherByLocation.presentation
 
+import android.app.Activity
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -82,7 +85,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
-
 @Composable
 internal fun WeatherRoute(
     viewModel: WeatherViewModel,
@@ -92,10 +94,14 @@ internal fun WeatherRoute(
 ) {
 
     val context = LocalContext.current
+    val activity = LocalActivity.current as Activity
     val snackBarHostState = LocalSnackbarHostState.current
 
     val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
 
+    BackHandler {
+        activity.finish()
+    }
 
     eventFlow.collectEvent { event ->
         when (event) {

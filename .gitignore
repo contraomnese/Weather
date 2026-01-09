@@ -16,4 +16,5 @@
 .cxx
 app/keystore
 app/release
+app/src/main/assets/test_contraomnese_weather_app.sqlite3
 local.properties

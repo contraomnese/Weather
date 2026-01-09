@@ -2,30 +2,23 @@ package com.contraomnese.weather.home.presentation
 
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.viewModelScope
-import com.contraomnese.weather.domain.exceptions.logPrefix
-import com.contraomnese.weather.domain.exceptions.notInitialize
 import com.contraomnese.weather.domain.home.usecase.AddFavoriteUseCase
 import com.contraomnese.weather.domain.home.usecase.GetLocationUseCase
 import com.contraomnese.weather.domain.home.usecase.GetLocationsUseCase
 import com.contraomnese.weather.domain.home.usecase.ObserveFavoritesUseCase
 import com.contraomnese.weather.domain.home.usecase.RemoveFavoriteUseCase
+import com.contraomnese.weather.domain.weatherByLocation.model.Location
 import com.contraomnese.weather.domain.weatherByLocation.model.LocationCoordinates
-import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveForecastWeatherUseCase
+import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveForecastsWeatherUseCase
 import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateForecastWeatherUseCase
 import com.contraomnese.weather.presentation.architecture.MviModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 internal class HomeViewModel(
     private val getLocationsUseCase: GetLocationsUseCase,
@@ -33,7 +26,7 @@ internal class HomeViewModel(
     private val observeFavoritesUseCase: ObserveFavoritesUseCase,
     private val addFavoriteUseCase: AddFavoriteUseCase,
     private val removeFavoriteUseCase: RemoveFavoriteUseCase,
-    private val observeForecastWeatherUseCase: ObserveForecastWeatherUseCase,
+    private val observeForecastsWeatherUseCase: ObserveForecastsWeatherUseCase,
     private val updateForecastWeatherUseCase: UpdateForecastWeatherUseCase,
 ) : MviModel<HomeScreenAction, HomeScreenEffect, HomeScreenEvent, HomeScreenState>(
     defaultState = HomeScreenState.DEFAULT,
@@ -44,52 +37,29 @@ internal class HomeViewModel(
         private const val LOCATION_UPDATE_DELAY = 2000L
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override suspend fun bootstrap() {
-        observeFavoritesUseCase()
-            .onEach {
-                push(HomeScreenEffect.FavoritesUpdated(it))
-            }
-            .catch {
-                push(HomeScreenEvent.HandleError(notInitialize(logPrefix("Can't observe favorites"), it)))
-            }
-            .launchIn(viewModelScope)
-
-        stateFlow
-            .map { it.favorites }
-            .distinctUntilChanged()
-            .flatMapLatest { newFavorites ->
-                if (newFavorites.isEmpty()) {
-                    emptyFlow()
-                } else {
-                    val forecastFlows = newFavorites.map { location ->
-                        observeForecastWeatherUseCase(location.id)
-                            .onEach { if (it == null) updateForecastWeatherUseCase(location.id) }
-                            .filterNotNull()
-                            .map { forecast -> location.id to forecast }
-                            .catch {
-                                push(HomeScreenEvent.HandleError(notInitialize(logPrefix("Can't observe forecast weather"), it)))
-                            }
-                    }
-                    combine(forecastFlows) { pairs ->
-                        pairs.toMap()
-                    }
-                }
-            }
-            .onEach { forecastsMap ->
-                push(HomeScreenEffect.FavoritesForecastUpdated(forecastsMap))
-            }
-            .catch {
-                push(HomeScreenEvent.HandleError(notInitialize(logPrefix("Bootstrap failed"), it)))
-            }
-            .launchIn(viewModelScope)
-
+    init {
         viewModelScope.launch {
-            while (true) {
-                push(HomeScreenEffect.CurrentTimeUpdated(Clock.System.now()))
-                delay(60_000L)
+            flow {
+                while (true) {
+                    val now = Clock.System.now()
+                    emit(now)
+                    delay(
+                        (60 - now.toLocalDateTime(TimeZone.currentSystemDefault()).second) * 1000L
+                    )
+                }
+            }.collect {
+                push(HomeScreenEffect.CurrentTimeUpdated(it))
             }
         }
+    }
+
+    override suspend fun bootstrap() {
+        delay(400)
+        observeFavoritesUseCase()
+            .collectLatest { favorites ->
+                push(HomeScreenEffect.FavoritesUpdated(favorites))
+                push(HomeScreenAction.UpdateFavorites(favorites))
+            }
     }
 
     override fun reducer(effect: HomeScreenEffect, previousState: HomeScreenState): HomeScreenState = when (effect) {
@@ -111,6 +81,7 @@ internal class HomeViewModel(
         is HomeScreenAction.SwitchGpsMode -> processGpsModeEnabled(action.enabled)
         is HomeScreenAction.AccessFineLocationPermissionGranted -> processAccessFineLocationPermissionGranted(action.granted)
         is HomeScreenAction.DeviceGpsModeEnabled -> processGpsModeEnabled(action.enabled)
+        is HomeScreenAction.UpdateFavorites -> processFavoritesUpdate(action.favorites)
     }
 
     private suspend fun processLocationInput(input: TextFieldValue) {
@@ -136,6 +107,7 @@ internal class HomeViewModel(
 
     private suspend fun processFavoriteAdd(locationId: Int) {
         addFavoriteUseCase(locationId)
+            .onSuccess { updateForecastWeatherUseCase(it) }
             .onFailure { push(HomeScreenEvent.HandleError(it)) }
     }
 
@@ -156,4 +128,10 @@ internal class HomeViewModel(
         if (isEnabled) push(HomeScreenEvent.GetGpsLocation)
     }
 
+    private suspend fun processFavoritesUpdate(favorites: List<Location>) {
+        observeForecastsWeatherUseCase(favorites.map { it.id })
+            .collectLatest { forecasts ->
+                push(HomeScreenEffect.FavoritesForecastUpdated(forecasts.associateBy { it.location.id }))
+            }
+    }
 }

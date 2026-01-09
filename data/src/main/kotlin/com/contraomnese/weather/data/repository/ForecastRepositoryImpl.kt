@@ -36,7 +36,7 @@ class ForecastRepositoryImpl(
     private val transactionProvider: TransactionProvider,
 ) : ForecastRepository {
 
-    override fun getForecastByLocationId(id: Int): Flow<Forecast?> {
+    override fun observeForecastByLocationId(id: Int): Flow<Forecast?> {
         return combine(
             database.forecastDao().observeForecastBy(id),
             appSettingsRepository.observeSettings()
@@ -46,6 +46,16 @@ class ForecastRepositoryImpl(
             .map { (entity, settings) ->
                 entity?.let { entity.toDomain(settings) }
             }
+            .flowOn(dispatcher)
+    }
+
+    override fun observeForecastsByLocationIds(ids: List<Int>): Flow<List<Forecast>> {
+        return combine(
+            database.forecastDao().observeForecastsBy(ids),
+            appSettingsRepository.observeSettings()
+        ) { entities, settings ->
+            entities.map { it.toDomain(settings) }
+        }
             .flowOn(dispatcher)
     }
 

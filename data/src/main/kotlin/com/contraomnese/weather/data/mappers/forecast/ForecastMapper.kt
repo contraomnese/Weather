@@ -57,6 +57,7 @@ fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
 
     return Forecast(
         location = ForecastLocation(
+            id = location.locationId,
             city = location.name,
             country = location.country,
             latitude = location.latitude,

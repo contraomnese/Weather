@@ -58,19 +58,18 @@ import kotlinx.datetime.toLocalDateTime
 @Composable
 fun FavoriteItem(
     modifier: Modifier = Modifier,
+    @DrawableRes background: Int,
     locationName: String,
     locationCountry: String,
-    timeZone: TimeZone,
-    conditionText: String,
-    @DrawableRes background: Int,
     temperature: String,
     maxTemperature: String,
     minTemperature: String,
+    conditionText: String,
     currentTime: Instant,
+    timeZone: TimeZone,
     onTapClicked: () -> Unit,
     onDeleteClicked: () -> Unit,
 ) {
-
     var deleteVisible by remember { mutableStateOf(false) }
 
     val localTime = remember(currentTime, timeZone) {
@@ -78,7 +77,7 @@ fun FavoriteItem(
     }
 
     Row(
-        modifier = modifier.padding(vertical = padding8),
+        modifier = modifier,
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(space8)
     ) {
@@ -102,8 +101,6 @@ fun FavoriteItem(
                     )
                 },
             shape = RoundedCornerShape(cornerRadius16),
-            shadowElevation = 8.dp,
-            tonalElevation = 4.dp,
             border = BorderStroke(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
@@ -139,8 +136,6 @@ fun FavoriteItem(
                         shape = RoundedCornerShape(cornerRadius16)
                         clip = true
                     },
-                shadowElevation = 8.dp,
-                tonalElevation = 4.dp,
                 border = BorderStroke(
                     width = 1.dp,
                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)

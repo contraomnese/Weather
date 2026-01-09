@@ -2,7 +2,6 @@ package com.contraomnese.weather.weatherByLocation.navigation
 
 import androidx.compose.runtime.remember
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
@@ -21,9 +20,6 @@ data class WeatherByLocationDestination(val id: Int) : MviDestination
 
 fun NavController.navigateToWeatherByLocation(id: Int) {
     navigate(WeatherByLocationDestination(id = id)) {
-        popUpTo(graph.findStartDestination().id) {
-            inclusive = true
-        }
         launchSingleTop = true
     }
 }

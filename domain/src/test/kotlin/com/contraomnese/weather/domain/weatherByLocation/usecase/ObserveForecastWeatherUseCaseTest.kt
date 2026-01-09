@@ -34,13 +34,13 @@ class ObserveForecastWeatherUseCaseTest {
 
         val expectedData = forecast
 
-        coEvery { repository.getForecastByLocationId(locationId) } returns flowOf(expectedData)
+        coEvery { repository.observeForecastByLocationId(locationId) } returns flowOf(expectedData)
 
         val actualData = useCase(locationId).first()
 
         assertNotNull(actualData)
         assertEquals(expectedData, actualData)
-        coVerify(exactly = 1) { repository.getForecastByLocationId(locationId) }
+        coVerify(exactly = 1) { repository.observeForecastByLocationId(locationId) }
         confirmVerified(repository)
     }
 
@@ -49,7 +49,7 @@ class ObserveForecastWeatherUseCaseTest {
 
         val expectedData = listOf(firstItem, secondItem)
 
-        coEvery { repository.getForecastByLocationId(locationId) } returns flow {
+        coEvery { repository.observeForecastByLocationId(locationId) } returns flow {
             emit(firstItem)
             emit(secondItem)
         }
@@ -60,7 +60,7 @@ class ObserveForecastWeatherUseCaseTest {
         assertNotNull(actualResult[1])
         assertEquals(expectedData[0], actualResult[0])
         assertEquals(expectedData[1], actualResult[1])
-        coVerify(exactly = 1) { repository.getForecastByLocationId(locationId) }
+        coVerify(exactly = 1) { repository.observeForecastByLocationId(locationId) }
         confirmVerified(repository)
     }
 
@@ -69,7 +69,7 @@ class ObserveForecastWeatherUseCaseTest {
 
         val expectedData = listOf(null, null)
 
-        coEvery { repository.getForecastByLocationId(locationId) } returns flow {
+        coEvery { repository.observeForecastByLocationId(locationId) } returns flow {
             emit(null)
             emit(null)
         }
@@ -78,7 +78,7 @@ class ObserveForecastWeatherUseCaseTest {
         assertEquals(expectedData.size, actualResult.size)
         assertNull(actualResult[0])
         assertNull(actualResult[1])
-        coVerify(exactly = 1) { repository.getForecastByLocationId(locationId) }
+        coVerify(exactly = 1) { repository.observeForecastByLocationId(locationId) }
         confirmVerified(repository)
     }
 
@@ -87,7 +87,7 @@ class ObserveForecastWeatherUseCaseTest {
 
         val expectedException = repositoryException
 
-        coEvery { repository.getForecastByLocationId(locationId) } returns flow {
+        coEvery { repository.observeForecastByLocationId(locationId) } returns flow {
             throw expectedException
         }
         val actualException = assertFailsWith<RuntimeException> {
@@ -95,7 +95,7 @@ class ObserveForecastWeatherUseCaseTest {
         }
 
         assertEquals(expectedException.message, actualException.message)
-        coVerify(exactly = 1) { repository.getForecastByLocationId(locationId) }
+        coVerify(exactly = 1) { repository.observeForecastByLocationId(locationId) }
         confirmVerified(repository)
     }
 
