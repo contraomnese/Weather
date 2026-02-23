@@ -1,6 +1,11 @@
 package com.contraomnese.weather.appsettings.presentation
 
 import androidx.lifecycle.viewModelScope
+import com.contraomnese.weather.appsettings.presentation.AppSettingsEffect.ForecastAutoSyncChanged
+import com.contraomnese.weather.appsettings.presentation.AppSettingsEffect.PrecipitationUnitChanged
+import com.contraomnese.weather.appsettings.presentation.AppSettingsEffect.PressureUnitChanged
+import com.contraomnese.weather.appsettings.presentation.AppSettingsEffect.TemperatureUnitChanged
+import com.contraomnese.weather.appsettings.presentation.AppSettingsEffect.WindSpeedUnitChanged
 import com.contraomnese.weather.domain.app.usecase.ObserveAppSettingsUseCase
 import com.contraomnese.weather.domain.app.usecase.UpdateAppSettingsUseCase
 import com.contraomnese.weather.domain.exceptions.logPrefix
@@ -49,12 +54,14 @@ internal class AppSettingsViewModel(
             is AppSettingsEffect.TemperatureUnitChanged -> previousState.setTemperatureUnit(effect.temperatureUnit)
             is AppSettingsEffect.WindSpeedUnitChanged -> previousState.setWindSpeedUnit(effect.windSpeedUnit)
             is AppSettingsEffect.SettingsUpdated -> previousState.setAppSettings(effect.appSettings)
+            is AppSettingsEffect.ForecastAutoSyncChanged -> previousState.setForecastAutoSync(effect.enabled)
         }
 
     override suspend fun actor(action: AppSettingsAction) = when (action) {
-        is AppSettingsAction.PrecipitationUnitChange -> push(AppSettingsEffect.PrecipitationUnitChanged(action.precipitationUnit))
-        is AppSettingsAction.PressureUnitChange -> push(AppSettingsEffect.PressureUnitChanged(action.pressureUnit))
-        is AppSettingsAction.TemperatureUnitChange -> push(AppSettingsEffect.TemperatureUnitChanged(action.temperatureUnit))
-        is AppSettingsAction.WindSpeedUnitChange -> push(AppSettingsEffect.WindSpeedUnitChanged(action.windSpeedUnit))
+        is AppSettingsAction.PrecipitationUnitChange -> push(PrecipitationUnitChanged(action.precipitationUnit))
+        is AppSettingsAction.PressureUnitChange -> push(PressureUnitChanged(action.pressureUnit))
+        is AppSettingsAction.TemperatureUnitChange -> push(TemperatureUnitChanged(action.temperatureUnit))
+        is AppSettingsAction.WindSpeedUnitChange -> push(WindSpeedUnitChanged(action.windSpeedUnit))
+        is AppSettingsAction.ForecastAutoSyncChange -> push(ForecastAutoSyncChanged(action.enabled))
     }
 }

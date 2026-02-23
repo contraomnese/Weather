@@ -4,6 +4,7 @@
     <string name="temperature_high_low">Макс:%1$s° Мин:%2$s°</string>
     <string name="now">Сейчас</string>
     <string name="local_time_title">Местное время</string>
+    <string name="get_forecast_auto">Получать прогноз погоды автоматически</string>
     <string name="today_forecast_title">СЕГОДНЯ</string>
     <string name="daily_forecast_title">ПРОГНОЗ НА 3 ДНЯ</string>
     <string name="use_search_title">Воспользуйтесь поиском</string>
@@ -69,24 +70,24 @@
 
     <!-- Temperature -->
     <string name="temperature_title">Температура</string>
-    <string name="temperature_celsius">Цельсий (°C)</string>
-    <string name="temperature_fahrenheit">Фаренгейт (°F)</string>
+    <string name="temperature_celsius">°C</string>
+    <string name="temperature_fahrenheit">°F</string>
 
     <!-- Wind speed -->
     <string name="speed_title">Скорость ветра</string>
-    <string name="speed_kph">Километры в час (км/ч)</string>
-    <string name="speed_mph">Мили в час (миль/ч)</string>
-    <string name="speed_ms">Метры в секунду (м/с)</string>
+    <string name="speed_kph">км/ч</string>
+    <string name="speed_mph">миль/ч</string>
+    <string name="speed_ms">м/с</string>
 
     <!-- Precipitation -->
     <string name="precipitation_title">Осадки</string>
-    <string name="precipitation_mm">Миллиметры (мм)</string>
-    <string name="precipitation_in">Дюймы (дюйм)</string>
+    <string name="precipitation_mm">мм</string>
+    <string name="precipitation_in">дюйм</string>
 
     <!-- Pressure -->
     <string name="atm_pressure_title">Атмосферное давление</string>
-    <string name="pressure_mmhg">Миллиметры ртутного столба (мм рт. ст.)</string>
-    <string name="pressure_gpa">Гекто паскаль (гПа)</string>
+    <string name="pressure_mmhg">мм рт. ст.</string>
+    <string name="pressure_gpa">гПа</string>
     <string name="feels_like_temperature_title">%2$s°/%3$s° Ощущается как %1$s°</string>
     <string name="day_title">День</string>
     <string name="dew_point_happy">Комфортно</string>

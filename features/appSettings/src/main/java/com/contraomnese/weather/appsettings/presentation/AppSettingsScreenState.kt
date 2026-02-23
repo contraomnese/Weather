@@ -27,6 +27,9 @@ internal data class AppSettingsScreenState(
     fun setWindSpeedUnit(windSpeedUnit: WindSpeedUnit): AppSettingsScreenState =
         copy(appSettings = appSettings!!.copy(windSpeedUnit = windSpeedUnit))
 
+    fun setForecastAutoSync(enabled: Boolean): AppSettingsScreenState =
+        copy(appSettings = appSettings!!.copy(forecastAutoSync = enabled))
+
     companion object {
         val DEFAULT = AppSettingsScreenState(isLoading = true)
     }

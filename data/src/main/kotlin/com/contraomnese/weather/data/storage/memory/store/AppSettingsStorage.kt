@@ -1,6 +1,7 @@
 package com.contraomnese.weather.data.storage.memory.store
 
 import android.content.Context
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -32,6 +33,7 @@ class AppSettingsStorageImpl(
         val PRECIPITATION_UNIT = stringPreferencesKey("precipitation_unit")
         val TEMPERATURE_UNIT = stringPreferencesKey("temperature_unit")
         val PRESSURE_UNIT = stringPreferencesKey("pressure_unit")
+        val FORECAST_AUTO_SYNC = booleanPreferencesKey("forecast_auto_sync")
     }
 
     private lateinit var settings: AppSettingsEntity
@@ -46,7 +48,8 @@ class AppSettingsStorageImpl(
                 speedUnit = prefs[Keys.SPEED_UNIT] ?: WindSpeedUnit.Kph.name,
                 precipitationUnit = prefs[Keys.PRECIPITATION_UNIT] ?: PrecipitationUnit.Millimeters.name,
                 temperatureUnit = prefs[Keys.TEMPERATURE_UNIT] ?: TemperatureUnit.Celsius.name,
-                pressureUnit = prefs[Keys.PRESSURE_UNIT] ?: PressureUnit.MmHg.name
+                pressureUnit = prefs[Keys.PRESSURE_UNIT] ?: PressureUnit.MmHg.name,
+                forecastAutoSync = prefs[Keys.FORECAST_AUTO_SYNC] ?: false
             )
             settings
         }
@@ -65,6 +68,7 @@ class AppSettingsStorageImpl(
                 prefs[Keys.PRECIPITATION_UNIT] = entity.precipitationUnit
                 prefs[Keys.TEMPERATURE_UNIT] = entity.temperatureUnit
                 prefs[Keys.PRESSURE_UNIT] = entity.pressureUnit
+                prefs[Keys.FORECAST_AUTO_SYNC] = entity.forecastAutoSync
             }
         }
     }

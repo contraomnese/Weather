@@ -3,7 +3,6 @@ package com.contraomnese.weather.home.presentation
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.os.Trace
 import android.widget.Toast
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -222,7 +221,6 @@ internal fun MainScreen(
                 pushAction(HomeScreenAction.SwitchGpsMode(true))
             }
         )
-        Trace.endSection()
 
         if (uiState.inputLocation.text.isNotEmpty()) {
             MatchingLocations(

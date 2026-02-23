@@ -15,7 +15,8 @@ class AppSettingsMapper {
         windSpeedUnit = WindSpeedUnit.entries.firstOrNull { it.name == entity.speedUnit } ?: WindSpeedUnit.Kph,
         precipitationUnit = PrecipitationUnit.entries.firstOrNull { it.name == entity.precipitationUnit } ?: PrecipitationUnit.Millimeters,
         temperatureUnit = TemperatureUnit.entries.firstOrNull { it.name == entity.temperatureUnit } ?: TemperatureUnit.Celsius,
-        pressureUnit = PressureUnit.entries.firstOrNull { it.name == entity.pressureUnit } ?: PressureUnit.MmHg
+        pressureUnit = PressureUnit.entries.firstOrNull { it.name == entity.pressureUnit } ?: PressureUnit.MmHg,
+        forecastAutoSync = entity.forecastAutoSync
     )
 
     fun toEntity(model: AppSettings): AppSettingsEntity = AppSettingsEntity(
@@ -23,6 +24,7 @@ class AppSettingsMapper {
         speedUnit = model.windSpeedUnit.name,
         precipitationUnit = model.precipitationUnit.name,
         temperatureUnit = model.temperatureUnit.name,
-        pressureUnit = model.pressureUnit.name
+        pressureUnit = model.pressureUnit.name,
+        forecastAutoSync = model.forecastAutoSync
     )
 }

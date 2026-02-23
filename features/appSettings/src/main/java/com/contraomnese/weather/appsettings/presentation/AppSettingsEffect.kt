@@ -12,5 +12,6 @@ internal sealed interface AppSettingsEffect : MviEffect {
     data class PressureUnitChanged(val pressureUnit: PressureUnit) : AppSettingsEffect
     data class PrecipitationUnitChanged(val precipitationUnit: PrecipitationUnit) : AppSettingsEffect
     data class WindSpeedUnitChanged(val windSpeedUnit: WindSpeedUnit) : AppSettingsEffect
+    data class ForecastAutoSyncChanged(val enabled: Boolean) : AppSettingsEffect
     data class SettingsUpdated(val appSettings: AppSettings) : AppSettingsEffect
 }

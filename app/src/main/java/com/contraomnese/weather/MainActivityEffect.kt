@@ -6,4 +6,5 @@ import com.contraomnese.weather.presentation.architecture.MviEffect
 internal sealed interface MainActivityEffect : MviEffect {
     data object NotLoading : MainActivityEffect
     data class FavoritesUpdated(val favorites: List<Location>) : MainActivityEffect
+    data class ForecastAutoSyncChanged(val enabled: Boolean) : MainActivityEffect
 }

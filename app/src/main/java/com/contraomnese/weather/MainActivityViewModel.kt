@@ -1,6 +1,7 @@
 package com.contraomnese.weather
 
 import androidx.lifecycle.viewModelScope
+import com.contraomnese.weather.domain.app.usecase.ObserveAppSettingsUseCase
 import com.contraomnese.weather.domain.exceptions.logPrefix
 import com.contraomnese.weather.domain.exceptions.notInitialize
 import com.contraomnese.weather.domain.home.usecase.AddFavoriteUseCase
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.onEach
 internal class MainActivityViewModel(
     private val observeFavoritesUseCase: ObserveFavoritesUseCase,
     private val addFavoriteUseCase: AddFavoriteUseCase,
+    private val observeAppSettingsUseCase: ObserveAppSettingsUseCase,
 ) : MviModel<MainActivityAction, MainActivityEffect, MainActivityEvent, MainActivityState>(
     tag = "MainActivity",
     defaultState = MainActivityState.DEFAULT
@@ -29,6 +31,15 @@ internal class MainActivityViewModel(
                 push(MainActivityEvent.HandleError(notInitialize(logPrefix("Bootstrap failed"), it)))
             }
             .launchIn(viewModelScope)
+
+        observeAppSettingsUseCase()
+            .onEach {
+                push(MainActivityEffect.ForecastAutoSyncChanged(it.forecastAutoSync))
+            }
+            .catch {
+                push(MainActivityEvent.HandleError(notInitialize(logPrefix("Bootstrap failed"), it)))
+            } // TODO
+            .launchIn(viewModelScope)
     }
 
     override fun reducer(effect: MainActivityEffect, previousState: MainActivityState): MainActivityState = when (effect) {
@@ -38,6 +49,7 @@ internal class MainActivityViewModel(
                 WeatherByLocationDestination(id = it.id)
             } ?: HomeDestination)
         is MainActivityEffect.FavoritesUpdated -> previousState.setFavorites(effect.favorites)
+        is MainActivityEffect.ForecastAutoSyncChanged -> previousState.setForecastAutoSync(effect.enabled)
     }
 
     override suspend fun actor(action: MainActivityAction) = when (action) {

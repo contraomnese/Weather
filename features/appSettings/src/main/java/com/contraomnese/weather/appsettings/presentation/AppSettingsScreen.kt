@@ -11,11 +11,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,8 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.style.LineBreak
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contraomnese.weather.core.ui.composition.LocalSnackbarHostState
@@ -34,8 +36,8 @@ import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemWidth64
 import com.contraomnese.weather.design.theme.padding16
-import com.contraomnese.weather.design.theme.padding4
 import com.contraomnese.weather.design.theme.padding8
+import com.contraomnese.weather.design.theme.space8
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.model.PrecipitationUnit
 import com.contraomnese.weather.domain.app.model.PressureUnit
@@ -147,6 +149,11 @@ private fun AppSettingsScreen(
                 pushAction(AppSettingsAction.PressureUnitChange(it))
             }
         )
+        AutoWeatherSyncSwitch(
+            enabled = uiState.appSettings.forecastAutoSync,
+            onEnabled = { pushAction(AppSettingsAction.ForecastAutoSyncChange(it)) }
+        )
+
     }
 }
 
@@ -157,38 +164,48 @@ private inline fun <reified T : Enum<T>> RadioGroup(
     selected: T,
     crossinline onSelected: (T) -> Unit,
 ) {
-    Column {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(bottom = padding4)
-        )
-        options.forEach { option ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .selectable(
-                        selected = (option == selected),
-                        onClick = { onSelected(option) },
-                        role = Role.RadioButton
-                    )
-                    .padding(vertical = padding8),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
+    Column(
+        modifier = Modifier.padding(top = padding16)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = padding8),
+            verticalArrangement = Arrangement.spacedBy(space8)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            SingleChoiceSegmentedButtonRow(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                RadioButton(
-                    selected = (option == selected),
-                    onClick = null
-                )
-                Text(
-                    text = stringResource(option.toTextRes()),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        lineBreak = LineBreak.Heading
-                    ),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(start = padding8)
-                )
+                options.forEachIndexed { index, option ->
+                    SegmentedButton(
+                        shape = SegmentedButtonDefaults.itemShape(
+                            index = index,
+                            count = options.size
+                        ),
+                        onClick = { onSelected(options[index]) },
+                        selected = options[index] == selected,
+                        label = {
+                            Text(
+                                text = stringResource(option.toTextRes()),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
+                        colors = SegmentedButtonDefaults.colors().copy(
+                            activeBorderColor = MaterialTheme.colorScheme.secondary,
+                            activeContentColor = MaterialTheme.colorScheme.onSecondary,
+                            activeContainerColor = MaterialTheme.colorScheme.secondary
+                        ),
+                        icon = {},
+                    )
+                }
             }
         }
     }
@@ -219,8 +236,40 @@ inline fun <reified T : Enum<T>> T.toTextRes(): Int = when (this) {
     else -> error("Unsupported enum type: ${T::class.simpleName}")
 }
 
+@Composable
+private fun AutoWeatherSyncSwitch(
+    enabled: Boolean = false,
+    onEnabled: (Boolean) -> Unit,
+) {
 
-@Preview(showBackground = true, backgroundColor = 0xFF3F6E74)
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            stringResource(R.string.get_forecast_auto),
+            modifier = Modifier.fillMaxWidth(0.8f),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+            maxLines = 2,
+            softWrap = true
+        )
+        Switch(
+            checked = enabled,
+            onCheckedChange = onEnabled,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = MaterialTheme.colorScheme.secondary,
+                checkedTrackColor = MaterialTheme.colorScheme.onSecondary,
+                uncheckedThumbColor = MaterialTheme.colorScheme.onBackground,
+                uncheckedTrackColor = MaterialTheme.colorScheme.background,
+                uncheckedBorderColor = MaterialTheme.colorScheme.onBackground
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF3F6E74, locale = "ru")
 @Composable
 private fun AppSettingsPreview() {
     WeatherTheme {

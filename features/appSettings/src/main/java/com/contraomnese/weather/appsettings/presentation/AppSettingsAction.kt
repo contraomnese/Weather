@@ -11,5 +11,6 @@ internal sealed interface AppSettingsAction : MviAction {
     data class PressureUnitChange(val pressureUnit: PressureUnit) : AppSettingsAction
     data class PrecipitationUnitChange(val precipitationUnit: PrecipitationUnit) : AppSettingsAction
     data class WindSpeedUnitChange(val windSpeedUnit: WindSpeedUnit) : AppSettingsAction
+    data class ForecastAutoSyncChange(val enabled: Boolean) : AppSettingsAction
 
 }

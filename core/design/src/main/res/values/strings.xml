@@ -9,6 +9,7 @@
     <string name="local_time_title">Local time</string>
     <string name="use_search_title">Use the search</string>
     <string name="use_gps_title">or GPS determination</string>
+    <string name="get_forecast_auto">Get weather automatically</string>
 
     <!--  Titles -->
     <string name="today_forecast_title">TODAY</string>
@@ -85,24 +86,24 @@
 
     <!-- Temperature -->
     <string name="temperature_title">Temperature</string>
-    <string name="temperature_celsius">Celsius (°C)</string>
-    <string name="temperature_fahrenheit">Fahrenheit (°F)</string>
+    <string name="temperature_celsius">°C</string>
+    <string name="temperature_fahrenheit">°F</string>
 
     <!-- Wind speed -->
     <string name="speed_title">Wind speed</string>
-    <string name="speed_kph">Kilometers per hour (kph)</string>
-    <string name="speed_mph">Miles per hour (mph)</string>
-    <string name="speed_ms">Meters per second (m/s)</string>
+    <string name="speed_kph">kph</string>
+    <string name="speed_mph">mph</string>
+    <string name="speed_ms">m/s</string>
 
     <!-- Precipitation -->
     <string name="precipitation_title">Precipitation</string>
-    <string name="precipitation_mm">Millimeters (mm)</string>
-    <string name="precipitation_in">Inches (in)</string>
+    <string name="precipitation_mm">mm</string>
+    <string name="precipitation_in">in</string>
 
     <!-- Pressure -->
     <string name="atm_pressure_title">Atmospheric pressure</string>
-    <string name="pressure_mmhg">Millimeters of mercury (mmHg)</string>
-    <string name="pressure_gpa">Gekko pascal (gPa)</string>
+    <string name="pressure_mmhg">mmHg</string>
+    <string name="pressure_gpa">gPa</string>
 
     <!-- Permissions -->
     <string name="permission_location_denied_title">The location permission is important for this app. Please grant the permission.</string>

@@ -37,7 +37,6 @@ tasks.withType<Test>().configureEach {
 dependencies {
 
     implementation(project(":domain"))
-
     api(libs.bundles.android)
     api(libs.bundles.koin)
     api(libs.bundles.presentation)

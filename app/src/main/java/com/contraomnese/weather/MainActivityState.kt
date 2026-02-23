@@ -12,11 +12,14 @@ internal data class MainActivityState(
     override val isLoading: Boolean = true,
     val favorites: ImmutableList<Location> = persistentListOf(),
     val startDestination: MviDestination,
+    val forecastAutoSyncEnabled: Boolean,
 ) : MviState {
 
     fun setFavorites(newFavorites: List<Location>): MainActivityState = copy(favorites = newFavorites.toPersistentList())
+    fun setForecastAutoSync(enabled: Boolean): MainActivityState = copy(forecastAutoSyncEnabled = enabled)
 
     companion object {
-        val DEFAULT = MainActivityState(isLoading = true, startDestination = HomeDestination)
+        val DEFAULT =
+            MainActivityState(isLoading = true, startDestination = HomeDestination, forecastAutoSyncEnabled = false)
     }
 }

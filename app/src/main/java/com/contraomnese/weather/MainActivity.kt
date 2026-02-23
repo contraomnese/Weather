@@ -24,15 +24,23 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.navigation.WeatherHost
+import com.contraomnese.weather.workers.WeatherUpdateWorker
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.KoinAndroidContext
 import org.koin.androidx.compose.koinViewModel
+import java.util.concurrent.TimeUnit
 
 private const val LOTTIE_ASSET_NAME = "clear_sky.json"
 
@@ -46,11 +54,32 @@ class MainActivity : ComponentActivity() {
         setContent {
             WeatherTheme {
                 KoinAndroidContext {
-                    WeatherApp()
+                    WeatherApp(activateWeatherSync = ::setupWeatherSync)
                 }
             }
         }
     }
+
+    private fun setupWeatherSync() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .setRequiresBatteryNotLow(true)
+            .build()
+
+        val weatherRequest = PeriodicWorkRequestBuilder<WeatherUpdateWorker>(
+            6, TimeUnit.HOURS
+        )
+            .setConstraints(constraints)
+            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 15, TimeUnit.MINUTES)
+            .build()
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "WeatherUpdateWork",
+            ExistingPeriodicWorkPolicy.KEEP,
+            weatherRequest
+        )
+    }
+
 }
 
 @Composable
@@ -92,10 +121,12 @@ fun SplashScreen(visible: Boolean, onFinish: () -> Unit) {
 }
 
 @Composable
-internal fun WeatherApp(viewModel: MainActivityViewModel = koinViewModel()) {
+internal fun WeatherApp(
+    viewModel: MainActivityViewModel = koinViewModel(),
+    activateWeatherSync: () -> Unit,
+) {
 
     val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
-
 
     Crossfade(targetState = uiState.isLoading, animationSpec = tween(1000)) { loading ->
         if (loading) {
@@ -103,6 +134,8 @@ internal fun WeatherApp(viewModel: MainActivityViewModel = koinViewModel()) {
                 viewModel.push(MainActivityAction.LottieAnimationFinished)
             }
         } else {
+            if (uiState.forecastAutoSyncEnabled) activateWeatherSync()
+
             WeatherHost(
                 startDestination = uiState.startDestination,
                 eventFlow = viewModel.eventFlow
