@@ -5,7 +5,7 @@ import com.contraomnese.weather.data.mappers.locations.toDomain
 import com.contraomnese.weather.data.mappers.locations.toEntity
 import com.contraomnese.weather.data.network.api.LocationsApi
 import com.contraomnese.weather.data.network.models.MatchingLocationNetwork
-import com.contraomnese.weather.data.network.parsers.ApiParser
+import com.contraomnese.weather.data.network.parsers.INetworkParser
 import com.contraomnese.weather.data.storage.db.WeatherAppDatabase
 import com.contraomnese.weather.data.storage.db.locations.entities.FavoriteEntity
 import com.contraomnese.weather.data.storage.db.locations.entities.MatchingLocationEntity
@@ -25,7 +25,7 @@ import retrofit2.Response
 class LocationsRepositoryImpl(
     private val locationsApi: LocationsApi,
     private val database: WeatherAppDatabase,
-    private val apiParser: ApiParser,
+    private val networkParser: INetworkParser,
     private val dispatcher: CoroutineDispatcher,
 ) : LocationsRepository {
 
@@ -102,14 +102,14 @@ class LocationsRepositoryImpl(
 
     private fun parseMatchingLocations(matchingLocations: Response<List<MatchingLocationNetwork>>) =
         try {
-            Result.success(apiParser.parseOrThrowError(matchingLocations))
+            Result.success(networkParser.parseOrThrowError(matchingLocations))
         } catch (cause: Exception) {
             Result.failure(operationFailed(logPrefix("Impossible parse matching locations from network"), cause))
         }
 
     private fun parseMatchingLocation(matchingLocation: Response<MatchingLocationNetwork>) =
         try {
-            Result.success(apiParser.parseOrThrowError(matchingLocation))
+            Result.success(networkParser.parseOrThrowError(matchingLocation))
         } catch (cause: Exception) {
             Result.failure(operationFailed(logPrefix("Impossible parse matching location from network"), cause))
         }

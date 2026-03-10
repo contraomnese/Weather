@@ -5,10 +5,11 @@ import com.contraomnese.weather.data.network.api.LocationsApi
 import com.contraomnese.weather.data.network.api.WeatherApi
 import com.contraomnese.weather.data.network.interceptors.LocationsInterceptor
 import com.contraomnese.weather.data.network.interceptors.WeatherInterceptor
-import com.contraomnese.weather.data.network.models.LocationsErrorResponse
-import com.contraomnese.weather.data.network.models.WeatherErrorResponse
-import com.contraomnese.weather.data.network.parsers.ApiParser
-import com.contraomnese.weather.data.network.parsers.ApiParserImpl
+import com.contraomnese.weather.data.network.models.errors.LocationsErrorResponse
+import com.contraomnese.weather.data.network.models.errors.WeatherErrorResponse
+import com.contraomnese.weather.data.network.parsers.INetworkParser
+import com.contraomnese.weather.data.network.parsers.LocationsApiParser
+import com.contraomnese.weather.data.network.parsers.WeatherApiParser
 import com.contraomnese.weather.data.repository.AppSettingsRepositoryImpl
 import com.contraomnese.weather.data.repository.ForecastRepositoryImpl
 import com.contraomnese.weather.data.repository.LocationsRepositoryImpl
@@ -89,15 +90,15 @@ val dataModule = module {
         get<Retrofit>(named(LOCATIONS)).responseBodyConverter(LocationsErrorResponse::class.java, emptyArray())
     }
 
-    single<ApiParser>(named(WEATHER)) {
-        ApiParserImpl(
+    single<INetworkParser>(named(WEATHER)) {
+        WeatherApiParser(
             converterFactory = GsonConverterFactory.create(get()),
             retrofit = get<Retrofit>(named(WEATHER))
         )
     }
 
-    single<ApiParser>(named(LOCATIONS)) {
-        ApiParserImpl(
+    single<INetworkParser>(named(LOCATIONS)) {
+        LocationsApiParser(
             converterFactory = GsonConverterFactory.create(get()),
             retrofit = get<Retrofit>(named(LOCATIONS))
         )
@@ -129,7 +130,7 @@ val dataModule = module {
     single<LocationsRepository> {
         LocationsRepositoryImpl(
             database = get(),
-            apiParser = get(named(LOCATIONS)),
+            networkParser = get(named(LOCATIONS)),
             locationsApi = get(),
             dispatcher = Dispatchers.IO
         )

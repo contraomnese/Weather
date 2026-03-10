@@ -10,7 +10,7 @@ import com.contraomnese.weather.data.mappers.locations.toEntity
 import com.contraomnese.weather.data.network.api.WeatherApi
 import com.contraomnese.weather.data.network.models.ForecastLocationNetwork
 import com.contraomnese.weather.data.network.models.ForecastResponse
-import com.contraomnese.weather.data.network.parsers.ApiParser
+import com.contraomnese.weather.data.network.parsers.INetworkParser
 import com.contraomnese.weather.data.storage.db.WeatherAppDatabase
 import com.contraomnese.weather.data.storage.db.forecast.dao.ForecastDao
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDailyEntity
@@ -64,7 +64,7 @@ class ForecastRepositoryTest {
     private val storage = mockk<WeatherAppDatabase>(relaxed = true)
     private val locationsDao = mockk<LocationsDao>(relaxed = true)
     private val forecastDao = mockk<ForecastDao>(relaxed = true)
-    private val apiParser = mockk<ApiParser>()
+    private val apiParser = mockk<INetworkParser>()
     private val dispatcher = UnconfinedTestDispatcher()
     private val transactionProvider = FakeTransactionProvider()
 

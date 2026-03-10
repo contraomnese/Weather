@@ -6,7 +6,7 @@ import com.contraomnese.weather.data.mappers.forecast.toDomain
 import com.contraomnese.weather.data.mappers.locations.toEntity
 import com.contraomnese.weather.data.network.api.WeatherApi
 import com.contraomnese.weather.data.network.models.ForecastResponse
-import com.contraomnese.weather.data.network.parsers.ApiParser
+import com.contraomnese.weather.data.network.parsers.INetworkParser
 import com.contraomnese.weather.data.storage.db.WeatherAppDatabase
 import com.contraomnese.weather.data.storage.db.locations.entities.MatchingLocationEntity
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 class ForecastRepositoryImpl(
     private val api: WeatherApi,
-    private val apiParser: ApiParser,
+    private val apiParser: INetworkParser,
     private val appSettingsRepository: AppSettingsRepository,
     private val database: WeatherAppDatabase,
     private val dispatcher: CoroutineDispatcher,
