@@ -10,7 +10,6 @@ import com.contraomnese.weather.data.network.parsers.INetworkParser
 import com.contraomnese.weather.data.storage.db.WeatherAppDatabase
 import com.contraomnese.weather.data.storage.db.locations.entities.MatchingLocationEntity
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
-import com.contraomnese.weather.domain.exceptions.badRequest
 import com.contraomnese.weather.domain.exceptions.logPrefix
 import com.contraomnese.weather.domain.exceptions.operationFailed
 import com.contraomnese.weather.domain.exceptions.storageError
@@ -105,7 +104,7 @@ class ForecastRepositoryImpl(
         try {
             parseForecast(api.getForecastWeather(query = query))
         } catch (cause: Exception) {
-            Result.failure(badRequest(logPrefix("Forecast not found"), cause))
+            Result.failure(cause)
         }
 
 

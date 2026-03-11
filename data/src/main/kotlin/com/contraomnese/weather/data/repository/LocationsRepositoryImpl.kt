@@ -9,7 +9,6 @@ import com.contraomnese.weather.data.network.parsers.INetworkParser
 import com.contraomnese.weather.data.storage.db.WeatherAppDatabase
 import com.contraomnese.weather.data.storage.db.locations.entities.FavoriteEntity
 import com.contraomnese.weather.data.storage.db.locations.entities.MatchingLocationEntity
-import com.contraomnese.weather.domain.exceptions.badRequest
 import com.contraomnese.weather.domain.exceptions.logPrefix
 import com.contraomnese.weather.domain.exceptions.operationFailed
 import com.contraomnese.weather.domain.exceptions.storageError
@@ -88,7 +87,7 @@ class LocationsRepositoryImpl(
         try {
             parseMatchingLocations(locationsApi.getLocations(query))
         } catch (cause: Exception) {
-            throw badRequest(logPrefix("Matching locations not found"), cause)
+            throw cause
         }
     }
 
@@ -96,7 +95,7 @@ class LocationsRepositoryImpl(
         try {
             parseMatchingLocation(locationsApi.getLocation(latitude = latitude, longitude = longitude))
         } catch (cause: Exception) {
-            throw badRequest(logPrefix("Matching location not found"), cause)
+            throw cause
         }
     }
 
@@ -104,7 +103,7 @@ class LocationsRepositoryImpl(
         try {
             Result.success(networkParser.parseOrThrowError(matchingLocations))
         } catch (cause: Exception) {
-            Result.failure(operationFailed(logPrefix("Impossible parse matching locations from network"), cause))
+            Result.failure(cause)
         }
 
     private fun parseMatchingLocation(matchingLocation: Response<MatchingLocationNetwork>) =
