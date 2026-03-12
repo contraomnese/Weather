@@ -4,6 +4,7 @@ import com.contraomnese.weather.BuildConfig
 import com.contraomnese.weather.data.network.api.LocationsApi
 import com.contraomnese.weather.data.network.api.WeatherApi
 import com.contraomnese.weather.data.network.interceptors.LocationsInterceptor
+import com.contraomnese.weather.data.network.interceptors.NetworkConnectionInterceptor
 import com.contraomnese.weather.data.network.interceptors.WeatherInterceptor
 import com.contraomnese.weather.data.network.models.errors.LocationsErrorResponse
 import com.contraomnese.weather.data.network.models.errors.WeatherErrorResponse
@@ -50,6 +51,7 @@ val dataModule = module {
             .readTimeout(20, TimeUnit.SECONDS)
             .writeTimeout(20, TimeUnit.SECONDS)
             .retryOnConnectionFailure(true)
+            .addInterceptor(get<NetworkConnectionInterceptor>())
             .addInterceptor(get<WeatherInterceptor>())
             .addInterceptor(get<HttpLoggingInterceptor>())
             .build()
@@ -61,6 +63,7 @@ val dataModule = module {
             .readTimeout(20, TimeUnit.SECONDS)
             .writeTimeout(20, TimeUnit.SECONDS)
             .retryOnConnectionFailure(true)
+            .addInterceptor(get<NetworkConnectionInterceptor>())
             .addInterceptor(get<LocationsInterceptor>())
             .addInterceptor(get<HttpLoggingInterceptor>())
             .build()
@@ -103,6 +106,8 @@ val dataModule = module {
             retrofit = get<Retrofit>(named(LOCATIONS))
         )
     }
+
+    single<NetworkConnectionInterceptor> { NetworkConnectionInterceptor(context = get()) }
 
     single<WeatherInterceptor> {
         WeatherInterceptor(apiKey = BuildConfig.WEATHER_API_KEY, appSettingsStorage = get())

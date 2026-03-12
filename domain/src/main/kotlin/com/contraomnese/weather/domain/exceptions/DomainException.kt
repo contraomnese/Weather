@@ -1,9 +1,11 @@
 package com.contraomnese.weather.domain.exceptions
 
+import java.io.IOException
+
 sealed class DomainException(
     message: String?,
     cause: Throwable? = null,
-) : Exception(message, cause) {
+) : IOException(message, cause) {
     data class ApiUnavailable(val msg: String?, val err: Throwable? = null) : DomainException(msg, err)
     data class Unauthorized(val msg: String?, val err: Throwable? = null) : DomainException(msg, err)
     data class RateLimitExceeded(val msg: String?, val err: Throwable? = null) : DomainException(msg, err)
@@ -12,6 +14,7 @@ sealed class DomainException(
     data class OperationFailed(val msg: String?, val err: Throwable? = null) : DomainException(msg, err)
     data class StorageError(val msg: String?, val err: Throwable? = null) : DomainException(msg, err)
     data class InitializeError(val msg: String?, val err: Throwable? = null) : DomainException(msg, err)
+    data class InternetUnavailable(val msg: String?, val err: Throwable? = null) : DomainException(msg, err)
     data class Unknown(val msg: String?, val err: Throwable? = null) : DomainException(msg, err)
 }
 

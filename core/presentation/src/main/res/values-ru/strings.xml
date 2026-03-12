@@ -9,4 +9,5 @@
     <string name="rate_limit_exception">Ого! Слишком много запросов. Попробуйте позже.</string>
     <string name="operation_failed">К сожалению не удалось выполнить операцию.</string>
     <string name="not_initialize">При загрузке данных получена непредвиденная ошибка. Попробуйте еще раз.</string>
+    <string name="internet_not_available">Интернет не доступен. Проверьте доступность и повторите еще раз.</string>
 </resources>

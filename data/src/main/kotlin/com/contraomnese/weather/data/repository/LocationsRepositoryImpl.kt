@@ -85,32 +85,32 @@ class LocationsRepositoryImpl(
 
     private suspend fun getMatchingLocations(query: String) = withContext(dispatcher) {
         try {
-            parseMatchingLocations(locationsApi.getLocations(query))
+            Result.success(parseMatchingLocations(locationsApi.getLocations(query)))
         } catch (cause: Exception) {
-            throw cause
+            Result.failure(cause)
         }
     }
 
     private suspend fun getMatchingLocation(latitude: Double, longitude: Double) = withContext(dispatcher) {
         try {
-            parseMatchingLocation(locationsApi.getLocation(latitude = latitude, longitude = longitude))
+            Result.success(parseMatchingLocation(locationsApi.getLocation(latitude = latitude, longitude = longitude)))
         } catch (cause: Exception) {
-            throw cause
+            Result.failure(cause)
         }
     }
 
     private fun parseMatchingLocations(matchingLocations: Response<List<MatchingLocationNetwork>>) =
         try {
-            Result.success(networkParser.parseOrThrowError(matchingLocations))
+            networkParser.parseOrThrowError(matchingLocations)
         } catch (cause: Exception) {
-            Result.failure(cause)
+            throw operationFailed(logPrefix("Impossible parse matching locations from network"), cause)
         }
 
     private fun parseMatchingLocation(matchingLocation: Response<MatchingLocationNetwork>) =
         try {
-            Result.success(networkParser.parseOrThrowError(matchingLocation))
+            networkParser.parseOrThrowError(matchingLocation)
         } catch (cause: Exception) {
-            Result.failure(operationFailed(logPrefix("Impossible parse matching location from network"), cause))
+            throw operationFailed(logPrefix("Impossible parse matching location from network"), cause)
         }
 
     private suspend fun insertMatchingLocations(locations: List<MatchingLocationEntity>) = withContext(dispatcher) {

@@ -11,5 +11,6 @@
     <string name="rate_limit_exception">Wow! Too many requests. Try again later.</string>
     <string name="operation_failed">Unfortunately, the operation could not be completed.</string>
     <string name="not_initialize">An unexpected error occurred while loading data. Please try again.</string>
+    <string name="internet_not_available">Internet not available. Please check availability and try again.</string>
 
 </resources>

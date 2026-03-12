@@ -14,6 +14,7 @@ fun provideException(exception: DomainException): Int {
         is DomainException.RateLimitExceeded -> R.string.rate_limit_exception
         is DomainException.StorageError, is DomainException.OperationFailed -> R.string.operation_failed
         is DomainException.InitializeError -> R.string.not_initialize
+        is DomainException.InternetUnavailable -> R.string.internet_not_available
     }
 }
 
