@@ -1,4 +1,4 @@
-package com.contraomnese.weather.data.network.models
+package com.contraomnese.weather.data.network.models.weatherapi
 
 import com.google.gson.annotations.SerializedName
 

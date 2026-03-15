@@ -1,21 +1,21 @@
 package com.contraomnese.weather.data
 
-import com.contraomnese.weather.data.network.models.AlertNetwork
-import com.contraomnese.weather.data.network.models.AstroNetwork
-import com.contraomnese.weather.data.network.models.DayNetwork
-import com.contraomnese.weather.data.network.models.ForecastAirQuality
-import com.contraomnese.weather.data.network.models.ForecastAlertsWeatherNetwork
-import com.contraomnese.weather.data.network.models.ForecastConditionNetwork
-import com.contraomnese.weather.data.network.models.ForecastCurrentNetwork
-import com.contraomnese.weather.data.network.models.ForecastDayNetwork
-import com.contraomnese.weather.data.network.models.ForecastLocationNetwork
-import com.contraomnese.weather.data.network.models.ForecastNetwork
-import com.contraomnese.weather.data.network.models.ForecastResponse
-import com.contraomnese.weather.data.network.models.HourNetwork
+import com.contraomnese.weather.data.network.models.weatherapi.AlertNetwork
+import com.contraomnese.weather.data.network.models.weatherapi.AstroNetwork
+import com.contraomnese.weather.data.network.models.weatherapi.DayNetwork
+import com.contraomnese.weather.data.network.models.weatherapi.ForecastAirQuality
+import com.contraomnese.weather.data.network.models.weatherapi.ForecastAlertsWeatherNetwork
+import com.contraomnese.weather.data.network.models.weatherapi.ForecastConditionNetwork
+import com.contraomnese.weather.data.network.models.weatherapi.ForecastCurrentNetwork
+import com.contraomnese.weather.data.network.models.weatherapi.ForecastDayNetwork
+import com.contraomnese.weather.data.network.models.weatherapi.ForecastLocationNetwork
+import com.contraomnese.weather.data.network.models.weatherapi.ForecastNetwork
+import com.contraomnese.weather.data.network.models.weatherapi.HourNetwork
+import com.contraomnese.weather.data.network.responses.WeatherApiForecastResponse
 
 object MockForecastNetworkReal {
 
-    fun take() = ForecastResponse(
+    fun take() = WeatherApiForecastResponse(
         alerts = ForecastAlertsWeatherNetwork(
             alert = listOf(
                 AlertNetwork(

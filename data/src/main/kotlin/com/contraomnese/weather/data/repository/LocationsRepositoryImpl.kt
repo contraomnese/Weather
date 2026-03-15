@@ -3,9 +3,10 @@ package com.contraomnese.weather.data.repository
 import com.contraomnese.weather.data.mappers.favorite.toDomain
 import com.contraomnese.weather.data.mappers.locations.toDomain
 import com.contraomnese.weather.data.mappers.locations.toEntity
-import com.contraomnese.weather.data.network.api.LocationsApi
-import com.contraomnese.weather.data.network.models.MatchingLocationNetwork
+import com.contraomnese.weather.data.network.api.LocationsIQApi
+import com.contraomnese.weather.data.network.models.locationiq.LocationNetwork
 import com.contraomnese.weather.data.network.parsers.INetworkParser
+import com.contraomnese.weather.data.network.remotes.locations.LocationsRemote
 import com.contraomnese.weather.data.storage.db.WeatherAppDatabase
 import com.contraomnese.weather.data.storage.db.locations.entities.FavoriteEntity
 import com.contraomnese.weather.data.storage.db.locations.entities.MatchingLocationEntity
@@ -22,7 +23,8 @@ import kotlinx.coroutines.withContext
 import retrofit2.Response
 
 class LocationsRepositoryImpl(
-    private val locationsApi: LocationsApi,
+    private val geocodingRemoteApi: LocationsRemote,
+    private val reverseGeocodingApi: LocationsIQApi,
     private val database: WeatherAppDatabase,
     private val networkParser: INetworkParser,
     private val dispatcher: CoroutineDispatcher,
@@ -60,7 +62,6 @@ class LocationsRepositoryImpl(
 
     override suspend fun getLocationsByName(query: String): Result<List<Location>> =
         getMatchingLocations(query)
-            .mapCatching { network -> network.toEntity() }
             .mapCatching { entities ->
                 insertMatchingLocations(entities)
                 entities.toDomain()
@@ -84,29 +85,25 @@ class LocationsRepositoryImpl(
         }
 
     private suspend fun getMatchingLocations(query: String) = withContext(dispatcher) {
-        try {
-            Result.success(parseMatchingLocations(locationsApi.getLocations(query)))
-        } catch (cause: Exception) {
-            Result.failure(cause)
-        }
+        geocodingRemoteApi.fetchLocations(query)
     }
 
     private suspend fun getMatchingLocation(latitude: Double, longitude: Double) = withContext(dispatcher) {
         try {
-            Result.success(parseMatchingLocation(locationsApi.getLocation(latitude = latitude, longitude = longitude)))
+            Result.success(
+                parseMatchingLocation(
+                    reverseGeocodingApi.getLocation(
+                        latitude = latitude,
+                        longitude = longitude
+                    )
+                )
+            )
         } catch (cause: Exception) {
             Result.failure(cause)
         }
     }
 
-    private fun parseMatchingLocations(matchingLocations: Response<List<MatchingLocationNetwork>>) =
-        try {
-            networkParser.parseOrThrowError(matchingLocations)
-        } catch (cause: Exception) {
-            throw operationFailed(logPrefix("Impossible parse matching locations from network"), cause)
-        }
-
-    private fun parseMatchingLocation(matchingLocation: Response<MatchingLocationNetwork>) =
+    private fun parseMatchingLocation(matchingLocation: Response<LocationNetwork>) =
         try {
             networkParser.parseOrThrowError(matchingLocation)
         } catch (cause: Exception) {

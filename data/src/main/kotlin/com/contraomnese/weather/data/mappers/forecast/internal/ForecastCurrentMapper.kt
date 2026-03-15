@@ -1,6 +1,6 @@
 package com.contraomnese.weather.data.mappers.forecast.internal
 
-import com.contraomnese.weather.data.network.models.ForecastCurrentNetwork
+import com.contraomnese.weather.data.network.models.weatherapi.ForecastCurrentNetwork
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastHourEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastTodayEntity
 import com.contraomnese.weather.data.utils.toMs

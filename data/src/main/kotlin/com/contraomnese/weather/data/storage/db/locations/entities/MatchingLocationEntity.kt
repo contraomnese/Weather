@@ -12,18 +12,9 @@ data class MatchingLocationEntity(
     @ColumnInfo(name = NETWORK_ID) val networkId: Int,
     @ColumnInfo(name = LATITUDE) val latitude: Double,
     @ColumnInfo(name = LONGITUDE) val longitude: Double,
-    @ColumnInfo(name = TYPE) val type: String? = null,
     @ColumnInfo(name = NAME) val name: String,
-    @ColumnInfo(name = HOUSE_NUMBER) val houseNumber: String? = null,
-    @ColumnInfo(name = ROAD) val road: String? = null,
-    @ColumnInfo(name = NEIGHBOURHOOD) val neighbourhood: String? = null,
-    @ColumnInfo(name = SUBURB) val suburb: String? = null,
-    @ColumnInfo(name = ISLAND) val island: String? = null,
     @ColumnInfo(name = CITY) val city: String? = null,
-    @ColumnInfo(name = COUNTY) val county: String? = null,
     @ColumnInfo(name = STATE) val state: String? = null,
-    @ColumnInfo(name = STATE_CODE) val stateCode: String? = null,
-    @ColumnInfo(name = POSTCODE) val postcode: String? = null,
     @ColumnInfo(name = COUNTRY) val country: String? = null,
     @ColumnInfo(name = COUNTRY_CODE) val countryCode: String? = null,
 ) {
@@ -32,18 +23,9 @@ data class MatchingLocationEntity(
         const val NETWORK_ID = "network_id"
         const val LATITUDE = "latitude"
         const val LONGITUDE = "longitude"
-        const val TYPE = "type"
         const val NAME = "name"
-        const val HOUSE_NUMBER = "house_number"
-        const val ROAD = "road"
-        const val NEIGHBOURHOOD = "neighbourhood"
-        const val SUBURB = "suburb"
-        const val ISLAND = "island"
         const val CITY = "city"
-        const val COUNTY = "county"
         const val STATE = "state"
-        const val STATE_CODE = "state_code"
-        const val POSTCODE = "postcode"
         const val COUNTRY = "country"
         const val COUNTRY_CODE = "country_code"
     }

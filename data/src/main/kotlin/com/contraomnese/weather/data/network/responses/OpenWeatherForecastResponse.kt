@@ -1,8 +1,10 @@
-package com.contraomnese.weather.data.network.models.openw
+package com.contraomnese.weather.data.network.responses
 
+import com.contraomnese.weather.data.network.models.openweather.Current
+import com.contraomnese.weather.data.network.models.openweather.CurrentUnits
 import com.google.gson.annotations.SerializedName
 
-data class ForecastOpenWeatherApiResponse(
+data class OpenWeatherForecastResponse(
     val current: Current,
     @SerializedName("current_units")
     val currentUnits: CurrentUnits,

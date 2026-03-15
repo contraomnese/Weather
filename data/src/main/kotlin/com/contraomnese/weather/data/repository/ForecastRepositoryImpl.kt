@@ -4,9 +4,9 @@ import com.contraomnese.weather.data.mappers.forecast.internal.toEntity
 import com.contraomnese.weather.data.mappers.forecast.internal.toForecastDayEntity
 import com.contraomnese.weather.data.mappers.forecast.toDomain
 import com.contraomnese.weather.data.mappers.locations.toEntity
-import com.contraomnese.weather.data.network.api.WeatherApi
-import com.contraomnese.weather.data.network.models.ForecastResponse
 import com.contraomnese.weather.data.network.parsers.INetworkParser
+import com.contraomnese.weather.data.network.remotes.weather.WeatherRemote
+import com.contraomnese.weather.data.network.responses.WeatherApiForecastResponse
 import com.contraomnese.weather.data.storage.db.WeatherAppDatabase
 import com.contraomnese.weather.data.storage.db.locations.entities.MatchingLocationEntity
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
@@ -22,11 +22,10 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
-import retrofit2.Response
 import java.util.concurrent.ConcurrentHashMap
 
 class ForecastRepositoryImpl(
-    private val api: WeatherApi,
+    private val weatherRemoteApi: WeatherRemote,
     private val apiParser: INetworkParser,
     private val appSettingsRepository: AppSettingsRepository,
     private val database: WeatherAppDatabase,
@@ -84,7 +83,7 @@ class ForecastRepositoryImpl(
             return@withContext updatingForecast(
                 locationId = location.networkId,
                 locationName = location.city ?: location.name,
-                forecastResponse = forecast
+                forecast = forecast
             ).fold(
                 onSuccess = { Result.success(locationId) },
                 onFailure = { Result.failure(it) }
@@ -99,37 +98,22 @@ class ForecastRepositoryImpl(
             Result.failure(storageError(logPrefix("Current location didn't find in storage"), cause))
         }
 
+    private suspend fun getForecast(query: String) = weatherRemoteApi.fetchForecast(query)
 
-    private suspend fun getForecast(query: String) =
-        try {
-            parseForecast(api.getForecastWeather(query = query))
-        } catch (cause: Exception) {
-            Result.failure(cause)
-        }
-
-
-    private fun parseForecast(forecast: Response<ForecastResponse>) =
-        try {
-            Result.success(apiParser.parseOrThrowError(forecast))
-        } catch (cause: Exception) {
-            Result.failure(cause)
-        }
-
-
-    private suspend fun updatingForecast(locationId: Int, locationName: String, forecastResponse: ForecastResponse) =
+    private suspend fun updatingForecast(locationId: Int, locationName: String, forecast: WeatherApiForecastResponse) =
         try {
             transactionProvider.runWithTransaction {
                 val locationsDao = database.locationsDao()
                 locationsDao.deleteForecastLocation(locationId)
 
-                val locationEntity = forecastResponse.location.toEntity(locationId).copy(name = locationName)
+                val locationEntity = forecast.location.toEntity(locationId).copy(name = locationName)
                 val forecastLocationId = locationsDao.insertForecastLocation(locationEntity).toInt()
 
                 val forecastDao = database.forecastDao()
-                forecastDao.insertForecastCurrent(forecastResponse.current.toEntity(forecastLocationId))
-                forecastDao.insertAlerts(forecastResponse.alerts.alert.map { it.toEntity(forecastLocationId) })
+                forecastDao.insertForecastCurrent(forecast.current.toEntity(forecastLocationId))
+                forecastDao.insertAlerts(forecast.alerts.alert.map { it.toEntity(forecastLocationId) })
 
-                forecastResponse.forecast.forecastDay.forEach { forecast ->
+                forecast.forecast.forecastDay.forEach { forecast ->
                     val forecastDayId = forecastDao.insertForecastDay(forecast.toForecastDayEntity(forecastLocationId)).toInt()
                     forecastDao.insertDay(forecast.toEntity(forecastDayId))
                     forecastDao.insertAstro(forecast.astro.toEntity(forecastDayId))
@@ -140,6 +124,5 @@ class ForecastRepositoryImpl(
         } catch (cause: Exception) {
             Result.failure(operationFailed(logPrefix("Impossible save new forecast to storage"), cause))
         }
-
 
 }

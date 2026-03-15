@@ -1,6 +1,6 @@
 package com.contraomnese.weather.data.mappers.forecast.internal
 
-import com.contraomnese.weather.data.network.models.HourNetwork
+import com.contraomnese.weather.data.network.models.weatherapi.HourNetwork
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastHourEntity
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.model.TemperatureUnit

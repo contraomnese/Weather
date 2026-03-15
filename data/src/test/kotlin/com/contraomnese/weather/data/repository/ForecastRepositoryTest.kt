@@ -8,9 +8,9 @@ import com.contraomnese.weather.data.MatchingLocationDataFixtures
 import com.contraomnese.weather.data.mappers.forecast.toDomain
 import com.contraomnese.weather.data.mappers.locations.toEntity
 import com.contraomnese.weather.data.network.api.WeatherApi
-import com.contraomnese.weather.data.network.models.ForecastLocationNetwork
-import com.contraomnese.weather.data.network.models.ForecastResponse
+import com.contraomnese.weather.data.network.models.weatherapi.ForecastLocationNetwork
 import com.contraomnese.weather.data.network.parsers.INetworkParser
+import com.contraomnese.weather.data.network.responses.WeatherApiForecastResponse
 import com.contraomnese.weather.data.storage.db.WeatherAppDatabase
 import com.contraomnese.weather.data.storage.db.forecast.dao.ForecastDao
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDailyEntity
@@ -74,7 +74,7 @@ class ForecastRepositoryTest {
         every { storage.forecastDao() } returns forecastDao
 
         repository = ForecastRepositoryImpl(
-            api = network,
+            weatherRemoteApi = network,
             appSettingsRepository = appSettingsRepository,
             database = storage,
             apiParser = apiParser,
@@ -224,7 +224,7 @@ class ForecastRepositoryTest {
             val forecastDailyId = 123L
 
             coEvery { locationsDao.getMatchingLocation(locationId) } returns locationWithCity
-            coEvery { network.getForecastWeather(matchingLocation.toPoint()) } returns response
+            coEvery { network.getForecast(matchingLocation.toPoint()) } returns response
             every { apiParser.parseOrThrowError(response) } returns forecastResponse
             coEvery { locationsDao.insertForecastLocation(any<ForecastLocationEntity>()) } returns forecastLocationId
             coEvery { forecastDao.insertForecastDay(any<ForecastDailyEntity>()) } returns forecastDailyId
@@ -236,7 +236,7 @@ class ForecastRepositoryTest {
             assertEquals(expectedData, actualData)
 
             coVerify { locationsDao.getMatchingLocation(locationId) }
-            coVerify(exactly = 1) { network.getForecastWeather(matchingLocation.toPoint()) }
+            coVerify(exactly = 1) { network.getForecast(matchingLocation.toPoint()) }
             verify(exactly = 1) { apiParser.parseOrThrowError(response) }
             coVerify { locationsDao.deleteForecastLocation(locationWithCity.networkId) }
             coVerify { locationsDao.insertForecastLocation(match { it.name == "Fallback City" }) }
@@ -249,7 +249,7 @@ class ForecastRepositoryTest {
 
             coVerifyOrder {
                 locationsDao.getMatchingLocation(locationId)
-                network.getForecastWeather(matchingLocation.toPoint())
+                network.getForecast(matchingLocation.toPoint())
                 apiParser.parseOrThrowError(response)
                 locationsDao.deleteForecastLocation(locationWithCity.networkId)
                 locationsDao.insertForecastLocation(match { it.name == "Fallback City" })
@@ -267,7 +267,7 @@ class ForecastRepositoryTest {
             val response = Response.success(forecastResponse)
 
             coEvery { locationsDao.getMatchingLocation(locationId) } returns locationWithNullCity
-            coEvery { network.getForecastWeather(any()) } returns response
+            coEvery { network.getForecast(any()) } returns response
             every { apiParser.parseOrThrowError(response) } returns forecastResponse
             every { any<ForecastLocationNetwork>().toEntity(locationId) } returns forecastLocation
 
@@ -348,7 +348,7 @@ class ForecastRepositoryTest {
             val expectedException = forecastNotFoundException
 
             coEvery { locationsDao.getMatchingLocation(locationId) } returns matchingLocation
-            coEvery { network.getForecastWeather(matchingLocation.toPoint()) } throws storageException
+            coEvery { network.getForecast(matchingLocation.toPoint()) } throws storageException
 
             val actualResult = repository.refreshForecastByLocationId(locationId)
             val actualException = actualResult.assertIsFailure()
@@ -356,7 +356,7 @@ class ForecastRepositoryTest {
             assertEquals(expectedException::class.java, actualException::class.java)
             assertEquals(expectedException.err, actualException.cause)
 
-            coVerify(exactly = 1) { network.getForecastWeather(matchingLocation.toPoint()) }
+            coVerify(exactly = 1) { network.getForecast(matchingLocation.toPoint()) }
         }
 
     @Test
@@ -367,7 +367,7 @@ class ForecastRepositoryTest {
             val response = Response.success(forecastResponse)
 
             coEvery { locationsDao.getMatchingLocation(locationId) } returns matchingLocation
-            coEvery { network.getForecastWeather(matchingLocation.toPoint()) } returns response
+            coEvery { network.getForecast(matchingLocation.toPoint()) } returns response
             every { apiParser.parseOrThrowError(response) } throws expectedException
 
             val actualResult = repository.refreshForecastByLocationId(locationId)
@@ -386,8 +386,8 @@ class ForecastRepositoryTest {
             val response = Response.success(forecastResponse)
 
             coEvery { locationsDao.getMatchingLocation(any()) } returns matchingLocation
-            coEvery { network.getForecastWeather(any()) } returns response
-            every { apiParser.parseOrThrowError(any<Response<ForecastResponse>>()) } returns forecastResponse
+            coEvery { network.getForecast(any()) } returns response
+            every { apiParser.parseOrThrowError(any<Response<WeatherApiForecastResponse>>()) } returns forecastResponse
             every { any<ForecastLocationNetwork>().toEntity(matchingLocation.networkId) } throws mappingException
 
             val actualResult = repository.refreshForecastByLocationId(locationId)
@@ -407,8 +407,8 @@ class ForecastRepositoryTest {
             val response = Response.success(forecastResponse)
 
             coEvery { locationsDao.getMatchingLocation(any()) } returns matchingLocation
-            coEvery { network.getForecastWeather(any()) } returns response
-            every { apiParser.parseOrThrowError(any<Response<ForecastResponse>>()) } returns forecastResponse
+            coEvery { network.getForecast(any()) } returns response
+            every { apiParser.parseOrThrowError(any<Response<WeatherApiForecastResponse>>()) } returns forecastResponse
             coEvery { storage.forecastDao() } throws storageException
 
             val actualResult = repository.refreshForecastByLocationId(locationId)

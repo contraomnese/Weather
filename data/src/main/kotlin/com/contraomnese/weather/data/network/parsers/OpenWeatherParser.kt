@@ -5,7 +5,7 @@ import com.contraomnese.weather.data.network.models.errors.OpenWeatherErrorRespo
 import retrofit2.Converter
 import retrofit2.Retrofit
 
-class OpenWeatherApiParser(
+class OpenWeatherParser(
     override val converterFactory: Converter.Factory,
     override val retrofit: Retrofit,
 ) : BaseNetworkParser<OpenWeatherErrorResponse>(OpenWeatherErrorResponse::class.java) {

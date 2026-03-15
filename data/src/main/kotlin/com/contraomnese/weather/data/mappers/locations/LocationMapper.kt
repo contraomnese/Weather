@@ -1,7 +1,6 @@
 package com.contraomnese.weather.data.mappers.locations
 
-import com.contraomnese.weather.data.network.models.ForecastLocationNetwork
-import com.contraomnese.weather.data.network.models.MatchingLocationNetwork
+import com.contraomnese.weather.data.network.models.weatherapi.ForecastLocationNetwork
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastLocationEntity
 import com.contraomnese.weather.data.storage.db.locations.entities.MatchingLocationEntity
 import com.contraomnese.weather.domain.exceptions.logPrefix
@@ -10,6 +9,8 @@ import com.contraomnese.weather.domain.weatherByLocation.model.Latitude
 import com.contraomnese.weather.domain.weatherByLocation.model.Location
 import com.contraomnese.weather.domain.weatherByLocation.model.LocationCoordinates
 import com.contraomnese.weather.domain.weatherByLocation.model.Longitude
+import com.contraomnese.weather.data.network.models.locationiq.LocationNetwork as IQLocationNetwork
+import com.contraomnese.weather.data.network.models.openweather.LocationNetwork as OWLocationNetwork
 
 fun ForecastLocationNetwork.toEntity(locationId: Int): ForecastLocationEntity {
     val forecastLocationEntity = ForecastLocationEntity(
@@ -27,24 +28,26 @@ fun ForecastLocationNetwork.toEntity(locationId: Int): ForecastLocationEntity {
     return forecastLocationEntity
 }
 
-fun MatchingLocationNetwork.toEntity() = MatchingLocationEntity(
+fun IQLocationNetwork.toEntity() = MatchingLocationEntity(
     networkId = placeId.toInt(),
     latitude = lat.toDouble(),
     longitude = lon.toDouble(),
-    type = type,
     name = displayName,
-    houseNumber = address.houseNumber,
-    road = address.road,
-    neighbourhood = address.neighbourhood,
-    suburb = address.suburb,
-    island = address.island,
     city = address.city,
-    county = address.county,
     state = address.state,
-    stateCode = address.stateCode,
-    postcode = address.postcode,
     country = address.country,
     countryCode = address.countryCode,
+)
+
+fun OWLocationNetwork.toEntity() = MatchingLocationEntity(
+    networkId = id,
+    latitude = latitude,
+    longitude = longitude,
+    name = name,
+    city = admin2,
+    state = admin1,
+    country = country,
+    countryCode = countryCode,
 )
 
 fun MatchingLocationEntity.toDomain() =
@@ -59,7 +62,7 @@ fun MatchingLocationEntity.toDomain() =
         )
     )
 
-fun List<MatchingLocationNetwork>.toEntity() = try {
+fun List<IQLocationNetwork>.toEntities() = try {
     filter { it.type == "city" || it.type == "town" }
         .ifEmpty { this }
         .map { it.toEntity() }

@@ -1,8 +1,8 @@
-package com.contraomnese.weather.data.network.models
+package com.contraomnese.weather.data.network.models.locationiq
 
 import com.google.gson.annotations.SerializedName
 
-data class MatchingLocationNetwork(
+data class LocationNetwork(
 
     @SerializedName("place_id") val placeId: Long,
     val licence: String,
