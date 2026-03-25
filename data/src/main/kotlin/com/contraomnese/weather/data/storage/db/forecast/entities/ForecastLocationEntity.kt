@@ -14,8 +14,6 @@ data class ForecastLocationEntity(
     @ColumnInfo(name = COUNTRY) val country: String,
     @ColumnInfo(name = LATITUDE) val latitude: Double,
     @ColumnInfo(name = LONGITUDE) val longitude: Double,
-    @ColumnInfo(name = LOCALTIME) val localtime: String,
-    @ColumnInfo(name = LOCALTIME_EPOCH) val localtimeEpoch: Long,
     @ColumnInfo(name = TIME_ZONE_ID) val timeZoneId: String,
     @ColumnInfo(name = LAST_UPDATED) val lastUpdated: Long,
 ) {
@@ -28,8 +26,6 @@ data class ForecastLocationEntity(
         const val COUNTRY = "country"
         const val LATITUDE = "latitude"
         const val LONGITUDE = "longitude"
-        const val LOCALTIME = "localtime"
-        const val LOCALTIME_EPOCH = "localtime_epoch"
         const val TIME_ZONE_ID = "time_zone_id"
         const val LAST_UPDATED = "last_updated"
     }

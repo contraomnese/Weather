@@ -19,14 +19,12 @@ import androidx.room.PrimaryKey
 data class ForecastDailyEntity(
     @PrimaryKey(autoGenerate = true) val id: Int? = null,
     @ColumnInfo(name = FORECAST_LOCATION_ID) val forecastLocationId: Int,
-    @ColumnInfo(name = DATE) val date: String,
     @ColumnInfo(name = DATE_EPOCH) val dateEpoch: Long,
 ) {
     companion object {
         const val TABLE_NAME = "forecast_daily"
         const val ID = "id"
         const val FORECAST_LOCATION_ID = "forecast_location_id"
-        const val DATE = "date"
         const val DATE_EPOCH = "date_epoch"
     }
 }

@@ -5,19 +5,28 @@ import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastHourEn
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastHour
+import com.contraomnese.weather.domain.weatherByLocation.model.LocationDateTime
 import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlin.math.roundToInt
 
 private const val IS_DAY = 1
 
 internal fun ForecastHourEntity.toDomain(appSettings: AppSettings): ForecastHour {
+
+    val instant = Instant.fromEpochSeconds(timeEpoch)
+    val localDateTime = instant.toLocalDateTime(TimeZone.of(appSettings.timezone))
+    val locationDateTime = LocationDateTime(localDateTime)
+
     return ForecastHour(
         temperature = when (appSettings.temperatureUnit) {
             TemperatureUnit.Celsius -> tempC.roundToInt().toString()
             TemperatureUnit.Fahrenheit -> tempF.roundToInt().toString()
         },
-        condition = WeatherCondition.fromConditionCode(conditionCode),
-        time = time.split(" ")[1],
+        condition = WeatherCondition.fromWeatherApi(conditionCode),
+        time = locationDateTime.toLocalTime(),
         isDay = isDay == IS_DAY
     )
 }
@@ -25,16 +34,13 @@ internal fun ForecastHourEntity.toDomain(appSettings: AppSettings): ForecastHour
 internal fun HourNetwork.toEntity(forecastDayId: Int) = ForecastHourEntity(
     forecastDailyId = forecastDayId,
     timeEpoch = timeEpoch,
-    time = time,
     tempC = tempC,
     tempF = tempF,
     isDay = isDay,
-    conditionText = condition.text,
     conditionCode = condition.code,
     windMph = windMph,
     windKph = windKph,
     windDegree = windDegree,
-    windDir = windDir,
     pressureMb = pressureMb,
     pressureIn = pressureIn,
     precipMm = precipMm,
@@ -44,15 +50,9 @@ internal fun HourNetwork.toEntity(forecastDayId: Int) = ForecastHourEntity(
     cloud = cloud,
     feelsLikeC = feelsLikeC,
     feelsLikeF = feelsLikeF,
-    windChillC = windChillC,
-    windChillF = windChillF,
-    heatIndexC = heatIndexC,
-    heatIndexF = heatIndexF,
     dewPointC = dewPointC,
     dewPointF = dewPointF,
-    willItRain = willItRain,
     chanceOfRain = chanceOfRain,
-    willItSnow = willItSnow,
     chanceOfSnow = chanceOfSnow,
     visibilityKm = visibilityKm,
     visibilityMiles = visibilityMiles,

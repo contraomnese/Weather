@@ -15,6 +15,7 @@ data class FavoriteEntity(
     @ColumnInfo(name = CITY) val city: String?,
     @ColumnInfo(name = STATE) val state: String?,
     @ColumnInfo(name = COUNTRY) val country: String?,
+    @ColumnInfo(name = TIMEZONE_ID) val timeZoneId: String? = null,
 ) {
     companion object {
         const val TABLE_NAME = "favorites"
@@ -24,5 +25,6 @@ data class FavoriteEntity(
         const val COUNTRY = "country"
         const val LATITUDE = "latitude"
         const val LONGITUDE = "longitude"
+        const val TIMEZONE_ID = "timezone_id"
     }
 }

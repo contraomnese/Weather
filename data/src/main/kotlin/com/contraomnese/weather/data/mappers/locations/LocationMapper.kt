@@ -10,23 +10,31 @@ import com.contraomnese.weather.domain.weatherByLocation.model.Location
 import com.contraomnese.weather.domain.weatherByLocation.model.LocationCoordinates
 import com.contraomnese.weather.domain.weatherByLocation.model.Longitude
 import com.contraomnese.weather.data.network.models.locationiq.LocationNetwork as IQLocationNetwork
-import com.contraomnese.weather.data.network.models.openweather.LocationNetwork as OWLocationNetwork
+import com.contraomnese.weather.data.network.models.openweather.geolocation.LocationNetwork as OWLocationNetwork
 
-fun ForecastLocationNetwork.toEntity(locationId: Int): ForecastLocationEntity {
-    val forecastLocationEntity = ForecastLocationEntity(
+private const val UNKNOWN = "Unknown"
+
+fun ForecastLocationNetwork.toEntity(locationId: Int) = ForecastLocationEntity(
         locationId = locationId,
         name = name,
         region = region,
         country = country,
         latitude = lat,
         longitude = lon,
-        localtimeEpoch = localtimeEpoch,
-        localtime = localtime,
         timeZoneId = timeZoneId,
         lastUpdated = System.currentTimeMillis()
     )
-    return forecastLocationEntity
-}
+
+fun MatchingLocationEntity.toForecastLocationEntity(locationId: Int) = ForecastLocationEntity(
+    locationId = locationId,
+    latitude = latitude,
+    longitude = longitude,
+    name = city ?: UNKNOWN,
+    region = state ?: UNKNOWN,
+    country = country ?: UNKNOWN,
+    timeZoneId = timeZoneId ?: "GMT",
+    lastUpdated = System.currentTimeMillis()
+)
 
 fun IQLocationNetwork.toEntity() = MatchingLocationEntity(
     networkId = placeId.toInt(),
@@ -48,6 +56,7 @@ fun OWLocationNetwork.toEntity() = MatchingLocationEntity(
     state = admin1,
     country = country,
     countryCode = countryCode,
+    timeZoneId = timezone
 )
 
 fun MatchingLocationEntity.toDomain() =

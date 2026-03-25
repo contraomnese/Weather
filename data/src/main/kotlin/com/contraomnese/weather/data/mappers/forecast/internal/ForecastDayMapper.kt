@@ -27,7 +27,6 @@ internal fun DailyForecastData.toForecastTodayDomain(appSettings: AppSettings): 
             TemperatureUnit.Fahrenheit -> day.minTempF.roundToInt().toString()
         },
         conditionCode = day.conditionCode,
-        conditionText = day.conditionText,
         totalUvIndex = day.uv.toString(),
         rainChance = day.dayChanceOfRain.toString(),
         totalRainFull = when (appSettings.precipitationUnit) {
@@ -41,8 +40,8 @@ internal fun DailyForecastData.toForecastTodayDomain(appSettings: AppSettings): 
 
 internal fun DailyForecastData.toForecastDayDomain(appSettings: AppSettings): ForecastDay {
     return ForecastDay(
-        dayNumber = getNumberOfMonth(forecast.dateEpoch),
-        dayName = getDayOfWeek(forecast.dateEpoch),
+        dayNumber = getNumberOfMonth(forecast.dateEpoch.toLong()),
+        dayName = getDayOfWeek(forecast.dateEpoch.toLong()),
         maxTemperature = when (appSettings.temperatureUnit) {
             TemperatureUnit.Celsius -> day.maxTempC.roundToInt()
             TemperatureUnit.Fahrenheit -> day.maxTempF.roundToInt()
@@ -51,7 +50,7 @@ internal fun DailyForecastData.toForecastDayDomain(appSettings: AppSettings): Fo
             TemperatureUnit.Celsius -> day.minTempC.roundToInt()
             TemperatureUnit.Fahrenheit -> day.minTempF.roundToInt()
         },
-        condition = WeatherCondition.fromConditionCode(day.conditionCode),
+        condition = WeatherCondition.fromWeatherApi(day.conditionCode),
         totalRainFull = when (appSettings.precipitationUnit) {
             PrecipitationUnit.Millimeters -> day.totalPrecipMm.roundToInt()
             PrecipitationUnit.Inches -> day.totalPrecipIn.roundToInt()
@@ -63,7 +62,6 @@ internal fun ForecastDayNetwork.toForecastDayEntity(locationId: Int): ForecastDa
 
     return ForecastDailyEntity(
         forecastLocationId = locationId,
-        date = date,
         dateEpoch = dateEpoch,
     )
 }
@@ -84,7 +82,6 @@ internal fun ForecastDayNetwork.toEntity(forecastDayId: Int) = ForecastDayEntity
     avgVisKm = day.avgVisKm,
     avgVisMiles = day.avgVisMiles,
     avgHumidity = day.avgHumidity,
-    conditionText = day.condition.text,
     conditionCode = day.condition.code,
     uv = day.uv,
     dayWillItRain = day.dailyWillItRain,

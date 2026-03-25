@@ -12,6 +12,7 @@ import com.contraomnese.weather.domain.app.model.WindSpeedUnit
 class AppSettingsMapper {
     fun toDomain(entity: AppSettingsEntity): AppSettings = AppSettings(
         language = Language(entity.language),
+        timezone = entity.timezone,
         windSpeedUnit = WindSpeedUnit.entries.firstOrNull { it.name == entity.speedUnit } ?: WindSpeedUnit.Kph,
         precipitationUnit = PrecipitationUnit.entries.firstOrNull { it.name == entity.precipitationUnit } ?: PrecipitationUnit.Millimeters,
         temperatureUnit = TemperatureUnit.entries.firstOrNull { it.name == entity.temperatureUnit } ?: TemperatureUnit.Celsius,
@@ -21,6 +22,7 @@ class AppSettingsMapper {
 
     fun toEntity(model: AppSettings): AppSettingsEntity = AppSettingsEntity(
         language = model.language.value,
+        timezone = model.timezone,
         speedUnit = model.windSpeedUnit.name,
         precipitationUnit = model.precipitationUnit.name,
         temperatureUnit = model.temperatureUnit.name,

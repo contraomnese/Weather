@@ -51,8 +51,7 @@ data class WindSection(
                 modifier = Modifier.padding(horizontal = padding16, vertical = padding8),
                 windSpeed = today.windSpeed,
                 gustSpeed = today.gustSpeed,
-                degree = today.windDegree,
-                direction = today.windDirection,
+                degrees = today.windDegree,
                 windSpeedUnit = appSettings.windSpeedUnit
             )
         }

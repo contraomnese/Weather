@@ -45,9 +45,9 @@ data class ForecastCurrentNetwork(
     @SerializedName("heatindex_f")
     val heatIndexF: Double,
     @SerializedName("dewpoint_c")
-    val dewPointC: Float,
+    val dewPointC: Double,
     @SerializedName("dewpoint_f")
-    val dewPointF: Float,
+    val dewPointF: Double,
     @SerializedName("vis_km")
     val visibilityKm: Double,
     @SerializedName("vis_miles")
@@ -68,12 +68,12 @@ data class ForecastConditionNetwork(
 )
 
 data class ForecastAirQuality(
-    @SerializedName("co") val co: Float,
-    @SerializedName("no2") val no2: Float,
-    @SerializedName("o3") val o3: Float,
-    @SerializedName("so2") val so2: Float,
-    @SerializedName("pm2_5") val pm25: Float,
-    @SerializedName("pm10") val pm10: Float,
+    @SerializedName("co") val co: Double,
+    @SerializedName("no2") val no2: Double,
+    @SerializedName("o3") val o3: Double,
+    @SerializedName("so2") val so2: Double,
+    @SerializedName("pm2_5") val pm25: Double,
+    @SerializedName("pm10") val pm10: Double,
     @SerializedName("us-epa-index") val usEpaIndex: Int,
     @SerializedName("gb-defra-index") val gbDefraIndex: Int,
 )

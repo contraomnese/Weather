@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.datetime.TimeZone
 import java.util.Locale
 
 val Context.appSettingsDataStore by preferencesDataStore("app_settings")
@@ -29,6 +30,7 @@ class AppSettingsStorageImpl(
 
     private object Keys {
         val LANGUAGE = stringPreferencesKey("language")
+        val TIMEZONE = stringPreferencesKey("timezone")
         val SPEED_UNIT = stringPreferencesKey("speed_unit")
         val PRECIPITATION_UNIT = stringPreferencesKey("precipitation_unit")
         val TEMPERATURE_UNIT = stringPreferencesKey("temperature_unit")
@@ -43,8 +45,12 @@ class AppSettingsStorageImpl(
             val languageValue = prefs[Keys.LANGUAGE]
                 ?: Locale.getDefault().language
 
+            val timezoneValue = prefs[Keys.TIMEZONE]
+                ?: TimeZone.currentSystemDefault().toString()
+
             settings = AppSettingsEntity(
                 language = languageValue,
+                timezone = timezoneValue,
                 speedUnit = prefs[Keys.SPEED_UNIT] ?: WindSpeedUnit.Kph.name,
                 precipitationUnit = prefs[Keys.PRECIPITATION_UNIT] ?: PrecipitationUnit.Millimeters.name,
                 temperatureUnit = prefs[Keys.TEMPERATURE_UNIT] ?: TemperatureUnit.Celsius.name,
@@ -64,6 +70,7 @@ class AppSettingsStorageImpl(
         if (getSettings() != entity) {
             context.appSettingsDataStore.edit { prefs ->
                 prefs[Keys.LANGUAGE] = entity.language
+                prefs[Keys.TIMEZONE] = entity.timezone
                 prefs[Keys.SPEED_UNIT] = entity.speedUnit
                 prefs[Keys.PRECIPITATION_UNIT] = entity.precipitationUnit
                 prefs[Keys.TEMPERATURE_UNIT] = entity.temperatureUnit

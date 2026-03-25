@@ -74,7 +74,7 @@ class ForecastRepositoryTest {
         every { storage.forecastDao() } returns forecastDao
 
         repository = ForecastRepositoryImpl(
-            weatherRemoteApi = network,
+            forecastRemoteApi = network,
             appSettingsRepository = appSettingsRepository,
             database = storage,
             apiParser = apiParser,
@@ -224,7 +224,7 @@ class ForecastRepositoryTest {
             val forecastDailyId = 123L
 
             coEvery { locationsDao.getMatchingLocation(locationId) } returns locationWithCity
-            coEvery { network.getForecast(matchingLocation.toPoint()) } returns response
+            coEvery { network.getForecast(matchingLocation.toTextPoints()) } returns response
             every { apiParser.parseOrThrowError(response) } returns forecastResponse
             coEvery { locationsDao.insertForecastLocation(any<ForecastLocationEntity>()) } returns forecastLocationId
             coEvery { forecastDao.insertForecastDay(any<ForecastDailyEntity>()) } returns forecastDailyId
@@ -236,7 +236,7 @@ class ForecastRepositoryTest {
             assertEquals(expectedData, actualData)
 
             coVerify { locationsDao.getMatchingLocation(locationId) }
-            coVerify(exactly = 1) { network.getForecast(matchingLocation.toPoint()) }
+            coVerify(exactly = 1) { network.getForecast(matchingLocation.toTextPoints()) }
             verify(exactly = 1) { apiParser.parseOrThrowError(response) }
             coVerify { locationsDao.deleteForecastLocation(locationWithCity.networkId) }
             coVerify { locationsDao.insertForecastLocation(match { it.name == "Fallback City" }) }
@@ -249,7 +249,7 @@ class ForecastRepositoryTest {
 
             coVerifyOrder {
                 locationsDao.getMatchingLocation(locationId)
-                network.getForecast(matchingLocation.toPoint())
+                network.getForecast(matchingLocation.toTextPoints())
                 apiParser.parseOrThrowError(response)
                 locationsDao.deleteForecastLocation(locationWithCity.networkId)
                 locationsDao.insertForecastLocation(match { it.name == "Fallback City" })
@@ -348,7 +348,7 @@ class ForecastRepositoryTest {
             val expectedException = forecastNotFoundException
 
             coEvery { locationsDao.getMatchingLocation(locationId) } returns matchingLocation
-            coEvery { network.getForecast(matchingLocation.toPoint()) } throws storageException
+            coEvery { network.getForecast(matchingLocation.toTextPoints()) } throws storageException
 
             val actualResult = repository.refreshForecastByLocationId(locationId)
             val actualException = actualResult.assertIsFailure()
@@ -356,7 +356,7 @@ class ForecastRepositoryTest {
             assertEquals(expectedException::class.java, actualException::class.java)
             assertEquals(expectedException.err, actualException.cause)
 
-            coVerify(exactly = 1) { network.getForecast(matchingLocation.toPoint()) }
+            coVerify(exactly = 1) { network.getForecast(matchingLocation.toTextPoints()) }
         }
 
     @Test
@@ -367,7 +367,7 @@ class ForecastRepositoryTest {
             val response = Response.success(forecastResponse)
 
             coEvery { locationsDao.getMatchingLocation(locationId) } returns matchingLocation
-            coEvery { network.getForecast(matchingLocation.toPoint()) } returns response
+            coEvery { network.getForecast(matchingLocation.toTextPoints()) } returns response
             every { apiParser.parseOrThrowError(response) } throws expectedException
 
             val actualResult = repository.refreshForecastByLocationId(locationId)

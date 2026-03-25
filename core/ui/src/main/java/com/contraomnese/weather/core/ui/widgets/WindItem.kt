@@ -11,6 +11,9 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -23,14 +26,12 @@ import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.domain.app.model.WindSpeedUnit
 
-
 @Composable
 fun WindItem(
     modifier: Modifier = Modifier,
     windSpeed: String,
     gustSpeed: String,
-    degree: Int,
-    direction: String,
+    degrees: Int,
     windSpeedUnit: WindSpeedUnit,
 ) {
 
@@ -38,6 +39,32 @@ fun WindItem(
         WindSpeedUnit.Kph -> R.string.units_killometer_per_hour
         WindSpeedUnit.Mph -> R.string.units_mile_per_hour
         WindSpeedUnit.Ms -> R.string.units_meter_in_second
+    }
+
+    val directionIndex by remember {
+        derivedStateOf {
+            (((degrees % 360 + 360) % 360 + 11.25) / 22.5).toInt() % 16
+        }
+    }
+
+    val direction = when (directionIndex) {
+        0 -> R.string.direction_n
+        1 -> R.string.direction_nne
+        2 -> R.string.direction_ne
+        3 -> R.string.direction_ene
+        4 -> R.string.direction_e
+        5 -> R.string.direction_ese
+        6 -> R.string.direction_se
+        7 -> R.string.direction_sse
+        8 -> R.string.direction_s
+        9 -> R.string.direction_ssw
+        10 -> R.string.direction_sw
+        11 -> R.string.direction_wsw
+        12 -> R.string.direction_w
+        13 -> R.string.direction_wnw
+        14 -> R.string.direction_nw
+        15 -> R.string.direction_nnw
+        else -> R.string.direction_n
     }
 
     Row(
@@ -49,8 +76,8 @@ fun WindItem(
     ) {
         Wind(
             modifier = Modifier.size(itemHeight160),
-            degree = degree,
-            direction = direction
+            degree = degrees,
+            direction = stringResource(direction)
         )
         Column(
             modifier = Modifier.wrapContentHeight(),
@@ -113,9 +140,8 @@ private fun WindItemPreview(modifier: Modifier = Modifier) {
             modifier = modifier,
             windSpeed = "5",
             gustSpeed = "13",
-            degree = 34,
-            direction = "NW",
+            degrees = 34,
             windSpeedUnit = WindSpeedUnit.Ms
-            )
+        )
     }
 }

@@ -1,17 +1,15 @@
 package com.contraomnese.weather.data.mappers.forecast
 
 import com.contraomnese.weather.data.mappers.forecast.internal.toAirQualityInfo
-import com.contraomnese.weather.data.mappers.forecast.internal.toDewPoint
 import com.contraomnese.weather.data.mappers.forecast.internal.toDomain
 import com.contraomnese.weather.data.mappers.forecast.internal.toForecastDayDomain
 import com.contraomnese.weather.data.mappers.forecast.internal.toForecastTodayDomain
-import com.contraomnese.weather.data.mappers.forecast.internal.toGustDomain
-import com.contraomnese.weather.data.mappers.forecast.internal.toPrecipitationDomain
-import com.contraomnese.weather.data.mappers.forecast.internal.toPressureDomain
-import com.contraomnese.weather.data.mappers.forecast.internal.toTemperatureDomain
-import com.contraomnese.weather.data.mappers.forecast.internal.toWindDomain
-import com.contraomnese.weather.data.mappers.forecast.internal.translateDirection
-import com.contraomnese.weather.data.parsers.DateTimeParser
+import com.contraomnese.weather.data.mappers.forecast.weatherapi.toDewPoint
+import com.contraomnese.weather.data.mappers.forecast.weatherapi.toGustDomain
+import com.contraomnese.weather.data.mappers.forecast.weatherapi.toPrecipitationDomain
+import com.contraomnese.weather.data.mappers.forecast.weatherapi.toPressureDomain
+import com.contraomnese.weather.data.mappers.forecast.weatherapi.toTemperatureDomain
+import com.contraomnese.weather.data.mappers.forecast.weatherapi.toWindDomain
 import com.contraomnese.weather.data.storage.db.locations.dto.ForecastData
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
@@ -22,6 +20,7 @@ import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeather
 import com.contraomnese.weather.domain.weatherByLocation.model.UvIndex
 import com.contraomnese.weather.domain.weatherByLocation.model.Weather
 import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
+import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlin.math.roundToInt
 
@@ -34,26 +33,27 @@ private const val DAILY_WILL_RAIN = 1
 private const val DEFAULT_RAINFALL = 0.0
 
 fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
-    val nextDayHourLimit = location.localtimeEpoch + HOURS * MINUTES * SECONDS
-    val forecastHours =
-        mutableListOf(dailyForecast.first().hour.last { it.timeEpoch <= location.localtimeEpoch })
-    forecastHours.addAll(dailyForecast.first().hour.filter { it.timeEpoch > location.localtimeEpoch })
-    forecastHours.addAll(dailyForecast.drop(1).first().hour.filter { it.timeEpoch <= nextDayHourLimit })
 
-    val rainfallBeforeNow = dailyForecast[0].hour.filter { hour -> hour.timeEpoch < location.localtimeEpoch }
+    val now = Clock.System.now().epochSeconds
+    val nextDaySeconds = now + HOURS * MINUTES * SECONDS
+
+    val forecastHours =
+        mutableListOf(dailyForecast.first().hour.last { it.timeEpoch <= now })
+    forecastHours.addAll(dailyForecast.first().hour.filter { it.timeEpoch > now })
+    forecastHours.addAll(dailyForecast.drop(1).first().hour.filter { it.timeEpoch <= nextDaySeconds })
+
+    val rainfallBeforeNow = dailyForecast[0].hour.filter { hour -> hour.timeEpoch < now }
         .map { it.toPrecipitationDomain(precipitationUnit = appSettings.precipitationUnit) }
 
-    val rainfallAfterNow = dailyForecast[0].hour.filter { hour -> hour.timeEpoch > location.localtimeEpoch }
+    val rainfallAfterNow = dailyForecast[0].hour.filter { hour -> hour.timeEpoch > now }
         .map { it.toPrecipitationDomain(precipitationUnit = appSettings.precipitationUnit) } +
-            dailyForecast[1].hour.filter { hour -> hour.timeEpoch < nextDayHourLimit }
+            dailyForecast[1].hour.filter { hour -> hour.timeEpoch < nextDaySeconds }
                 .map { it.toPrecipitationDomain(precipitationUnit = appSettings.precipitationUnit) }
 
     val rainfallNow =
-        (dailyForecast[0].hour.firstOrNull { hour -> hour.timeEpoch > location.localtimeEpoch }
+        (dailyForecast[0].hour.firstOrNull { hour -> hour.timeEpoch > now }
             ?: dailyForecast[1].hour.first())
             .toPrecipitationDomain(precipitationUnit = appSettings.precipitationUnit)
-
-    val locationTime = DateTimeParser.parseIso(location.localtime)
 
     return Forecast(
         location = ForecastLocation(
@@ -62,8 +62,6 @@ fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
             country = location.country,
             latitude = location.latitude,
             longitude = location.longitude,
-            localTimeEpoch = location.localtimeEpoch,
-            localTime = locationTime,
             timeZone = TimeZone.of(location.timeZoneId),
             isSunUp = dailyForecast.first().astro.isSunUp == IS_SUN_UP
         ),
@@ -74,14 +72,12 @@ fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
                 TemperatureUnit.Fahrenheit -> todayForecast.feelsLikeF.roundToInt().toString()
             },
             isDay = todayForecast.isDay == IS_DAY,
-            condition = WeatherCondition.fromConditionCode(todayForecast.conditionCode),
-            conditionText = todayForecast.conditionText,
+            condition = WeatherCondition.fromWeatherApi(todayForecast.conditionCode),
             windSpeed = todayForecast.toWindDomain(appSettings.windSpeedUnit),
             gustSpeed = todayForecast.toGustDomain(appSettings.windSpeedUnit),
-            windDirection = todayForecast.windDir.translateDirection(),
             windDegree = todayForecast.windDegree,
             pressure = todayForecast.toPressureDomain(appSettings.pressureUnit),
-            isRainingExpected = dailyForecast.first().day.dayWillItRain == DAILY_WILL_RAIN,
+            willRain = dailyForecast.first().day.dayWillItRain == DAILY_WILL_RAIN,
             rainfallBeforeNow = rainfallBeforeNow,
             rainfallAfterNow = rainfallAfterNow,
             rainfallNow = rainfallNow,

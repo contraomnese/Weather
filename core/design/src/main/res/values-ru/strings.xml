@@ -108,4 +108,52 @@
     <string name="gps_not_activated_title">GPS не был включён ❌</string>
     <string name="gps_dialog_error_title">Ошибка открытия диалога</string>
     <string name="gps_unavailable_title">GPS недоступен</string>
+
+    <!-- WMO Weather interpretation codes -->
+    <string name="wmo_clear_sky">Ясное небо</string>
+    <string name="wmo_mainly_clear">Преимущественно ясно</string>
+    <string name="wmo_partly_cloudy">Переменная облачность</string>
+    <string name="wmo_overcast">Пасмурно</string>
+    <string name="wmo_fog">Туман</string>
+    <string name="wmo_freezing_fog">Туман с изморозью</string>
+    <string name="wmo_drizzle_light">Слабая морось</string>
+    <string name="wmo_drizzle_moderate">Умеренная морось</string>
+    <string name="wmo_drizzle_dense">Сильная морось</string>
+    <string name="wmo_freezing_drizzle_light">Слабая ледяная морось</string>
+    <string name="wmo_freezing_drizzle_dense">Сильная ледяная морось</string>
+    <string name="wmo_rain_slight">Слабый дождь</string>
+    <string name="wmo_rain_moderate">Умеренный дождь</string>
+    <string name="wmo_rain_heavy">Сильный дождь</string>
+    <string name="wmo_freezing_rain_light">Слабый ледяной дождь</string>
+    <string name="wmo_freezing_rain_heavy">Сильный ледяной дождь</string>
+    <string name="wmo_snow_fall_slight">Слабый снег</string>
+    <string name="wmo_snow_fall_moderate">Умеренный снег</string>
+    <string name="wmo_snow_fall_heavy">Сильный снег</string>
+    <string name="wmo_snow_grains">Снежные крупинки</string>
+    <string name="wmo_rain_showers_slight">Слабые ливни</string>
+    <string name="wmo_rain_showers_moderate">Умеренные ливни</string>
+    <string name="wmo_rain_showers_violent">Сильные ливни</string>
+    <string name="wmo_snow_showers_slight">Слабые снегопады</string>
+    <string name="wmo_snow_showers_heavy">Сильные снегопады</string>
+    <string name="wmo_thunderstorm_slight">Слабая гроза</string>
+    <string name="wmo_thunderstorm_moderate">Умеренная гроза</string>
+    <string name="wmo_thunderstorm_hail_slight">Гроза с небольшим градом</string>
+    <string name="wmo_thunderstorm_hail_heavy">Гроза с сильным градом</string>
+
+    <string name="direction_n">С</string>
+    <string name="direction_nne">ССВ</string>
+    <string name="direction_ne">СВ</string>
+    <string name="direction_ene">ВСВ</string>
+    <string name="direction_e">В</string>
+    <string name="direction_ese">ВЮВ</string>
+    <string name="direction_se">ЮВ</string>
+    <string name="direction_sse">ЮЮВ</string>
+    <string name="direction_s">Ю</string>
+    <string name="direction_ssw">ЮЮЗ</string>
+    <string name="direction_sw">ЮЗ</string>
+    <string name="direction_wsw">ЗЮЗ</string>
+    <string name="direction_w">З</string>
+    <string name="direction_wnw">ЗСЗ</string>
+    <string name="direction_nw">СЗ</string>
+    <string name="direction_nnw">ССЗ</string>
 </resources>

@@ -33,7 +33,6 @@ data class ForecastDayEntity(
     @ColumnInfo(name = AVG_VIS_KM) val avgVisKm: Double,
     @ColumnInfo(name = AVG_VIS_MILES) val avgVisMiles: Double,
     @ColumnInfo(name = AVG_HUMIDITY) val avgHumidity: Int,
-    @ColumnInfo(name = CONDITION_TEXT) val conditionText: String,
     @ColumnInfo(name = CONDITION_CODE) val conditionCode: Int,
     @ColumnInfo(name = UV) val uv: Double,
     @ColumnInfo(name = DAY_WILL_IT_RAIN) val dayWillItRain: Int,
@@ -58,7 +57,6 @@ data class ForecastDayEntity(
         const val AVG_VIS_KM = "avg_vis_km"
         const val AVG_VIS_MILES = "avg_vis_miles"
         const val AVG_HUMIDITY = "avg_humidity"
-        const val CONDITION_TEXT = "condition_text"
         const val CONDITION_CODE = "condition_code"
         const val UV = "uv"
         const val DAY_WILL_IT_RAIN = "day_will_it_rain"

@@ -1,6 +1,6 @@
 package com.contraomnese.weather.data.network.api
 
-import com.contraomnese.weather.data.network.models.openweather.LocationsResponse
+import com.contraomnese.weather.data.network.models.openweather.geolocation.LocationsResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query

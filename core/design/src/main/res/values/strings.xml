@@ -119,4 +119,66 @@
     <string name="gps_not_activated_title">GPS was not turned on ❌</string>
     <string name="gps_dialog_error_title">Error opening dialog</string>
     <string name="gps_unavailable_title">GPS is unavailable</string>
+
+    <!-- WMO Weather interpretation codes -->
+    <string name="wmo_clear_sky">Clear sky</string>
+
+    <string name="wmo_mainly_clear">Mainly clear</string>
+    <string name="wmo_partly_cloudy">Partly cloudy</string>
+    <string name="wmo_overcast">Overcast</string>
+
+    <string name="wmo_fog">Fog</string>
+    <string name="wmo_freezing_fog">Freezing fog</string>
+
+    <string name="wmo_drizzle_light">Drizzle light</string>
+    <string name="wmo_drizzle_moderate">Drizzle moderate</string>
+    <string name="wmo_drizzle_dense">Drizzle dense</string>
+
+    <string name="wmo_freezing_drizzle_light">Freezing drizzle light</string>
+    <string name="wmo_freezing_drizzle_dense">Freezing drizzle dense</string>
+
+    <string name="wmo_rain_slight">Rain slight</string>
+    <string name="wmo_rain_moderate">Rain moderate</string>
+    <string name="wmo_rain_heavy">Rain heavy</string>
+
+    <string name="wmo_freezing_rain_light">Freezing rain light</string>
+    <string name="wmo_freezing_rain_heavy">Freezing rain heavy</string>
+
+    <string name="wmo_snow_fall_slight">Snow fall slight</string>
+    <string name="wmo_snow_fall_moderate">Snow fall moderate</string>
+    <string name="wmo_snow_fall_heavy">Snow fall heavy</string>
+
+    <string name="wmo_snow_grains">Snow grains</string>
+
+    <string name="wmo_rain_showers_slight">Rain showers slight</string>
+    <string name="wmo_rain_showers_moderate">Rain showers moderate</string>
+    <string name="wmo_rain_showers_violent">Rain showers violent</string>
+
+    <string name="wmo_snow_showers_slight">Snow showers slight</string>
+    <string name="wmo_snow_showers_heavy">Snow showers heavy</string>
+
+    <string name="wmo_thunderstorm_slight">Thunderstorm slight</string>
+    <string name="wmo_thunderstorm_moderate">Thunderstorm moderate</string>
+
+    <string name="wmo_thunderstorm_hail_slight">Thunderstorm with slight hail</string>
+    <string name="wmo_thunderstorm_hail_heavy">Thunderstorm with heavy hail</string>
+
+    <!-- Wind directions -->
+    <string name="direction_n">N</string>
+    <string name="direction_nne">NNE</string>
+    <string name="direction_ne">NE</string>
+    <string name="direction_ene">ENE</string>
+    <string name="direction_e">E</string>
+    <string name="direction_ese">ESE</string>
+    <string name="direction_se">SE</string>
+    <string name="direction_sse">SSE</string>
+    <string name="direction_s">S</string>
+    <string name="direction_ssw">SSW</string>
+    <string name="direction_sw">SW</string>
+    <string name="direction_wsw">WSW</string>
+    <string name="direction_w">W</string>
+    <string name="direction_wnw">WNW</string>
+    <string name="direction_nw">NW</string>
+    <string name="direction_nnw">NNW</string>
+
 </resources>

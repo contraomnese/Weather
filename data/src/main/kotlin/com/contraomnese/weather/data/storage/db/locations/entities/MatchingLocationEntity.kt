@@ -17,6 +17,7 @@ data class MatchingLocationEntity(
     @ColumnInfo(name = STATE) val state: String? = null,
     @ColumnInfo(name = COUNTRY) val country: String? = null,
     @ColumnInfo(name = COUNTRY_CODE) val countryCode: String? = null,
+    @ColumnInfo(name = TIMEZONE_ID) val timeZoneId: String? = null,
 ) {
     companion object {
         const val TABLE_NAME = "matching_locations"
@@ -28,7 +29,10 @@ data class MatchingLocationEntity(
         const val STATE = "state"
         const val COUNTRY = "country"
         const val COUNTRY_CODE = "country_code"
+        const val TIMEZONE_ID = "timezone_id"
     }
 
-    fun toPoint(): String = "$latitude,$longitude"
+    fun toTextPoints(): String = "$latitude,$longitude"
+
+    fun toPoints(): Pair<Double, Double> = Pair(latitude, longitude)
 }

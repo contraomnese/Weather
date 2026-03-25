@@ -52,7 +52,7 @@ data class RainfallSection(
                 rainfallBeforeNow = today.rainfallBeforeNow,
                 rainfallAfterNow = today.rainfallAfterNow,
                 rainfallNow = today.rainfallNow,
-                isRainingExpected = today.isRainingExpected,
+                isRainingExpected = today.willRain,
                 maxRainfall = today.maxRainfall,
                 precipitationUnit = appSettings.precipitationUnit
             )

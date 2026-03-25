@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.contraomnese.weather.core.ui.composition.LocalWeatherBackgrounds
 import com.contraomnese.weather.core.ui.composition.weatherBackgrounds
+import com.contraomnese.weather.core.ui.utils.getBackground
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
 
@@ -24,11 +25,8 @@ import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
 fun ImageBackgroundWithGradient(
     condition: WeatherCondition,
 ) {
-    val backgrounds = LocalWeatherBackgrounds.current
-    val extractedColor = backgrounds.getValue(condition).color
-
     SubcomposeAsyncImage(
-        model = backgrounds.getValue(condition).resId,
+        model = condition.getBackground().resId,
         contentDescription = null,
         contentScale = ContentScale.Crop,
         modifier = Modifier
@@ -41,7 +39,7 @@ fun ImageBackgroundWithGradient(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(extractedColor)
+                    .background(condition.getBackground().color)
             )
         },
     )
@@ -52,8 +50,8 @@ fun ImageBackgroundWithGradient(
                 Brush.verticalGradient(
                     colors = listOf(
                         Color.Transparent,
-                        extractedColor,
-                        extractedColor
+                        condition.getBackground().color,
+                        condition.getBackground().color
                     ),
                     startY = with(LocalDensity.current) { (400.dp).toPx() },
                     endY = Float.POSITIVE_INFINITY
@@ -69,7 +67,7 @@ fun ImageBackgroundWithGradient(
 private fun ImageBackgroundWithGradientPreview() {
     WeatherTheme {
         CompositionLocalProvider(LocalWeatherBackgrounds provides weatherBackgrounds) {
-            ImageBackgroundWithGradient(condition = WeatherCondition.SLEET)
+            ImageBackgroundWithGradient(condition = WeatherCondition.CLEAR)
         }
     }
 }

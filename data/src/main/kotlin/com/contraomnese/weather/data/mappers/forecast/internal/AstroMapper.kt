@@ -7,10 +7,5 @@ internal fun AstroNetwork.toEntity(forecastDayId: Int) = ForecastAstroEntity(
     forecastDailyId = forecastDayId,
     sunrise = this.sunrise,
     sunset = this.sunset,
-    moonrise = this.moonrise,
-    moonset = this.moonset,
-    moonPhase = this.moonPhase,
-    moonIllumination = this.moonIllumination,
-    isMoonUp = this.isMoonUp,
     isSunUp = this.isSunUp
 )

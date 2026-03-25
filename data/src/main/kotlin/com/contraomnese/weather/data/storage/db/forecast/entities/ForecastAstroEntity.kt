@@ -21,11 +21,6 @@ data class ForecastAstroEntity(
     @ColumnInfo(name = FORECAST_DAILY_ID) val forecastDailyId: Int,
     @ColumnInfo(name = SUNRISE) val sunrise: String,
     @ColumnInfo(name = SUNSET) val sunset: String,
-    @ColumnInfo(name = MOONRISE) val moonrise: String,
-    @ColumnInfo(name = MOONSET) val moonset: String,
-    @ColumnInfo(name = MOON_PHASE) val moonPhase: String,
-    @ColumnInfo(name = MOON_ILLUMINATION) val moonIllumination: Int,
-    @ColumnInfo(name = IS_MOON_UP) val isMoonUp: Int,
     @ColumnInfo(name = IS_SUN_UP) val isSunUp: Int,
 ) {
     companion object {
@@ -33,11 +28,6 @@ data class ForecastAstroEntity(
         const val FORECAST_DAILY_ID = "forecast_daily_id"
         const val SUNRISE = "sunrise"
         const val SUNSET = "sunset"
-        const val MOONRISE = "moonrise"
-        const val MOONSET = "moonset"
-        const val MOON_PHASE = "moon_phase"
-        const val MOON_ILLUMINATION = "moon_illumination"
-        const val IS_MOON_UP = "is_moon_up"
         const val IS_SUN_UP = "is_sun_up"
     }
 }

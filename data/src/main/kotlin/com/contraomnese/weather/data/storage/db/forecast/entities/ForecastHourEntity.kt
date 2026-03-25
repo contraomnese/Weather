@@ -20,16 +20,13 @@ data class ForecastHourEntity(
     @PrimaryKey(autoGenerate = true) val id: Int? = null,
     @ColumnInfo(name = FORECAST_DAILY_ID) val forecastDailyId: Int,
     @ColumnInfo(name = TIME_EPOCH) val timeEpoch: Long,
-    @ColumnInfo(name = TIME) val time: String,
     @ColumnInfo(name = TEMP_C) val tempC: Double,
     @ColumnInfo(name = TEMP_F) val tempF: Double,
     @ColumnInfo(name = IS_DAY) val isDay: Int,
-    @ColumnInfo(name = CONDITION_TEXT) val conditionText: String,
     @ColumnInfo(name = CONDITION_CODE) val conditionCode: Int,
     @ColumnInfo(name = WIND_MPH) val windMph: Double,
     @ColumnInfo(name = WIND_KPH) val windKph: Double,
     @ColumnInfo(name = WIND_DEGREE) val windDegree: Int,
-    @ColumnInfo(name = WIND_DIR) val windDir: String,
     @ColumnInfo(name = PRESSURE_MB) val pressureMb: Double,
     @ColumnInfo(name = PRESSURE_IN) val pressureIn: Double,
     @ColumnInfo(name = PRECIP_MM) val precipMm: Double,
@@ -39,15 +36,9 @@ data class ForecastHourEntity(
     @ColumnInfo(name = CLOUD) val cloud: Int,
     @ColumnInfo(name = FEELS_LIKE_C) val feelsLikeC: Double,
     @ColumnInfo(name = FEELS_LIKE_F) val feelsLikeF: Double,
-    @ColumnInfo(name = WIND_CHILL_C) val windChillC: Double,
-    @ColumnInfo(name = WIND_CHILL_F) val windChillF: Double,
-    @ColumnInfo(name = HEAT_INDEX_C) val heatIndexC: Double,
-    @ColumnInfo(name = HEAT_INDEX_F) val heatIndexF: Double,
     @ColumnInfo(name = DEW_POINT_C) val dewPointC: Double,
     @ColumnInfo(name = DEW_POINT_F) val dewPointF: Double,
-    @ColumnInfo(name = WILL_IT_RAIN) val willItRain: Int,
     @ColumnInfo(name = CHANCE_OF_RAIN) val chanceOfRain: Int,
-    @ColumnInfo(name = WILL_IT_SNOW) val willItSnow: Int,
     @ColumnInfo(name = CHANCE_OF_SNOW) val chanceOfSnow: Int,
     @ColumnInfo(name = VISIBILITY_KM) val visibilityKm: Double,
     @ColumnInfo(name = VISIBILITY_MILES) val visibilityMiles: Double,
@@ -63,12 +54,10 @@ data class ForecastHourEntity(
         const val TEMP_C = "temp_c"
         const val TEMP_F = "temp_f"
         const val IS_DAY = "is_day"
-        const val CONDITION_TEXT = "condition_text"
         const val CONDITION_CODE = "condition_code"
         const val WIND_MPH = "wind_mph"
         const val WIND_KPH = "wind_kph"
         const val WIND_DEGREE = "wind_degree"
-        const val WIND_DIR = "wind_dir"
         const val PRESSURE_MB = "pressure_mb"
         const val PRESSURE_IN = "pressure_in"
         const val PRECIP_MM = "precip_mm"

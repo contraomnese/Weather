@@ -1,5 +1,6 @@
 package com.contraomnese.weather.core.ui.icons
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -12,6 +13,7 @@ import com.contraomnese.weather.core.ui.canvas.PartlyCloudIcon
 import com.contraomnese.weather.core.ui.canvas.RainCloudIcon
 import com.contraomnese.weather.core.ui.canvas.SleetCloudIcon
 import com.contraomnese.weather.core.ui.canvas.SnowCloudIcon
+import com.contraomnese.weather.core.ui.canvas.SnowFlakeIcon
 import com.contraomnese.weather.core.ui.canvas.SunIcon
 import com.contraomnese.weather.core.ui.canvas.ThunderCloudIcon
 import com.contraomnese.weather.core.ui.canvas.TwoCloudIcon
@@ -23,12 +25,28 @@ fun ConditionsIcon(condition: WeatherCondition, modifier: Modifier = Modifier, i
     when (condition) {
         WeatherCondition.CLEAR -> if (isNight) MoonIcon(modifier) else SunIcon(modifier)
         WeatherCondition.PARTLY_CLOUDY -> PartlyCloudIcon(modifier)
-        WeatherCondition.CLOUDY -> TwoCloudIcon(modifier)
+        WeatherCondition.CLOUDY, WeatherCondition.OVERCAST -> TwoCloudIcon(modifier)
         WeatherCondition.FOG -> FogIcon(modifier)
-        WeatherCondition.RAIN -> RainCloudIcon(modifier)
-        WeatherCondition.SNOW -> SnowCloudIcon(modifier)
-        WeatherCondition.THUNDER -> ThunderCloudIcon(modifier)
-        WeatherCondition.SLEET -> SleetCloudIcon(modifier)
+        WeatherCondition.FREEZING_FOG -> SnowCloudIcon(modifier)
+        WeatherCondition.DRIZZLE_LIGHT, WeatherCondition.DRIZZLE_MODERATE, WeatherCondition.DRIZZLE_HEAVY -> RainCloudIcon(
+            modifier
+        )
+
+        WeatherCondition.FREEZING_DRIZZLE_LIGHT, WeatherCondition.FREEZING_RAIN_LIGHT, WeatherCondition.FREEZING_DRIZZLE_HEAVY, WeatherCondition.FREEZING_RAIN_HEAVY -> SleetCloudIcon()
+        WeatherCondition.SNOW_FALL_SLIGHT, WeatherCondition.SNOW_FALL_MODERATE, WeatherCondition.SNOW_FALL_HEAVY -> SnowFlakeIcon()
+        WeatherCondition.RAIN_SLIGHT, WeatherCondition.RAIN_MODERATE, WeatherCondition.RAIN_HEAVY, WeatherCondition.SNOW_SHOWERS_LIGHT, WeatherCondition.SNOW_SHOWERS_HEAVY -> RainCloudIcon(
+            modifier
+        )
+
+        WeatherCondition.RAIN_SHOWERS_SLIGHT, WeatherCondition.RAIN_SHOWERS_MODERATE, WeatherCondition.RAIN_SHOWERS_HEAVY -> RainCloudIcon(
+            modifier
+        )
+
+        WeatherCondition.THUNDERSTORM, WeatherCondition.THUNDERSTORM_WITH_RAIN_LIGHT, WeatherCondition.THUNDERSTORM_WITH_RAIN_HEAVY -> ThunderCloudIcon(
+            modifier
+        )
+
+        WeatherCondition.UNKNOWN -> Box(modifier)
     }
 }
 

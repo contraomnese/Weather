@@ -1,5 +1,6 @@
 package com.contraomnese.weather.core.ui.canvas
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.contraomnese.weather.design.theme.WeatherTheme
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun SnowCloudIcon(modifier: Modifier = Modifier) {
     BoxWithConstraints(modifier) {

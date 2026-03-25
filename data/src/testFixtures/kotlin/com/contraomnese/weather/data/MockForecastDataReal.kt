@@ -3057,7 +3057,7 @@ object MockForecastDataReal {
             lastUpdated = 1763993042829L,
             latitude = 55.752,
             localtime = "2025-11-24 17:03",
-            localtimeEpoch = 1763993017L,
+            localTimeEpoch = 1763993017L,
             locationId = 193562371,
             longitude = 37.616,
             name = "Moscow",

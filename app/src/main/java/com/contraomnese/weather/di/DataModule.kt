@@ -8,6 +8,7 @@ import com.contraomnese.weather.data.network.api.OpenWeatherGeoCodingApi
 import com.contraomnese.weather.data.network.api.WeatherApi
 import com.contraomnese.weather.data.network.interceptors.LocationsInterceptor
 import com.contraomnese.weather.data.network.interceptors.NetworkConnectionInterceptor
+import com.contraomnese.weather.data.network.interceptors.OpenMeteoForecastInterceptor
 import com.contraomnese.weather.data.network.interceptors.WeatherInterceptor
 import com.contraomnese.weather.data.network.models.errors.LocationsErrorResponse
 import com.contraomnese.weather.data.network.models.errors.OpenWeatherErrorResponse
@@ -17,9 +18,9 @@ import com.contraomnese.weather.data.network.parsers.LocationsApiParser
 import com.contraomnese.weather.data.network.parsers.OpenWeatherParser
 import com.contraomnese.weather.data.network.parsers.WeatherApiParser
 import com.contraomnese.weather.data.network.remotes.locations.LocationsRemote
-import com.contraomnese.weather.data.network.remotes.locations.OpenWeatherRemote
-import com.contraomnese.weather.data.network.remotes.weather.WeatherApiRemote
-import com.contraomnese.weather.data.network.remotes.weather.WeatherRemote
+import com.contraomnese.weather.data.network.remotes.locations.OpenWeatherGeoRemote
+import com.contraomnese.weather.data.network.remotes.weather.ForecastRemote
+import com.contraomnese.weather.data.network.remotes.weather.OpenWeatherRemote
 import com.contraomnese.weather.data.repository.AppSettingsRepositoryImpl
 import com.contraomnese.weather.data.repository.ForecastRepositoryImpl
 import com.contraomnese.weather.data.repository.LocationsRepositoryImpl
@@ -86,14 +87,16 @@ val dataModule = module {
     // --- OkHttp Clients ---
     factory(named(W_API)) { provideOkHttp(get<WeatherInterceptor>()) }
     factory(named(LIQ_API)) { provideOkHttp(get<LocationsInterceptor>()) }
-    factory(named("OpenMeteoClient")) { provideOkHttp() }
+    factory(named(OM_FORECAST)) { provideOkHttp(get<OpenMeteoForecastInterceptor>()) }
+    factory(named(OM_AIR)) { provideOkHttp() }
+    factory(named(OM_GEO)) { provideOkHttp() }
 
     // --- Retrofit Instances ---
     single(named(W_API)) { provideRetrofit(BuildConfig.WEATHER_API_BASE_URL, get(named(W_API))) }
     single(named(LIQ_API)) { provideRetrofit(BuildConfig.LOCATION_API_BASE_URL, get(named(LIQ_API))) }
-    single(named(OM_FORECAST)) { provideRetrofit(BuildConfig.OPEN_WEATHER_FORECAST_URL, get(named("OpenMeteoClient"))) }
-    single(named(OM_AIR)) { provideRetrofit(BuildConfig.OPEN_WEATHER_AIR_QUALITY_URL, get(named("OpenMeteoClient"))) }
-    single(named(OM_GEO)) { provideRetrofit(BuildConfig.OPEN_WEATHER_GEOCODING_URL, get(named("OpenMeteoClient"))) }
+    single(named(OM_FORECAST)) { provideRetrofit(BuildConfig.OPEN_WEATHER_FORECAST_URL, get(named(OM_FORECAST))) }
+    single(named(OM_AIR)) { provideRetrofit(BuildConfig.OPEN_WEATHER_AIR_QUALITY_URL, get(named(OM_AIR))) }
+    single(named(OM_GEO)) { provideRetrofit(BuildConfig.OPEN_WEATHER_GEOCODING_URL, get(named(OM_GEO))) }
 
     // --- Error Converters ---
     fun <T> Scope.provideErrorConverter(namedApi: String, clazz: Class<T>): Converter<ResponseBody, T> {
@@ -158,6 +161,7 @@ val dataModule = module {
 
     single<WeatherInterceptor> { WeatherInterceptor(apiKey = BuildConfig.WEATHER_API_KEY, appSettingsStorage = get()) }
     single<LocationsInterceptor> { LocationsInterceptor(apiKey = BuildConfig.LOCATION_API_KEY) }
+    single<OpenMeteoForecastInterceptor> { OpenMeteoForecastInterceptor(appSettingsStorage = get()) }
 
     // --- Storage & DB ---
     single<WeatherAppDatabase> { WeatherAppDatabase.create(get()) }
@@ -172,17 +176,24 @@ val dataModule = module {
 
     // --- Repositories & Remotes ---
     single<LocationsRemote> {
-        OpenWeatherRemote(
+        OpenWeatherGeoRemote(
             get(),
             get(named(OM_GEO))
         )
     }
-    single<WeatherRemote> {
-        WeatherApiRemote(
-            get(),
+    single<ForecastRemote> {
+        OpenWeatherRemote(
+            forecastApi = get(),
+            airQualityApi = get(),
             get(named(W_API))
         )
     }
+//    single<ForecastRemote> {
+//        WeatherApiRemote(
+//            api = get(),
+//            get (named(W_API))
+//        )
+//    }
 
     single<LocationsRepository> {
         LocationsRepositoryImpl(
@@ -197,7 +208,6 @@ val dataModule = module {
     single<ForecastRepository> {
         ForecastRepositoryImpl(
             get(),
-            get(named(W_API)),
             get(),
             get(),
             Dispatchers.IO,

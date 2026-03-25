@@ -27,8 +27,8 @@ val weatherBackgrounds =
         WeatherCondition.PARTLY_CLOUDY to WeatherBackground(R.drawable.partly_cloud, Color(0xFF788088)),
         WeatherCondition.CLOUDY to WeatherBackground(R.drawable.overcast, Color(0xFF999B9D)),
         WeatherCondition.FOG to WeatherBackground(R.drawable.fog, Color(0xFF676767)),
-        WeatherCondition.RAIN to WeatherBackground(R.drawable.rain, Color(0xFF485043)),
-        WeatherCondition.SNOW to WeatherBackground(R.drawable.snow, Color(0xFFE9F0F6)),
-        WeatherCondition.THUNDER to WeatherBackground(R.drawable.thunder, Color(0xFF6276A0)),
-        WeatherCondition.SLEET to WeatherBackground(R.drawable.sleet, Color(0xFF0F1D24)),
+        WeatherCondition.RAIN_MODERATE to WeatherBackground(R.drawable.rain, Color(0xFF485043)),
+        WeatherCondition.SNOW_FALL_MODERATE to WeatherBackground(R.drawable.snow, Color(0xFFE9F0F6)),
+        WeatherCondition.THUNDERSTORM to WeatherBackground(R.drawable.thunder, Color(0xFF6276A0)),
+        WeatherCondition.OVERCAST to WeatherBackground(R.drawable.sleet, Color(0xFF0F1D24)),
     )

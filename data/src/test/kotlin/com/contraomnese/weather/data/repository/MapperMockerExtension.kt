@@ -1,8 +1,8 @@
 package com.contraomnese.weather.data.repository
 
-import com.contraomnese.weather.data.mappers.forecast.internal.toEntity
 import com.contraomnese.weather.data.mappers.forecast.internal.toForecastDayEntity
 import com.contraomnese.weather.data.mappers.forecast.toDomain
+import com.contraomnese.weather.data.mappers.forecast.weatherapi.toEntity
 import com.contraomnese.weather.data.mappers.locations.toEntity
 import com.contraomnese.weather.data.network.models.weatherapi.AlertNetwork
 import com.contraomnese.weather.data.network.models.weatherapi.AstroNetwork

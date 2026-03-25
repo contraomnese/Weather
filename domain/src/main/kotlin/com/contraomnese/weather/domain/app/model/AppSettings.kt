@@ -1,9 +1,8 @@
 package com.contraomnese.weather.domain.app.model
 
-
-
 data class AppSettings(
     val language: Language = Language("en"),
+    val timezone: String = "Europe/Moscow",
     val windSpeedUnit: WindSpeedUnit = WindSpeedUnit.Kph,
     val precipitationUnit: PrecipitationUnit = PrecipitationUnit.Millimeters,
     val temperatureUnit: TemperatureUnit = TemperatureUnit.Celsius,

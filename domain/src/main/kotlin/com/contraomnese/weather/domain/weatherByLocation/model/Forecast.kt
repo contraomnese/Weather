@@ -15,8 +15,6 @@ data class ForecastLocation(
     val country: String,
     val latitude: Double,
     val longitude: Double,
-    val localTimeEpoch: Long,
-    val localTime: LocationDateTime?,
     val timeZone: TimeZone,
     val isSunUp: Boolean,
 )

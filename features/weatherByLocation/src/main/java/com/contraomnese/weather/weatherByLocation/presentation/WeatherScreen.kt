@@ -171,8 +171,20 @@ internal fun WeatherRoute(
                                             coroutineScope = coroutineScope,
                                             scaleAnimated = scaleAnimated,
                                             alphaAnimated = alphaAnimated,
-                                            onDragNext = { pushAction(WeatherScreenAction.SwapFavorite(currentFavoriteIndex + 1)) },
-                                            onDragPrev = { pushAction(WeatherScreenAction.SwapFavorite(currentFavoriteIndex - 1)) }
+                                            onDragNext = {
+                                                pushAction(
+                                                    WeatherScreenAction.SwapFavorite(
+                                                        currentFavoriteIndex + 1
+                                                    )
+                                                )
+                                            },
+                                            onDragPrev = {
+                                                pushAction(
+                                                    WeatherScreenAction.SwapFavorite(
+                                                        currentFavoriteIndex - 1
+                                                    )
+                                                )
+                                            }
                                         )
                                     },
                                     onHorizontalDrag = { _, dragAmount ->
@@ -383,7 +395,7 @@ internal fun WeatherScreen(
             feelsLikeTemp = weather.today.feelsLikeTemperature,
             maxTemp = weather.forecast.today.maxTemperature,
             minTemp = weather.forecast.today.minTemperature,
-            condition = weather.today.conditionText,
+            condition = "", // TODO
         )
         LazyColumn(
             modifier = Modifier

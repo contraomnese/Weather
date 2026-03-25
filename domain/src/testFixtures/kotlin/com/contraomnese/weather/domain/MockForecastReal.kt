@@ -125,7 +125,7 @@ object MockForecastReal {
             gustSpeed = "31",
             humidity = 87,
             isDay = false,
-            isRainingExpected = true,
+            willRain = true,
             maxRainfall = 0.98,
             pressure = 752,
             rainfallAfterNow = listOf(

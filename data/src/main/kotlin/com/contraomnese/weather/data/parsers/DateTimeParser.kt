@@ -16,7 +16,7 @@ object DateTimeParser {
         time(LocalTime.Formats.ISO)
     }
 
-    private val amPmFormatter = LocalTime.Format {
+    private val astroFormatter = LocalTime.Format {
         amPmHour(); char(':'); minute(); char(' '); amPmMarker("AM", "PM")
     }
 
@@ -32,7 +32,7 @@ object DateTimeParser {
 
     fun parseAmPmTime(input: String): LocationTime? {
         return try {
-            val time = LocalTime.parse(input, amPmFormatter)
+            val time = LocalTime.parse(input, astroFormatter)
             LocationTime(time)
         } catch (e: Exception) {
             Log.e("DateTimeParser", "Parse error for input=$input", e)
