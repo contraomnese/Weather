@@ -1,6 +1,7 @@
 package com.contraomnese.weather.data.mappers.forecast
 
-import com.contraomnese.weather.data.mappers.forecast.internal.toAirQualityInfo
+import com.contraomnese.weather.data.mappers.forecast.internal.toAirQualityUKIndex
+import com.contraomnese.weather.data.mappers.forecast.internal.toAirQualityUSAIndex
 import com.contraomnese.weather.data.mappers.forecast.internal.toDomain
 import com.contraomnese.weather.data.mappers.forecast.internal.toForecastDayDomain
 import com.contraomnese.weather.data.mappers.forecast.internal.toForecastTodayDomain
@@ -85,7 +86,9 @@ fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
             humidity = todayForecast.humidity,
             dewPoint = todayForecast.toDewPoint(appSettings.temperatureUnit),
             uvIndex = UvIndex(todayForecast.uv.roundToInt()),
-            airQuality = todayForecast.toAirQualityInfo()
+            airQuality = todayForecast.airQualityUKIndex?.let {
+                todayForecast.toAirQualityUKIndex()
+            } ?: todayForecast.toAirQualityUSAIndex()
         ),
         forecast = ForecastWeather(
             today = dailyForecast.first().toForecastTodayDomain(appSettings),

@@ -6,6 +6,7 @@ import com.contraomnese.weather.domain.weatherByLocation.model.LocationTime
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 
 object DateTimeParser {
@@ -17,7 +18,7 @@ object DateTimeParser {
     }
 
     private val astroFormatter = LocalTime.Format {
-        amPmHour(); char(':'); minute(); char(' '); amPmMarker("AM", "PM")
+        amPmHour(padding = Padding.NONE); char(':'); minute(); char(' '); amPmMarker("AM", "PM")
     }
 
     fun parseIso(input: String): LocationDateTime? {

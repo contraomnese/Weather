@@ -115,7 +115,7 @@ object MockForecastReal {
                 no2Level = PollutantLevel.Good,
                 o3Level = PollutantLevel.Good,
                 pm10Level = PollutantLevel.Moderate,
-                pm25Level = PollutantLevel.Bad,
+                pm25Level = PollutantLevel.Hazardous,
                 so2Level = PollutantLevel.Moderate
             ),
             condition = WeatherCondition.PARTLY_CLOUDY,

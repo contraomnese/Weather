@@ -47,8 +47,8 @@ data class ForecastTodayEntity(
     @ColumnInfo(name = AIR_QUALITY_SO2) val airQualitySo2: Double,
     @ColumnInfo(name = AIR_QUALITY_PM25) val airQualityPm25: Double,
     @ColumnInfo(name = AIR_QUALITY_PM10) val airQualityPm10: Double,
-    @ColumnInfo(name = AIR_QUALITY_US_EPA_INDEX) val airQualityUsEpaIndex: Int,
-    @ColumnInfo(name = AIR_QUALITY_GB_DEFRA_INDEX) val airQualityGbDefraIndex: Int,
+    @ColumnInfo(name = AIR_QUALITY_USA_INDEX) val airQualityUSAIndex: Int? = null,
+    @ColumnInfo(name = AIR_QUALITY_UK_INDEX) val airQualityUKIndex: Int? = null,
     @ColumnInfo(name = LAST_UPDATED_EPOCH) val lastUpdatedEpoch: Long,
 ) {
     companion object {
@@ -82,8 +82,8 @@ data class ForecastTodayEntity(
         const val AIR_QUALITY_SO2 = "air_quality_so2"
         const val AIR_QUALITY_PM25 = "air_quality_pm25"
         const val AIR_QUALITY_PM10 = "air_quality_pm10"
-        const val AIR_QUALITY_US_EPA_INDEX = "air_quality_us_epa_index"
-        const val AIR_QUALITY_GB_DEFRA_INDEX = "air_quality_gb_defra_index"
+        const val AIR_QUALITY_USA_INDEX = "air_quality_usa_index"
+        const val AIR_QUALITY_UK_INDEX = "air_quality_uk_index"
         const val LAST_UPDATED_EPOCH = "last_updated_epoch"
     }
 }

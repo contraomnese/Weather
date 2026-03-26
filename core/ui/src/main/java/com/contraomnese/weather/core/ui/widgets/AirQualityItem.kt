@@ -26,7 +26,7 @@ import com.contraomnese.weather.domain.weatherByLocation.model.PollutantLevel
 @Composable
 fun AirQualityItem(
     modifier: Modifier = Modifier,
-    aqiIndex: Int,
+    aqiIndex: PollutantLevel,
     coLevel: PollutantLevel,
     no2Level: PollutantLevel,
     o3Level: PollutantLevel,
@@ -37,11 +37,22 @@ fun AirQualityItem(
 
     val aqi = remember(aqiIndex) {
         when (aqiIndex) {
-        in 1..3 -> GoodAqi()
-        in 4..6 -> ModerateAqi()
-        in 7..9 -> BadAqi()
-        else -> VeryBadAqi()
+            PollutantLevel.Good -> GoodAqi()
+            PollutantLevel.Moderate -> ModerateAqi()
+            PollutantLevel.UnhealthyForSensGroups -> BadAqi()
+            PollutantLevel.Unhealthy -> BadAqi()
+            PollutantLevel.VeryUnhealthy -> VeryBadAqi()
+            PollutantLevel.Hazardous -> VeryBadAqi()
         }
+    }
+
+    val index = when (aqiIndex) {
+        PollutantLevel.Good -> 1
+        PollutantLevel.Moderate -> 2
+        PollutantLevel.UnhealthyForSensGroups -> 4
+        PollutantLevel.Unhealthy -> 6
+        PollutantLevel.VeryUnhealthy -> 8
+        PollutantLevel.Hazardous -> 10
     }
 
     Column(
@@ -49,7 +60,7 @@ fun AirQualityItem(
         verticalArrangement = Arrangement.spacedBy(padding8)
     ) {
         Text(
-            text = stringResource(aqi.text, aqiIndex),
+            text = stringResource(aqi.text, index),
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
@@ -62,7 +73,7 @@ fun AirQualityItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(itemHeight6),
-            current = aqiIndex.toFloat()
+            current = index.toFloat()
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -105,12 +116,18 @@ fun AirQualityItem(
 
 private val GoodColor = Color(0xFFFFFFFF)
 private val ModerateColor = Color(0xFFDCD807)
-private val BadColor = Color(0xFFAA5111)
+private val UnhealthyForSensGroupsColor = Color(0xFFf0a642)
+private val UnhealthyColor = Color(0xFFff4d50)
+private val VeryUnhealthyColor = Color(0xFF960132)
+private val HazardousColor = Color(0xFF7d2181)
 
 private fun PollutantLevel.toColor(): Color = when (this) {
     PollutantLevel.Good -> GoodColor
     PollutantLevel.Moderate -> ModerateColor
-    PollutantLevel.Bad -> BadColor
+    PollutantLevel.UnhealthyForSensGroups -> UnhealthyForSensGroupsColor
+    PollutantLevel.Unhealthy -> UnhealthyColor
+    PollutantLevel.VeryUnhealthy -> VeryUnhealthyColor
+    PollutantLevel.Hazardous -> HazardousColor
 }
 
 private interface Aqi {
@@ -147,12 +164,12 @@ private fun AirQualityItemPreview(modifier: Modifier = Modifier) {
     WeatherTheme {
         AirQualityItem(
             modifier = modifier,
-            aqiIndex = 10,
+            aqiIndex = PollutantLevel.Moderate,
             coLevel = PollutantLevel.Good,
             no2Level = PollutantLevel.Good,
             o3Level = PollutantLevel.Moderate,
             so2Level = PollutantLevel.Good,
-            pm10Level = PollutantLevel.Bad,
+            pm10Level = PollutantLevel.Hazardous,
             pm25Level = PollutantLevel.Good
         )
     }

@@ -28,6 +28,6 @@ internal interface WeatherSection {
         weather: Forecast,
         appSettings: AppSettings,
         measureContainerHeight: (Int) -> Unit,
-        progress: Float = 0f,
+        progress: Float, // TODO
     )
 }

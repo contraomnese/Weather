@@ -41,8 +41,8 @@ internal fun ForecastCurrentNetwork.toEntity(forecastLocationId: Int) = Forecast
     airQualitySo2 = forecastAirQuality.so2,
     airQualityO3 = forecastAirQuality.o3,
     airQualityNo2 = forecastAirQuality.no2,
-    airQualityUsEpaIndex = forecastAirQuality.usEpaIndex,
-    airQualityGbDefraIndex = forecastAirQuality.gbDefraIndex,
+    airQualityUSAIndex = null,
+    airQualityUKIndex = forecastAirQuality.gbDefraIndex,
     lastUpdatedEpoch = lastUpdatedEpoch,
 )
 

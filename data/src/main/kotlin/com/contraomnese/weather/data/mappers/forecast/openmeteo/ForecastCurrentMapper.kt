@@ -45,8 +45,8 @@ internal fun ForecastCurrentNetwork.toEntity(
     airQualitySo2 = airQualityCurrent.current.sulphurDioxide,
     airQualityPm10 = airQualityCurrent.current.pm10,
     airQualityPm25 = airQualityCurrent.current.pm25,
-    airQualityUsEpaIndex = airQualityCurrent.current.usAqi,
-    airQualityGbDefraIndex = 0,
+    airQualityUSAIndex = airQualityCurrent.current.usAqi,
+    airQualityUKIndex = null,
     lastUpdatedEpoch = updatedTime
 )
 
