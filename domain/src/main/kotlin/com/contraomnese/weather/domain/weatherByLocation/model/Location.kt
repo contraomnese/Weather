@@ -3,20 +3,19 @@ package com.contraomnese.weather.domain.weatherByLocation.model
 
 data class Location(
     val id: Int,
+    val name: String,
     val city: String? = null,
     val state: String? = null,
     val country: String? = null,
+    val countryCode: String,
     val geo: LocationCoordinates,
 ) {
     companion object {
         val EMPTY = Location(
             id = 0,
+            name = "",
+            countryCode = "",
             geo = LocationCoordinates.EMPTY
-        )
-
-        fun fromGeo(id: Int, latitude: Double, longitude: Double) = Location(
-            id = id,
-            geo = LocationCoordinates.from(latitude, longitude)
         )
     }
 }

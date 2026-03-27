@@ -124,6 +124,7 @@ androidx-compose-material-iconsExtended = { group = "androidx.compose.material",
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil-compose" }
+coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coil-compose" }
 
 # ui
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
@@ -236,7 +237,8 @@ compose = [
     "androidx-runtime-android",
     "androidx-constraintlayout-compose",
     "lottie-compose",
-    "coil-compose"
+    "coil-compose",
+    "coil-svg"
 ]
 
 composeDebug = [

@@ -15,8 +15,8 @@ interface FavoritesDao {
 
 
     @Query(
-        "INSERT INTO favorites (location_id, city, state, country, latitude, longitude, timezone_id) " +
-                "SELECT network_id, city, state, country, latitude, longitude, timezone_id " +
+        "INSERT INTO favorites (location_id, name, city, state, country, latitude, longitude, timezone_id) " +
+                "SELECT network_id, name, city, state, country, latitude, longitude, timezone_id " +
                 "FROM matching_locations WHERE network_id = :locationId"
     )
     suspend fun addFavorite(locationId: Int)

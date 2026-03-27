@@ -1,6 +1,5 @@
 package com.contraomnese.weather.data.mappers.locations
 
-import com.contraomnese.weather.data.network.models.weatherapi.ForecastLocationNetwork
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastLocationEntity
 import com.contraomnese.weather.data.storage.db.locations.entities.MatchingLocationEntity
 import com.contraomnese.weather.domain.exceptions.logPrefix
@@ -13,28 +12,6 @@ import com.contraomnese.weather.data.network.models.locationiq.LocationNetwork a
 import com.contraomnese.weather.data.network.models.openweather.geolocation.LocationNetwork as OWLocationNetwork
 
 private const val UNKNOWN = "Unknown"
-
-fun ForecastLocationNetwork.toEntity(locationId: Int) = ForecastLocationEntity(
-        locationId = locationId,
-        name = name,
-        region = region,
-        country = country,
-        latitude = lat,
-        longitude = lon,
-        timeZoneId = timeZoneId,
-        lastUpdated = System.currentTimeMillis()
-    )
-
-fun MatchingLocationEntity.toForecastLocationEntity(locationId: Int) = ForecastLocationEntity(
-    locationId = locationId,
-    latitude = latitude,
-    longitude = longitude,
-    name = city ?: UNKNOWN,
-    region = state ?: UNKNOWN,
-    country = country ?: UNKNOWN,
-    timeZoneId = timeZoneId ?: "GMT",
-    lastUpdated = System.currentTimeMillis()
-)
 
 fun IQLocationNetwork.toEntity() = MatchingLocationEntity(
     networkId = placeId.toInt(),
@@ -59,12 +36,25 @@ fun OWLocationNetwork.toEntity() = MatchingLocationEntity(
     timeZoneId = timezone
 )
 
+fun MatchingLocationEntity.toForecastLocationEntity(locationId: Int) = ForecastLocationEntity(
+    locationId = locationId,
+    latitude = latitude,
+    longitude = longitude,
+    name = name,
+    city = city ?: UNKNOWN,
+    region = state ?: UNKNOWN,
+    country = country ?: UNKNOWN,
+    timeZoneId = timeZoneId ?: "GMT",
+    lastUpdated = System.currentTimeMillis()
+)
+
 fun MatchingLocationEntity.toDomain() =
     Location(
         id = networkId,
+        name = name,
         city = city,
         state = state,
-        country = country,
+        countryCode = countryCode ?: UNKNOWN,
         geo = LocationCoordinates(
             latitude = Latitude(value = latitude),
             longitude = Longitude(value = longitude)

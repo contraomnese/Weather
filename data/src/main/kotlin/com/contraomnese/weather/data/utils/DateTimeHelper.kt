@@ -48,7 +48,7 @@ internal fun getAmPmTime(
     val instant = Instant.fromEpochSeconds(epochSeconds)
     val millis = instant.toEpochMilliseconds()
 
-    val sdf = SimpleDateFormat("h:mm a", locale)
+    val sdf = SimpleDateFormat("K:mm a", locale)
     sdf.timeZone = java.util.TimeZone.getTimeZone(timeZone.id)
 
     return sdf.format(Date(millis))

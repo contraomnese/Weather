@@ -390,7 +390,7 @@ internal fun WeatherScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(with(LocalDensity.current) { currentTitleBoxHeight.toDp() }),
-            location = weather.location.city,
+            location = weather.location.name,
             currentTemp = weather.today.temperature,
             feelsLikeTemp = weather.today.feelsLikeTemperature,
             maxTemp = weather.forecast.today.maxTemperature,

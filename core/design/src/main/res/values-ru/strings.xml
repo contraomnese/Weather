@@ -16,15 +16,21 @@
     <string name="wind_title">ВЕТЕР</string>
     <string name="rainfall_title">ОСАДКИ</string>
     <string name="pressure_title">ДАВЛЕНИЕ</string>
-    <string name="aqi_good">%1$d - Низкий</string>
-    <string name="aqi_moderate">%1$d - Умеренный</string>
-    <string name="aqi_bad">%1$d - Высокий</string>
-    <string name="aqi_very_bad">%1$d - Очень высокий</string>
+
+    <!--  Aqi section -->
+    <string name="aqi_good">%1$d - Хороший</string>
+    <string name="aqi_moderate">%1$d - Нормальный</string>
+    <string name="aqi_unhealthy_for_sens_groups">%1$d - Вредный для чувствительных групп</string>
+    <string name="aqi_unhealthy">%1$d - Вредный</string>
+    <string name="aqi_very_unhealthy">%1$d - Очень вредный</string>
+    <string name="aqi_hazardous">%1$d - Опасный</string>
 
     <string name="aqi_good_desc">Качество воздуха хорошее. Риск для здоровья отсутствует.</string>
-    <string name="aqi_moderate_desc">Качество воздуха удовлетворительное. Людям с повышенной чувствительностью стоит ограничить длительное пребывание на улице.</string>
-    <string name="aqi_bad_desc">Качество воздуха плохое. Людям с заболеваниями сердца или лёгких, детям и пожилым следует избегать продолжительных нагрузок на свежем воздухе.</string>
-    <string name="aqi_very_bad_desc">Качество воздуха очень плохое. Негативное воздействие возможно для всех — избегайте физических нагрузок на улице и по возможности оставайтесь в помещении.</string>
+    <string name="aqi_moderate_desc">Качество воздуха удовлетворительное. У некоторых чувствительных людей могут возникать незначительные симптомы при длительном пребывании на улице.</string>
+    <string name="aqi_unhealthy_for_sens_groups_desc">Качество воздуха ухудшено. Людям с заболеваниями дыхательной системы, детям и пожилым рекомендуется сократить время пребывания на улице и избегать физических нагрузок.</string>
+    <string name="aqi_unhealthy_desc">Качество воздуха вредное. У всех могут появляться негативные симптомы, особенно у чувствительных групп. Рекомендуется ограничить пребывание на улице.</string>
+    <string name="aqi_very_unhealthy_desc">Качество воздуха очень плохое. Людям с заболеваниями сердца или лёгких, детям и пожилым следует избегать пребывания на улице и физических нагрузок.</string>
+    <string name="aqi_hazardous_desc">Качество воздуха опасное. Серьёзное воздействие на здоровье возможно для всех. Рекомендуется оставаться в помещении и избегать любой активности на улице.</string>
 
     <string name="night_title">Ночь</string>
     <string name="sunrise_time_title">Восход в %1$s</string>

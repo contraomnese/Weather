@@ -1,5 +1,6 @@
 package com.contraomnese.weather.home.presentation
 
+import android.R.attr.country
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -23,6 +24,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -72,6 +74,7 @@ import com.contraomnese.weather.core.ui.composition.weatherBackgrounds
 import com.contraomnese.weather.core.ui.utils.getConditionText
 import com.contraomnese.weather.core.ui.widgets.AnimatedCircleButton
 import com.contraomnese.weather.core.ui.widgets.AnimatedIcon
+import com.contraomnese.weather.core.ui.widgets.CountryFlagWidget
 import com.contraomnese.weather.core.ui.widgets.FavoriteItem
 import com.contraomnese.weather.core.ui.widgets.GpsModeAlertDialog
 import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
@@ -84,10 +87,13 @@ import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.cornerRadius1
 import com.contraomnese.weather.design.theme.itemHeight160
 import com.contraomnese.weather.design.theme.itemHeight20
+import com.contraomnese.weather.design.theme.itemHeight32
+import com.contraomnese.weather.design.theme.itemHeight48
 import com.contraomnese.weather.design.theme.itemThickness2
 import com.contraomnese.weather.design.theme.itemWidth56
 import com.contraomnese.weather.design.theme.itemWidth64
 import com.contraomnese.weather.design.theme.padding16
+import com.contraomnese.weather.design.theme.padding4
 import com.contraomnese.weather.design.theme.space8
 import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 import com.contraomnese.weather.domain.weatherByLocation.model.Location
@@ -416,8 +422,8 @@ private fun MatchingLocations(
                 favoriteIcon =
                     if (locationsInFavorites.getOrDefault(location, false)) WeatherIcons.RemoveFavorite
                     else WeatherIcons.AddFavorite,
-                city = location.city,
-                country = location.country,
+                name = location.name,
+                countryCode = location.countryCode,
                 state = location.state
             )
         }
@@ -434,16 +440,16 @@ private fun MatchingLocations(
 }
 
 @Composable
-private fun MatchLocation(
-    onClick: () -> Unit,
-    onFavoriteClick: () -> Unit,
+fun MatchLocation(
+    onClick: () -> Unit = {},
+    onFavoriteClick: () -> Unit = {},
     favoriteIcon: ImageVector,
-    city: String?,
-    country: String?,
+    name: String,
     state: String?,
+    countryCode: String,
 ) {
 
-    val cityStyle = MaterialTheme.typography.labelMedium.toSpanStyle().copy(
+    val nameStyle = MaterialTheme.typography.labelMedium.toSpanStyle().copy(
         color = MaterialTheme.colorScheme.onSurface,
     )
 
@@ -451,24 +457,20 @@ private fun MatchLocation(
         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
     )
 
-    val matchLocationText = remember(city, country, state) {
+    val matchLocationText = remember(name, country, state) {
         buildAnnotatedString {
             withStyle(
-                cityStyle
+                nameStyle
             ) {
-                city?.let {
-                    append("${it}, ")
-                } ?: ""
+                append(name)
             }
             withStyle(
                 stateStyle
             ) {
                 state?.let {
-                    append("${it}, ")
+                    append(", $it")
                 } ?: ""
-                country?.let {
-                    append(it)
-                } ?: ""
+
             }
         }
     }
@@ -477,21 +479,30 @@ private fun MatchLocation(
         modifier = Modifier
             .clickable { onClick() }
             .fillMaxWidth()
-            .wrapContentHeight(),
+            .height(itemHeight48),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-
-        Text(
+        Row(
             modifier = Modifier.weight(1f, fill = false),
-            text = matchLocationText,
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.labelSmall.copy(
-                lineBreak = LineBreak.Paragraph
-            ),
-            color = MaterialTheme.colorScheme.onBackground
-        )
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            CountryFlagWidget(modifier = Modifier
+                .size(itemHeight32)
+                .padding(padding4), flagCode = countryCode)
+            Spacer(
+                modifier = Modifier.width(space8)
+            )
+            Text(
+                text = matchLocationText,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.labelSmall.copy(
+                    lineBreak = LineBreak.Paragraph
+                ),
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
 
         Spacer(
             modifier = Modifier.width(space8)
@@ -549,7 +560,7 @@ private fun FavoritesLocations(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(itemHeight160),
-                    locationName = it.location.city,
+                    locationName = location.name,
                     locationCountry = it.location.country,
                     timeZone = it.location.timeZone,
                     temperature = it.today.temperature,
@@ -653,6 +664,35 @@ private fun HomeScreenPreview() {
                     uiState,
                     eventFlow = emptyFlow(),
                     snackbarHostState
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = false, showSystemUi = false, device = "id:pixel_5")
+@Composable
+private fun MatchLocationPreview() {
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val uiState = HomeScreenState(
+        matchingLocations = emptyList<Location>().toPersistentList(),
+        favorites = emptyList<Location>().toPersistentList()
+    )
+
+    WeatherTheme {
+        CompositionLocalProvider(LocalWeatherBackgrounds provides weatherBackgrounds) {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(WindowInsets.statusBars.asPaddingValues())
+            ) {
+                MatchLocation(
+                    favoriteIcon = WeatherIcons.AddFavorite,
+                    name = "123",
+                    state = null,
+                    countryCode = "RU"
                 )
             }
         }

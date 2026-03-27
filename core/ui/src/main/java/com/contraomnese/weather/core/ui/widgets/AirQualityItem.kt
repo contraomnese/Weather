@@ -39,10 +39,10 @@ fun AirQualityItem(
         when (aqiIndex) {
             PollutantLevel.Good -> GoodAqi()
             PollutantLevel.Moderate -> ModerateAqi()
-            PollutantLevel.UnhealthyForSensGroups -> BadAqi()
-            PollutantLevel.Unhealthy -> BadAqi()
-            PollutantLevel.VeryUnhealthy -> VeryBadAqi()
-            PollutantLevel.Hazardous -> VeryBadAqi()
+            PollutantLevel.UnhealthyForSensGroups -> UnhealthyForSensGroupsAqi()
+            PollutantLevel.Unhealthy -> UnhealthyAqi()
+            PollutantLevel.VeryUnhealthy -> VeryUnhealthyAqi()
+            PollutantLevel.Hazardous -> HazardousAqi()
         }
     }
 
@@ -148,14 +148,24 @@ private data class ModerateAqi(
     override val description: Int = R.string.aqi_moderate_desc,
 ) : Aqi
 
-private data class BadAqi(
-    override val text: Int = R.string.aqi_bad,
-    override val description: Int = R.string.aqi_bad_desc,
+private data class UnhealthyForSensGroupsAqi(
+    override val text: Int = R.string.aqi_unhealthy_for_sens_groups,
+    override val description: Int = R.string.aqi_unhealthy_for_sens_groups_desc,
 ) : Aqi
 
-private data class VeryBadAqi(
-    override val text: Int = R.string.aqi_very_bad,
-    override val description: Int = R.string.aqi_very_bad_desc,
+private data class UnhealthyAqi(
+    override val text: Int = R.string.aqi_unhealthy,
+    override val description: Int = R.string.aqi_unhealthy_desc,
+) : Aqi
+
+private data class VeryUnhealthyAqi(
+    override val text: Int = R.string.aqi_very_unhealthy,
+    override val description: Int = R.string.aqi_very_unhealthy_desc,
+) : Aqi
+
+private data class HazardousAqi(
+    override val text: Int = R.string.aqi_hazardous,
+    override val description: Int = R.string.aqi_hazardous_desc,
 ) : Aqi
 
 @Preview

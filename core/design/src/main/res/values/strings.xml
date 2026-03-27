@@ -22,14 +22,19 @@
     <string name="pressure_title">PRESSURE</string>
 
     <!--  Aqi section -->
-    <string name="aqi_good">%1$d - Low</string>
+    <string name="aqi_good">%1$d - Good</string>
     <string name="aqi_moderate">%1$d - Moderate</string>
-    <string name="aqi_bad">%1$d - High</string>
-    <string name="aqi_very_bad">%1$d - Very High</string>
-    <string name="aqi_good_desc">Air quality is good. No risk expected for health.</string>
-    <string name="aqi_moderate_desc">Air quality is acceptable. Sensitive individuals should consider limiting prolonged outdoor activity.</string>
-    <string name="aqi_bad_desc">Air quality is poor. People with heart or lung conditions, children and older adults should avoid prolonged exertion outdoors.</string>
-    <string name="aqi_very_bad_desc">Air quality is very poor. Everyone may experience effects — avoid outdoor exercise and stay indoors if possible.</string>
+    <string name="aqi_unhealthy_for_sens_groups">%1$d - Unhealthy for Sensitive Groups</string>
+    <string name="aqi_unhealthy">%1$d - Unhealthy</string>
+    <string name="aqi_very_unhealthy">%1$d - Very Unhealthy</string>
+    <string name="aqi_hazardous">%1$d - Hazardous</string>
+
+    <string name="aqi_good_desc">Air quality is good. There is no health risk.</string>
+    <string name="aqi_moderate_desc">Air quality is acceptable. Some sensitive individuals may experience mild symptoms during prolonged outdoor exposure.</string>
+    <string name="aqi_unhealthy_for_sens_groups_desc">Air quality is degraded. People with respiratory conditions, children, and the elderly should limit outdoor time and avoid physical exertion.</string>
+    <string name="aqi_unhealthy_desc">Air quality is unhealthy. Everyone may begin to experience health effects, especially sensitive groups. It is recommended to reduce time spent outdoors.</string>
+    <string name="aqi_very_unhealthy_desc">Air quality is very poor. People with heart or lung conditions, children, and the elderly should avoid outdoor activities and physical exertion.</string>
+    <string name="aqi_hazardous_desc">Air quality is hazardous. Serious health effects may occur for everyone. Stay indoors and avoid all outdoor activities.</string>
 
     <!--  Sunrise section -->
     <string name="day_title">Day</string>
