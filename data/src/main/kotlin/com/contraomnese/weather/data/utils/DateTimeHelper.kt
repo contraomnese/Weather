@@ -42,14 +42,14 @@ internal fun getNumberOfMonth(
 
 internal fun getAmPmTime(
     epochSeconds: Long,
-    timeZone: TimeZone = TimeZone.currentSystemDefault(),
+    timeZoneId: String,
     locale: Locale = Locale.getDefault(),
 ): String {
     val instant = Instant.fromEpochSeconds(epochSeconds)
     val millis = instant.toEpochMilliseconds()
 
     val sdf = SimpleDateFormat("K:mm a", locale)
-    sdf.timeZone = java.util.TimeZone.getTimeZone(timeZone.id)
+    sdf.timeZone = java.util.TimeZone.getTimeZone(timeZoneId)
 
     return sdf.format(Date(millis))
 }

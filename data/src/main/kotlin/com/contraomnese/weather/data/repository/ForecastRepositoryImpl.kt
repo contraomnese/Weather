@@ -159,8 +159,8 @@ class ForecastRepositoryImpl(
             val forecastAstroEntities = forecastDaily.time.indices.map { index ->
                 ForecastAstroEntity(
                     forecastDailyId = index,
-                    sunrise = getAmPmTime(forecastDaily.sunrise[index]),
-                    sunset = getAmPmTime(forecastDaily.sunset[index]),
+                    sunrise = getAmPmTime(forecastDaily.sunrise[index], forecast.timezone),
+                    sunset = getAmPmTime(forecastDaily.sunset[index], forecast.timezone),
                     isSunUp = if (forecastDaily.time[index] > forecastDaily.sunrise[index]) 1 else 0
                 )
             }
