@@ -49,10 +49,12 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contraomnese.weather.core.ui.composition.LocalSnackbarHostState
+import com.contraomnese.weather.core.ui.utils.getConditionText
 import com.contraomnese.weather.core.ui.utils.handleHorizontalDragEnd
 import com.contraomnese.weather.core.ui.utils.toPx
 import com.contraomnese.weather.core.ui.widgets.ImageBackgroundWithGradient
@@ -395,7 +397,7 @@ internal fun WeatherScreen(
             feelsLikeTemp = weather.today.feelsLikeTemperature,
             maxTemp = weather.forecast.today.maxTemperature,
             minTemp = weather.forecast.today.minTemperature,
-            condition = "", // TODO
+            condition = stringResource(weather.today.condition.getConditionText()),
         )
         LazyColumn(
             modifier = Modifier

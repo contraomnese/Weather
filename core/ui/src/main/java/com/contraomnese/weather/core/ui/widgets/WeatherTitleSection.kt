@@ -43,7 +43,7 @@ fun TitleSection(
             .background(MaterialTheme.colorScheme.surface.copy(alpha = .0f)),
         contentAlignment = Alignment.Center
     ) {
-        if (maxHeight > 250.dp) {
+        if (this.maxHeight > 250.dp) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
