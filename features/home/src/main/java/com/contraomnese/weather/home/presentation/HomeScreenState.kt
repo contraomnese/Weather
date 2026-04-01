@@ -1,6 +1,7 @@
 package com.contraomnese.weather.home.presentation
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.input.TextFieldValue
 import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 import com.contraomnese.weather.domain.weatherByLocation.model.Location
@@ -14,6 +15,7 @@ import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 
+@Immutable
 internal data class Gps(
     val location: Location? = null,
     val isPermissionGranted: Boolean = false,
@@ -24,6 +26,7 @@ internal data class Gps(
 internal data class HomeScreenState(
     override val isLoading: Boolean = false,
     val isSearching: Boolean = false,
+    @Stable
     val inputLocation: TextFieldValue = TextFieldValue(),
     val gps: Gps = Gps(),
     val matchingLocations: ImmutableList<Location> = persistentListOf(),
