@@ -14,8 +14,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
-import com.contraomnese.weather.core.ui.composition.LocalWeatherBackgrounds
-import com.contraomnese.weather.core.ui.composition.weatherBackgrounds
 import com.contraomnese.weather.core.ui.utils.getBackground
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
@@ -66,7 +64,7 @@ fun ImageBackgroundWithGradient(
 @Composable
 private fun ImageBackgroundWithGradientPreview() {
     WeatherTheme {
-        CompositionLocalProvider(LocalWeatherBackgrounds provides weatherBackgrounds) {
+        CompositionLocalProvider {
             ImageBackgroundWithGradient(condition = WeatherCondition.CLEAR)
         }
     }

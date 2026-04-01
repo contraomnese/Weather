@@ -69,8 +69,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contraomnese.weather.core.ui.composition.LocalSnackbarHostState
-import com.contraomnese.weather.core.ui.composition.LocalWeatherBackgrounds
-import com.contraomnese.weather.core.ui.composition.weatherBackgrounds
+import com.contraomnese.weather.core.ui.utils.getBackground
 import com.contraomnese.weather.core.ui.utils.getConditionText
 import com.contraomnese.weather.core.ui.widgets.AnimatedCircleButton
 import com.contraomnese.weather.core.ui.widgets.AnimatedIcon
@@ -487,9 +486,11 @@ fun MatchLocation(
             modifier = Modifier.weight(1f, fill = false),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CountryFlagWidget(modifier = Modifier
-                .size(itemHeight32)
-                .padding(padding4), flagCode = countryCode)
+            CountryFlagWidget(
+                modifier = Modifier
+                    .size(itemHeight32)
+                    .padding(padding4), flagCode = countryCode
+            )
             Spacer(
                 modifier = Modifier.width(space8)
             )
@@ -544,8 +545,6 @@ private fun FavoritesLocations(
         LazyListState()
     }
 
-    val backgrounds = LocalWeatherBackgrounds.current
-
     LazyColumn(
         modifier = Modifier
             .padding(horizontal = padding16)
@@ -567,7 +566,7 @@ private fun FavoritesLocations(
                     maxTemperature = it.forecast.today.maxTemperature,
                     minTemperature = it.forecast.today.minTemperature,
                     conditionText = stringResource(it.today.condition.getConditionText()),
-                    background = backgrounds.getValue(it.today.condition).resId,
+                    background = it.today.condition.getBackground().resId,
                     onTapClicked = {
                         onNavigateToWeatherByLocation(
                             location.id
@@ -653,19 +652,17 @@ private fun HomeScreenPreview() {
     )
 
     WeatherTheme {
-        CompositionLocalProvider(LocalWeatherBackgrounds provides weatherBackgrounds) {
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(WindowInsets.statusBars.asPaddingValues())
-            ) {
-                HomeScreen(
-                    uiState,
-                    eventFlow = emptyFlow(),
-                    snackbarHostState
-                )
-            }
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(WindowInsets.statusBars.asPaddingValues())
+        ) {
+            HomeScreen(
+                uiState,
+                eventFlow = emptyFlow(),
+                snackbarHostState
+            )
         }
     }
 }
@@ -673,15 +670,8 @@ private fun HomeScreenPreview() {
 @Preview(showBackground = false, showSystemUi = false, device = "id:pixel_5")
 @Composable
 private fun MatchLocationPreview() {
-
-    val snackbarHostState = remember { SnackbarHostState() }
-    val uiState = HomeScreenState(
-        matchingLocations = emptyList<Location>().toPersistentList(),
-        favorites = emptyList<Location>().toPersistentList()
-    )
-
     WeatherTheme {
-        CompositionLocalProvider(LocalWeatherBackgrounds provides weatherBackgrounds) {
+        CompositionLocalProvider {
             Box(
                 Modifier
                     .fillMaxSize()

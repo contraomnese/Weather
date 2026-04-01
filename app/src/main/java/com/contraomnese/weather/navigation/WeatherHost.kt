@@ -21,8 +21,6 @@ import androidx.navigation.compose.rememberNavController
 import com.contraomnese.weather.MainActivityEvent
 import com.contraomnese.weather.appsettings.navigation.appSettings
 import com.contraomnese.weather.core.ui.composition.LocalSnackbarHostState
-import com.contraomnese.weather.core.ui.composition.LocalWeatherBackgrounds
-import com.contraomnese.weather.core.ui.composition.weatherBackgrounds
 import com.contraomnese.weather.home.navigation.home
 import com.contraomnese.weather.presentation.architecture.MviDestination
 import com.contraomnese.weather.presentation.architecture.collectEvent
@@ -49,7 +47,9 @@ internal fun WeatherHost(
         }
     }
 
-    CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState, LocalWeatherBackgrounds provides weatherBackgrounds) {
+    CompositionLocalProvider(
+        LocalSnackbarHostState provides snackbarHostState
+    ) {
         Box(
             modifier = Modifier
                 .semantics {
