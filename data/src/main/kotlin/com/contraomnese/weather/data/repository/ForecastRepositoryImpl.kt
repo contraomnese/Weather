@@ -214,7 +214,7 @@ class ForecastRepositoryImpl(
                 forecastDao.insertDay(forecastDayEntities[index].copy(forecastDailyId = forecastDayId))
                 forecastDao.insertAstro(forecastAstroEntities[index].copy(forecastDailyId = forecastDayId))
                 val insertForecastHour =
-                    forecastHourlyEntities.filter { it.timeEpoch < forecastDaily.dateEpoch + 86400 } // 86400 seconds in a day
+                    forecastHourlyEntities.filter { it.timeEpoch < forecastDaily.dateEpoch + 86400 && it.timeEpoch >= forecastDaily.dateEpoch } // 86400 seconds in a day
                 forecastDao.insertHourlyForecast(insertForecastHour.map { it.copy(forecastDailyId = forecastDayId) })
             }
         }

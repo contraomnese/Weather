@@ -23,6 +23,8 @@ import com.contraomnese.weather.domain.weatherByLocation.model.Weather
 import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import kotlin.math.roundToInt
 
 private const val HOURS = 24
@@ -35,13 +37,14 @@ private const val DEFAULT_RAINFALL = 0.0
 
 fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
 
-    val now = Clock.System.now().epochSeconds
+    val timeZone = TimeZone.of(location.timeZoneId)
+    val now = Clock.System.now().toLocalDateTime(timeZone).toInstant(timeZone).epochSeconds
     val nextDaySeconds = now + HOURS * MINUTES * SECONDS
 
     val forecastHours =
         mutableListOf(dailyForecast.first().hour.last { it.timeEpoch <= now })
     forecastHours.addAll(dailyForecast.first().hour.filter { it.timeEpoch > now })
-    forecastHours.addAll(dailyForecast.drop(1).first().hour.filter { it.timeEpoch <= nextDaySeconds })
+    forecastHours.addAll(dailyForecast[1].hour.filter { it.timeEpoch <= nextDaySeconds })
 
     val rainfallBeforeNow = dailyForecast[0].hour.filter { hour -> hour.timeEpoch < now }
         .map { it.toPrecipitationDomain(precipitationUnit = appSettings.precipitationUnit) }
@@ -94,7 +97,7 @@ fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
         forecast = ForecastWeather(
             today = dailyForecast.first().toForecastTodayDomain(appSettings),
             days = dailyForecast.map { it.toForecastDayDomain(appSettings) },
-            hours = forecastHours.map { it.toDomain(appSettings) }
+            hours = forecastHours.map { it.toDomain(appSettings, timeZone) }
         ),
         alerts = AlertsWeather(
             alerts = alerts.filter { it.desc.isNotEmpty() }.map { it.desc.replaceFirstChar { char -> char.uppercaseChar() } }

@@ -14,10 +14,10 @@ import kotlin.math.roundToInt
 
 private const val IS_DAY = 1
 
-internal fun ForecastHourEntity.toDomain(appSettings: AppSettings): ForecastHour {
+internal fun ForecastHourEntity.toDomain(appSettings: AppSettings, timeZone: TimeZone): ForecastHour {
 
     val instant = Instant.fromEpochSeconds(timeEpoch)
-    val localDateTime = instant.toLocalDateTime(TimeZone.of(appSettings.timezone))
+    val localDateTime = instant.toLocalDateTime(timeZone)
     val locationDateTime = LocationDateTime(localDateTime)
 
     return ForecastHour(

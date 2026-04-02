@@ -38,7 +38,7 @@ fun ForecastHourlyItem(
     ) {
         Text(
             modifier = Modifier.height(itemHeight20),
-            text = if (isNow) stringResource(R.string.now) else time.substring(0, 2),
+            text = time.take(2),
             style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
             color = MaterialTheme.colorScheme.onSurface
         )
