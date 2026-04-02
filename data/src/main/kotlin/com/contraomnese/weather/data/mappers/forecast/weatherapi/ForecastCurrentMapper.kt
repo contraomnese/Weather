@@ -1,7 +1,7 @@
 package com.contraomnese.weather.data.mappers.forecast.weatherapi
 
+import com.contraomnese.weather.data.mappers.utils.hPaToMmHg
 import com.contraomnese.weather.data.mappers.utils.kphToMph
-import com.contraomnese.weather.data.mappers.utils.mmToInch
 import com.contraomnese.weather.data.network.models.weatherapi.ForecastCurrentNetwork
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastHourEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastTodayEntity
@@ -71,7 +71,7 @@ internal fun ForecastTodayEntity.toGustDomain(windSpeedUnit: WindSpeedUnit): Str
 
 internal fun ForecastTodayEntity.toPressureDomain(pressureUnit: PressureUnit): Int {
     return when (pressureUnit) {
-        PressureUnit.MmHg -> mmToInch(this.pressureIn).roundToInt()
+        PressureUnit.MmHg -> hPaToMmHg(this.pressureMb).roundToInt()
         PressureUnit.GPa -> this.pressureMb.roundToInt()
     }
 }
