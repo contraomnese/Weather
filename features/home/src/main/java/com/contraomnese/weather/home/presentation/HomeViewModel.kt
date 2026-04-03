@@ -54,10 +54,8 @@ internal class HomeViewModel(
     }
 
     override suspend fun bootstrap() {
-        delay(400)
         observeFavoritesUseCase()
             .collectLatest { favorites ->
-                push(HomeScreenEffect.FavoritesUpdated(favorites))
                 push(HomeScreenAction.UpdateFavorites(favorites))
             }
     }
@@ -66,15 +64,17 @@ internal class HomeViewModel(
         is HomeScreenEffect.InputLocationUpdated -> previousState.setInputLocation(effect.input)
         is HomeScreenEffect.GpsLocationUpdated -> previousState.setGpsLocation(effect.location)
         is HomeScreenEffect.MatchingLocationsUpdated -> previousState.setMatchingLocations(effect.locations)
-        is HomeScreenEffect.FavoritesUpdated -> previousState.setFavorites(effect.favorites)
-        is HomeScreenEffect.FavoritesForecastUpdated -> previousState.setFavoritesForecast(effect.favoritesForecast)
+        is HomeScreenEffect.FavoritesForecastUpdated -> previousState.setFavoritesForecast(
+            effect.favorites,
+            effect.favoritesForecast
+        )
         is HomeScreenEffect.AccessFineLocationPermissionGranted -> previousState.setAccessFineLocationPermissionGranted(effect.isGranted)
         is HomeScreenEffect.GpsModeEnabled -> previousState.setGpsModeEnabled(effect.isEnabled)
         is HomeScreenEffect.CurrentTimeUpdated -> previousState.setTime(effect.time)
     }
 
     override suspend fun actor(action: HomeScreenAction) = when (action) {
-        is HomeScreenAction.InputLocation -> processLocationInput(action.input)
+        is HomeScreenAction.InputLocation -> processLocationInput(action.input, action.isTextChanged)
         is HomeScreenAction.UpdateGpsLocation -> processGpsLocationChange(LocationCoordinates.from(action.lat, action.lon))
         is HomeScreenAction.AddFavorite -> processFavoriteAdd(action.locationId)
         is HomeScreenAction.RemoveFavorite -> processFavoriteRemove(action.locationId)
@@ -84,10 +84,11 @@ internal class HomeViewModel(
         is HomeScreenAction.UpdateFavorites -> processFavoritesUpdate(action.favorites)
     }
 
-    private suspend fun processLocationInput(input: TextFieldValue) {
+    private suspend fun processLocationInput(input: TextFieldValue, isTextChanged: Boolean) {
+
         push(HomeScreenEffect.InputLocationUpdated(input))
 
-        if (input.text.isNotEmpty()) {
+        if (isTextChanged && input.text.isNotEmpty()) {
             delay(LOCATION_UPDATE_DELAY)
             getLocationsUseCase(input.text)
                 .onFailure { push(HomeScreenEvent.HandleError(it)) }
@@ -131,7 +132,11 @@ internal class HomeViewModel(
     private suspend fun processFavoritesUpdate(favorites: List<Location>) {
         observeForecastsWeatherUseCase(favorites.map { it.id })
             .collectLatest { forecasts ->
-                push(HomeScreenEffect.FavoritesForecastUpdated(forecasts.associateBy { it.location.id }))
+                push(
+                    HomeScreenEffect.FavoritesForecastUpdated(
+                        favorites = favorites,
+                        favoritesForecast = forecasts.associateBy { it.location.id })
+                )
             }
     }
 }

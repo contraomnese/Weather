@@ -55,13 +55,20 @@ internal data class HomeScreenState(
     fun setMatchingLocations(locations: List<Location>): HomeScreenState =
         copy(matchingLocations = locations.toPersistentList(), isSearching = false)
 
-    fun setFavorites(favorites: List<Location>): HomeScreenState =
-        if (favorites.isNotEmpty()) copy(favorites = favorites.toPersistentList()) else cleanFavorites()
+    fun setFavoritesForecast(
+        newFavorites: List<Location>,
+        newFavoritesForecast: Map<Int, Forecast>,
+    ): HomeScreenState =
+        if (newFavorites.isNotEmpty()) copy(
+            isLoading = false,
+            isSearching = false,
+            favorites = newFavorites.toPersistentList(),
+            favoritesForecast = newFavoritesForecast.toPersistentMap(),
+        )
+        else cleanFavorites()
 
-    fun setFavoritesForecast(newFavoritesForecast: Map<Int, Forecast>): HomeScreenState =
-        copy(favoritesForecast = newFavoritesForecast.toPersistentMap(), isLoading = false)
-
-    fun setAccessFineLocationPermissionGranted(isGranted: Boolean): HomeScreenState = copy(gps = gps.copy(isPermissionGranted = isGranted))
+    fun setAccessFineLocationPermissionGranted(isGranted: Boolean): HomeScreenState =
+        copy(gps = gps.copy(isPermissionGranted = isGranted))
 
     fun setGpsModeEnabled(isEnabled: Boolean): HomeScreenState = copy(gps = gps.copy(isGpsMode = isEnabled))
 

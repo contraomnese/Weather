@@ -44,12 +44,12 @@
 -keep class com.contraomnese.weather.core.ui.widgets.** { *; }
 -keep class com.contraomnese.weather.core.ui.utils.** { *; }
 
+-keep class com.contraomnese.weather.data.mappers.** { *; }
 -keep class com.contraomnese.weather.data.network.** { *; }
+-keep class com.contraomnese.weather.data.parsers.** { *; }
 -keep class com.contraomnese.weather.data.repository.** { *; }
 -keep class com.contraomnese.weather.data.storage.db.** { *; }
 -keep class com.contraomnese.weather.data.storage.memory.** { *; }
--keep class com.contraomnese.weather.data.parsers.** { *; }
--keep class com.contraomnese.weather.data.mappers.** { *; }
 -keep class com.contraomnese.weather.data.utils.** { *; }
 
 -keep class com.contraomnese.weather.domain.** { *; }

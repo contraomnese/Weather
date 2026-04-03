@@ -191,7 +191,7 @@ val dataModule = module {
 //    single<ForecastRemote> {
 //        WeatherApiRemote(
 //            api = get(),
-//            get (named(W_API))
+//            get(named(W_API))
 //        )
 //    }
 

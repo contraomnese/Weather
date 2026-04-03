@@ -5,7 +5,7 @@ import com.contraomnese.weather.domain.weatherByLocation.model.Location
 import com.contraomnese.weather.presentation.architecture.MviAction
 
 internal sealed interface HomeScreenAction : MviAction {
-    data class InputLocation(val input: TextFieldValue) : HomeScreenAction
+    data class InputLocation(val input: TextFieldValue, val isTextChanged: Boolean) : HomeScreenAction
     data class AddFavorite(val locationId: Int) : HomeScreenAction
     data class RemoveFavorite(val locationId: Int) : HomeScreenAction
     data class UpdateGpsLocation(val lat: Double, val lon: Double) : HomeScreenAction

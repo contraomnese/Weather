@@ -283,7 +283,12 @@ internal fun WelcomeScreen(
         )
 
         if (uiState.inputLocation.text.isNotEmpty() && searchBarOnTop) {
-            MatchingLocations(uiState.matchingLocations, uiState.favorites, pushAction, onNavigateToWeatherByLocation)
+            MatchingLocations(
+                locations = uiState.matchingLocations,
+                favorites = uiState.favorites,
+                pushAction,
+                onNavigateToWeatherByLocation
+            )
         } else FavoritesLocations(
             uiState.currentTime,
             uiState.favorites,
@@ -361,7 +366,7 @@ private fun TextSearchBar(
             modifier = Modifier
                 .weight(1f),
             searchQuery = inputLocation,
-            onSearchQueryChanged = { pushAction(HomeScreenAction.InputLocation(it)) },
+            onSearchQueryChanged = { pushAction(HomeScreenAction.InputLocation(it, it.text != inputLocation.text)) },
             isError = !inputLocation.hasValidLocation(),
             placeholder = stringResource(R.string.search),
             leadingIcon = if (isSearching) {
