@@ -10,6 +10,7 @@ import com.contraomnese.weather.data.network.models.openweather.forecast.Forecas
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDayEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastHourEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastTodayEntity
+import kotlin.time.Duration.Companion.days
 
 internal fun ForecastCurrentNetwork.toEntity(
     forecastLocationId: Int,
@@ -17,10 +18,10 @@ internal fun ForecastCurrentNetwork.toEntity(
     forecastDayEntities: List<ForecastDayEntity>,
     forecastHourlyEntities: List<ForecastHourEntity>,
 ): ForecastTodayEntity {
-
+    val hoursPerDay = 1.days.inWholeHours.toInt()
     val visibility = forecastDayEntities[0].avgVisKm
     val dewPoint = forecastHourlyEntities
-        .take(24)
+        .take(hoursPerDay)
         .map { it.dewPointC }
         .average()
         .takeUnless { it.isNaN() } ?: 0.0
@@ -46,7 +47,7 @@ internal fun ForecastCurrentNetwork.toEntity(
         dewPointF = celsiusToFahrenheit(dewPoint),
         visibilityKm = visibility,
         visibilityMiles = kmToMiles(visibility),
-        uv = airQualityCurrent.hourly.uvIndex.max(),
+        uv = forecastHourlyEntities.take(hoursPerDay).maxOf { it.uv },
         gustKph = windGusts10m,
         gustMph = kphToMph(windGusts10m),
         airQualityCo = airQualityCurrent.current.carbonMonoxide,

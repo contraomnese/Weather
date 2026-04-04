@@ -13,7 +13,7 @@ interface OpenWeatherAirQualityApi {
         @Query("longitude") longitude: Double,
         @Query("current") current: String = "carbon_monoxide,nitrogen_dioxide,pm2_5,pm10,sulphur_dioxide,ozone,us_aqi,uv_index",
         @Query("hourly") hourly: String = "uv_index",
-        @Query("forecast_days") forecastDays: Int = 3,
+        @Query("forecast_days") forecastDays: Int = 7,
         @Query("timeformat") timeFormat: String = "unixtime",
         @Query("timezone") timezone: String,
     ): Response<AirQualityNetwork>

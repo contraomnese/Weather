@@ -12,7 +12,7 @@ interface OpenWeatherForecastApi {
         @Query("latitude") latitude: Double,
         @Query("longitude") longitude: Double,
         @Query("timezone") timezone: String,
-        @Query("forecast_days") forecastDays: Int = 3,
+        @Query("forecast_days") forecastDays: Int = 7,
         @Query("timeformat") timeFormat: String = "unixtime",
         @Query("current") current: String = "temperature_2m,is_day,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,surface_pressure,precipitation,relative_humidity_2m,cloud_cover,apparent_temperature,rain,showers,snowfall",
         @Query("hourly") hourly: String = "temperature_2m,relative_humidity_2m,dew_point_2m,apparent_temperature,precipitation_probability,precipitation,rain,showers,snowfall,snow_depth,weather_code,surface_pressure,cloud_cover,visibility,wind_speed_10m,wind_direction_10m,wind_gusts_10m,is_day",

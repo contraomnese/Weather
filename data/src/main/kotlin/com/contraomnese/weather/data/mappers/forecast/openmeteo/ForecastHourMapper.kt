@@ -43,6 +43,6 @@ fun ForecastHourly.toForecastHourlyEntities(airQuality: AirQualityNetwork): List
             visibilityMiles = kmToMiles(visibility[index]),
             gustKph = windGusts10m[index],
             gustMph = kphToMph(windGusts10m[index]),
-            uv = airQuality.hourly.uvIndex[index]
+            uv = airQuality.hourly.uvIndex[index] ?: 0.0
         )
     }

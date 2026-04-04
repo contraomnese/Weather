@@ -5,5 +5,5 @@ import com.google.gson.annotations.SerializedName
 data class AirQualityHour(
     val time: List<Double>,
     @SerializedName("uv_index")
-    val uvIndex: List<Double>,
+    val uvIndex: List<Double?>,
 )
