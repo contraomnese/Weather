@@ -1,26 +1,20 @@
 package com.contraomnese.weather.data.repository
 
-import com.contraomnese.weather.data.mappers.forecast.internal.toEntity
-import com.contraomnese.weather.data.mappers.forecast.internal.toForecastDayEntity
+import com.contraomnese.weather.data.mappers.forecast.openmeteo.takeForecastHourByTime
 import com.contraomnese.weather.data.mappers.forecast.openmeteo.toEntity
+import com.contraomnese.weather.data.mappers.forecast.openmeteo.toForecastAstroEntities
+import com.contraomnese.weather.data.mappers.forecast.openmeteo.toForecastDailyEntities
+import com.contraomnese.weather.data.mappers.forecast.openmeteo.toForecastDayEntities
+import com.contraomnese.weather.data.mappers.forecast.openmeteo.toForecastHourlyEntities
 import com.contraomnese.weather.data.mappers.forecast.toDomain
 import com.contraomnese.weather.data.mappers.forecast.weatherapi.toEntity
+import com.contraomnese.weather.data.mappers.forecast.weatherapi.toForecastDayEntity
 import com.contraomnese.weather.data.mappers.locations.toForecastLocationEntity
-import com.contraomnese.weather.data.mappers.utils.celsiusToFahrenheit
-import com.contraomnese.weather.data.mappers.utils.hPaToInchesHg
-import com.contraomnese.weather.data.mappers.utils.kmToMiles
-import com.contraomnese.weather.data.mappers.utils.kphToMph
-import com.contraomnese.weather.data.mappers.utils.mmToInch
 import com.contraomnese.weather.data.network.remotes.weather.ForecastRemote
 import com.contraomnese.weather.data.network.remotes.weather.OpenWeatherRemote
 import com.contraomnese.weather.data.network.remotes.weather.WeatherApiRemote
 import com.contraomnese.weather.data.storage.db.WeatherAppDatabase
-import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastAstroEntity
-import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDailyEntity
-import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDayEntity
-import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastHourEntity
 import com.contraomnese.weather.data.storage.db.locations.entities.MatchingLocationEntity
-import com.contraomnese.weather.data.utils.getAmPmTime
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
 import com.contraomnese.weather.domain.exceptions.logPrefix
 import com.contraomnese.weather.domain.exceptions.operationFailed
@@ -122,90 +116,18 @@ class ForecastRepositoryImpl(
             val locationEntity = location.toForecastLocationEntity(location.networkId)
             val forecastLocationId = locationsDao.insertForecastLocation(locationEntity).toInt()
 
-            val forecastDailyEntities = forecastDaily.time.indices.map { index ->
-                ForecastDailyEntity(
-                    forecastLocationId = forecastLocationId,
-                    dateEpoch = forecast.daily.time[index],
-                )
-            }
-
-            val forecastDayEntities = forecastDaily.time.indices.map { index ->
-                ForecastDayEntity(
-                    forecastDailyId = index,
-                    maxTempC = forecastDaily.temperature2mMax[index],
-                    maxTempF = celsiusToFahrenheit(forecastDaily.temperature2mMax[index]),
-                    minTempC = forecastDaily.temperature2mMin[index],
-                    minTempF = celsiusToFahrenheit(forecastDaily.temperature2mMin[index]),
-                    avgTempC = forecastDaily.temperature2mMean[index],
-                    avgTempF = celsiusToFahrenheit(forecastDaily.temperature2mMean[index]),
-                    maxWindKph = forecastDaily.windSpeed10mMax[index],
-                    maxWindMph = kphToMph(forecastDaily.windSpeed10mMax[index]),
-                    totalPrecipMm = forecastDaily.precipitationSum[index],
-                    totalPrecipIn = mmToInch(forecastDaily.precipitationSum[index]),
-                    totalSnowCm = forecastDaily.snowfallSum[index],
-                    avgVisKm = forecastDaily.visibilityMean[index],
-                    avgVisMiles = kmToMiles(forecastDaily.visibilityMean[index]),
-                    avgHumidity = forecastDaily.relativeHumidity2mMean[index].toInt(),
-                    conditionCode = forecastDaily.weatherCode[index],
-                    uv = forecastDaily.uvIndexMax[index],
-                    // TODO this is not a chance
-                    dayWillItRain = forecastDaily.precipitationProbabilityMax[index],
-                    dayWillItSnow = forecastDaily.precipitationProbabilityMax[index],
-                    dayChanceOfRain = forecastDaily.precipitationProbabilityMax[index],
-                    dayChanceOfSnow = forecastDaily.precipitationProbabilityMax[index]
-                )
-            }
-
-            val forecastAstroEntities = forecastDaily.time.indices.map { index ->
-                ForecastAstroEntity(
-                    forecastDailyId = index,
-                    sunrise = getAmPmTime(forecastDaily.sunrise[index], forecast.timezone),
-                    sunset = getAmPmTime(forecastDaily.sunset[index], forecast.timezone),
-                    isSunUp = if (forecastDaily.time[index] > forecastDaily.sunrise[index]) 1 else 0
-                )
-            }
-
-            val forecastHourlyEntities = forecastHourly.time.indices.map { index ->
-                ForecastHourEntity(
-                    forecastDailyId = index,
-                    timeEpoch = forecastHourly.time[index],
-                    tempC = forecastHourly.temperature2m[index],
-                    tempF = celsiusToFahrenheit(forecastHourly.temperature2m[index]),
-                    isDay = forecastHourly.isDay[index],
-                    conditionCode = forecastHourly.weatherCode[index],
-                    windKph = forecastHourly.windSpeed10m[index],
-                    windMph = kphToMph(forecastHourly.windSpeed10m[index]),
-                    windDegree = forecastHourly.windDirection10m[index],
-                    pressureMb = forecastHourly.surfacePressure[index],
-                    pressureIn = hPaToInchesHg(forecastHourly.surfacePressure[index]),
-                    precipMm = forecastHourly.precipitation[index],
-                    precipIn = mmToInch(forecastHourly.precipitation[index]),
-                    snowCm = forecastHourly.snowfall[index],
-                    humidity = forecastHourly.relativeHumidity2m[index],
-                    cloud = forecastHourly.cloudCover[index],
-                    feelsLikeC = forecastHourly.apparentTemperature[index],
-                    feelsLikeF = celsiusToFahrenheit(forecastHourly.apparentTemperature[index]),
-                    dewPointC = forecastHourly.dewPoint2m[index],
-                    dewPointF = celsiusToFahrenheit(forecastHourly.dewPoint2m[index]),
-                    chanceOfRain = forecastHourly.precipitationProbability[index],
-                    chanceOfSnow = forecastHourly.precipitationProbability[index],
-                    visibilityKm = forecastHourly.visibility[index],
-                    visibilityMiles = kmToMiles(forecastHourly.visibility[index]),
-                    gustKph = forecastHourly.windGusts10m[index],
-                    gustMph = kphToMph(forecastHourly.windGusts10m[index]),
-                    uv = airQuality.hourly.uvIndex[index]
-                )
-            }
+            val forecastDailyEntities = forecastDaily.toForecastDailyEntities(forecastLocationId)
+            val forecastDayEntities = forecastDaily.toForecastDayEntities()
+            val forecastAstroEntities = forecastDaily.toForecastAstroEntities(forecast.timezone)
+            val forecastHourlyEntities = forecastHourly.toForecastHourlyEntities(airQuality)
 
             val forecastDao = database.forecastDao()
             forecastDao.insertForecastCurrent(
                 forecast.current.toEntity(
                     forecastLocationId = forecastLocationId,
-                    visibility = forecastDayEntities[0].avgVisKm,
-                    dewPoint = forecastHourlyEntities.filter { it.timeEpoch < forecast.current.time + 86400 }
-                        .sumOf { it.dewPointC } / 24,
                     airQualityCurrent = airQuality,
-                    updatedTime = forecast.current.time
+                    forecastDayEntities,
+                    forecastHourlyEntities
                 )
             )
 
@@ -213,8 +135,7 @@ class ForecastRepositoryImpl(
                 val forecastDayId = forecastDao.insertForecastDay(forecastDaily).toInt()
                 forecastDao.insertDay(forecastDayEntities[index].copy(forecastDailyId = forecastDayId))
                 forecastDao.insertAstro(forecastAstroEntities[index].copy(forecastDailyId = forecastDayId))
-                val insertForecastHour =
-                    forecastHourlyEntities.filter { it.timeEpoch < forecastDaily.dateEpoch + 86400 && it.timeEpoch >= forecastDaily.dateEpoch } // 86400 seconds in a day
+                val insertForecastHour = forecastHourlyEntities.filter { it.takeForecastHourByTime(forecastDaily) }
                 forecastDao.insertHourlyForecast(insertForecastHour.map { it.copy(forecastDailyId = forecastDayId) })
             }
         }

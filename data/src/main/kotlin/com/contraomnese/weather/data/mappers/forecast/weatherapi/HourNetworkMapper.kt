@@ -1,4 +1,4 @@
-package com.contraomnese.weather.data.mappers.forecast.internal
+package com.contraomnese.weather.data.mappers.forecast.weatherapi
 
 import com.contraomnese.weather.data.network.models.weatherapi.HourNetwork
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastHourEntity

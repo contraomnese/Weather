@@ -1,11 +1,11 @@
 package com.contraomnese.weather.data.mappers.forecast
 
-import com.contraomnese.weather.data.mappers.forecast.internal.toAirQualityUKIndex
-import com.contraomnese.weather.data.mappers.forecast.internal.toAirQualityUSAIndex
-import com.contraomnese.weather.data.mappers.forecast.internal.toDomain
-import com.contraomnese.weather.data.mappers.forecast.internal.toForecastDayDomain
-import com.contraomnese.weather.data.mappers.forecast.internal.toForecastTodayDomain
+import com.contraomnese.weather.data.mappers.forecast.weatherapi.toAirQualityUKIndex
+import com.contraomnese.weather.data.mappers.forecast.weatherapi.toAirQualityUSAIndex
 import com.contraomnese.weather.data.mappers.forecast.weatherapi.toDewPoint
+import com.contraomnese.weather.data.mappers.forecast.weatherapi.toDomain
+import com.contraomnese.weather.data.mappers.forecast.weatherapi.toForecastDayDomain
+import com.contraomnese.weather.data.mappers.forecast.weatherapi.toForecastTodayDomain
 import com.contraomnese.weather.data.mappers.forecast.weatherapi.toGustDomain
 import com.contraomnese.weather.data.mappers.forecast.weatherapi.toPrecipitationDomain
 import com.contraomnese.weather.data.mappers.forecast.weatherapi.toPressureDomain
