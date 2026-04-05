@@ -9,7 +9,7 @@ import com.contraomnese.weather.domain.weatherByLocation.model.Location
 import com.contraomnese.weather.domain.weatherByLocation.model.LocationCoordinates
 import com.contraomnese.weather.domain.weatherByLocation.model.Longitude
 import com.contraomnese.weather.data.network.models.locationiq.LocationNetwork as IQLocationNetwork
-import com.contraomnese.weather.data.network.models.openweather.geolocation.LocationNetwork as OWLocationNetwork
+import com.contraomnese.weather.data.network.models.openmeteo.geolocation.LocationNetwork as OWLocationNetwork
 
 private const val UNKNOWN = "Unknown"
 

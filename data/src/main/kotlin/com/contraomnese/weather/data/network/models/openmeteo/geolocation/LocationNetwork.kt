@@ -1,4 +1,4 @@
-package com.contraomnese.weather.data.network.models.openweather.geolocation
+package com.contraomnese.weather.data.network.models.openmeteo.geolocation
 
 import com.google.gson.annotations.SerializedName
 

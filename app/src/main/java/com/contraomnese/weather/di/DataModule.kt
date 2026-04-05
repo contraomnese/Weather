@@ -2,25 +2,25 @@ package com.contraomnese.weather.di
 
 import com.contraomnese.weather.BuildConfig
 import com.contraomnese.weather.data.network.api.LocationsIQApi
-import com.contraomnese.weather.data.network.api.OpenWeatherAirQualityApi
-import com.contraomnese.weather.data.network.api.OpenWeatherForecastApi
-import com.contraomnese.weather.data.network.api.OpenWeatherGeoCodingApi
+import com.contraomnese.weather.data.network.api.OpenMeteoAirQualityApi
+import com.contraomnese.weather.data.network.api.OpenMeteoForecastApi
+import com.contraomnese.weather.data.network.api.OpenMeteoGeoCodingApi
 import com.contraomnese.weather.data.network.api.WeatherApi
 import com.contraomnese.weather.data.network.interceptors.LocationsInterceptor
 import com.contraomnese.weather.data.network.interceptors.NetworkConnectionInterceptor
 import com.contraomnese.weather.data.network.interceptors.OpenMeteoForecastInterceptor
 import com.contraomnese.weather.data.network.interceptors.WeatherInterceptor
 import com.contraomnese.weather.data.network.models.errors.LocationsErrorResponse
-import com.contraomnese.weather.data.network.models.errors.OpenWeatherErrorResponse
+import com.contraomnese.weather.data.network.models.errors.OpenMeteoErrorResponse
 import com.contraomnese.weather.data.network.models.errors.WeatherErrorResponse
 import com.contraomnese.weather.data.network.parsers.INetworkParser
 import com.contraomnese.weather.data.network.parsers.LocationsApiParser
-import com.contraomnese.weather.data.network.parsers.OpenWeatherParser
+import com.contraomnese.weather.data.network.parsers.OpenMeteoParser
 import com.contraomnese.weather.data.network.parsers.WeatherApiParser
 import com.contraomnese.weather.data.network.remotes.locations.LocationsRemote
-import com.contraomnese.weather.data.network.remotes.locations.OpenWeatherGeoRemote
+import com.contraomnese.weather.data.network.remotes.locations.OpenMeteoGeoRemote
 import com.contraomnese.weather.data.network.remotes.weather.ForecastRemote
-import com.contraomnese.weather.data.network.remotes.weather.OpenWeatherRemote
+import com.contraomnese.weather.data.network.remotes.weather.OpenMeteoRemote
 import com.contraomnese.weather.data.repository.AppSettingsRepositoryImpl
 import com.contraomnese.weather.data.repository.ForecastRepositoryImpl
 import com.contraomnese.weather.data.repository.LocationsRepositoryImpl
@@ -117,10 +117,10 @@ val dataModule = module {
     }
 
     listOf(OM_FORECAST, OM_AIR, OM_GEO).forEach { apiName ->
-        factory<Converter<ResponseBody, OpenWeatherErrorResponse>> {
+        factory<Converter<ResponseBody, OpenMeteoErrorResponse>> {
             provideErrorConverter(
                 apiName,
-                OpenWeatherErrorResponse::class.java
+                OpenMeteoErrorResponse::class.java
             )
         }
     }
@@ -139,21 +139,21 @@ val dataModule = module {
     }
 
     single<INetworkParser>(named(OM_FORECAST)) {
-        OpenWeatherParser(
+        OpenMeteoParser(
             GsonConverterFactory.create(get()),
             get(named(OM_FORECAST))
         )
     }
 
     single<INetworkParser>(named(OM_AIR)) {
-        OpenWeatherParser(
+        OpenMeteoParser(
             GsonConverterFactory.create(get()),
             get(named(OM_AIR))
         )
     }
 
     single<INetworkParser>(named(OM_GEO)) {
-        OpenWeatherParser(
+        OpenMeteoParser(
             GsonConverterFactory.create(get()),
             get(named(OM_GEO))
         )
@@ -168,21 +168,21 @@ val dataModule = module {
     single<AppSettingsStorage> { AppSettingsStorageImpl(get(), Dispatchers.IO) }
 
     // --- API Services ---
-    single<OpenWeatherForecastApi> { get<Retrofit>(named(OM_FORECAST)).create(OpenWeatherForecastApi::class.java) }
-    single<OpenWeatherAirQualityApi> { get<Retrofit>(named(OM_AIR)).create(OpenWeatherAirQualityApi::class.java) }
-    single<OpenWeatherGeoCodingApi> { get<Retrofit>(named(OM_GEO)).create(OpenWeatherGeoCodingApi::class.java) }
+    single<OpenMeteoForecastApi> { get<Retrofit>(named(OM_FORECAST)).create(OpenMeteoForecastApi::class.java) }
+    single<OpenMeteoAirQualityApi> { get<Retrofit>(named(OM_AIR)).create(OpenMeteoAirQualityApi::class.java) }
+    single<OpenMeteoGeoCodingApi> { get<Retrofit>(named(OM_GEO)).create(OpenMeteoGeoCodingApi::class.java) }
     single<WeatherApi> { get<Retrofit>(named(W_API)).create(WeatherApi::class.java) }
     single<LocationsIQApi> { get<Retrofit>(named(LIQ_API)).create(LocationsIQApi::class.java) }
 
     // --- Repositories & Remotes ---
     single<LocationsRemote> {
-        OpenWeatherGeoRemote(
+        OpenMeteoGeoRemote(
             get(),
             get(named(OM_GEO))
         )
     }
     single<ForecastRemote> {
-        OpenWeatherRemote(
+        OpenMeteoRemote(
             forecastApi = get(),
             airQualityApi = get(),
             get(named(W_API))

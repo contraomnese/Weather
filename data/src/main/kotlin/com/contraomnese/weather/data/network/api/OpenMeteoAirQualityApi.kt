@@ -1,11 +1,11 @@
 package com.contraomnese.weather.data.network.api
 
-import com.contraomnese.weather.data.network.models.openweather.airquality.AirQualityNetwork
+import com.contraomnese.weather.data.network.responses.OpenMeteoAirQualityResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface OpenWeatherAirQualityApi {
+interface OpenMeteoAirQualityApi {
 
     @GET("air-quality")
     suspend fun getAirQuality(
@@ -16,6 +16,6 @@ interface OpenWeatherAirQualityApi {
         @Query("forecast_days") forecastDays: Int = 7,
         @Query("timeformat") timeFormat: String = "unixtime",
         @Query("timezone") timezone: String,
-    ): Response<AirQualityNetwork>
+    ): Response<OpenMeteoAirQualityResponse>
 
 }

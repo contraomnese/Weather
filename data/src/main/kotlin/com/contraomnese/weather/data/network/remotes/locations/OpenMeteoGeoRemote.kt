@@ -1,12 +1,12 @@
 package com.contraomnese.weather.data.network.remotes.locations
 
 import com.contraomnese.weather.data.mappers.locations.toEntity
-import com.contraomnese.weather.data.network.api.OpenWeatherGeoCodingApi
+import com.contraomnese.weather.data.network.api.OpenMeteoGeoCodingApi
 import com.contraomnese.weather.data.network.parsers.INetworkParser
 import com.contraomnese.weather.data.storage.db.locations.entities.MatchingLocationEntity
 
-class OpenWeatherGeoRemote(
-    private val api: OpenWeatherGeoCodingApi,
+class OpenMeteoGeoRemote(
+    private val api: OpenMeteoGeoCodingApi,
     private val parser: INetworkParser,
 ) : LocationsRemote {
 

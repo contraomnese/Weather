@@ -11,11 +11,11 @@ plugins {
 
 val weatherApiKey: String = gradleLocalProperties(rootDir, providers).getProperty("WEATHER_API_KEY")
 val weatherApiBaseUrl: String = gradleLocalProperties(rootDir, providers).getProperty("WEATHER_API_BASE_URL")
-val openWeatherForecastUrl: String = gradleLocalProperties(rootDir, providers).getProperty("OPEN_WEATHER_FORECAST_URL")
-val openWeatherAirQualityUrl: String =
-    gradleLocalProperties(rootDir, providers).getProperty("OPEN_WEATHER_AIR_QUALITY_URL")
-val openWeatherGeoCodingUrl: String =
-    gradleLocalProperties(rootDir, providers).getProperty("OPEN_WEATHER_GEOCODING_URL")
+val openMeteoForecastUrl: String = gradleLocalProperties(rootDir, providers).getProperty("OPEN_METEO_FORECAST_URL")
+val openMeteoAirQualityUrl: String =
+    gradleLocalProperties(rootDir, providers).getProperty("OPEN_METEO_AIR_QUALITY_URL")
+val openMeteoGeoCodingUrl: String =
+    gradleLocalProperties(rootDir, providers).getProperty("OPEN_METEO_GEOCODING_URL")
 val locationApiBaseUrl: String = gradleLocalProperties(rootDir, providers).getProperty("LOCATION_API_BASE_URL")
 val locationApiKey: String = gradleLocalProperties(rootDir, providers).getProperty("LOCATION_API_KEY")
 
@@ -47,9 +47,9 @@ android {
             buildConfigField("String", "WEATHER_API_BASE_URL", "\"${weatherApiBaseUrl}\"")
             buildConfigField("String", "LOCATION_API_BASE_URL", "\"${locationApiBaseUrl}\"")
             buildConfigField("String", "LOCATION_API_KEY", "\"${locationApiKey}\"")
-            buildConfigField("String", "OPEN_WEATHER_FORECAST_URL", "\"${openWeatherForecastUrl}\"")
-            buildConfigField("String", "OPEN_WEATHER_AIR_QUALITY_URL", "\"${openWeatherAirQualityUrl}\"")
-            buildConfigField("String", "OPEN_WEATHER_GEOCODING_URL", "\"${openWeatherGeoCodingUrl}\"")
+            buildConfigField("String", "OPEN_METEO_FORECAST_URL", "\"${openMeteoForecastUrl}\"")
+            buildConfigField("String", "OPEN_METEO_AIR_QUALITY_URL", "\"${openMeteoAirQualityUrl}\"")
+            buildConfigField("String", "OPEN_METEO_GEOCODING_URL", "\"${openMeteoGeoCodingUrl}\"")
         }
         release {
             signingConfig = signingConfigs.getByName("release")
@@ -61,9 +61,9 @@ android {
             buildConfigField("String", "WEATHER_API_BASE_URL", "\"${weatherApiBaseUrl}\"")
             buildConfigField("String", "LOCATION_API_BASE_URL", "\"${locationApiBaseUrl}\"")
             buildConfigField("String", "LOCATION_API_KEY", "\"${locationApiKey}\"")
-            buildConfigField("String", "OPEN_WEATHER_FORECAST_URL", "\"${openWeatherForecastUrl}\"")
-            buildConfigField("String", "OPEN_WEATHER_AIR_QUALITY_URL", "\"${openWeatherAirQualityUrl}\"")
-            buildConfigField("String", "OPEN_WEATHER_GEOCODING_URL", "\"${openWeatherGeoCodingUrl}\"")
+            buildConfigField("String", "OPEN_METEO_FORECAST_URL", "\"${openMeteoForecastUrl}\"")
+            buildConfigField("String", "OPEN_METEO_AIR_QUALITY_URL", "\"${openMeteoAirQualityUrl}\"")
+            buildConfigField("String", "OPEN_METEO_GEOCODING_URL", "\"${openMeteoGeoCodingUrl}\"")
         }
     }
     compileOptions {

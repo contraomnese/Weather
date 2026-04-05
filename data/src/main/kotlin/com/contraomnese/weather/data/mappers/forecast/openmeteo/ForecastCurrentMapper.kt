@@ -5,8 +5,8 @@ import com.contraomnese.weather.data.mappers.utils.hPaToInchesHg
 import com.contraomnese.weather.data.mappers.utils.kmToMiles
 import com.contraomnese.weather.data.mappers.utils.kphToMph
 import com.contraomnese.weather.data.mappers.utils.mmToInch
-import com.contraomnese.weather.data.network.models.openweather.airquality.AirQualityNetwork
-import com.contraomnese.weather.data.network.models.openweather.forecast.ForecastCurrentNetwork
+import com.contraomnese.weather.data.network.models.openmeteo.forecast.ForecastCurrentNetwork
+import com.contraomnese.weather.data.network.responses.OpenMeteoAirQualityResponse
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDayEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastHourEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastTodayEntity
@@ -14,7 +14,7 @@ import kotlin.time.Duration.Companion.days
 
 internal fun ForecastCurrentNetwork.toEntity(
     forecastLocationId: Int,
-    airQualityCurrent: AirQualityNetwork,
+    airQualityCurrent: OpenMeteoAirQualityResponse,
     forecastDayEntities: List<ForecastDayEntity>,
     forecastHourlyEntities: List<ForecastHourEntity>,
 ): ForecastTodayEntity {

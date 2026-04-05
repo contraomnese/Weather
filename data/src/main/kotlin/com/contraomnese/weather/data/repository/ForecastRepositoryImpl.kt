@@ -11,7 +11,7 @@ import com.contraomnese.weather.data.mappers.forecast.weatherapi.toEntity
 import com.contraomnese.weather.data.mappers.forecast.weatherapi.toForecastDayEntity
 import com.contraomnese.weather.data.mappers.locations.toForecastLocationEntity
 import com.contraomnese.weather.data.network.remotes.weather.ForecastRemote
-import com.contraomnese.weather.data.network.remotes.weather.OpenWeatherRemote
+import com.contraomnese.weather.data.network.remotes.weather.OpenMeteoRemote
 import com.contraomnese.weather.data.network.remotes.weather.WeatherApiRemote
 import com.contraomnese.weather.data.storage.db.WeatherAppDatabase
 import com.contraomnese.weather.data.storage.db.locations.entities.MatchingLocationEntity
@@ -84,7 +84,7 @@ class ForecastRepositoryImpl(
             }
 
             return@withContext when (forecastRemoteApi) {
-                is OpenWeatherRemote -> updateForecastByOpenWeatherResponse(location, forecastRemoteApi)
+                is OpenMeteoRemote -> updateForecastByOpenMeteoResponse(location, forecastRemoteApi)
                 is WeatherApiRemote -> updateForecastByWeatherApiResponse(location, forecastRemoteApi)
             }.fold(
                 onSuccess = { Result.success(locationId) },
@@ -100,9 +100,9 @@ class ForecastRepositoryImpl(
             Result.failure(storageError(logPrefix("Current location didn't find in storage"), cause))
         }
 
-    private suspend fun updateForecastByOpenWeatherResponse(
+    private suspend fun updateForecastByOpenMeteoResponse(
         location: MatchingLocationEntity,
-        forecastRemote: OpenWeatherRemote,
+        forecastRemote: OpenMeteoRemote,
     ) = try {
         val forecast = forecastRemote.fetchForecast(location)
         val airQuality = forecastRemote.fetchAirQuality(location)

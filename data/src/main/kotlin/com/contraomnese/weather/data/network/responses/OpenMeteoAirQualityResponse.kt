@@ -1,8 +1,11 @@
-package com.contraomnese.weather.data.network.models.openweather.airquality
+package com.contraomnese.weather.data.network.responses
 
+import com.contraomnese.weather.data.network.models.openmeteo.airquality.AirQualityCurrent
+import com.contraomnese.weather.data.network.models.openmeteo.airquality.AirQualityCurrentUnits
+import com.contraomnese.weather.data.network.models.openmeteo.airquality.AirQualityHour
 import com.google.gson.annotations.SerializedName
 
-data class AirQualityNetwork(
+data class OpenMeteoAirQualityResponse(
     val latitude: Double,
     val longitude: Double,
     @SerializedName("generationtime_ms")

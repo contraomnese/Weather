@@ -1,4 +1,4 @@
-package com.contraomnese.weather.data.network.models.openweather.airquality
+package com.contraomnese.weather.data.network.models.openmeteo.airquality
 
 import com.google.gson.annotations.SerializedName
 

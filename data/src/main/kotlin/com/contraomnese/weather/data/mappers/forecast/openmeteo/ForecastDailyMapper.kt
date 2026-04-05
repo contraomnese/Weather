@@ -4,7 +4,7 @@ import com.contraomnese.weather.data.mappers.utils.celsiusToFahrenheit
 import com.contraomnese.weather.data.mappers.utils.kmToMiles
 import com.contraomnese.weather.data.mappers.utils.kphToMph
 import com.contraomnese.weather.data.mappers.utils.mmToInch
-import com.contraomnese.weather.data.network.models.openweather.forecast.ForecastDaily
+import com.contraomnese.weather.data.network.models.openmeteo.forecast.ForecastDaily
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastAstroEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDailyEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDayEntity

@@ -5,8 +5,8 @@ import com.contraomnese.weather.data.mappers.utils.hPaToInchesHg
 import com.contraomnese.weather.data.mappers.utils.kmToMiles
 import com.contraomnese.weather.data.mappers.utils.kphToMph
 import com.contraomnese.weather.data.mappers.utils.mmToInch
-import com.contraomnese.weather.data.network.models.openweather.airquality.AirQualityNetwork
-import com.contraomnese.weather.data.network.models.openweather.forecast.ForecastHourly
+import com.contraomnese.weather.data.network.models.openmeteo.forecast.ForecastHourly
+import com.contraomnese.weather.data.network.responses.OpenMeteoAirQualityResponse
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDailyEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastHourEntity
 import kotlin.time.Duration.Companion.days
@@ -14,7 +14,7 @@ import kotlin.time.Duration.Companion.days
 fun ForecastHourEntity.takeForecastHourByTime(forecastDaily: ForecastDailyEntity) =
     this.timeEpoch < forecastDaily.dateEpoch + 1.days.inWholeSeconds && this.timeEpoch >= forecastDaily.dateEpoch
 
-fun ForecastHourly.toForecastHourlyEntities(airQuality: AirQualityNetwork): List<ForecastHourEntity> =
+fun ForecastHourly.toForecastHourlyEntities(airQuality: OpenMeteoAirQualityResponse): List<ForecastHourEntity> =
     time.indices.map { index ->
         ForecastHourEntity(
             forecastDailyId = index,

@@ -1,18 +1,18 @@
 package com.contraomnese.weather.data.network.responses
 
-import com.contraomnese.weather.data.network.models.openweather.forecast.ForecastCurrentNetwork
-import com.contraomnese.weather.data.network.models.openweather.forecast.ForecastCurrentUnits
-import com.contraomnese.weather.data.network.models.openweather.forecast.ForecastDaily
-import com.contraomnese.weather.data.network.models.openweather.forecast.ForecastDailyUnits
-import com.contraomnese.weather.data.network.models.openweather.forecast.ForecastHourly
-import com.contraomnese.weather.data.network.models.openweather.forecast.ForecastHourlyUnits
+import com.contraomnese.weather.data.network.models.openmeteo.forecast.ForecastCurrentNetwork
+import com.contraomnese.weather.data.network.models.openmeteo.forecast.ForecastCurrentUnits
+import com.contraomnese.weather.data.network.models.openmeteo.forecast.ForecastDaily
+import com.contraomnese.weather.data.network.models.openmeteo.forecast.ForecastDailyUnits
+import com.contraomnese.weather.data.network.models.openmeteo.forecast.ForecastHourly
+import com.contraomnese.weather.data.network.models.openmeteo.forecast.ForecastHourlyUnits
 import com.google.gson.annotations.SerializedName
 
-data class OpenWeatherForecastResponse(
+data class OpenMeteoForecastResponse(
     val latitude: Double,
     val longitude: Double,
     @SerializedName("generationtime_ms")
-    val generationtimeMs: Double,
+    val generationTimeMs: Double,
     @SerializedName("utc_offset_seconds")
     val utcOffsetSeconds: Int,
     val timezone: String,
