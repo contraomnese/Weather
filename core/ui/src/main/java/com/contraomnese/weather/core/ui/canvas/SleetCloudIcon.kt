@@ -18,7 +18,7 @@ import com.contraomnese.weather.design.theme.WeatherTheme
 fun SleetCloudIcon(modifier: Modifier = Modifier) {
     BoxWithConstraints(modifier) {
 
-        val snowFlakeSize = maxWidth * 0.15f
+        val snowFlakeSize = this.maxWidth * 0.15f
         val rainDropSize = maxWidth * 0.15f
 
         CloudIcon(
@@ -45,12 +45,12 @@ fun SleetCloudIcon(modifier: Modifier = Modifier) {
                         snowFlakeWidthRatio = 6f
                     )
                 } else {
-                    RainDropIcon(
+                    RainDropLineIcon(
                         modifier = Modifier
                             .size(rainDropSize)
                             .align(Alignment.Bottom),
                         rainDropColor = Color.White,
-                        rainDropWidthRatio = 4f
+                        rainDropRatio = 4f
                     )
                 }
             }

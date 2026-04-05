@@ -18,7 +18,7 @@ import com.contraomnese.weather.design.theme.WeatherTheme
 fun RainCloudIcon(modifier: Modifier = Modifier) {
     BoxWithConstraints(modifier) {
 
-        val rainDropSize = maxWidth * 0.15f
+        val rainDropSize = this.maxWidth * 0.15f
 
         CloudIcon(
             modifier = Modifier
@@ -35,12 +35,12 @@ fun RainCloudIcon(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             repeat(4) {
-                RainDropIcon(
+                RainDropLineIcon(
                     modifier = Modifier
                         .size(rainDropSize)
                         .align(Alignment.Bottom),
                     rainDropColor = Color.White,
-                    rainDropWidthRatio = 3f
+                    rainDropRatio = 3f
                 )
             }
         }
