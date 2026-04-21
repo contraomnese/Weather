@@ -57,19 +57,19 @@ val temperatureGradientStops = listOf(
     50f to Color(0xFFDC3535),
 )
 
-private fun Float.toCelsius(unit: TemperatureUnit): Float = when (unit) {
-    TemperatureUnit.Celsius -> this
+private fun Int.toCelsius(unit: TemperatureUnit): Float = when (unit) {
+    TemperatureUnit.Celsius -> this.toFloat()
     TemperatureUnit.Fahrenheit -> (this - 32f) / 1.8f
 }
 
 @Composable
 fun TemperatureRangeLine(
     modifier: Modifier = Modifier,
-    minRange: Float,
-    maxRange: Float,
-    min: Float,
-    max: Float,
-    current: Float? = null,
+    minRange: Int,
+    maxRange: Int,
+    min: Int,
+    max: Int,
+    current: Int? = null,
     temperatureUnit: TemperatureUnit,
 ) {
 
@@ -87,13 +87,13 @@ fun TemperatureRangeLine(
 @Composable
 fun UvIndexRangeLine(
     modifier: Modifier = Modifier,
-    current: Float,
+    current: Int,
 ) {
     GradientRangeLine(
         modifier = modifier,
         minRange = 0f,
         maxRange = 11f,
-        current = current,
+        current = current.toFloat(),
         gradientStops = uvIndexGradientStops
     )
 }
@@ -101,13 +101,13 @@ fun UvIndexRangeLine(
 @Composable
 fun AqiIndexRangeLine(
     modifier: Modifier = Modifier,
-    current: Float,
+    current: Int,
 ) {
     GradientRangeLine(
         modifier = modifier,
         minRange = 1f,
         maxRange = 10f,
-        current = current,
+        current = current.toFloat(),
         gradientStops = aqiIndexGradientStops
     )
 }
@@ -215,11 +215,11 @@ fun TemperatureRangeLinePreview() {
             modifier = Modifier
                 .width(itemWidth112)
                 .height(itemHeight8),
-            minRange = -5f,
-            maxRange = 35f,
-            min = 0f,
-            current = 23f,
-            max = 33f,
+            minRange = -5,
+            maxRange = 35,
+            min = 0,
+            current = 23,
+            max = 33,
             temperatureUnit = TemperatureUnit.Celsius
         )
     }
@@ -233,7 +233,7 @@ fun UVIndexRangeLinePreview() {
             modifier = Modifier
                 .width(itemWidth112)
                 .height(itemHeight8),
-            current = 2f,
+            current = 2,
         )
     }
 }
@@ -246,7 +246,7 @@ fun AqiRangeLinePreview() {
             modifier = Modifier
                 .width(itemWidth112)
                 .height(itemHeight8),
-            current = 2f,
+            current = 2,
         )
     }
 }

@@ -5,4 +5,5 @@ data class ForecastHour(
     val temperature: String,
     val condition: WeatherCondition,
     val isDay: Boolean,
+    val precipitationProbability: Int,
 )

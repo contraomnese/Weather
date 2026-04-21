@@ -1,6 +1,7 @@
 package com.contraomnese.weather.core.ui.canvas
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -21,26 +22,25 @@ fun SunIcon(
     color: Color = Color(0xFFF8D74A),
     rayAmount: Int = 8,
 ) {
-    Canvas(modifier) {
-        val radius = size.minDimension / 4
-        val outRayRadius = radius * 1.8f
-        val inRayRadius = radius * 1.4f
-        val rayWidth = radius / 4
+    Canvas(modifier.aspectRatio(1f)) {
+        val radius = size.width / 2.2f
+        val inRayRadius = radius * 0.7f
+        val rayWidth = radius / 8
 
         drawCircle(
             color = color,
-            radius = radius,
+            radius = radius / 1.8f,
             center = center
         )
         repeat(rayAmount) { i ->
-            val angle = Math.toRadians((i * fullRotation / rayAmount).toDouble())
+            val angle = Math.toRadians((i * fullRotation / rayAmount + 22.5).toDouble())
             val start = Offset(
                 x = center.x + cos(angle).toFloat() * inRayRadius,
                 y = center.y + sin(angle).toFloat() * inRayRadius
             )
             val end = Offset(
-                x = center.x + cos(angle).toFloat() * outRayRadius,
-                y = center.y + sin(angle).toFloat() * outRayRadius
+                x = center.x + cos(angle).toFloat() * radius,
+                y = center.y + sin(angle).toFloat() * radius
             )
             drawLine(color, start, end, strokeWidth = rayWidth, cap = StrokeCap.Round)
         }
@@ -51,6 +51,6 @@ fun SunIcon(
 @Composable
 private fun SunIconPreview() {
     WeatherTheme {
-        SunIcon(Modifier.size(200.dp))
+        SunIcon(Modifier.size(128.dp))
     }
 }

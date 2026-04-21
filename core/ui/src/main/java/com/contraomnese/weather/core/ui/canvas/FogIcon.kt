@@ -1,8 +1,12 @@
 package com.contraomnese.weather.core.ui.canvas
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -17,38 +21,42 @@ fun FogIcon(
     modifier: Modifier = Modifier,
     fogColor: Color = Color.LightGray,
 ) {
-    Canvas(
-        modifier
+    Box(
+        modifier = modifier.aspectRatio(1f),
+        contentAlignment = Alignment.Center
     ) {
-        val w = size.width * 0.8f
-        val h = size.height
-        val fogWidth = size.minDimension / 16f
-        val fogStroke = Stroke(fogWidth, cap = StrokeCap.Round)
+        Canvas(Modifier.fillMaxSize()) {
+            val w = size.width * 0.8f
+            val h = size.height
+            val fogWidth = size.minDimension / 16f
+            val fogStroke = Stroke(fogWidth, cap = StrokeCap.Round)
 
-        fun Path.wave(y: Float, amplitude: Float = size.minDimension / 12, wavelength: Float = w / 4f) {
-            moveTo(w * 0.1f, y)
-            var x = w * 0.1f
-            while (x < w) {
-                quadraticTo(
-                    x + wavelength / 2f, y - amplitude,
-                    x + wavelength, y
-                )
-                quadraticTo(
-                    x + (wavelength + (wavelength / 2f)), y + amplitude,
-                    x + wavelength * 2, y
-                )
-                x += wavelength * 2
+            fun Path.wave(y: Float, amplitude: Float = size.minDimension / 12, wavelength: Float = w / 4f) {
+                moveTo(w * 0.1f, y)
+                var x = w * 0.1f
+                while (x < w) {
+                    quadraticTo(
+                        x + wavelength / 2f, y - amplitude,
+                        x + wavelength, y
+                    )
+                    quadraticTo(
+                        x + (wavelength + (wavelength / 2f)), y + amplitude,
+                        x + wavelength * 2, y
+                    )
+                    x += wavelength * 2
+                }
             }
+
+            val path1 = Path().apply { wave(h * 0.3f) }
+            val path2 = Path().apply { wave(h * 0.5f) }
+            val path3 = Path().apply { wave(h * 0.7f) }
+
+            drawPath(path1, fogColor, style = fogStroke)
+            drawPath(path2, fogColor, style = fogStroke)
+            drawPath(path3, fogColor, style = fogStroke)
         }
-
-        val path1 = Path().apply { wave(h * 0.3f) }
-        val path2 = Path().apply { wave(h * 0.5f) }
-        val path3 = Path().apply { wave(h * 0.7f) }
-
-        drawPath(path1, fogColor, style = fogStroke)
-        drawPath(path2, fogColor, style = fogStroke)
-        drawPath(path3, fogColor, style = fogStroke)
     }
+
 }
 
 @Preview

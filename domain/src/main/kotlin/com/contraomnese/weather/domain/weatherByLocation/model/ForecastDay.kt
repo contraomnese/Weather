@@ -7,4 +7,5 @@ data class ForecastDay(
     val minTemperature: Int,
     val condition: WeatherCondition,
     val totalRainFull: Int,
+    val precipitationProbability: Int,
 )

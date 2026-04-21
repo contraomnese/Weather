@@ -1,10 +1,13 @@
 package com.contraomnese.weather.core.ui.widgets
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,13 +16,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import com.contraomnese.weather.core.ui.icons.ConditionsIcon
+import androidx.compose.ui.unit.dp
+import com.contraomnese.weather.core.ui.icons.ConditionIcons
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
-import com.contraomnese.weather.design.theme.itemHeight20
-import com.contraomnese.weather.design.theme.itemHeight26
-import com.contraomnese.weather.design.theme.itemWidth40
-import com.contraomnese.weather.design.theme.padding16
+import com.contraomnese.weather.design.theme.itemHeight140
+import com.contraomnese.weather.design.theme.itemHeight64
+import com.contraomnese.weather.design.theme.itemWidth48
 import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
 
 @Composable
@@ -30,24 +33,34 @@ fun ForecastHourlyItem(
     temperature: String,
     isNow: Boolean = false,
     isDay: Boolean = false,
+    precipitationProbability: Int,
 ) {
     Column(
-        modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(padding16),
+        modifier = modifier
+            .width(itemWidth48)
+            .fillMaxHeight(),
+        verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            modifier = Modifier.height(itemHeight20),
+            modifier = Modifier.wrapContentSize(),
             text = time.take(2),
             style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
             color = MaterialTheme.colorScheme.onSurface
         )
-        ConditionsIcon(condition = condition, isNight = !isDay, modifier = Modifier.size(itemWidth40))
+        ConditionIcons(
+            condition = condition,
+            isNight = !isDay,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(itemHeight64),
+            precipitationProbability = precipitationProbability
+        )
         Text(
-            modifier = Modifier.height(itemHeight26),
+            modifier = Modifier.wrapContentSize(),
             text = stringResource(R.string.current_temperature_title, temperature),
             style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
         )
     }
 }
@@ -56,11 +69,19 @@ fun ForecastHourlyItem(
 @Composable
 private fun ForecastHourlyItemPreview() {
     WeatherTheme {
-        ForecastHourlyItem(
-            time = "02:00",
-            condition = WeatherCondition.CLEAR,
-            temperature = "19"
-        )
+        Box(
+            modifier = Modifier
+                .height(120.dp)
+                .fillMaxWidth()
+        ) {
+            ForecastHourlyItem(
+                time = "02:00",
+                condition = WeatherCondition.DRIZZLE_LIGHT,
+                temperature = "19",
+                precipitationProbability = 10
+            )
+        }
+
     }
 }
 
@@ -68,11 +89,18 @@ private fun ForecastHourlyItemPreview() {
 @Composable
 private fun ForecastHourlyItemNowPreview() {
     WeatherTheme {
-        ForecastHourlyItem(
-            time = "03:00",
-            condition = WeatherCondition.CLEAR,
-            temperature = "19",
-            isNow = true
-        )
+        Box(
+            modifier = Modifier
+                .height(itemHeight140)
+                .fillMaxWidth()
+        ) {
+            ForecastHourlyItem(
+                time = "03:00",
+                condition = WeatherCondition.RAIN_HEAVY,
+                temperature = "191",
+                isNow = true,
+                precipitationProbability = 10
+            )
+        }
     }
 }

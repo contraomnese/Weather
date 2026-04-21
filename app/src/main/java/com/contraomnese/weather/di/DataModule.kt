@@ -94,9 +94,9 @@ val dataModule = module {
     // --- Retrofit Instances ---
     single(named(W_API)) { provideRetrofit(BuildConfig.WEATHER_API_BASE_URL, get(named(W_API))) }
     single(named(LIQ_API)) { provideRetrofit(BuildConfig.LOCATION_API_BASE_URL, get(named(LIQ_API))) }
-    single(named(OM_FORECAST)) { provideRetrofit(BuildConfig.OPEN_WEATHER_FORECAST_URL, get(named(OM_FORECAST))) }
-    single(named(OM_AIR)) { provideRetrofit(BuildConfig.OPEN_WEATHER_AIR_QUALITY_URL, get(named(OM_AIR))) }
-    single(named(OM_GEO)) { provideRetrofit(BuildConfig.OPEN_WEATHER_GEOCODING_URL, get(named(OM_GEO))) }
+    single(named(OM_FORECAST)) { provideRetrofit(BuildConfig.OPEN_METEO_FORECAST_URL, get(named(OM_FORECAST))) }
+    single(named(OM_AIR)) { provideRetrofit(BuildConfig.OPEN_METEO_AIR_QUALITY_URL, get(named(OM_AIR))) }
+    single(named(OM_GEO)) { provideRetrofit(BuildConfig.OPEN_METEO_GEOCODING_URL, get(named(OM_GEO))) }
 
     // --- Error Converters ---
     fun <T> Scope.provideErrorConverter(namedApi: String, clazz: Class<T>): Converter<ResponseBody, T> {

@@ -1,6 +1,7 @@
 package com.contraomnese.weather.core.ui.canvas
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -17,16 +18,16 @@ fun RainDropLineIcon(
     rainDropColor: Color = Color(0xFFFFFFFF),
     rainDropRatio: Float = 2f,
 ) {
-    Canvas(modifier) {
-
+    Canvas(modifier.fillMaxSize()) {
+        val padding = size.minDimension * 0.05f
         val w = size.width
         val h = size.height
         val rainDropSize: Float = size.minDimension / rainDropRatio.coerceIn(2f, 4f)
 
         drawLine(
             color = rainDropColor,
-            start = Offset(w - rainDropSize / 2, rainDropSize / 2),
-            end = Offset(rainDropSize / 2, h - rainDropSize / 2),
+            start = Offset(w - (rainDropSize / 2 + padding), rainDropSize / 2 + padding),
+            end = Offset(rainDropSize / 2 + padding, h - (rainDropSize / 2 + padding)),
             strokeWidth = rainDropSize,
             cap = StrokeCap.Round
         )

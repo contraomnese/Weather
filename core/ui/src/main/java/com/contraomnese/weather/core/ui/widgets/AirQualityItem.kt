@@ -73,7 +73,7 @@ fun AirQualityItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(itemHeight6),
-            current = index.toFloat()
+            current = index
         )
         Row(
             modifier = Modifier.fillMaxWidth(),

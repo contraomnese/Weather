@@ -27,7 +27,8 @@ internal fun ForecastHourEntity.toDomain(appSettings: AppSettings, timeZone: Tim
         },
         condition = WeatherCondition.fromWeatherApi(conditionCode),
         time = locationDateTime.toLocalTime(),
-        isDay = isDay == IS_DAY
+        isDay = isDay == IS_DAY,
+        precipitationProbability = chanceOfRain.takeIf { it != 0 } ?: chanceOfSnow
     )
 }
 

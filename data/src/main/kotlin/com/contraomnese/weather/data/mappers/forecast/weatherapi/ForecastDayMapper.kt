@@ -55,6 +55,7 @@ internal fun DailyForecastData.toForecastDayDomain(appSettings: AppSettings): Fo
             PrecipitationUnit.Millimeters -> day.totalPrecipMm.roundToInt()
             PrecipitationUnit.Inches -> day.totalPrecipIn.roundToInt()
         },
+        precipitationProbability = day.dayChanceOfRain.takeIf { it != 0 } ?: day.dayChanceOfSnow
     )
 }
 

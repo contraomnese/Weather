@@ -1,6 +1,8 @@
-package com.contraomnese.weather.core.ui.canvas
+package com.contraomnese.weather.core.ui.icons
 
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -9,26 +11,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
+import com.contraomnese.weather.core.ui.canvas.CloudIcon
 import com.contraomnese.weather.design.theme.WeatherTheme
 
 @Composable
 fun OverCastIcon(modifier: Modifier = Modifier) {
-    BoxWithConstraints(modifier) {
-
+    BoxWithConstraints(
+        modifier.aspectRatio(1f),
+        contentAlignment = Alignment.Center
+    ) {
+        val side = min(this.maxWidth, this.maxHeight)
         CloudIcon(
             modifier = Modifier
-                .size(this.maxWidth * 0.9f)
-                .align(Alignment.Center)
-                .offset(x = maxWidth * 0.04f, y = (-maxHeight * 0.1f)),
-            cloudColor = Color(0xFF97A2AC),
-            cloudCenterY = 0.6f
+                .fillMaxSize(0.9f)
+                .offset(
+                    x = side * 0.015f,
+                    y = -side * 0.07f
+                ),
+            color = Color(0xFF97A2AC),
         )
         CloudIcon(
-            modifier = Modifier
-                .size(maxWidth * 0.9f)
-                .align(Alignment.Center),
-            cloudColor = Color.White,
-            cloudCenterY = 0.6f
+            modifier = Modifier.fillMaxSize(0.9f),
         )
     }
 }

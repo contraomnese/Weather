@@ -1,6 +1,7 @@
 package com.contraomnese.weather.core.ui.canvas
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,7 +16,7 @@ fun ThunderIcon(
     modifier: Modifier = Modifier,
     thunderColor: Color = Color(0xFFF1C312),
 ) {
-    Canvas(modifier) {
+    Canvas(modifier.fillMaxSize()) {
         val w = size.width
         val h = size.height
 

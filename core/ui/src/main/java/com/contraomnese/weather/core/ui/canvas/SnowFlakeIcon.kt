@@ -1,6 +1,7 @@
 package com.contraomnese.weather.core.ui.canvas
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -18,13 +19,13 @@ private const val fullRotation = 360f
 @Composable
 fun SnowFlakeIcon(
     modifier: Modifier = Modifier,
-    snowFlakeColor: Color = Color(0xFFFFFFFF),
-    snowFlakeWidthRatio: Float = 6f,
+    snowFlakeColor: Color = Color.White,
+    snowFlakeRatio: Float = 10f,
 ) {
-    Canvas(modifier) {
-
-        val snowFlakeWidth: Float = size.minDimension / snowFlakeWidthRatio
-        val outRayRadius = size.minDimension / 2 - snowFlakeWidth / 2
+    Canvas(modifier.fillMaxSize()) {
+        val padding = 2.5f
+        val snowFlakeWidth: Float = size.minDimension / snowFlakeRatio.coerceAtLeast(10f)
+        val outRayRadius = size.minDimension / padding - snowFlakeWidth / padding
 
         repeat(8) { i ->
             val angle = Math.toRadians((i * fullRotation / 8).toDouble())

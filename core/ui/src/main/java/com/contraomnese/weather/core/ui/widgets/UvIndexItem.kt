@@ -69,7 +69,7 @@ fun UvIndexItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(itemHeight8),
-            current = index.toFloat(),
+            current = index,
         )
 
         Text(
