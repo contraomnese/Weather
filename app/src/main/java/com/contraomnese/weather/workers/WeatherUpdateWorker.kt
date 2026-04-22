@@ -1,6 +1,7 @@
 package com.contraomnese.weather.workers
 
 import android.content.Context
+import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.contraomnese.weather.domain.home.usecase.GetFavoritesUseCase
@@ -18,6 +19,7 @@ class WeatherUpdateWorker(
         return try {
             getFavoritesUseCase()
                 .onSuccess {
+                    Log.d("WeatherUpdateWorker", "Start update weather")
                     updateFavoritesForecastsUseCase(it.map { it.id })
                 }
                 .onFailure {

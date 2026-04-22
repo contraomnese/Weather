@@ -96,7 +96,7 @@ fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
         ),
         forecast = ForecastWeather(
             today = dailyForecast.first().toForecastTodayDomain(appSettings),
-            days = dailyForecast.map { it.toForecastDayDomain(appSettings) },
+            days = dailyForecast.map { it.toForecastDayDomain(appSettings, timeZone) },
             hours = forecastHours.map { it.toDomain(appSettings, timeZone) }
         ),
         alerts = AlertsWeather(

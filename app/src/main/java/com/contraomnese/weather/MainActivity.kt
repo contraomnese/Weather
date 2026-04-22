@@ -38,6 +38,12 @@ import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.navigation.WeatherHost
 import com.contraomnese.weather.workers.WeatherUpdateWorker
 import kotlinx.coroutines.delay
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
 import org.koin.androidx.compose.KoinAndroidContext
 import org.koin.androidx.compose.koinViewModel
 import java.util.concurrent.TimeUnit
@@ -69,6 +75,7 @@ class MainActivity : ComponentActivity() {
         val weatherRequest = PeriodicWorkRequestBuilder<WeatherUpdateWorker>(
             6, TimeUnit.HOURS
         )
+            .setInitialDelay(getDelayUntilMidnight(), TimeUnit.SECONDS)
             .setConstraints(constraints)
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 15, TimeUnit.MINUTES)
             .build()
@@ -78,6 +85,17 @@ class MainActivity : ComponentActivity() {
             ExistingPeriodicWorkPolicy.KEEP,
             weatherRequest
         )
+    }
+
+    private fun getDelayUntilMidnight(): Long {
+        val now = Clock.System.now()
+        val timeZone = TimeZone.currentSystemDefault()
+
+        val today = now.toLocalDateTime(timeZone).date
+        val tomorrowMidnight = today
+            .plus(1, DateTimeUnit.DAY)
+            .atStartOfDayIn(timeZone)
+        return (tomorrowMidnight - now).inWholeSeconds
     }
 
 }

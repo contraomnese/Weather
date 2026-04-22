@@ -13,6 +13,7 @@ import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastDay
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastToday
 import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
+import kotlinx.datetime.TimeZone
 import kotlin.math.roundToInt
 
 internal fun DailyForecastData.toForecastTodayDomain(appSettings: AppSettings): ForecastToday {
@@ -38,10 +39,10 @@ internal fun DailyForecastData.toForecastTodayDomain(appSettings: AppSettings): 
     )
 }
 
-internal fun DailyForecastData.toForecastDayDomain(appSettings: AppSettings): ForecastDay {
+internal fun DailyForecastData.toForecastDayDomain(appSettings: AppSettings, timeZone: TimeZone): ForecastDay {
     return ForecastDay(
-        dayNumber = getNumberOfMonth(forecast.dateEpoch.toLong()),
-        dayName = getDayOfWeek(forecast.dateEpoch.toLong()),
+        dayNumber = getNumberOfMonth(forecast.dateEpoch, timeZone),
+        dayName = getDayOfWeek(forecast.dateEpoch, timeZone),
         maxTemperature = when (appSettings.temperatureUnit) {
             TemperatureUnit.Celsius -> day.maxTempC.roundToInt()
             TemperatureUnit.Fahrenheit -> day.maxTempF.roundToInt()
