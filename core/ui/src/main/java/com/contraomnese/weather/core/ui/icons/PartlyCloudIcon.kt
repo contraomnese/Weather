@@ -27,9 +27,9 @@ fun PartlyCloudIcon(
 
         ClearIcon(
             modifier = Modifier
-                .size(side * 0.5f)
+                .size(side * 0.7f)
                 .offset(
-                    x = side * 0.25f,
+                    x = side * 0.2f,
                     y = side * -0.05f
                 ),
             isNight = isNight

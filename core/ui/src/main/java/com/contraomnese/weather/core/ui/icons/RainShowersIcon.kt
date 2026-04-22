@@ -4,10 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,6 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import com.contraomnese.weather.core.ui.canvas.ClearIcon
+import com.contraomnese.weather.core.ui.canvas.CloudIcon
 import com.contraomnese.weather.design.theme.WeatherTheme
 
 
@@ -34,34 +34,43 @@ internal fun RainShowersIcon(
 
         ClearIcon(
             modifier = Modifier
-                .size(side * 0.5f)
+                .size(side * 0.7f)
                 .offset(
-                    x = side * 0.25f,
-                    y = side * -0.15f
+                    x = side * 0.2f,
+                    y = side * -0.25f
                 ),
             isNight = isNight
         )
 
-        RainIcon(
+        CloudIcon(
             modifier = Modifier
-                .size(side * 0.5f)
+                .size(side * 0.35f)
                 .offset(
-                    x = side * -0.25f,
-                    y = side * -0.25f
+                    x = side * -0.32f,
+                    y = side * -0.38f
                 ),
-            intensity = intensity,
         )
 
         RainIcon(
             modifier = Modifier
-                .size(side * 0.7f)
+                .size(side * 0.78f)
                 .offset(
-                    x = side * 0.15f,
-                    y = side * 0.15f
+                    x = side * 0.1f,
+                    y = side * 0.08f
                 ),
             intensity = intensity,
-            precipitationProbability = precipitationProbability
         )
+        precipitationProbability?.let {
+            PrecipitationProbabilityIcon(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .offset(
+                        y = side * 0.4f
+                    ),
+                it,
+                side
+            )
+        }
     }
 }
 
@@ -75,16 +84,9 @@ fun RainShowersPreview() {
         ) {
             RainShowersIcon(
                 modifier = Modifier
-                    .width(62.dp)
-                    .height(32.dp),
+                    .size(128.dp),
                 intensity = Intensity.MODERATE,
                 precipitationProbability = 10
-            )
-            RainShowersIcon(
-                modifier = Modifier
-                    .width(32.dp)
-                    .height(64.dp),
-                intensity = Intensity.MODERATE
             )
         }
     }
