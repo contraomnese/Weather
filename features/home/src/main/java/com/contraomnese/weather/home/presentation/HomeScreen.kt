@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,7 +24,6 @@ import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -117,8 +115,28 @@ internal fun HomeRoute(
 ) {
 
     val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
-
     val snackBarHostState = LocalSnackbarHostState.current
+
+    HomePage(
+        uiState,
+        viewModel.eventFlow,
+        pushAction = viewModel::push,
+        onNavigateToWeatherByLocation,
+        onNavigateToAppSettings,
+        snackBarHostState
+    )
+}
+
+@Composable
+private fun HomePage(
+    uiState: HomeScreenState,
+    eventFlow: Flow<HomeScreenEvent> = emptyFlow(),
+    pushAction: (HomeScreenAction) -> Unit = {},
+    onNavigateToWeatherByLocation: (Int) -> Unit = { },
+    onNavigateToAppSettings: () -> Unit = {},
+    snackBarHostState: SnackbarHostState,
+) {
+
 
     val backgroundBrush = remember {
         Brush.verticalGradient(
@@ -132,7 +150,7 @@ internal fun HomeRoute(
     }
     Scaffold(
         snackbarHost = { WeatherSnackBarHost(snackBarHostState) },
-        contentWindowInsets = WindowInsets.statusBars,
+//        contentWindowInsets = WindowInsets.statusBars,
         containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
         Box(
@@ -152,8 +170,8 @@ internal fun HomeRoute(
                 else -> HomeScreen(
                     uiState = uiState,
                     snackBar = snackBarHostState,
-                    eventFlow = viewModel.eventFlow,
-                    pushAction = viewModel::push,
+                    eventFlow = eventFlow,
+                    pushAction = pushAction,
                     onNavigateToWeatherByLocation = onNavigateToWeatherByLocation,
                     onNavigateToAppSettings = onNavigateToAppSettings
                 )
@@ -646,33 +664,27 @@ private fun getGpsLocation(
     }
 }
 
-@Preview(showBackground = false, showSystemUi = false, device = "id:pixel_5")
+@Preview(showBackground = false, showSystemUi = true, device = "spec:parent=pixel_5,navigation=buttons")
 @Composable
 private fun HomeScreenPreview() {
 
     val snackbarHostState = remember { SnackbarHostState() }
+
     val uiState = HomeScreenState(
-        matchingLocations = emptyList<Location>().toPersistentList(),
-        favorites = emptyList<Location>().toPersistentList()
+        isSearching = false,
+        favorites = listOf(Location.EMPTY).toPersistentList()
     )
 
     WeatherTheme {
-        Box(
-            Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(WindowInsets.statusBars.asPaddingValues())
-        ) {
-            HomeScreen(
-                uiState,
-                eventFlow = emptyFlow(),
-                snackbarHostState
-            )
-        }
+        HomePage(
+            uiState,
+            eventFlow = emptyFlow(),
+            snackBarHostState = snackbarHostState
+        )
     }
 }
 
-@Preview(showBackground = false, showSystemUi = false, device = "id:pixel_5")
+@Preview(showBackground = false)
 @Composable
 private fun MatchLocationPreview() {
     WeatherTheme {
@@ -681,8 +693,8 @@ private fun MatchLocationPreview() {
                 Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
-                    .padding(WindowInsets.statusBars.asPaddingValues())
-            ) {
+            )
+            {
                 MatchLocation(
                     favoriteIcon = WeatherIcons.AddFavorite,
                     name = "123",

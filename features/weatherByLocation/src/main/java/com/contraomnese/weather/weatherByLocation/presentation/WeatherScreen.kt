@@ -13,11 +13,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -27,6 +26,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -50,6 +50,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -62,6 +63,7 @@ import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
 import com.contraomnese.weather.core.ui.widgets.TitleSection
 import com.contraomnese.weather.core.ui.widgets.WeatherBottomBar
 import com.contraomnese.weather.core.ui.widgets.WeatherSnackBarHost
+import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight150
 import com.contraomnese.weather.design.theme.itemHeight300
 import com.contraomnese.weather.design.theme.itemHeight32
@@ -84,18 +86,16 @@ import com.contraomnese.weather.weatherByLocation.presentation.sections.SunriseS
 import com.contraomnese.weather.weatherByLocation.presentation.sections.UVIndexSection
 import com.contraomnese.weather.weatherByLocation.presentation.sections.WindSection
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
 @Composable
 internal fun WeatherRoute(
     viewModel: WeatherViewModel,
-    eventFlow: Flow<WeatherScreenEvent>,
-    pushAction: (WeatherScreenAction) -> Unit,
     onNavigateToHome: () -> Unit,
 ) {
 
-    val context = LocalContext.current
     val activity = LocalActivity.current as Activity
     val snackBarHostState = LocalSnackbarHostState.current
 
@@ -104,6 +104,31 @@ internal fun WeatherRoute(
     BackHandler {
         activity.finish()
     }
+
+    WeatherPage(
+        uiState,
+        viewModel.eventFlow,
+        viewModel::push,
+        onNavigateToHome,
+        snackBarHostState,
+    )
+
+}
+
+@Composable
+
+private fun WeatherPage(
+    uiState: WeatherScreenState,
+    eventFlow: Flow<WeatherScreenEvent>,
+    pushAction: (WeatherScreenAction) -> Unit = {},
+    onNavigateToHome: () -> Unit = {},
+    snackBarHostState: SnackbarHostState,
+) {
+    val context = LocalContext.current
+
+    val backgroundModifier =
+        if (uiState.isLoading) Modifier.background(MaterialTheme.colorScheme.background) else Modifier
+    val currentFavoriteIndex = uiState.favorites.indexOfFirst { it.id == uiState.locationId }
 
     eventFlow.collectEvent { event ->
         when (event) {
@@ -115,11 +140,10 @@ internal fun WeatherRoute(
         }
     }
 
-    val backgroundModifier = if (uiState.isLoading) Modifier.background(MaterialTheme.colorScheme.background) else Modifier
-    val currentFavoriteIndex = uiState.favorites.indexOfFirst { it.id == uiState.locationId }
-
     Scaffold(
-        modifier = Modifier.then(backgroundModifier),
+        modifier = Modifier
+            .then(backgroundModifier)
+            .navigationBarsPadding(),
         snackbarHost = { WeatherSnackBarHost(snackBarHostState) },
         bottomBar = {
             WeatherBottomBar(
@@ -130,13 +154,12 @@ internal fun WeatherRoute(
                 pushAction(WeatherScreenAction.AddFavorite(uiState.locationId))
             }
         },
-        contentWindowInsets = WindowInsets.navigationBars,
         containerColor = Color.Transparent,
     ) { innerPadding ->
         Box(
             modifier = Modifier
-                .fillMaxSize()
                 .padding(innerPadding)
+                .fillMaxSize()
         ) {
 
             when {
@@ -220,7 +243,7 @@ internal fun WeatherRoute(
 }
 
 @Composable
-internal fun WeatherScreen(
+private fun WeatherScreen(
     modifier: Modifier = Modifier,
     weather: Forecast,
     appSettings: AppSettings,
@@ -446,6 +469,25 @@ private fun AnimatedBackground(condition: WeatherCondition) {
         label = "WeatherBackground"
     ) { targetCondition ->
         ImageBackgroundWithGradient(condition = targetCondition)
+    }
+}
+
+@Preview(showBackground = false, showSystemUi = true, device = "spec:parent=pixel_5,navigation=buttons")
+@Composable
+private fun WeatherScreenPreview() {
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val uiState = WeatherScreenState(
+        isLoading = true,
+        locationId = 123
+    )
+
+    WeatherTheme {
+        WeatherPage(
+            uiState,
+            eventFlow = emptyFlow(),
+            snackBarHostState = snackbarHostState,
+        )
     }
 }
 

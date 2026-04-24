@@ -63,7 +63,7 @@ enum class WeatherCondition {
                 1243, 81 -> RAIN_SHOWERS_MODERATE
                 1246, 82 -> RAIN_SHOWERS_HEAVY
 
-                1255, 85 -> SNOW_SHOWERS_LIGHT
+                1255, 77, 85 -> SNOW_SHOWERS_LIGHT
                 1258, 86 -> SNOW_SHOWERS_HEAVY
 
                 1087, 95 -> THUNDERSTORM

@@ -12,6 +12,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight48
 import com.contraomnese.weather.design.theme.itemWidth56
 import com.contraomnese.weather.design.theme.padding8
@@ -20,15 +22,15 @@ import com.contraomnese.weather.design.theme.padding8
 fun WeatherBottomBar(
     favorites: List<Int>,
     currentFavoriteIndex: Int,
-    onHomeButtonClicked: () -> Unit,
-    onFavoriteButtonClicked: () -> Unit,
+    onHomeButtonClicked: () -> Unit = {},
+    onFavoriteButtonClicked: () -> Unit = {},
 ) {
 
     BottomAppBar(
         modifier = Modifier
             .height(itemHeight48)
             .fillMaxWidth(),
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.surface
     ) {
         Row(
             modifier = Modifier
@@ -43,5 +45,17 @@ fun WeatherBottomBar(
             } else FavoriteButton { onFavoriteButtonClicked() }
             HomeButton { onHomeButtonClicked() }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun WeatherBottomBarPreview() {
+    WeatherTheme {
+        WeatherBottomBar(
+            favorites = emptyList(),
+            currentFavoriteIndex = 0,
+            onHomeButtonClicked = { },
+        ) {}
     }
 }

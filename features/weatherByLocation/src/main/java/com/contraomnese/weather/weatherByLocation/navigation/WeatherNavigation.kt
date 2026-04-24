@@ -48,8 +48,6 @@ fun NavGraphBuilder.weatherByLocation(
 
         WeatherRoute(
             viewModel = viewModel,
-            eventFlow = viewModel.eventFlow,
-            pushAction = viewModel::push,
             onNavigateToHome = externalNavigator::onNavigateToHome
         )
     }
