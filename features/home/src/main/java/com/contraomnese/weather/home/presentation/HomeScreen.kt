@@ -472,8 +472,8 @@ private fun MatchingLocations(
                     modifier = Modifier
                         .padding(vertical = padding16)
                         .fillMaxWidth(),
-                    "https://locationiq.com",
-                    "Search by LocationIQ.com"
+                    "https://open-meteo.com/",
+                    stringResource(R.string.service_provided_open_meteo)
                 )
             }
         }
@@ -629,7 +629,11 @@ private fun FavoritesLocations(
 }
 
 @Composable
-private fun LocationApiLink(modifier: Modifier, url: String, description: String) {
+private fun LocationApiLink(
+    modifier: Modifier,
+    url: String,
+    description: String,
+) {
     val context = LocalContext.current
 
     val style = MaterialTheme.typography.labelMedium.toSpanStyle().copy(

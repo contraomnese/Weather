@@ -13,6 +13,7 @@
 
     <!-- System messages -->
     <string name="empty_matching_locations">Matching locations not found. Please, try again.</string>
+    <string name="service_provided_open_meteo">Location search and weather data provided by Open-Meteo.</string>
 
     <!--  Titles -->
     <string name="today_forecast_title">TODAY</string>
