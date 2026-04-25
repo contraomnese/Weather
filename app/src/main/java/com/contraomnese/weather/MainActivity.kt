@@ -1,145 +1,44 @@
 package com.contraomnese.weather
 
+import android.annotation.SuppressLint
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.work.BackoffPolicy
-import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import com.airbnb.lottie.compose.rememberLottieComposition
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.navigation.WeatherHost
-import com.contraomnese.weather.workers.WeatherUpdateWorker
-import kotlinx.coroutines.delay
-import kotlinx.datetime.Clock
-import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
-import kotlinx.datetime.plus
-import kotlinx.datetime.toLocalDateTime
+import com.contraomnese.weather.workers.setupWeatherSync
 import org.koin.androidx.compose.KoinAndroidContext
 import org.koin.androidx.compose.koinViewModel
-import java.util.concurrent.TimeUnit
-
-private const val LOTTIE_ASSET_NAME = "clear_sky.json"
 
 class MainActivity : ComponentActivity() {
 
+    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         enableEdgeToEdge()
         WindowCompat.setDecorFitsSystemWindows(window, false)
         actionBar?.hide()
         setContent {
             WeatherTheme {
                 KoinAndroidContext {
-                    WeatherApp(activateWeatherSync = ::setupWeatherSync)
+                    WeatherScreen(activateWeatherSync = { setupWeatherSync(this) })
                 }
             }
         }
     }
-
-    private fun setupWeatherSync() {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .setRequiresBatteryNotLow(true)
-            .build()
-
-        val weatherRequest = PeriodicWorkRequestBuilder<WeatherUpdateWorker>(
-            6, TimeUnit.HOURS
-        )
-            .setInitialDelay(getDelayUntilMidnight(), TimeUnit.SECONDS)
-            .setConstraints(constraints)
-            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 15, TimeUnit.MINUTES)
-            .build()
-
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "WeatherUpdateWork",
-            ExistingPeriodicWorkPolicy.KEEP,
-            weatherRequest
-        )
-    }
-
-    private fun getDelayUntilMidnight(): Long {
-        val now = Clock.System.now()
-        val timeZone = TimeZone.currentSystemDefault()
-
-        val today = now.toLocalDateTime(timeZone).date
-        val tomorrowMidnight = today
-            .plus(1, DateTimeUnit.DAY)
-            .atStartOfDayIn(timeZone)
-        return (tomorrowMidnight - now).inWholeSeconds
-    }
-
 }
 
 @Composable
-fun SplashScreen(visible: Boolean, onFinish: () -> Unit) {
-
-    val composition by rememberLottieComposition(LottieCompositionSpec.Asset(LOTTIE_ASSET_NAME))
-
-    val progress by animateLottieCompositionAsState(
-        composition,
-        iterations = 1,
-        restartOnPlay = true
-    )
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-        contentAlignment = Alignment.Center
-    ) {
-        AnimatedVisibility(
-            visible = visible,
-            exit = scaleOut(animationSpec = tween(300))
-        ) {
-            LottieAnimation(
-                composition = composition,
-                progress = { progress },
-                modifier = Modifier
-                    .size(200.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        delay(1500)
-        onFinish()
-    }
-}
-
-@Composable
-internal fun WeatherApp(
+internal fun WeatherScreen(
     viewModel: MainActivityViewModel = koinViewModel(),
     activateWeatherSync: () -> Unit,
 ) {
