@@ -74,7 +74,7 @@ internal class HomeViewModel(
     }
 
     override suspend fun actor(action: HomeScreenAction) = when (action) {
-        is HomeScreenAction.InputLocation -> processLocationInput(action.input, action.isTextChanged)
+        is HomeScreenAction.InputLocation -> processLocationInput(action.input)
         is HomeScreenAction.UpdateGpsLocation -> processGpsLocationChange(LocationCoordinates.from(action.lat, action.lon))
         is HomeScreenAction.AddFavorite -> processFavoriteAdd(action.locationId)
         is HomeScreenAction.RemoveFavorite -> processFavoriteRemove(action.locationId)
@@ -84,15 +84,16 @@ internal class HomeViewModel(
         is HomeScreenAction.UpdateFavorites -> processFavoritesUpdate(action.favorites)
     }
 
-    private suspend fun processLocationInput(input: TextFieldValue, isTextChanged: Boolean) {
+    private suspend fun processLocationInput(input: TextFieldValue) {
 
         push(HomeScreenEffect.InputLocationUpdated(input))
-
-        if (isTextChanged && input.text.isNotEmpty()) {
+        if (input.text.isNotEmpty()) {
             delay(LOCATION_UPDATE_DELAY)
             getLocationsUseCase(input.text)
                 .onFailure { push(HomeScreenEvent.HandleError(it)) }
-                .onSuccess { push(HomeScreenEffect.MatchingLocationsUpdated(it)) }
+                .onSuccess {
+                    push(HomeScreenEffect.MatchingLocationsUpdated(it))
+                }
         }
     }
 

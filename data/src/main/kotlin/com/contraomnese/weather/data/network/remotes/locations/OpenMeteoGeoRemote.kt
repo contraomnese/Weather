@@ -13,7 +13,8 @@ class OpenMeteoGeoRemote(
     override suspend fun fetchLocations(query: String): Result<List<MatchingLocationEntity>> {
         val response = api.getLocations(query)
         return try {
-            Result.success(parser.parseOrThrowError(response).results.map { it.toEntity() })
+            Result.success(parser.parseOrThrowError(response).results?.let { it.map { locationNetwork -> locationNetwork.toEntity() } }
+                ?: emptyList())
         } catch (cause: Exception) {
             Result.failure(cause)
         }

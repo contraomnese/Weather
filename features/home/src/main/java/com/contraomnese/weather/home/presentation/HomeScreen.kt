@@ -39,6 +39,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -137,7 +138,6 @@ private fun HomePage(
     snackBarHostState: SnackbarHostState,
 ) {
 
-
     val backgroundBrush = remember {
         Brush.verticalGradient(
             colors = listOf(
@@ -150,7 +150,6 @@ private fun HomePage(
     }
     Scaffold(
         snackbarHost = { WeatherSnackBarHost(snackBarHostState) },
-//        contentWindowInsets = WindowInsets.statusBars,
         containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
         Box(
@@ -251,7 +250,8 @@ internal fun MainScreen(
                 uiState.matchingLocations,
                 uiState.favorites,
                 pushAction,
-                onNavigateToWeatherByLocation
+                onNavigateToWeatherByLocation,
+                uiState.isSearching
             )
         } else FavoritesLocations(
             uiState.currentTime,
@@ -305,7 +305,8 @@ internal fun WelcomeScreen(
                 locations = uiState.matchingLocations,
                 favorites = uiState.favorites,
                 pushAction,
-                onNavigateToWeatherByLocation
+                onNavigateToWeatherByLocation,
+                uiState.isSearching
             )
         } else FavoritesLocations(
             uiState.currentTime,
@@ -384,7 +385,14 @@ private fun TextSearchBar(
             modifier = Modifier
                 .weight(1f),
             searchQuery = inputLocation,
-            onSearchQueryChanged = { pushAction(HomeScreenAction.InputLocation(it, it.text != inputLocation.text)) },
+            onSearchQueryChanged = {
+                if (it.text != inputLocation.text) pushAction(
+                    HomeScreenAction.InputLocation(
+                        it,
+                        true
+                    )
+                )
+            },
             isError = !inputLocation.hasValidLocation(),
             placeholder = stringResource(R.string.search),
             leadingIcon = if (isSearching) {
@@ -414,49 +422,60 @@ private fun MatchingLocations(
     favorites: ImmutableList<Location>,
     pushAction: (HomeScreenAction) -> Unit = {},
     onNavigateToWeatherByLocation: (Int) -> Unit = {},
+    isSearching: Boolean,
 ) {
-
-    val locationsInFavorites = remember(locations, favorites) {
-        val favoriteIds = favorites.map { it.id }.toSet()
-        locations.associateWith { it.id in favoriteIds }
-    }
-
-    LazyColumn(
-        modifier = Modifier
-            .testTag("matching_locations")
-            .padding(horizontal = padding16)
-            .wrapContentHeight(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        items(
-            items = locations,
-            key = { it.id }
-        ) { location ->
-            MatchLocation(
-                onClick = { onNavigateToWeatherByLocation.invoke(location.id) },
-                onFavoriteClick = {
-                    if (locationsInFavorites.getOrDefault(location, false)) {
-                        pushAction(HomeScreenAction.RemoveFavorite(location.id))
-                    } else {
-                        pushAction(HomeScreenAction.AddFavorite(location.id))
-                    }
-                },
-                favoriteIcon =
-                    if (locationsInFavorites.getOrDefault(location, false)) WeatherIcons.RemoveFavorite
-                    else WeatherIcons.AddFavorite,
-                name = location.name,
-                countryCode = location.countryCode,
-                state = location.state
+    if (!isSearching && locations.isEmpty()) {
+        val snackBarHostState = LocalSnackbarHostState.current
+        val emptyMatchingLocationsMessage = stringResource(R.string.empty_matching_locations)
+        LaunchedEffect(locations) {
+            snackBarHostState.showSnackbar(
+                message = emptyMatchingLocationsMessage,
+                duration = SnackbarDuration.Short
             )
         }
-        item {
-            LocationApiLink(
-                modifier = Modifier
-                    .padding(vertical = padding16)
-                    .fillMaxWidth(),
-                "https://locationiq.com",
-                "Search by LocationIQ.com"
-            )
+    } else {
+        val locationsInFavorites = remember(locations, favorites) {
+            val favoriteIds = favorites.map { it.id }.toSet()
+            locations.associateWith { it.id in favoriteIds }
+        }
+
+        LazyColumn(
+            modifier = Modifier
+                .testTag("matching_locations")
+                .padding(horizontal = padding16)
+                .wrapContentHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            items(
+                items = locations,
+                key = { it.id }
+            ) { location ->
+                MatchLocation(
+                    onClick = { onNavigateToWeatherByLocation.invoke(location.id) },
+                    onFavoriteClick = {
+                        if (locationsInFavorites.getOrDefault(location, false)) {
+                            pushAction(HomeScreenAction.RemoveFavorite(location.id))
+                        } else {
+                            pushAction(HomeScreenAction.AddFavorite(location.id))
+                        }
+                    },
+                    favoriteIcon =
+                        if (locationsInFavorites.getOrDefault(location, false)) WeatherIcons.RemoveFavorite
+                        else WeatherIcons.AddFavorite,
+                    name = location.name,
+                    countryCode = location.countryCode,
+                    state = location.state
+                )
+            }
+            item {
+                LocationApiLink(
+                    modifier = Modifier
+                        .padding(vertical = padding16)
+                        .fillMaxWidth(),
+                    "https://locationiq.com",
+                    "Search by LocationIQ.com"
+                )
+            }
         }
     }
 }

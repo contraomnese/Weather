@@ -5,6 +5,7 @@
     <string name="now">Сейчас</string>
     <string name="local_time_title">Местное время</string>
     <string name="get_forecast_auto">Получать прогноз погоды автоматически</string>
+    <string name="empty_matching_locations">Подходящие локации не найдены. Пожалуйста, попробуйте еще раз</string>
     <string name="today_forecast_title">СЕГОДНЯ</string>
     <string name="daily_forecast_title">ПРОГНОЗ НА 3 ДНЯ</string>
     <string name="use_search_title">Воспользуйтесь поиском</string>

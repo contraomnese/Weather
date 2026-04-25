@@ -11,6 +11,9 @@
     <string name="use_gps_title">or GPS determination</string>
     <string name="get_forecast_auto">Get weather automatically</string>
 
+    <!-- System messages -->
+    <string name="empty_matching_locations">Matching locations not found. Please, try again.</string>
+
     <!--  Titles -->
     <string name="today_forecast_title">TODAY</string>
     <string name="daily_forecast_title">3-DAY FORECAST</string>
