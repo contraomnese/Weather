@@ -17,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.contraomnese.weather.core.ui.canvas.AqiIndexRangeLine
 import com.contraomnese.weather.design.R
+import com.contraomnese.weather.design.WeatherTheme.airColors
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight6
 import com.contraomnese.weather.design.theme.padding8
@@ -114,20 +115,14 @@ fun AirQualityItem(
     }
 }
 
-private val GoodColor = Color(0xFFFFFFFF)
-private val ModerateColor = Color(0xFFDCD807)
-private val UnhealthyForSensGroupsColor = Color(0xFFf0a642)
-private val UnhealthyColor = Color(0xFFff4d50)
-private val VeryUnhealthyColor = Color(0xFF960132)
-private val HazardousColor = Color(0xFF7d2181)
-
+@Composable
 private fun PollutantLevel.toColor(): Color = when (this) {
-    PollutantLevel.Good -> GoodColor
-    PollutantLevel.Moderate -> ModerateColor
-    PollutantLevel.UnhealthyForSensGroups -> UnhealthyForSensGroupsColor
-    PollutantLevel.Unhealthy -> UnhealthyColor
-    PollutantLevel.VeryUnhealthy -> VeryUnhealthyColor
-    PollutantLevel.Hazardous -> HazardousColor
+    PollutantLevel.Good -> airColors.good
+    PollutantLevel.Moderate -> airColors.moderate
+    PollutantLevel.UnhealthyForSensGroups -> airColors.unhealthySens
+    PollutantLevel.Unhealthy -> airColors.unhealthy
+    PollutantLevel.VeryUnhealthy -> airColors.veryUnhealthy
+    PollutantLevel.Hazardous -> airColors.hazardous
 }
 
 private interface Aqi {

@@ -33,7 +33,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -45,8 +44,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -71,6 +68,7 @@ import com.contraomnese.weather.core.ui.composition.LocalSnackbarHostState
 import com.contraomnese.weather.core.ui.utils.getBackground
 import com.contraomnese.weather.core.ui.utils.getConditionText
 import com.contraomnese.weather.core.ui.widgets.AnimatedCircleButton
+import com.contraomnese.weather.core.ui.widgets.AnimatedGradientBackgroundScaffold
 import com.contraomnese.weather.core.ui.widgets.AnimatedIcon
 import com.contraomnese.weather.core.ui.widgets.CountryFlagWidget
 import com.contraomnese.weather.core.ui.widgets.FavoriteItem
@@ -78,7 +76,6 @@ import com.contraomnese.weather.core.ui.widgets.GpsModeAlertDialog
 import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
 import com.contraomnese.weather.core.ui.widgets.PermissionAlertDialog
 import com.contraomnese.weather.core.ui.widgets.SearchTextField
-import com.contraomnese.weather.core.ui.widgets.WeatherSnackBarHost
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.icons.WeatherIcons
 import com.contraomnese.weather.design.theme.WeatherTheme
@@ -138,43 +135,25 @@ private fun HomePage(
     snackBarHostState: SnackbarHostState,
 ) {
 
-    val backgroundBrush = remember {
-        Brush.verticalGradient(
-            colors = listOf(
-                Color(0xFF3989BF),
-                Color(0xFF317FB3),
-                Color(0xFF2C72A1),
-                Color(0xFF266289),
-            )
-        )
-    }
-    Scaffold(
-        snackbarHost = { WeatherSnackBarHost(snackBarHostState) },
-        containerColor = MaterialTheme.colorScheme.background,
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(brush = backgroundBrush)
-                .padding(innerPadding)
-        ) {
-            when {
-                uiState.isLoading ->
-                    LoadingIndicator(
-                        Modifier
-                            .align(Alignment.Center)
-                            .width(itemWidth64)
-                    )
-
-                else -> HomeScreen(
-                    uiState = uiState,
-                    snackBar = snackBarHostState,
-                    eventFlow = eventFlow,
-                    pushAction = pushAction,
-                    onNavigateToWeatherByLocation = onNavigateToWeatherByLocation,
-                    onNavigateToAppSettings = onNavigateToAppSettings
+    AnimatedGradientBackgroundScaffold(
+        snackBarHostState
+    ) {
+        when {
+            uiState.isLoading ->
+                LoadingIndicator(
+                    Modifier
+                        .align(Alignment.Center)
+                        .width(itemWidth64)
                 )
-            }
+
+            else -> HomeScreen(
+                uiState = uiState,
+                snackBar = snackBarHostState,
+                eventFlow = eventFlow,
+                pushAction = pushAction,
+                onNavigateToWeatherByLocation = onNavigateToWeatherByLocation,
+                onNavigateToAppSettings = onNavigateToAppSettings
+            )
         }
     }
 }

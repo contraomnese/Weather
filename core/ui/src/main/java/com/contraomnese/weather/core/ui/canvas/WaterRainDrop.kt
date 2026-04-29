@@ -5,16 +5,14 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.contraomnese.weather.design.WeatherTheme
 
 @Composable
-fun WaterRainDropIcon(
-    modifier: Modifier = Modifier,
-    color: Color = Color(0xFF4791C9),
-) {
+fun WaterRainDropIcon(modifier: Modifier = Modifier) {
+    val colors = WeatherTheme.weatherIconsColors
 
     Canvas(modifier = modifier) {
         val width = size.width
@@ -46,7 +44,7 @@ fun WaterRainDropIcon(
 
         drawPath(
             path = path,
-            color = color
+            color = colors.rainDropWater
         )
     }
 }

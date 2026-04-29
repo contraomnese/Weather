@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,7 +18,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.contraomnese.weather.design.theme.WeatherTheme
-import androidx.compose.ui.graphics.Color as ComposeColor
+import com.contraomnese.weather.design.theme.emojiColors
 
 enum class DewPointState {
     Happy, Neutral, Sad;
@@ -46,12 +47,15 @@ fun DewPointEmoji(
     modifier: Modifier = Modifier,
     state: DewPointState,
 ) {
+    val emojiColors = MaterialTheme.colorScheme.emojiColors
+    val mouthColor = MaterialTheme.colorScheme.onPrimary
+    val eyeColor = MaterialTheme.colorScheme.primary
     Canvas(modifier = modifier) {
         val radius = size.minDimension / 2f
 
         drawCircle(
             brush = Brush.radialGradient(
-                colors = listOf(ComposeColor(0xFFFFD93B), ComposeColor(0xFFEFAC40), ComposeColor(0xFFDEB435)),
+                colors = emojiColors,
                 center = center,
                 radius = radius * 2
             ),
@@ -66,15 +70,15 @@ fun DewPointEmoji(
         val leftEyeCenter = Offset(center.x - eyeOffsetX, center.y + eyeOffsetY)
         val rightEyeCenter = Offset(center.x + eyeOffsetX, center.y + eyeOffsetY)
 
-        drawCircle(ComposeColor.White, radius = eyeRadius, center = leftEyeCenter)
-        drawCircle(ComposeColor.White, radius = eyeRadius, center = rightEyeCenter)
+        drawCircle(eyeColor, radius = eyeRadius, center = leftEyeCenter)
+        drawCircle(eyeColor, radius = eyeRadius, center = rightEyeCenter)
 
         val pupilRadius = eyeRadius * 0.4f
         val pupilLeftOffset = Offset(leftEyeCenter.x - eyeOffsetX * 0.1f, leftEyeCenter.y - eyeOffsetY * 0.1f)
         val pupilRightOffset = Offset(rightEyeCenter.x - eyeOffsetX * 0.1f, rightEyeCenter.y - eyeOffsetY * 0.1f)
 
-        drawCircle(ComposeColor.Black, radius = pupilRadius, center = pupilLeftOffset)
-        drawCircle(ComposeColor.Black, radius = pupilRadius, center = pupilRightOffset)
+        drawCircle(mouthColor, radius = pupilRadius, center = pupilLeftOffset)
+        drawCircle(mouthColor, radius = pupilRadius, center = pupilRightOffset)
 
         val mouthWidth = radius * 1.2f
         val mouthHeight = radius * 0.4f
@@ -107,7 +111,7 @@ fun DewPointEmoji(
 
         drawPath(
             path = mouthPath,
-            color = ComposeColor.Black,
+            color = mouthColor,
             style = Stroke(width = radius * 0.1f, cap = StrokeCap.Round)
         )
     }

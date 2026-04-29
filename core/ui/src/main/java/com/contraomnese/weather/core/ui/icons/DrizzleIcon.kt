@@ -17,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -45,7 +44,7 @@ internal fun DrizzleIcon(
         val drizzleSize = side * 0.05f
         CloudIcon(
             modifier = Modifier.fillMaxWidth(),
-            color = Color(0xFF97A2AC),
+            isOvercast = true
         )
         Column(
             modifier = Modifier

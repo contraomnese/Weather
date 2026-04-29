@@ -134,6 +134,7 @@
 
     <string name="wmo_mainly_clear">Mainly clear</string>
     <string name="wmo_partly_cloudy">Partly cloudy</string>
+    <string name="wmo_cloudy">Cloudy</string>
     <string name="wmo_overcast">Overcast</string>
 
     <string name="wmo_fog">Fog</string>

@@ -7,16 +7,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.contraomnese.weather.design.WeatherTheme
 import com.contraomnese.weather.design.theme.WeatherTheme
 
 @Composable
 fun CloudIcon(
     modifier: Modifier = Modifier,
-    color: Color = Color.White,
+    isOvercast: Boolean = false,
 ) {
+    val colors = WeatherTheme.weatherIconsColors
     Canvas(modifier = modifier.aspectRatio(1.7f)) {
         val w = size.width
         val h = size.height
@@ -32,14 +33,14 @@ fun CloudIcon(
         )
 
         circles.forEach { (radius, center) ->
-            drawCircle(color, radius, center)
+            drawCircle(if (isOvercast) colors.overcast else colors.cloud, radius, center)
         }
 
         val left = circles.first().second.x
         val right = circles.last().second.x
 
         drawRect(
-            color = color,
+            color = if (isOvercast) colors.overcast else colors.cloud,
             topLeft = Offset(left, centerY),
             size = Size(right - left, circles.first().first)
         )

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
@@ -29,7 +28,7 @@ fun OverCastIcon(modifier: Modifier = Modifier) {
                     x = side * 0.015f,
                     y = -side * 0.07f
                 ),
-            color = Color(0xFF97A2AC),
+            isOvercast = true,
         )
         CloudIcon(
             modifier = Modifier.fillMaxSize(0.9f),

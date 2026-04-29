@@ -5,17 +5,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.contraomnese.weather.design.WeatherTheme
 import com.contraomnese.weather.design.theme.WeatherTheme
 
 @Composable
 fun ThunderIcon(
     modifier: Modifier = Modifier,
-    thunderColor: Color = Color(0xFFF1C312),
 ) {
+    val colors = WeatherTheme.weatherIconsColors
+
     Canvas(modifier.fillMaxSize()) {
         val w = size.width
         val h = size.height
@@ -30,7 +31,7 @@ fun ThunderIcon(
             lineTo(w * 0.2f, h)
         }
 
-        drawPath(thunderPath, thunderColor)
+        drawPath(thunderPath, colors.thunder)
     }
 }
 

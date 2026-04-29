@@ -19,43 +19,12 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.tooling.preview.Preview
+import com.contraomnese.weather.design.IndexColor
+import com.contraomnese.weather.design.WeatherTheme
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight8
 import com.contraomnese.weather.design.theme.itemWidth112
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
-
-val aqiIndexGradientStops = listOf(
-    1f to Color(0xFF2D6FA1),
-    2f to Color(0xFF2DA19D),
-    3f to Color(0xFF2DA14E),
-    5f to Color(0xFF569221),
-    6f to Color(0xFFA18931),
-    7f to Color(0xFFB6500F),
-    8f to Color(0xFFCE2421),
-    9f to Color(0xFF951111),
-    10f to Color(0xFF680A05),
-)
-
-val uvIndexGradientStops = listOf(
-    0f to Color(0xFF3E840D),
-    3f to Color(0xFFDCC635),
-    6f to Color(0xFFDC6F35),
-    9f to Color(0xFFDC3B35),
-    11f to Color(0xFFBD35DC),
-)
-
-val temperatureGradientStops = listOf(
-    -40f to Color(0xFF511089),
-    -30f to Color(0xFF7015C0),
-    -20f to Color(0xFF4815C0),
-    -10f to Color(0xFF3652DC),
-    0f to Color(0xFF157CC0),
-    10f to Color(0xFF3CC4A2),
-    20f to Color(0xFF67A043),
-    30f to Color(0xFFDCB835),
-    40f to Color(0xFFDC5C35),
-    50f to Color(0xFFDC3535),
-)
 
 private fun Int.toCelsius(unit: TemperatureUnit): Float = when (unit) {
     TemperatureUnit.Celsius -> this.toFloat()
@@ -72,7 +41,7 @@ fun TemperatureRangeLine(
     current: Int? = null,
     temperatureUnit: TemperatureUnit,
 ) {
-
+    val gradientStops = WeatherTheme.temperatureGradientIndex
     GradientRangeLine(
         modifier = modifier,
         minRange = minRange.toCelsius(temperatureUnit),
@@ -80,7 +49,7 @@ fun TemperatureRangeLine(
         min = min.toCelsius(temperatureUnit),
         max = max.toCelsius(temperatureUnit),
         current = current?.toCelsius(temperatureUnit),
-        gradientStops = temperatureGradientStops
+        gradientStops = gradientStops
     )
 }
 
@@ -89,12 +58,13 @@ fun UvIndexRangeLine(
     modifier: Modifier = Modifier,
     current: Int,
 ) {
+    val gradientStops = WeatherTheme.uvIndexGradientIndex
     GradientRangeLine(
         modifier = modifier,
         minRange = 0f,
         maxRange = 11f,
         current = current.toFloat(),
-        gradientStops = uvIndexGradientStops
+        gradientStops = gradientStops
     )
 }
 
@@ -103,12 +73,13 @@ fun AqiIndexRangeLine(
     modifier: Modifier = Modifier,
     current: Int,
 ) {
+    val gradientStops = WeatherTheme.aqiGradientIndex
     GradientRangeLine(
         modifier = modifier,
         minRange = 1f,
         maxRange = 10f,
         current = current.toFloat(),
-        gradientStops = aqiIndexGradientStops
+        gradientStops = gradientStops
     )
 }
 
@@ -122,7 +93,7 @@ private fun GradientRangeLine(
     current: Float? = null,
     currentColor: Color = MaterialTheme.colorScheme.onSurface,
     backgroundColor: Color = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.15f),
-    gradientStops: List<Pair<Float, Color>>,
+    gradientStops: List<IndexColor>,
 ) {
     Canvas(modifier = modifier) {
         val w = size.width
@@ -195,7 +166,7 @@ private fun GradientRangeLine(
     }
 }
 
-fun interpolateColor(value: Float, stops: List<Pair<Float, Color>>): Color {
+fun interpolateColor(value: Float, stops: List<IndexColor>): Color {
     for (i in 0 until stops.lastIndex) {
         val (t1, c1) = stops[i]
         val (t2, c2) = stops[i + 1]
@@ -204,7 +175,7 @@ fun interpolateColor(value: Float, stops: List<Pair<Float, Color>>): Color {
             return lerp(c1, c2, fraction)
         }
     }
-    return if (value <= stops.first().first) stops.first().second else stops.last().second
+    return if (value <= stops.first().level) stops.first().color else stops.last().color
 }
 
 @Preview(showBackground = true)

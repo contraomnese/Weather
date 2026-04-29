@@ -6,10 +6,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.contraomnese.weather.design.WeatherTheme
 import com.contraomnese.weather.design.theme.WeatherTheme
 import kotlin.math.cos
 import kotlin.math.sin
@@ -19,16 +19,16 @@ private const val fullRotation = 360f
 @Composable
 fun SunIcon(
     modifier: Modifier = Modifier,
-    color: Color = Color(0xFFF8D74A),
     rayAmount: Int = 8,
 ) {
+    val colors = WeatherTheme.weatherIconsColors
     Canvas(modifier.aspectRatio(1f)) {
         val radius = size.width / 2.2f
         val inRayRadius = radius * 0.7f
         val rayWidth = radius / 8
 
         drawCircle(
-            color = color,
+            color = colors.sun,
             radius = radius / 1.8f,
             center = center
         )
@@ -42,7 +42,7 @@ fun SunIcon(
                 x = center.x + cos(angle).toFloat() * radius,
                 y = center.y + sin(angle).toFloat() * radius
             )
-            drawLine(color, start, end, strokeWidth = rayWidth, cap = StrokeCap.Round)
+            drawLine(colors.sun, start, end, strokeWidth = rayWidth, cap = StrokeCap.Round)
         }
     }
 }

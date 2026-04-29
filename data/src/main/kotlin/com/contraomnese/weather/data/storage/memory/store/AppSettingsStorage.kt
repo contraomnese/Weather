@@ -55,7 +55,7 @@ class AppSettingsStorageImpl(
                 precipitationUnit = prefs[Keys.PRECIPITATION_UNIT] ?: PrecipitationUnit.Millimeters.name,
                 temperatureUnit = prefs[Keys.TEMPERATURE_UNIT] ?: TemperatureUnit.Celsius.name,
                 pressureUnit = prefs[Keys.PRESSURE_UNIT] ?: PressureUnit.MmHg.name,
-                forecastAutoSync = prefs[Keys.FORECAST_AUTO_SYNC] ?: false
+                forecastAutoSync = prefs[Keys.FORECAST_AUTO_SYNC] ?: true
             )
             settings
         }

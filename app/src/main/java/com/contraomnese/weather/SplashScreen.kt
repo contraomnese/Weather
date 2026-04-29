@@ -15,12 +15,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.contraomnese.weather.design.theme.backgroundGradient
 import kotlinx.coroutines.delay
 
 private const val LOTTIE_ASSET_NAME = "clear_sky.json"
@@ -39,7 +41,11 @@ fun SplashScreen(visible: Boolean, onFinish: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .background(
+                brush = Brush.verticalGradient(
+                    colorStops = MaterialTheme.colorScheme.backgroundGradient.toTypedArray(),
+                )
+            ),
         contentAlignment = Alignment.Center
     ) {
         AnimatedVisibility(

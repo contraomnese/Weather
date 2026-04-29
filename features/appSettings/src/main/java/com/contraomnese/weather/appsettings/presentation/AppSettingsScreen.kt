@@ -1,8 +1,6 @@
 package com.contraomnese.weather.appsettings.presentation
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -12,26 +10,28 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contraomnese.weather.core.ui.composition.LocalSnackbarHostState
+import com.contraomnese.weather.core.ui.widgets.AnimatedGradientBackgroundScaffold
 import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
-import com.contraomnese.weather.core.ui.widgets.WeatherSnackBarHost
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemWidth64
@@ -46,18 +46,61 @@ import com.contraomnese.weather.domain.app.model.WindSpeedUnit
 import com.contraomnese.weather.presentation.architecture.collectEvent
 import com.contraomnese.weather.presentation.utils.handleError
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
-internal fun AppSettingsRoute(
-    viewModel: AppSettingsViewModel,
-    eventFlow: Flow<AppSettingsEvent>,
-    pushAction: (AppSettingsAction) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val context = LocalContext.current
+internal fun AppSettingsRoute(viewModel: AppSettingsViewModel) {
     val snackBarHostState = LocalSnackbarHostState.current
 
     val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
+
+    AppSettingsPage(
+        uiState,
+        viewModel.eventFlow,
+        pushAction = viewModel::push,
+        snackBarHostState
+    )
+}
+
+@Composable
+private fun AppSettingsPage(
+    uiState: AppSettingsScreenState,
+    eventFlow: Flow<AppSettingsEvent> = emptyFlow(),
+    pushAction: (AppSettingsAction) -> Unit,
+    snackBarHostState: SnackbarHostState,
+) {
+    AnimatedGradientBackgroundScaffold(
+        snackBarHostState,
+        insets = WindowInsets.statusBars
+    ) {
+        when {
+            uiState.isLoading ->
+                LoadingIndicator(
+                    Modifier
+                        .align(Alignment.Center)
+                        .width(itemWidth64)
+                )
+
+            else -> {
+                AppSettingsScreen(
+                    uiState = uiState,
+                    eventFlow,
+                    pushAction = pushAction,
+                    snackBarHostState = snackBarHostState
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun AppSettingsScreen(
+    uiState: AppSettingsScreenState,
+    eventFlow: Flow<AppSettingsEvent>,
+    pushAction: (AppSettingsAction) -> Unit,
+    snackBarHostState: SnackbarHostState,
+) {
+    val context = LocalContext.current
 
     eventFlow.collectEvent { event ->
         when (event) {
@@ -68,49 +111,11 @@ internal fun AppSettingsRoute(
         }
     }
 
-    Scaffold(
-        modifier = modifier,
-        snackbarHost = { WeatherSnackBarHost(snackBarHostState) },
-        contentWindowInsets = WindowInsets.statusBars,
-        containerColor = MaterialTheme.colorScheme.background,
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            when {
-                uiState.isLoading ->
-                    LoadingIndicator(
-                        Modifier
-                            .align(Alignment.Center)
-                            .width(itemWidth64)
-                    )
-
-                else -> {
-                    AppSettingsScreen(
-                        uiState = uiState,
-                        pushAction = pushAction,
-                    )
-                }
-            }
-        }
-    }
-
-}
-
-@Composable
-private fun AppSettingsScreen(
-    modifier: Modifier = Modifier,
-    uiState: AppSettingsScreenState,
-    pushAction: (AppSettingsAction) -> Unit,
-) {
     requireNotNull(uiState.appSettings)
 
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = padding16),
         verticalArrangement = Arrangement.spacedBy(padding8)
     ) {
@@ -176,7 +181,7 @@ private inline fun <reified T : Enum<T>> RadioGroup(
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -251,7 +256,7 @@ private fun AutoWeatherSyncSwitch(
             stringResource(R.string.get_forecast_auto),
             modifier = Modifier.fillMaxWidth(0.8f),
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             maxLines = 2,
             softWrap = true
         )
@@ -262,7 +267,7 @@ private fun AutoWeatherSyncSwitch(
                 checkedThumbColor = MaterialTheme.colorScheme.secondary,
                 checkedTrackColor = MaterialTheme.colorScheme.onSecondary,
                 uncheckedThumbColor = MaterialTheme.colorScheme.onBackground,
-                uncheckedTrackColor = MaterialTheme.colorScheme.background,
+                uncheckedTrackColor = Color.Transparent,
                 uncheckedBorderColor = MaterialTheme.colorScheme.onBackground
             )
         )
@@ -272,12 +277,18 @@ private fun AutoWeatherSyncSwitch(
 @Preview(showBackground = true, backgroundColor = 0xFF3F6E74, locale = "ru")
 @Composable
 private fun AppSettingsPreview() {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val uiState = AppSettingsScreenState(
+        isLoading = false,
+        appSettings = AppSettings()
+    )
+
     WeatherTheme {
-        AppSettingsScreen(
-            uiState = AppSettingsScreenState(
-                appSettings = AppSettings()
-            ),
-            pushAction = {}
+        AppSettingsPage(
+            uiState = uiState,
+            eventFlow = emptyFlow(),
+            pushAction = {},
+            snackbarHostState
         )
     }
 }

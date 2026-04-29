@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
@@ -29,15 +28,14 @@ fun ThunderCloudIcon(modifier: Modifier = Modifier) {
         val side = min(this.maxWidth, this.maxHeight)
         CloudIcon(
             modifier = Modifier.fillMaxSize(),
-            color = Color(0xFF97A2AC)
+            isOvercast = true
         )
         ThunderIcon(
             modifier = Modifier
                 .size(side * .45f)
                 .offset(
                     y = side * 0.5f
-                ),
-            thunderColor = Color(0xFFF1C312)
+                )
         )
     }
 }

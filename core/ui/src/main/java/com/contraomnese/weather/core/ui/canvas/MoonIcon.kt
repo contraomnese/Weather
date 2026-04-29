@@ -7,28 +7,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.ClipOp
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.contraomnese.weather.design.WeatherTheme
 import com.contraomnese.weather.design.theme.WeatherTheme
 
 @Composable
-fun MoonIcon(
-    modifier: Modifier = Modifier,
-    color: Color = Color(0xFFA8A439),
-    starColor: Color = Color(0xFFDEDC99),
-) {
+fun MoonIcon(modifier: Modifier = Modifier) {
+    val colors = WeatherTheme.weatherIconsColors
+
     Canvas(modifier) {
         val radius = size.minDimension / 2.5f
         val earthShadowCenter = Offset(center.x * 1.5f, center.y * 0.7f)
 
         val drawMoon: DrawScope.() -> Unit = {
             drawCircle(
-                color = color,
+                color = colors.moon,
                 radius = radius,
                 center = center
             )
@@ -56,7 +54,7 @@ fun MoonIcon(
             val centerOffset = Offset(center.x * rx, center.y * ry)
             val starSize = radius * sizeRatio
             val starPath = star(centerOffset, starSize)
-            drawPath(path = starPath, color = starColor, style = Fill)
+            drawPath(path = starPath, color = colors.star, style = Fill)
         }
     }
 }

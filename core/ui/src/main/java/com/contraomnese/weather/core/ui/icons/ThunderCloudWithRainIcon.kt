@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
@@ -33,16 +32,15 @@ internal fun ThunderCloudWithRainIcon(
                 .fillMaxSize(),
             intensity = intensity,
             precipitationProbability = precipitationProbability,
-            color = Color(0xFF97A2AC)
+            isOvercast = true
         )
 
         ThunderIcon(
             modifier = Modifier
                 .size(side * .4f)
                 .offset(
-                    y = side * 0.25f
-                ),
-            thunderColor = Color(0xFFF1C312)
+                    y = side * 0.23f
+                )
         )
     }
 }

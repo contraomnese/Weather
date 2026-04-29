@@ -121,6 +121,7 @@
     <string name="wmo_clear_sky">Ясное небо</string>
     <string name="wmo_mainly_clear">Преимущественно ясно</string>
     <string name="wmo_partly_cloudy">Переменная облачность</string>
+    <string name="wmo_cloudy">Облачно</string>
     <string name="wmo_overcast">Пасмурно</string>
     <string name="wmo_fog">Туман</string>
     <string name="wmo_freezing_fog">Туман с изморозью</string>
