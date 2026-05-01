@@ -18,7 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
-import com.contraomnese.weather.core.ui.utils.getBackground
+import com.contraomnese.weather.core.ui.utils.getResources
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
 
@@ -32,14 +32,14 @@ fun ImageBackgroundWithGradient(
     val density = LocalDensity.current
     if (isPreview) {
         Image(
-            painter = painterResource(id = condition.getBackground().resId),
+            painter = painterResource(id = condition.getResources().backgroundResId),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
         )
     } else {
         SubcomposeAsyncImage(
-            model = condition.getBackground().resId,
+            model = condition.getResources().backgroundResId,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -51,7 +51,7 @@ fun ImageBackgroundWithGradient(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(condition.getBackground().color)
+                        .background(condition.getResources().color)
                 )
             },
         )
@@ -63,8 +63,8 @@ fun ImageBackgroundWithGradient(
                 Brush.verticalGradient(
                     colors = listOf(
                         Color.Transparent,
-                        condition.getBackground().color,
-                        condition.getBackground().color
+                        condition.getResources().color,
+                        condition.getResources().color
                     ),
                     startY = with(LocalDensity.current) { (400.dp).toPx() },
                     endY = Float.POSITIVE_INFINITY

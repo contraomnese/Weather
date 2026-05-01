@@ -65,8 +65,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contraomnese.weather.core.ui.composition.LocalSnackbarHostState
-import com.contraomnese.weather.core.ui.utils.getBackground
-import com.contraomnese.weather.core.ui.utils.getConditionText
+import com.contraomnese.weather.core.ui.utils.getConditionResId
+import com.contraomnese.weather.core.ui.utils.getResources
 import com.contraomnese.weather.core.ui.widgets.AnimatedCircleButton
 import com.contraomnese.weather.core.ui.widgets.AnimatedGradientBackgroundScaffold
 import com.contraomnese.weather.core.ui.widgets.AnimatedIcon
@@ -586,8 +586,8 @@ private fun FavoritesLocations(
                     temperature = it.today.temperature,
                     maxTemperature = it.forecast.today.maxTemperature,
                     minTemperature = it.forecast.today.minTemperature,
-                    conditionText = stringResource(it.today.condition.getConditionText()),
-                    background = it.today.condition.getBackground().resId,
+                    conditionText = stringResource(it.today.condition.getConditionResId()),
+                    background = it.today.condition.getResources().backgroundResId,
                     onTapClicked = {
                         onNavigateToWeatherByLocation(
                             location.id

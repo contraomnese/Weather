@@ -9,7 +9,8 @@ val LocalSnackbarHostState = compositionLocalOf<SnackbarHostState> {
     error("No SnackbarHostState provided")
 }
 
-data class WeatherBackground(
-    @DrawableRes val resId: Int,
+data class WeatherConditionResources(
+    @DrawableRes val backgroundResId: Int,
     val color: Color,
+    @DrawableRes val iconResId: Int,
 )

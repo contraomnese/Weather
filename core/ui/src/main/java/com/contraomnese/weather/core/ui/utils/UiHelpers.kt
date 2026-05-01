@@ -8,8 +8,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
-import com.contraomnese.weather.core.ui.composition.WeatherBackground
+import com.contraomnese.weather.core.ui.composition.WeatherConditionResources
 import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherConditionsClear
 import com.contraomnese.weather.design.theme.WeatherConditionsCloudy
@@ -92,51 +93,96 @@ fun handleHorizontalDragEnd(
     }
 }
 
-@Composable
-fun WeatherCondition.getBackground(): WeatherBackground = when (this) {
-    WeatherCondition.CLEAR -> WeatherBackground(R.drawable.clear, WeatherConditionsClear)
-    WeatherCondition.PARTLY_CLOUDY -> WeatherBackground(R.drawable.partly_cloud, WeatherConditionsPartlyCloudy)
-    WeatherCondition.CLOUDY, WeatherCondition.OVERCAST -> WeatherBackground(
+fun WeatherCondition.getResources(): WeatherConditionResources = when (this) {
+    WeatherCondition.CLEAR -> WeatherConditionResources(
+        R.drawable.clear,
+        WeatherConditionsClear,
+        R.mipmap.ic_weather_condition_clear_round
+    )
+
+    WeatherCondition.PARTLY_CLOUDY -> WeatherConditionResources(
+        R.drawable.partly_cloud,
+        WeatherConditionsPartlyCloudy,
+        R.mipmap.ic_weather_condition_partly_cloudy_round
+    )
+
+    WeatherCondition.CLOUDY, WeatherCondition.OVERCAST -> WeatherConditionResources(
         R.drawable.overcast,
-        WeatherConditionsCloudy
+        WeatherConditionsCloudy,
+        R.mipmap.ic_weather_condition_overcast_round
     )
 
-    WeatherCondition.FOG -> WeatherBackground(R.drawable.fog, WeatherConditionsFog)
-    WeatherCondition.FREEZING_FOG -> WeatherBackground(R.drawable.snow, WeatherConditionsFreezingFog)
-    WeatherCondition.DRIZZLE_LIGHT, WeatherCondition.DRIZZLE_MODERATE, WeatherCondition.DRIZZLE_HEAVY -> WeatherBackground(
-        R.drawable.rain,
-        WeatherConditionsDrizzle
+    WeatherCondition.FOG -> WeatherConditionResources(
+        R.drawable.fog,
+        WeatherConditionsFog,
+        R.mipmap.ic_weather_condition_fog_round
     )
 
-    WeatherCondition.FREEZING_DRIZZLE_LIGHT, WeatherCondition.FREEZING_RAIN_LIGHT, WeatherCondition.FREEZING_DRIZZLE_HEAVY, WeatherCondition.FREEZING_RAIN_HEAVY -> WeatherBackground(
-        R.drawable.sleet,
-        WeatherConditionsFreezingDrizzle
-    )
-
-    WeatherCondition.SNOW_FALL_SLIGHT, WeatherCondition.SNOW_FALL_MODERATE, WeatherCondition.SNOW_FALL_HEAVY -> WeatherBackground(
+    WeatherCondition.FREEZING_FOG -> WeatherConditionResources(
         R.drawable.snow,
-        WeatherConditionsSnowFall
+        WeatherConditionsFreezingFog,
+        R.mipmap.ic_weather_condition_snow_round
     )
 
-    WeatherCondition.RAIN_SLIGHT, WeatherCondition.RAIN_MODERATE, WeatherCondition.RAIN_HEAVY, WeatherCondition.SNOW_SHOWERS_LIGHT, WeatherCondition.SNOW_SHOWERS_HEAVY -> WeatherBackground(
+    WeatherCondition.DRIZZLE_LIGHT, WeatherCondition.DRIZZLE_MODERATE, WeatherCondition.DRIZZLE_HEAVY -> WeatherConditionResources(
         R.drawable.rain,
-        WeatherConditionsRain
+        WeatherConditionsDrizzle,
+        R.mipmap.ic_weather_condition_rain_round
     )
 
-    WeatherCondition.RAIN_SHOWERS_SLIGHT, WeatherCondition.RAIN_SHOWERS_MODERATE, WeatherCondition.RAIN_SHOWERS_HEAVY -> WeatherBackground(
+    WeatherCondition.FREEZING_DRIZZLE_LIGHT,
+    WeatherCondition.FREEZING_RAIN_LIGHT,
+    WeatherCondition.FREEZING_DRIZZLE_HEAVY,
+    WeatherCondition.FREEZING_RAIN_HEAVY,
+        -> WeatherConditionResources(
+        R.drawable.sleet,
+        WeatherConditionsFreezingDrizzle,
+        R.mipmap.ic_weather_condition_sleet_round
+    )
+
+    WeatherCondition.SNOW_FALL_SLIGHT, WeatherCondition.SNOW_FALL_MODERATE, WeatherCondition.SNOW_FALL_HEAVY,
+        -> WeatherConditionResources(
+        R.drawable.snow,
+        WeatherConditionsSnowFall,
+        R.mipmap.ic_weather_condition_snow_round
+    )
+
+    WeatherCondition.RAIN_SLIGHT, WeatherCondition.RAIN_MODERATE, WeatherCondition.RAIN_HEAVY,
+    WeatherCondition.SNOW_SHOWERS_LIGHT, WeatherCondition.SNOW_SHOWERS_HEAVY,
+        -> WeatherConditionResources(
         R.drawable.rain,
-        WeatherConditionsRainShowers
+        WeatherConditionsRain,
+        R.mipmap.ic_weather_condition_rain_round
     )
 
-    WeatherCondition.THUNDERSTORM, WeatherCondition.THUNDERSTORM_WITH_RAIN_LIGHT, WeatherCondition.THUNDERSTORM_WITH_RAIN_HEAVY -> WeatherBackground(
+    WeatherCondition.RAIN_SHOWERS_SLIGHT, WeatherCondition.RAIN_SHOWERS_MODERATE, WeatherCondition.RAIN_SHOWERS_HEAVY,
+        -> WeatherConditionResources(
+        R.drawable.rain,
+        WeatherConditionsRainShowers,
+        R.mipmap.ic_weather_condition_rain_round
+    )
+
+    WeatherCondition.THUNDERSTORM, WeatherCondition.THUNDERSTORM_WITH_RAIN_LIGHT,
+    WeatherCondition.THUNDERSTORM_WITH_RAIN_HEAVY,
+        -> WeatherConditionResources(
         R.drawable.thunder,
-        WeatherConditionsThunderStorm
+        WeatherConditionsThunderStorm,
+        R.mipmap.ic_weather_condition_thunder_round
     )
 
-    WeatherCondition.UNKNOWN -> WeatherBackground(R.drawable.clear, WeatherConditionsClear)
+    WeatherCondition.UNKNOWN -> WeatherConditionResources(
+        R.drawable.clear,
+        WeatherConditionsClear,
+        R.mipmap.ic_weather_condition_clear_round
+    )
 }
 
-fun WeatherCondition.getConditionText(): Int = when (this) {
+@Composable
+fun WeatherCondition.getConditionText(): String {
+    return stringResource(this.getConditionResId())
+}
+
+fun WeatherCondition.getConditionResId(): Int = when (this) {
     WeatherCondition.CLEAR -> R.string.wmo_clear_sky
     WeatherCondition.PARTLY_CLOUDY -> R.string.wmo_partly_cloudy
     WeatherCondition.CLOUDY -> R.string.wmo_cloudy

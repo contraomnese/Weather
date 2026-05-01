@@ -5,6 +5,8 @@
     <string name="now">Сейчас</string>
     <string name="local_time_title">Местное время</string>
     <string name="get_forecast_auto">Получать прогноз погоды автоматически</string>
+    <string name="notification_channel_title">Обновления прогноза погоды</string>
+    <string name="notification_channel_description">Приходят в момент обновления прогноза погоды</string>
     <string name="empty_matching_locations">Подходящие локации не найдены. Пожалуйста, попробуйте еще раз</string>
     <string name="service_provided_open_meteo">Поиск локаций и данные погоды предоставлены Open-Meteo</string>
     <string name="today_forecast_title">СЕГОДНЯ</string>
@@ -18,6 +20,7 @@
     <string name="wind_title">ВЕТЕР</string>
     <string name="rainfall_title">ОСАДКИ</string>
     <string name="pressure_title">ДАВЛЕНИЕ</string>
+
 
     <!--  Aqi section -->
     <string name="aqi_good">%1$d - Хороший</string>

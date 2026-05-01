@@ -11,6 +11,10 @@
     <string name="use_gps_title">or GPS determination</string>
     <string name="get_forecast_auto">Get weather automatically</string>
 
+    <!-- Notifications -->
+    <string name="notification_channel_title">Weather forecast updates</string>
+    <string name="notification_channel_description">Come at the time of weather forecast update</string>
+
     <!-- System messages -->
     <string name="empty_matching_locations">Matching locations not found. Please, try again.</string>
     <string name="service_provided_open_meteo">Location search and weather data provided by Open-Meteo.</string>

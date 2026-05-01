@@ -56,7 +56,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contraomnese.weather.core.ui.composition.LocalSnackbarHostState
-import com.contraomnese.weather.core.ui.utils.getConditionText
+import com.contraomnese.weather.core.ui.utils.getConditionResId
 import com.contraomnese.weather.core.ui.utils.handleHorizontalDragEnd
 import com.contraomnese.weather.core.ui.utils.toPx
 import com.contraomnese.weather.core.ui.widgets.ImageBackgroundWithGradient
@@ -426,7 +426,7 @@ private fun WeatherScreen(
             feelsLikeTemp = weather.today.feelsLikeTemperature,
             maxTemp = weather.forecast.today.maxTemperature,
             minTemp = weather.forecast.today.minTemperature,
-            condition = stringResource(weather.today.condition.getConditionText()),
+            condition = stringResource(weather.today.condition.getConditionResId()),
         )
         LazyColumn(
             modifier = Modifier

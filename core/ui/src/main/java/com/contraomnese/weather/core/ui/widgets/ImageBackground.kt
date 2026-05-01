@@ -83,7 +83,7 @@ private fun ImageBackgroundPreview() {
             modifier = Modifier
                 .height(itemHeight160)
                 .fillMaxWidth(),
-            backgroundResId = R.drawable.clear_compact
+            backgroundResId = R.drawable.clear
         )
     }
 }
