@@ -9,6 +9,7 @@ import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
@@ -100,4 +101,11 @@ internal fun getDelayUntilMidnight(): Long {
         .plus(1, DateTimeUnit.DAY)
         .atStartOfDayIn(timeZone)
     return (tomorrowMidnight - now).inWholeSeconds
+}
+
+fun probeNotification(context: Context) {
+    val workRequest = OneTimeWorkRequestBuilder<WeatherUpdateWorker>()
+        .build()
+
+    WorkManager.getInstance(context).enqueue(workRequest)
 }

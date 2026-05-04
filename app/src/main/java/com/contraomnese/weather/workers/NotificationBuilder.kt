@@ -9,6 +9,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Icon
 import android.os.Build
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import com.contraomnese.weather.MainActivity
 import com.contraomnese.weather.core.ui.utils.getConditionResId
 import com.contraomnese.weather.core.ui.utils.getResources
@@ -68,6 +70,7 @@ fun buildNewWeatherForecastNotification(
 
     val notification: Notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         Notification.Builder(context, CHANNEL_ID)
+            .setColor(Color(0xFF214B63).toArgb())
             .setContentTitle(locationName)
             .setContentText(
                 context.getString(
@@ -82,12 +85,13 @@ fun buildNewWeatherForecastNotification(
                     .BigTextStyle()
                     .bigText(context.getText(condition.getConditionResId()))
             )
-            .setSmallIcon(Icon.createWithResource(context, R.mipmap.ic_launcher_round))
+            .setSmallIcon(Icon.createWithResource(context, R.drawable.ic_notification))
             .setLargeIcon(Icon.createWithResource(context, condition.getResources().iconResId))
             .setContentIntent(pendingIntent)
             .build()
     } else {
         Notification.Builder(context)
+            .setColor(Color(0xFF214B63).toArgb())
             .setContentTitle(locationName)
             .setContentText(
                 context.getString(
@@ -102,7 +106,7 @@ fun buildNewWeatherForecastNotification(
                     .BigTextStyle()
                     .bigText(context.getText(condition.getConditionResId()))
             )
-            .setSmallIcon(Icon.createWithResource(context, R.mipmap.ic_launcher_round))
+            .setSmallIcon(Icon.createWithResource(context, R.drawable.ic_notification))
             .setLargeIcon(Icon.createWithResource(context, condition.getResources().iconResId))
             .setContentIntent(pendingIntent)
             .build()
