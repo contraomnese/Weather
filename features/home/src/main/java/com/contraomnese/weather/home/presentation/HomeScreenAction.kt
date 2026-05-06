@@ -9,7 +9,6 @@ internal sealed interface HomeScreenAction : MviAction {
     data class AddFavorite(val locationId: Int) : HomeScreenAction
     data class RemoveFavorite(val locationId: Int) : HomeScreenAction
     data class UpdateGpsLocation(val lat: Double, val lon: Double) : HomeScreenAction
-    data class SwitchGpsMode(val enabled: Boolean) : HomeScreenAction
     data class AccessFineLocationPermissionGranted(val granted: Boolean) : HomeScreenAction
     data class DeviceGpsModeEnabled(val enabled: Boolean) : HomeScreenAction
     data class UpdateFavorites(val favorites: List<Location>) : HomeScreenAction

@@ -107,9 +107,13 @@
 
     <!-- Permissions -->
     <string name="permission_location_denied_title">Для этого приложения важно разрешение на определение местоположения. Пожалуйста, предоставьте его.</string>
+    <string name="permission_notification_denied_title">Если вы хотите получать уведомления о свежем прогнозе погоды, необходимо предоставить разрешение на их отправку.</string>
     <string name="permission_location_first_time_title">Для доступа к этой функции требуется разрешение на определение местоположения. Пожалуйста, предоставьте разрешение.</string>
+    <string name="permission_notification_first_time_title">Хотели бы вы получать уведомления о смене прогноза погоды?</string>
     <string name="get_location_title">Получить местоположение</string>
     <string name="confirm_title">Подтверждаю</string>
+    <string name="grant_label_button">Предоставить</string>
+    <string name="not_grant_label_button">Не сейчас</string>
 
     <!-- GPS -->
     <string name="gps_alert_title">Для определения местоположения необходим GPS.</string>

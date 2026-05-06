@@ -4,6 +4,7 @@ import android.R.attr.country
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.widget.Toast
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -40,8 +41,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -99,6 +102,7 @@ import com.google.android.gms.location.Priority
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.datetime.Instant
@@ -169,6 +173,16 @@ private fun HomeScreen(
 ) {
     val context = LocalContext.current
 
+    val versionNotification by rememberSaveable { mutableStateOf(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) }
+    var canShowNotificationDialog by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        if (versionNotification) {
+            delay(1500)
+            canShowNotificationDialog = true
+        }
+    }
+
     eventFlow.collectEvent { event ->
         when (event) {
 
@@ -183,6 +197,17 @@ private fun HomeScreen(
 
             is HomeScreenEvent.NavigateToGpsLocation -> onNavigateToWeatherByLocation(event.id)
         }
+    }
+
+    if (canShowNotificationDialog) {
+        PermissionAlertDialog(
+            onDismissRequest = { },
+            onPermissionGranted = { granted -> },
+            deniedTitle = R.string.permission_notification_denied_title,
+            firstTimeTitle = R.string.permission_notification_first_time_title,
+            permission = android.Manifest.permission.POST_NOTIFICATIONS,
+            isSelectable = true
+        )
     }
 
     when {
@@ -219,9 +244,6 @@ internal fun MainScreen(
             isSearching = uiState.isSearching,
             pushAction = pushAction,
             onNavigateToAppSettings = onNavigateToAppSettings,
-            onGpsClickButton = {
-                pushAction(HomeScreenAction.SwitchGpsMode(true))
-            }
         )
 
         if (uiState.inputLocation.text.isNotEmpty()) {
@@ -259,6 +281,7 @@ internal fun WelcomeScreen(
         targetValue = if (searchBarOnTop) 0.dp else screenHeight / 2.5f,
         animationSpec = tween(ANIMATION_DURATION)
     )
+    var gpsModeEnabled by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -275,7 +298,7 @@ internal fun WelcomeScreen(
             pushAction = pushAction,
             onNavigateToAppSettings = onNavigateToAppSettings,
             onGpsClickButton = {
-                pushAction(HomeScreenAction.SwitchGpsMode(true))
+                gpsModeEnabled = true
             }
         )
 
@@ -295,9 +318,13 @@ internal fun WelcomeScreen(
             onNavigateToWeatherByLocation
         )
 
-        if (uiState.gps.isGpsMode) {
+
+        // uiState.gps.isGpsMode is ON when click GPS button in SearchBar
+        if (gpsModeEnabled) {
             PermissionAlertDialog(
-                onDismissRequest = { pushAction(HomeScreenAction.SwitchGpsMode(false)) },
+                onDismissRequest = {
+                    gpsModeEnabled = false
+                },
                 onPermissionGranted = { granted ->
                     pushAction(HomeScreenAction.AccessFineLocationPermissionGranted(granted))
                 },
@@ -306,11 +333,16 @@ internal fun WelcomeScreen(
                 permission = android.Manifest.permission.ACCESS_FINE_LOCATION
             )
         }
-        if (uiState.gps.isPermissionGranted && uiState.gps.isGpsMode) {
+        if (uiState.gps.isPermissionGranted
+            && gpsModeEnabled
+        ) {
             GpsModeAlertDialog(
-                onDismissRequest = { pushAction(HomeScreenAction.DeviceGpsModeEnabled(false)) },
+                onDismissRequest = {
+                    gpsModeEnabled = false
+                },
                 onGpsModeEnabled = { enabled ->
                     pushAction(HomeScreenAction.DeviceGpsModeEnabled(enabled))
+                    gpsModeEnabled = false
                 }
             )
         }

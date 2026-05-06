@@ -50,7 +50,12 @@ internal data class HomeScreenState(
         )
     }
 
-    fun setGpsLocation(location: Location): HomeScreenState = copy(gps = gps.copy(location = location))
+    fun setGpsLocation(location: Location): HomeScreenState = copy(
+        gps = gps.copy(
+            location = location,
+            isGpsMode = false
+        )
+    )
 
     fun setMatchingLocations(locations: List<Location>): HomeScreenState =
         copy(matchingLocations = locations.toPersistentList(), isSearching = false)

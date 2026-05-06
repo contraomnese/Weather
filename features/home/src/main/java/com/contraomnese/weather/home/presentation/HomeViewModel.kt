@@ -78,7 +78,6 @@ internal class HomeViewModel(
         is HomeScreenAction.UpdateGpsLocation -> processGpsLocationChange(LocationCoordinates.from(action.lat, action.lon))
         is HomeScreenAction.AddFavorite -> processFavoriteAdd(action.locationId)
         is HomeScreenAction.RemoveFavorite -> processFavoriteRemove(action.locationId)
-        is HomeScreenAction.SwitchGpsMode -> processGpsModeEnabled(action.enabled)
         is HomeScreenAction.AccessFineLocationPermissionGranted -> processAccessFineLocationPermissionGranted(action.granted)
         is HomeScreenAction.DeviceGpsModeEnabled -> processGpsModeEnabled(action.enabled)
         is HomeScreenAction.UpdateFavorites -> processFavoritesUpdate(action.favorites)

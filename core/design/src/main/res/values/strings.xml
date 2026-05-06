@@ -120,9 +120,13 @@
 
     <!-- Permissions -->
     <string name="permission_location_denied_title">The location permission is important for this app. Please grant the permission.</string>
+    <string name="permission_notification_denied_title">If you want to receive forecast updates, you must provide permission for them.</string>
     <string name="permission_location_first_time_title">The location permission required for this feature to be available. Please grant the permission.</string>
+    <string name="permission_notification_first_time_title">Would you like to be notified when the forecast changes?</string>
     <string name="get_location_title">Get location</string>
     <string name="confirm_title">Confirm</string>
+    <string name="grant_label_button">Allow</string>
+    <string name="not_grant_label_button">Not now</string>
 
     <!-- GPS -->
     <string name="gps_alert_title">GPS is required to determine location.</string>
