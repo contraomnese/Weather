@@ -7,6 +7,6 @@ data class ForecastToday(
     val totalUvIndex: String,
     val rainChance: String,
     val totalRainFull: String,
-    val sunrise: LocationTime?,
-    val sunset: LocationTime?,
+    val sunrise: LocationTime,
+    val sunset: LocationTime,
 )

@@ -20,6 +20,7 @@ private const val fullRotation = 360f
 fun SunIcon(
     modifier: Modifier = Modifier,
     rayAmount: Int = 8,
+    angle: Float = 22.5f,
 ) {
     val colors = WeatherTheme.weatherIconsColors
     Canvas(modifier.aspectRatio(1f)) {
@@ -33,14 +34,14 @@ fun SunIcon(
             center = center
         )
         repeat(rayAmount) { i ->
-            val angle = Math.toRadians((i * fullRotation / rayAmount + 22.5).toDouble())
+            val angleRay = Math.toRadians((i * fullRotation / rayAmount + angle).toDouble())
             val start = Offset(
-                x = center.x + cos(angle).toFloat() * inRayRadius,
-                y = center.y + sin(angle).toFloat() * inRayRadius
+                x = center.x + cos(angleRay).toFloat() * inRayRadius,
+                y = center.y + sin(angleRay).toFloat() * inRayRadius
             )
             val end = Offset(
-                x = center.x + cos(angle).toFloat() * radius,
-                y = center.y + sin(angle).toFloat() * radius
+                x = center.x + cos(angleRay).toFloat() * radius,
+                y = center.y + sin(angleRay).toFloat() * radius
             )
             drawLine(colors.sun, start, end, strokeWidth = rayWidth, cap = StrokeCap.Round)
         }

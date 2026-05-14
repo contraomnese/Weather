@@ -16,8 +16,10 @@ import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import com.contraomnese.weather.domain.weatherByLocation.model.AlertsWeather
 import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
+import com.contraomnese.weather.domain.weatherByLocation.model.ForecastHour
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastLocation
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeather
+import com.contraomnese.weather.domain.weatherByLocation.model.LocationDateTime
 import com.contraomnese.weather.domain.weatherByLocation.model.UvIndex
 import com.contraomnese.weather.domain.weatherByLocation.model.Weather
 import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
@@ -41,10 +43,55 @@ fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
     val now = Clock.System.now().toLocalDateTime(timeZone).toInstant(timeZone).epochSeconds
     val nextDaySeconds = now + HOURS * MINUTES * SECONDS
 
-    val forecastHours =
-        mutableListOf(dailyForecast.first().hour.last { it.timeEpoch <= now })
-    forecastHours.addAll(dailyForecast.first().hour.filter { it.timeEpoch > now })
-    forecastHours.addAll(dailyForecast[1].hour.filter { it.timeEpoch <= nextDaySeconds })
+    val nowHour = dailyForecast.first().hour.last { it.timeEpoch <= now }
+    val hoursToNight = dailyForecast.first().hour.filter { it.timeEpoch > now }
+    val hoursNextDayFromNightToNowNextDay = dailyForecast[1].hour.filter { it.timeEpoch <= nextDaySeconds }
+
+    val forecastHoursEntity = mutableListOf(nowHour)
+    forecastHoursEntity.addAll(hoursToNight)
+    forecastHoursEntity.addAll(hoursNextDayFromNightToNowNextDay)
+
+    val todayEntity = dailyForecast.first()
+    val nextDayEntity = dailyForecast[1]
+
+    val today = todayEntity.toForecastTodayDomain(appSettings, timeZone)
+
+    val forecastHours = forecastHoursEntity.map { it.toDomain(appSettings, timeZone) }.toMutableList()
+    val indexOfSunrise =
+        forecastHoursEntity.indexOf(forecastHoursEntity.find { it.timeEpoch > todayEntity.astro.sunrise })
+
+    if (indexOfSunrise == 0) {
+        forecastHours.add(
+            index = forecastHoursEntity.indexOf(forecastHoursEntity.find { it.timeEpoch > todayEntity.astro.sunset }),
+            ForecastHour(
+                time = LocationDateTime.toLocalTimeFromEpochSeconds(todayEntity.astro.sunset, timeZone),
+                condition = WeatherCondition.SUNSET,
+            )
+        )
+        forecastHours.add(
+            index = forecastHoursEntity.indexOf(forecastHoursEntity.find { it.timeEpoch > nextDayEntity.astro.sunrise }),
+            ForecastHour(
+                time = LocationDateTime.toLocalTimeFromEpochSeconds(nextDayEntity.astro.sunrise, timeZone),
+                condition = WeatherCondition.SUNRISE,
+            )
+        )
+    } else {
+        forecastHours.add(
+            index = indexOfSunrise,
+            ForecastHour(
+                time = LocationDateTime.toLocalTimeFromEpochSeconds(todayEntity.astro.sunrise, timeZone),
+                condition = WeatherCondition.SUNRISE,
+            )
+        )
+        forecastHours.add(
+            index = forecastHoursEntity.indexOf(forecastHoursEntity.find { it.timeEpoch > todayEntity.astro.sunset }),
+            ForecastHour(
+                time = LocationDateTime.toLocalTimeFromEpochSeconds(todayEntity.astro.sunset, timeZone),
+                condition = WeatherCondition.SUNSET,
+            )
+        )
+    }
+
 
     val rainfallBeforeNow = dailyForecast[0].hour.filter { hour -> hour.timeEpoch < now }
         .map { it.toPrecipitationDomain(precipitationUnit = appSettings.precipitationUnit) }
@@ -95,12 +142,13 @@ fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
             } ?: todayForecast.toAirQualityUSAIndex()
         ),
         forecast = ForecastWeather(
-            today = dailyForecast.first().toForecastTodayDomain(appSettings),
+            today = today,
             days = dailyForecast.map { it.toForecastDayDomain(appSettings, timeZone) },
-            hours = forecastHours.map { it.toDomain(appSettings, timeZone) }
+            hours = forecastHours
         ),
         alerts = AlertsWeather(
-            alerts = alerts.filter { it.desc.isNotEmpty() }.map { it.desc.replaceFirstChar { char -> char.uppercaseChar() } }
+            alerts = alerts.filter { it.desc.isNotEmpty() }
+                .map { it.desc.replaceFirstChar { char -> char.uppercaseChar() } }
         )
     )
 }

@@ -170,7 +170,7 @@ fun WeatherCondition.getResources(): WeatherConditionResources = when (this) {
         R.mipmap.ic_weather_condition_thunder_round
     )
 
-    WeatherCondition.UNKNOWN -> WeatherConditionResources(
+    WeatherCondition.UNKNOWN, WeatherCondition.SUNRISE, WeatherCondition.SUNSET -> WeatherConditionResources(
         R.drawable.clear,
         WeatherConditionsClear,
         R.mipmap.ic_weather_condition_clear_round
@@ -211,4 +211,6 @@ fun WeatherCondition.getConditionResId(): Int = when (this) {
     WeatherCondition.THUNDERSTORM_WITH_RAIN_LIGHT -> R.string.wmo_thunderstorm_hail_slight
     WeatherCondition.THUNDERSTORM_WITH_RAIN_HEAVY -> R.string.wmo_thunderstorm_hail_heavy
     WeatherCondition.UNKNOWN -> R.string.wmo_clear_sky
+    WeatherCondition.SUNRISE -> R.string.sunrise_title
+    WeatherCondition.SUNSET -> R.string.sunset_title
 }

@@ -156,6 +156,7 @@
     <string name="wmo_thunderstorm_hail_slight">Гроза с небольшим градом</string>
     <string name="wmo_thunderstorm_hail_heavy">Гроза с сильным градом</string>
 
+    <string name="sunset_title">Закат</string>
     <string name="direction_n">С</string>
     <string name="direction_nne">ССВ</string>
     <string name="direction_ne">СВ</string>
@@ -172,4 +173,5 @@
     <string name="direction_wnw">ЗСЗ</string>
     <string name="direction_nw">СЗ</string>
     <string name="direction_nnw">ССЗ</string>
+    <string name="sunrise_title">Восход</string>
 </resources>

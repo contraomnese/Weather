@@ -31,13 +31,8 @@ object DateTimeParser {
         }
     }
 
-    fun parseAmPmTime(input: String): LocationTime? {
-        return try {
-            val time = LocalTime.parse(input, astroFormatter)
-            LocationTime(time)
-        } catch (e: Exception) {
-            Log.e("DateTimeParser", "Parse error for input=$input", e)
-            null
-        }
+    fun parseAmPmTime(input: String): LocationTime {
+        val time = LocalTime.parse(input, astroFormatter)
+        return LocationTime(time)
     }
 }

@@ -64,7 +64,8 @@ val LocalWeatherIconsColors = staticCompositionLocalOf {
         overcast = Color(0xFF97A2AC),
         rainDropCircle = Color(0xFFFFFFFF),
         rainDropWater = Color(0xFF4791C9),
-        thunder = Color(0xFFF1C312)
+        thunder = Color(0xFFF1C312),
+        arrow = Color(0xFFFFFFFF)
     )
 }
 
@@ -88,6 +89,7 @@ data class WeatherIconsColors(
     val rainDropCircle: Color,
     val rainDropWater: Color,
     val thunder: Color,
+    val arrow: Color,
 )
 
 @Immutable

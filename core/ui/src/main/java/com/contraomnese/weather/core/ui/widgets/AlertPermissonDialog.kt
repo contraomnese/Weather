@@ -1,6 +1,5 @@
 package com.contraomnese.weather.core.ui.widgets
 
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -94,11 +93,11 @@ fun PermissionAlertDialog(
             firstTimeTitle = firstTimeTitle,
             isSelectable,
             onConfirmClick = { confirmed = true },
-            onGrantClick = {
-                confirmed = true
-                Log.e("!", "AAA!!!!!!!!")
-            },
-            onNoGrantClick = { confirmed = false }
+            onGrantClick = { confirmed = true },
+            onNoGrantClick = {
+                confirmed = false
+                onDismissRequest()
+            }
         )
     }
 }

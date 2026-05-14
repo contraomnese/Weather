@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.contraomnese.weather.core.ui.canvas.ClearIcon
 import com.contraomnese.weather.core.ui.canvas.FogIcon
+import com.contraomnese.weather.core.ui.canvas.SunStateIcon
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
 
@@ -103,9 +104,11 @@ fun ConditionIcons(
             intensity = Intensity.HEAVY,
             precipitationProbability
         )
-
+        WeatherCondition.SUNRISE -> SunStateIcon(modifier)
+        WeatherCondition.SUNSET -> SunStateIcon(modifier, true)
 
         WeatherCondition.UNKNOWN -> Box(modifier)
+
     }
 }
 
@@ -277,6 +280,19 @@ private fun ThunderIconPreview() {
                 modifier = Modifier.size(sizeIcon),
                 condition = WeatherCondition.SNOW_SHOWERS_LIGHT,
             )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                ConditionIcons(
+                    modifier = Modifier.size(sizeIcon),
+                    condition = WeatherCondition.SUNRISE
+                )
+                ConditionIcons(
+                    modifier = Modifier.size(sizeIcon),
+                    condition = WeatherCondition.SUNSET,
+                )
+            }
         }
     }
 }

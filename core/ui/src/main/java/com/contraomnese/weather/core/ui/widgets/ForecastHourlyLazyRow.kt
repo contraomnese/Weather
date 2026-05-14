@@ -39,7 +39,7 @@ fun ForecastHourlyLazyRow(
                     time = it.time,
                     condition = it.condition,
                     temperature = it.temperature,
-                    isNow = index == 0,
+                    isSunCycle = it.condition == WeatherCondition.SUNRISE || it.condition == WeatherCondition.SUNSET,
                     isDay = it.isDay,
                     precipitationProbability = it.precipitationProbability
                 )

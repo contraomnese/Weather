@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.TimeZone
 import java.util.concurrent.ConcurrentHashMap
 
 class ForecastRepositoryImpl(
@@ -163,12 +164,17 @@ class ForecastRepositoryImpl(
             forecastDao.insertForecastCurrent(forecast.current.toEntity(forecastLocationId))
             forecastDao.insertAlerts(forecast.alerts.alert.map { it.toEntity(forecastLocationId) })
 
-            forecast.forecast.forecastDay.forEach { forecast ->
+            forecast.forecast.forecastDay.forEach { forecastDay ->
                 val forecastDayId =
-                    forecastDao.insertForecastDay(forecast.toForecastDayEntity(forecastLocationId)).toInt()
-                forecastDao.insertDay(forecast.toEntity(forecastDayId))
-                forecastDao.insertAstro(forecast.astro.toEntity(forecastDayId))
-                forecastDao.insertHourlyForecast(forecast.hour.map { it.toEntity(forecastDayId) })
+                    forecastDao.insertForecastDay(forecastDay.toForecastDayEntity(forecastLocationId)).toInt()
+                forecastDao.insertDay(forecastDay.toEntity(forecastDayId))
+                forecastDao.insertAstro(
+                    forecastDay.astro.toEntity(
+                        forecastDayId,
+                        TimeZone.of(forecast.location.timeZoneId)
+                    )
+                )
+                forecastDao.insertHourlyForecast(forecastDay.hour.map { it.toEntity(forecastDayId) })
             }
         }
         Result.success(Unit)

@@ -181,6 +181,9 @@
     <string name="wmo_thunderstorm_hail_slight">Thunderstorm with slight hail</string>
     <string name="wmo_thunderstorm_hail_heavy">Thunderstorm with heavy hail</string>
 
+    <string name="sunrise_title">Sunrise</string>
+    <string name="sunset_title">Sunset</string>
+
     <!-- Wind directions -->
     <string name="direction_n">N</string>
     <string name="direction_nne">NNE</string>

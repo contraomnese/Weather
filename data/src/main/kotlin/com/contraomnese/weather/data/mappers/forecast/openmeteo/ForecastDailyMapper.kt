@@ -8,7 +8,6 @@ import com.contraomnese.weather.data.network.models.openmeteo.forecast.ForecastD
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastAstroEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDailyEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDayEntity
-import com.contraomnese.weather.data.utils.getAmPmTime
 
 fun ForecastDaily.toForecastDailyEntities(forecastLocationId: Int): List<ForecastDailyEntity> =
     time.indices.map { index ->
@@ -49,8 +48,8 @@ fun ForecastDaily.toForecastAstroEntities(timeZone: String): List<ForecastAstroE
     time.indices.map { index ->
         ForecastAstroEntity(
             forecastDailyId = index,
-            sunrise = getAmPmTime(sunrise[index], timeZone),
-            sunset = getAmPmTime(sunset[index], timeZone),
+            sunrise = sunrise[index],
+            sunset = sunset[index],
             isSunUp = if (time[index] > sunrise[index]) 1 else 0
         )
     }

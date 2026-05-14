@@ -1,9 +1,9 @@
 package com.contraomnese.weather.domain.weatherByLocation.model
 
 data class ForecastHour(
-    val time: String,
-    val temperature: String,
+    val time: String = "",
+    val temperature: String = "",
     val condition: WeatherCondition,
-    val isDay: Boolean,
-    val precipitationProbability: Int,
+    val isDay: Boolean = false,
+    val precipitationProbability: Int = 0,
 )

@@ -14,7 +14,7 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.navigation.WeatherHost
-import com.contraomnese.weather.workers.probeNotification
+import com.contraomnese.weather.workers.setupWeatherSync
 import org.koin.androidx.compose.KoinAndroidContext
 import org.koin.androidx.compose.koinViewModel
 
@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             WeatherTheme {
                 KoinAndroidContext {
-                    WeatherScreen(activateWeatherSync = { probeNotification(this) })
+                    WeatherScreen(activateWeatherSync = { setupWeatherSync(this) })
                 }
             }
         }
@@ -52,8 +52,8 @@ internal fun WeatherScreen(
                 viewModel.push(MainActivityAction.LottieAnimationFinished)
             }
         } else {
-//            if (uiState.forecastAutoSyncEnabled) activateWeatherSync()
-            activateWeatherSync()
+            if (uiState.forecastAutoSyncEnabled) activateWeatherSync()
+//            activateWeatherSync()
 
             WeatherHost(
                 startDestination = uiState.startDestination,

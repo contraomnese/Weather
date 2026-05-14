@@ -28,6 +28,8 @@ enum class WeatherCondition {
     THUNDERSTORM,
     THUNDERSTORM_WITH_RAIN_LIGHT,
     THUNDERSTORM_WITH_RAIN_HEAVY,
+    SUNRISE,
+    SUNSET,
     UNKNOWN;
 
     companion object {

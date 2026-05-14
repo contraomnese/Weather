@@ -19,8 +19,8 @@ import androidx.room.PrimaryKey
 data class ForecastAstroEntity(
     @PrimaryKey(autoGenerate = true) val id: Int? = null,
     @ColumnInfo(name = FORECAST_DAILY_ID) val forecastDailyId: Int,
-    @ColumnInfo(name = SUNRISE) val sunrise: String,
-    @ColumnInfo(name = SUNSET) val sunset: String,
+    @ColumnInfo(name = SUNRISE) val sunrise: Long,
+    @ColumnInfo(name = SUNSET) val sunset: Long,
     @ColumnInfo(name = IS_SUN_UP) val isSunUp: Int,
 ) {
     companion object {

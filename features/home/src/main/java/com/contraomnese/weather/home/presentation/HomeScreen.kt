@@ -201,7 +201,7 @@ private fun HomeScreen(
 
     if (canShowNotificationDialog) {
         PermissionAlertDialog(
-            onDismissRequest = { },
+            onDismissRequest = { canShowNotificationDialog = false },
             onPermissionGranted = { granted -> },
             deniedTitle = R.string.permission_notification_denied_title,
             firstTimeTitle = R.string.permission_notification_first_time_title,
