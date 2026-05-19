@@ -59,6 +59,8 @@ fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
     val forecastHours = forecastHoursEntity.map { it.toDomain(appSettings, timeZone) }.toMutableList()
     val indexOfSunrise =
         forecastHoursEntity.indexOf(forecastHoursEntity.find { it.timeEpoch > todayEntity.astro.sunrise })
+    val indexOfSunset =
+        forecastHoursEntity.indexOf(forecastHoursEntity.find { it.timeEpoch > todayEntity.astro.sunset })
 
     if (indexOfSunrise == 0) {
         forecastHours.add(
@@ -75,6 +77,21 @@ fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
                 condition = WeatherCondition.SUNRISE,
             )
         )
+    } else if (indexOfSunset == 0) {
+        forecastHours.add(
+            index = forecastHoursEntity.indexOf(forecastHoursEntity.find { it.timeEpoch > nextDayEntity.astro.sunrise }),
+            ForecastHour(
+                time = LocationDateTime.toLocalTimeFromEpochSeconds(nextDayEntity.astro.sunrise, timeZone),
+                condition = WeatherCondition.SUNRISE,
+            )
+        )
+        forecastHours.add(
+            index = forecastHoursEntity.indexOf(forecastHoursEntity.find { it.timeEpoch > nextDayEntity.astro.sunset }),
+            ForecastHour(
+                time = LocationDateTime.toLocalTimeFromEpochSeconds(nextDayEntity.astro.sunset, timeZone),
+                condition = WeatherCondition.SUNSET,
+            )
+        )
     } else {
         forecastHours.add(
             index = indexOfSunrise,
@@ -84,7 +101,7 @@ fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
             )
         )
         forecastHours.add(
-            index = forecastHoursEntity.indexOf(forecastHoursEntity.find { it.timeEpoch > todayEntity.astro.sunset }),
+            index = indexOfSunset,
             ForecastHour(
                 time = LocationDateTime.toLocalTimeFromEpochSeconds(todayEntity.astro.sunset, timeZone),
                 condition = WeatherCondition.SUNSET,
