@@ -12,10 +12,15 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,7 +54,7 @@ fun SunriseSunset(
         animationSpec = tween(800, easing = FastOutSlowInEasing)
     )
 
-    Canvas(modifier = modifier) {
+    Canvas(modifier = modifier.aspectRatio(1f)) {
         val w = size.width
         val h = size.height
 
@@ -79,18 +84,39 @@ fun SunriseSunset(
                 isAntiAlias = true
             }
 
-            val leftMoonPath = Path().apply {
+            val fullLeftMoonPath = Path().apply {
                 moveTo(leftP0.x, leftP0.y)
                 quadTo(leftP1.x, leftP1.y, leftP2.x, leftP2.y)
             }
 
-            drawPath(leftMoonPath, moonPaintPath)
+            val leftMeasure = android.graphics.PathMeasure(fullLeftMoonPath, false)
+            val visibleLeftMoonPath = Path()
 
-            val rightMoonPath = Path().apply {
+            leftMeasure.getSegment(
+                leftMeasure.length / 2.5f,
+                leftMeasure.length,
+                visibleLeftMoonPath,
+                true
+            )
+
+            drawPath(visibleLeftMoonPath, moonPaintPath)
+
+            val fullRightMoonPath = Path().apply {
                 moveTo(rightP0.x, rightP0.y)
                 quadTo(rightP1.x, rightP1.y, rightP2.x, rightP2.y)
             }
-            drawPath(rightMoonPath, moonPaintPath)
+
+            val rightMeasure = android.graphics.PathMeasure(fullRightMoonPath, false)
+            val visibleRightMoonPath = Path()
+
+            rightMeasure.getSegment(
+                0f,
+                rightMeasure.length / 1.75f,
+                visibleRightMoonPath,
+                true
+            )
+
+            drawPath(visibleRightMoonPath, moonPaintPath)
 
             // SUN PATH
             val sunPathPaint = Paint().apply {
@@ -140,7 +166,7 @@ fun SunriseSunset(
                 val sunPaint = Paint().apply {
                     shader = RadialGradient(
                         sunX, sunY, sunRadius,
-                        intArrayOf(Color.WHITE, Color.WHITE),
+                        intArrayOf(Color.YELLOW, Color.rgb(248, 216, 74)),
                         null, Shader.TileMode.CLAMP
                     )
                     isAntiAlias = true
@@ -148,7 +174,7 @@ fun SunriseSunset(
                 drawCircle(sunX, sunY, sunRadius, sunPaint)
 
                 val glowPaint = Paint().apply {
-                    color = Color.WHITE
+                    color = Color.rgb(248, 216, 74)
                     maskFilter = BlurMaskFilter(sunRadius * 2, BlurMaskFilter.Blur.SOLID)
                 }
                 drawCircle(sunX, sunY, sunRadius, glowPaint)
@@ -171,11 +197,11 @@ fun SunriseSunset(
                     shader = RadialGradient(
                         moonX, moonY, moonRadius,
                         intArrayOf(
-                            Color.BLACK,
-                            Color.BLACK,
-                            Color.WHITE
+                            Color.GRAY,
+                            Color.LTGRAY,
+                            Color.LTGRAY
                         ),
-                        floatArrayOf(0f, 0.8f, 1f), Shader.TileMode.CLAMP
+                        floatArrayOf(0f, 0.95f, 1f), Shader.TileMode.CLAMP
                     )
                     isAntiAlias = true
                 }
@@ -206,11 +232,11 @@ fun SunriseSunset(
                     shader = RadialGradient(
                         moonX, moonY, moonRadius,
                         intArrayOf(
-                            Color.BLACK,
-                            Color.BLACK,
-                            Color.rgb(255, 255, 255)
+                            Color.GRAY,
+                            Color.LTGRAY,
+                            Color.LTGRAY
                         ),
-                        floatArrayOf(0f, 0.8f, 1f), Shader.TileMode.CLAMP
+                        floatArrayOf(0f, 0.95f, 1f), Shader.TileMode.CLAMP
                     )
                     isAntiAlias = true
                 }
@@ -233,8 +259,8 @@ fun SunriseSunsetMoonPreview() {
     WeatherTheme {
         SunriseSunset(
             modifier = Modifier
-                .height(200.dp)
-                .width(600.dp),
+                .height(600.dp)
+                .width(200.dp),
             sunriseMinutes = 240,
             sunsetMinutes = 480,
             currentMinutes = 300,
@@ -246,13 +272,22 @@ fun SunriseSunsetMoonPreview() {
 @Composable
 fun SunriseSunsetSunPreview() {
     WeatherTheme {
-        SunriseSunset(
-            modifier = Modifier
-                .height(200.dp)
-                .width(600.dp),
-            sunriseMinutes = 240,
-            sunsetMinutes = 480,
-            currentMinutes = 180,
-        )
+        Box(
+            Modifier
+                .height(600.dp)
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            SunriseSunset(
+                modifier = Modifier
+                    .fillMaxSize(0.5f)
+                    .height(200.dp)
+                    .width(600.dp),
+                sunriseMinutes = 240,
+                sunsetMinutes = 480,
+                currentMinutes = 180,
+            )
+        }
+
     }
 }
