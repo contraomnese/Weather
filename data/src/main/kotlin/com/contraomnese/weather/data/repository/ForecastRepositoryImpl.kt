@@ -9,11 +9,11 @@ import com.contraomnese.weather.data.mappers.forecast.openmeteo.toForecastHourly
 import com.contraomnese.weather.data.mappers.forecast.toDomain
 import com.contraomnese.weather.data.mappers.forecast.weatherapi.toEntity
 import com.contraomnese.weather.data.mappers.forecast.weatherapi.toForecastDayEntity
-import com.contraomnese.weather.data.mappers.locations.toForecastLocationEntity
 import com.contraomnese.weather.data.network.remotes.weather.ForecastRemote
 import com.contraomnese.weather.data.network.remotes.weather.OpenMeteoRemote
 import com.contraomnese.weather.data.network.remotes.weather.WeatherApiRemote
 import com.contraomnese.weather.data.storage.db.WeatherAppDatabase
+import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastLocationEntity
 import com.contraomnese.weather.data.storage.db.locations.entities.MatchingLocationEntity
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
 import com.contraomnese.weather.domain.exceptions.logPrefix
@@ -53,12 +53,14 @@ class ForecastRepositoryImpl(
             .flowOn(dispatcher)
     }
 
-    override fun observeForecastsByLocationIds(ids: List<Int>): Flow<List<Forecast>> {
+    override fun observeForecastsByFavoritesIds(ids: List<Int>): Flow<List<Forecast>> {
         return combine(
             database.forecastDao().observeForecastsBy(ids),
             appSettingsRepository.observeSettings()
         ) { entities, settings ->
-            entities.map { it.toDomain(settings) }
+            entities
+                .filter { it.todayForecast != null }
+                .map { it.toDomain(settings) }
         }
             .flowOn(dispatcher)
     }
@@ -80,7 +82,7 @@ class ForecastRepositoryImpl(
     private suspend fun updateForecast(locationId: Int): Result<Int> {
         return withContext(dispatcher) {
 
-            val location = getMatchingLocation(locationId).getOrElse {
+            val location = getForecastLocation(locationId).getOrElse {
                 return@withContext Result.failure(it)
             }
 
@@ -101,8 +103,15 @@ class ForecastRepositoryImpl(
             Result.failure(storageError(logPrefix("Current location didn't find in storage"), cause))
         }
 
+    private suspend fun getForecastLocation(locationId: Int): Result<ForecastLocationEntity> =
+        try {
+            Result.success(database.locationsDao().getForecastLocation(locationId))
+        } catch (cause: Exception) {
+            Result.failure(storageError(logPrefix("Current location didn't find in storage"), cause))
+        }
+
     private suspend fun updateForecastByOpenMeteoResponse(
-        location: MatchingLocationEntity,
+        location: ForecastLocationEntity,
         forecastRemote: OpenMeteoRemote,
     ) = try {
         val forecast = forecastRemote.fetchForecast(location)
@@ -112,10 +121,9 @@ class ForecastRepositoryImpl(
 
         transactionProvider.runWithTransaction {
             val locationsDao = database.locationsDao()
-            locationsDao.deleteForecastLocation(location.networkId)
+            locationsDao.deleteForecastLocation(location.locationId)
 
-            val locationEntity = location.toForecastLocationEntity(location.networkId)
-            val forecastLocationId = locationsDao.insertForecastLocation(locationEntity).toInt()
+            val forecastLocationId = locationsDao.insertForecastLocation(location).toInt()
 
             val forecastDailyEntities = forecastDaily.toForecastDailyEntities(forecastLocationId)
             val forecastDayEntities = forecastDaily.toForecastDayEntities()
@@ -147,7 +155,7 @@ class ForecastRepositoryImpl(
 
 
     private suspend fun updateForecastByWeatherApiResponse(
-        location: MatchingLocationEntity,
+        location: ForecastLocationEntity,
         forecastRemote: WeatherApiRemote,
     ) = try {
 
@@ -155,10 +163,9 @@ class ForecastRepositoryImpl(
 
         transactionProvider.runWithTransaction {
             val locationsDao = database.locationsDao()
-            locationsDao.deleteForecastLocation(location.networkId)
+            locationsDao.deleteForecastLocation(location.locationId)
 
-            val locationEntity = location.toForecastLocationEntity(location.networkId)
-            val forecastLocationId = locationsDao.insertForecastLocation(locationEntity).toInt()
+            val forecastLocationId = locationsDao.insertForecastLocation(location).toInt()
 
             val forecastDao = database.forecastDao()
             forecastDao.insertForecastCurrent(forecast.current.toEntity(forecastLocationId))

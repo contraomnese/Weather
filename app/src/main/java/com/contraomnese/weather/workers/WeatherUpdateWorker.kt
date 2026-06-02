@@ -78,7 +78,7 @@ internal fun setupWeatherSync(context: Context) {
         .build()
 
     val weatherRequest = PeriodicWorkRequestBuilder<WeatherUpdateWorker>(
-        1, TimeUnit.HOURS
+        6, TimeUnit.HOURS
     )
 //        .setInitialDelay(getDelayUntilMidnight(), TimeUnit.SECONDS)
         .setConstraints(constraints)
@@ -87,7 +87,7 @@ internal fun setupWeatherSync(context: Context) {
 
     WorkManager.getInstance(context).enqueueUniquePeriodicWork(
         "WeatherUpdateWork",
-        ExistingPeriodicWorkPolicy.KEEP,
+        ExistingPeriodicWorkPolicy.UPDATE,
         weatherRequest
     )
 }
@@ -103,7 +103,7 @@ internal fun getDelayUntilMidnight(): Long {
     return (tomorrowMidnight - now).inWholeSeconds
 }
 
-fun probeNotification(context: Context) {
+private fun probeNotification(context: Context) {
     val workRequest = OneTimeWorkRequestBuilder<WeatherUpdateWorker>()
         .build()
 

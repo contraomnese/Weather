@@ -9,7 +9,7 @@ import com.contraomnese.weather.domain.home.usecase.ObserveFavoritesUseCase
 import com.contraomnese.weather.domain.home.usecase.RemoveFavoriteUseCase
 import com.contraomnese.weather.domain.weatherByLocation.model.Location
 import com.contraomnese.weather.domain.weatherByLocation.model.LocationCoordinates
-import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveForecastsWeatherUseCase
+import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveFavoritesForecastsUseCase
 import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateForecastWeatherUseCase
 import com.contraomnese.weather.presentation.architecture.MviModel
 import kotlinx.coroutines.delay
@@ -26,7 +26,7 @@ internal class HomeViewModel(
     private val observeFavoritesUseCase: ObserveFavoritesUseCase,
     private val addFavoriteUseCase: AddFavoriteUseCase,
     private val removeFavoriteUseCase: RemoveFavoriteUseCase,
-    private val observeForecastsWeatherUseCase: ObserveForecastsWeatherUseCase,
+    private val observeFavoritesForecastsUseCase: ObserveFavoritesForecastsUseCase,
     private val updateForecastWeatherUseCase: UpdateForecastWeatherUseCase,
 ) : MviModel<HomeScreenAction, HomeScreenEffect, HomeScreenEvent, HomeScreenState>(
     defaultState = HomeScreenState.DEFAULT,
@@ -68,14 +68,24 @@ internal class HomeViewModel(
             effect.favorites,
             effect.favoritesForecast
         )
-        is HomeScreenEffect.AccessFineLocationPermissionGranted -> previousState.setAccessFineLocationPermissionGranted(effect.isGranted)
+
+        is HomeScreenEffect.AccessFineLocationPermissionGranted -> previousState.setAccessFineLocationPermissionGranted(
+            effect.isGranted
+        )
+
         is HomeScreenEffect.GpsModeEnabled -> previousState.setGpsModeEnabled(effect.isEnabled)
         is HomeScreenEffect.CurrentTimeUpdated -> previousState.setTime(effect.time)
     }
 
     override suspend fun actor(action: HomeScreenAction) = when (action) {
         is HomeScreenAction.InputLocation -> processLocationInput(action.input)
-        is HomeScreenAction.UpdateGpsLocation -> processGpsLocationChange(LocationCoordinates.from(action.lat, action.lon))
+        is HomeScreenAction.UpdateGpsLocation -> processGpsLocationChange(
+            LocationCoordinates.from(
+                action.lat,
+                action.lon
+            )
+        )
+
         is HomeScreenAction.AddFavorite -> processFavoriteAdd(action.locationId)
         is HomeScreenAction.RemoveFavorite -> processFavoriteRemove(action.locationId)
         is HomeScreenAction.AccessFineLocationPermissionGranted -> processAccessFineLocationPermissionGranted(action.granted)
@@ -108,7 +118,9 @@ internal class HomeViewModel(
 
     private suspend fun processFavoriteAdd(locationId: Int) {
         addFavoriteUseCase(locationId)
-            .onSuccess { updateForecastWeatherUseCase(it) }
+            .onSuccess { favorite ->
+                updateForecastWeatherUseCase(favorite)
+            }
             .onFailure { push(HomeScreenEvent.HandleError(it)) }
     }
 
@@ -130,7 +142,7 @@ internal class HomeViewModel(
     }
 
     private suspend fun processFavoritesUpdate(favorites: List<Location>) {
-        observeForecastsWeatherUseCase(favorites.map { it.id })
+        observeFavoritesForecastsUseCase(favorites.map { it.id })
             .collectLatest { forecasts ->
                 push(
                     HomeScreenEffect.FavoritesForecastUpdated(

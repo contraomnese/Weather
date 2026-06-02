@@ -54,7 +54,7 @@ fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
     val todayEntity = dailyForecast.first()
     val nextDayEntity = dailyForecast[1]
 
-    val today = todayEntity.toForecastTodayDomain(appSettings, timeZone)
+    val today = todayForecast!! // todayEntity.toForecastTodayDomain(appSettings, timeZone)
 
     val forecastHours = forecastHoursEntity.map { it.toDomain(appSettings, timeZone) }.toMutableList()
     val indexOfSunrise =
@@ -159,7 +159,7 @@ fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
             } ?: todayForecast.toAirQualityUSAIndex()
         ),
         forecast = ForecastWeather(
-            today = today,
+            today = todayEntity.toForecastTodayDomain(appSettings, timeZone),
             days = dailyForecast.map { it.toForecastDayDomain(appSettings, timeZone) },
             hours = forecastHours
         ),

@@ -36,8 +36,8 @@ fun OMLocationNetwork.toEntity() = MatchingLocationEntity(
     timeZoneId = timezone
 )
 
-fun MatchingLocationEntity.toForecastLocationEntity(locationId: Int) = ForecastLocationEntity(
-    locationId = locationId,
+fun MatchingLocationEntity.toForecastLocationEntity(networkId: Int) = ForecastLocationEntity(
+    locationId = networkId,
     latitude = latitude,
     longitude = longitude,
     name = name,

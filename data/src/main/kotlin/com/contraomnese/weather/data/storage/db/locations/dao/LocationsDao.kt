@@ -22,6 +22,9 @@ interface LocationsDao {
     @Query("SELECT * FROM matching_locations WHERE network_id = :id")
     fun getMatchingLocation(id: Int): MatchingLocationEntity
 
+    @Query("SELECT * FROM forecast_location WHERE location_id = :id")
+    fun getForecastLocation(id: Int): ForecastLocationEntity
+
     @Query("DELETE FROM matching_locations")
     fun deleteAllMatchingLocations()
 

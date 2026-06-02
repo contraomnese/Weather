@@ -201,7 +201,8 @@ val dataModule = module {
             get(),
             get(),
             get(named(OM_GEO)),
-            Dispatchers.IO
+            Dispatchers.IO,
+            transactionProvider = RoomTransactionProvider(get<WeatherAppDatabase>())
         )
     }
 

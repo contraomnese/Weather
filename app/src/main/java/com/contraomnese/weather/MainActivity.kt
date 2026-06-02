@@ -53,7 +53,6 @@ internal fun WeatherScreen(
             }
         } else {
             if (uiState.forecastAutoSyncEnabled) activateWeatherSync()
-//            activateWeatherSync()
 
             WeatherHost(
                 startDestination = uiState.startDestination,

@@ -4,14 +4,14 @@ import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 import com.contraomnese.weather.domain.weatherByLocation.repository.ForecastRepository
 import kotlinx.coroutines.flow.Flow
 
-fun interface ObserveForecastsWeatherUseCase {
+fun interface ObserveFavoritesForecastsUseCase {
     operator fun invoke(request: List<Int>): Flow<List<Forecast>>
 }
 
-class ObserveForecastsWeatherUseCaseImpl(
+class ObserveFavoritesFavoritesForecastsUseCaseImpl(
     private val repository: ForecastRepository,
-) : ObserveForecastsWeatherUseCase {
+) : ObserveFavoritesForecastsUseCase {
 
-    override fun invoke(request: List<Int>): Flow<List<Forecast>> = repository.observeForecastsByLocationIds(request)
+    override fun invoke(request: List<Int>): Flow<List<Forecast>> = repository.observeForecastsByFavoritesIds(request)
 
 }

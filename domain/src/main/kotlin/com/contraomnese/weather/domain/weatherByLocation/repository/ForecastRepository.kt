@@ -7,6 +7,6 @@ interface ForecastRepository {
 
     suspend fun refreshForecastByLocationId(id: Int): Result<Int>
     fun observeForecastByLocationId(id: Int): Flow<Forecast?>
-    fun observeForecastsByLocationIds(ids: List<Int>): Flow<List<Forecast>>
+    fun observeForecastsByFavoritesIds(ids: List<Int>): Flow<List<Forecast>>
 }
 

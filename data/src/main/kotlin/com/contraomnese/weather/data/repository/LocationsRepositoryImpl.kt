@@ -3,6 +3,7 @@ package com.contraomnese.weather.data.repository
 import com.contraomnese.weather.data.mappers.favorite.toDomain
 import com.contraomnese.weather.data.mappers.locations.toDomain
 import com.contraomnese.weather.data.mappers.locations.toEntity
+import com.contraomnese.weather.data.mappers.locations.toForecastLocationEntity
 import com.contraomnese.weather.data.network.api.LocationsIQApi
 import com.contraomnese.weather.data.network.models.locationiq.LocationNetwork
 import com.contraomnese.weather.data.network.parsers.INetworkParser
@@ -28,6 +29,7 @@ class LocationsRepositoryImpl(
     private val database: WeatherAppDatabase,
     private val networkParser: INetworkParser,
     private val dispatcher: CoroutineDispatcher,
+    private val transactionProvider: TransactionProvider,
 ) : LocationsRepository {
 
     override suspend fun getFavorites(): Result<List<Location>> =
@@ -44,7 +46,12 @@ class LocationsRepositoryImpl(
     override suspend fun addFavorite(locationId: Int): Result<Int> = withContext(dispatcher) {
 
         try {
-            database.favoritesDao().addFavorite(locationId)
+            transactionProvider.runWithTransaction {
+                val locationsDao = database.locationsDao()
+                val forecastLocation = locationsDao.getMatchingLocation(locationId).toForecastLocationEntity(locationId)
+                locationsDao.insertForecastLocation(forecastLocation)
+                database.favoritesDao().addFavorite(locationId)
+            }
             Result.success(locationId)
         } catch (cause: Exception) {
             Result.failure(storageError(logPrefix("Impossible add favorite to storage"), cause))
