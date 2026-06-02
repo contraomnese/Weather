@@ -27,6 +27,9 @@ interface FavoritesDao {
     @Query("SELECT * FROM favorites")
     fun observeFavorites(): Flow<List<FavoriteEntity>>
 
+    @Query("SELECT location_id FROM favorites LIMIT 1")
+    fun getFirstFavoriteId(): Int?
+
     @Query("DELETE FROM favorites WHERE location_id = :favoriteId")
     suspend fun removeFavorite(favoriteId: Int)
 

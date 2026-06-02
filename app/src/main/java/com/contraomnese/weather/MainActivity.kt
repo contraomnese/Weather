@@ -48,11 +48,9 @@ internal fun WeatherScreen(
 
     Crossfade(targetState = uiState.isLoading, animationSpec = tween(1000)) { loading ->
         if (loading) {
-            SplashScreen(uiState.isLoading) {
-                viewModel.push(MainActivityAction.LottieAnimationFinished)
-            }
+            SplashScreen(uiState.isLoading)
         } else {
-            if (uiState.forecastAutoSyncEnabled) activateWeatherSync()
+            if (uiState.isForecastAutoSync) activateWeatherSync()
 
             WeatherHost(
                 startDestination = uiState.startDestination,

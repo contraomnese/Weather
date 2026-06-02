@@ -1,25 +1,27 @@
 package com.contraomnese.weather
 
-import com.contraomnese.weather.domain.weatherByLocation.model.Location
 import com.contraomnese.weather.home.navigation.HomeDestination
 import com.contraomnese.weather.presentation.architecture.MviDestination
 import com.contraomnese.weather.presentation.architecture.MviState
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toPersistentList
+import com.contraomnese.weather.weatherByLocation.navigation.WeatherByLocationDestination
 
 internal data class MainActivityState(
     override val isLoading: Boolean = true,
-    val favorites: ImmutableList<Location> = persistentListOf(),
+    val isForecastAutoSync: Boolean,
     val startDestination: MviDestination,
-    val forecastAutoSyncEnabled: Boolean,
 ) : MviState {
 
-    fun setFavorites(newFavorites: List<Location>): MainActivityState = copy(favorites = newFavorites.toPersistentList())
-    fun setForecastAutoSync(enabled: Boolean): MainActivityState = copy(forecastAutoSyncEnabled = enabled)
+    fun setWeatherDestinationId(id: Int?): MainActivityState = copy(
+        isLoading = false,
+        startDestination = id?.let { id ->
+            WeatherByLocationDestination(id = id)
+        } ?: HomeDestination
+    )
+
+    fun setForecastAutoSync(enabled: Boolean): MainActivityState = copy(isForecastAutoSync = enabled)
+    fun finishLoading(): MainActivityState = copy(isLoading = false)
 
     companion object {
-        val DEFAULT =
-            MainActivityState(isLoading = true, startDestination = HomeDestination, forecastAutoSyncEnabled = false)
+        val DEFAULT = MainActivityState(startDestination = HomeDestination, isForecastAutoSync = false)
     }
 }

@@ -11,4 +11,5 @@ interface LocationsRepository {
     suspend fun deleteFavorite(locationId: Int): Result<Int>
     suspend fun getFavorites(): Result<List<Location>>
     fun observeFavorites(): Flow<List<Location>>
+    fun getFirstFavoriteId(): Int?
 }

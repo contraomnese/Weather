@@ -43,6 +43,11 @@ class LocationsRepositoryImpl(
             .map { favorites -> favorites.map { it.toDomain() } }
             .flowOn(dispatcher)
 
+    override fun getFirstFavoriteId(): Int? =
+        database
+            .favoritesDao()
+            .getFirstFavoriteId()
+
     override suspend fun addFavorite(locationId: Int): Result<Int> = withContext(dispatcher) {
 
         try {

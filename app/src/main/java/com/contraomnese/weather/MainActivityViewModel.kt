@@ -4,33 +4,21 @@ import androidx.lifecycle.viewModelScope
 import com.contraomnese.weather.domain.app.usecase.ObserveAppSettingsUseCase
 import com.contraomnese.weather.domain.exceptions.logPrefix
 import com.contraomnese.weather.domain.exceptions.notInitialize
-import com.contraomnese.weather.domain.home.usecase.AddFavoriteUseCase
-import com.contraomnese.weather.domain.home.usecase.ObserveFavoritesUseCase
-import com.contraomnese.weather.home.navigation.HomeDestination
+import com.contraomnese.weather.domain.home.usecase.GetFirstFavoriteIdUseCase
 import com.contraomnese.weather.presentation.architecture.MviModel
-import com.contraomnese.weather.weatherByLocation.navigation.WeatherByLocationDestination
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-
 internal class MainActivityViewModel(
-    private val observeFavoritesUseCase: ObserveFavoritesUseCase,
-    private val addFavoriteUseCase: AddFavoriteUseCase,
+    private val getFirstFavoriteIdUseCase: GetFirstFavoriteIdUseCase,
     private val observeAppSettingsUseCase: ObserveAppSettingsUseCase,
 ) : MviModel<MainActivityAction, MainActivityEffect, MainActivityEvent, MainActivityState>(
     tag = "MainActivity",
     defaultState = MainActivityState.DEFAULT
 ) {
     override suspend fun bootstrap() {
-        observeFavoritesUseCase()
-            .onEach {
-                push(MainActivityEffect.FavoritesUpdated(it))
-            }
-            .catch {
-                push(MainActivityEvent.HandleError(notInitialize(logPrefix("Bootstrap failed"), it)))
-            }
-            .launchIn(viewModelScope)
+        push(MainActivityEffect.WeatherDestinationIdChanged(getFirstFavoriteIdUseCase()))
 
         observeAppSettingsUseCase()
             .onEach {
@@ -38,27 +26,13 @@ internal class MainActivityViewModel(
             }
             .catch {
                 push(MainActivityEvent.HandleError(notInitialize(logPrefix("Bootstrap failed"), it)))
-            } // TODO
+            }
             .launchIn(viewModelScope)
     }
 
     override fun reducer(effect: MainActivityEffect, previousState: MainActivityState): MainActivityState = when (effect) {
-        is MainActivityEffect.NotLoading -> previousState.copy(
-            isLoading = false,
-            startDestination = previousState.favorites.firstOrNull()?.let {
-                WeatherByLocationDestination(id = it.id)
-            } ?: HomeDestination)
-        is MainActivityEffect.FavoritesUpdated -> previousState.setFavorites(effect.favorites)
+        is MainActivityEffect.LoadingFinished -> previousState.finishLoading()
         is MainActivityEffect.ForecastAutoSyncChanged -> previousState.setForecastAutoSync(effect.enabled)
-    }
-
-    override suspend fun actor(action: MainActivityAction) = when (action) {
-        is MainActivityAction.AddFavorite -> processFavoriteAdd(action.locationId)
-        is MainActivityAction.LottieAnimationFinished -> push(MainActivityEffect.NotLoading)
-    }
-
-    private suspend fun processFavoriteAdd(locationId: Int) {
-        addFavoriteUseCase(locationId)
-            .onFailure { cause -> push(MainActivityEvent.HandleError(cause)) }
+        is MainActivityEffect.WeatherDestinationIdChanged -> previousState.setWeatherDestinationId(effect.id)
     }
 }

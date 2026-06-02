@@ -8,6 +8,8 @@ import com.contraomnese.weather.domain.home.usecase.AddFavoriteUseCase
 import com.contraomnese.weather.domain.home.usecase.AddFavoriteUseCaseImpl
 import com.contraomnese.weather.domain.home.usecase.GetFavoritesUseCase
 import com.contraomnese.weather.domain.home.usecase.GetFavoritesUseCaseImpl
+import com.contraomnese.weather.domain.home.usecase.GetFirstFavoriteIdUseCase
+import com.contraomnese.weather.domain.home.usecase.GetFirstFavoriteIdUseCaseImpl
 import com.contraomnese.weather.domain.home.usecase.GetLocationUseCase
 import com.contraomnese.weather.domain.home.usecase.GetLocationUseCaseImpl
 import com.contraomnese.weather.domain.home.usecase.GetLocationsUseCase
@@ -50,6 +52,11 @@ val domainModule = module {
     }
     factory<ObserveFavoritesUseCase> {
         ObserveFavoritesUseCaseImpl(
+            repository = get()
+        )
+    }
+    factory<GetFirstFavoriteIdUseCase> {
+        GetFirstFavoriteIdUseCaseImpl(
             repository = get()
         )
     }

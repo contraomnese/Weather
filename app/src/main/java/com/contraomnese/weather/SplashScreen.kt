@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,12 +22,11 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.contraomnese.weather.design.theme.backgroundGradient
-import kotlinx.coroutines.delay
 
 private const val LOTTIE_ASSET_NAME = "clear_sky.json"
 
 @Composable
-fun SplashScreen(visible: Boolean, onFinish: () -> Unit) {
+fun SplashScreen(visible: Boolean) {
 
     val composition by rememberLottieComposition(LottieCompositionSpec.Asset(LOTTIE_ASSET_NAME))
 
@@ -61,10 +59,5 @@ fun SplashScreen(visible: Boolean, onFinish: () -> Unit) {
                 contentScale = ContentScale.Crop
             )
         }
-    }
-
-    LaunchedEffect(Unit) {
-        delay(1500)
-        onFinish()
     }
 }
