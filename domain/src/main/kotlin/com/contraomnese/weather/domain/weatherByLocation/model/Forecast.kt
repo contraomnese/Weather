@@ -4,7 +4,7 @@ import kotlinx.datetime.TimeZone
 
 data class Forecast(
     val location: ForecastLocation,
-    val today: Weather,
+    val today: TodayForecast,
     val forecast: ForecastWeather,
     val alerts: AlertsWeather,
 )

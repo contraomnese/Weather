@@ -20,8 +20,8 @@ import com.contraomnese.weather.domain.weatherByLocation.model.ForecastHour
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastLocation
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeather
 import com.contraomnese.weather.domain.weatherByLocation.model.LocationDateTime
+import com.contraomnese.weather.domain.weatherByLocation.model.TodayForecast
 import com.contraomnese.weather.domain.weatherByLocation.model.UvIndex
-import com.contraomnese.weather.domain.weatherByLocation.model.Weather
 import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
@@ -134,7 +134,7 @@ fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
             timeZone = TimeZone.of(location.timeZoneId),
             isSunUp = dailyForecast.first().astro.isSunUp == IS_SUN_UP
         ),
-        today = Weather(
+        today = TodayForecast(
             temperature = todayForecast.toTemperatureDomain(appSettings.temperatureUnit),
             feelsLikeTemperature = when (appSettings.temperatureUnit) {
                 TemperatureUnit.Celsius -> todayForecast.feelsLikeC.roundToInt().toString()

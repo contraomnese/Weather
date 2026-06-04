@@ -11,6 +11,7 @@ import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDailyE
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDayEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastHourEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastTodayEntity
+import com.contraomnese.weather.data.storage.db.locations.dto.FavoriteForecastData
 import com.contraomnese.weather.data.storage.db.locations.dto.ForecastData
 import kotlinx.coroutines.flow.Flow
 
@@ -46,4 +47,8 @@ interface ForecastDao {
     @Transaction
     @Query("SELECT * FROM forecast_location WHERE location_id IN (:locationIds)")
     fun observeForecastsBy(locationIds: List<Int>): Flow<List<ForecastData>>
+
+    @Transaction
+    @Query("SELECT * FROM forecast_location WHERE location_id IN (:locationIds)")
+    fun observeFavoriteForecastsBy(locationIds: List<Int>): Flow<List<FavoriteForecastData>>
 }

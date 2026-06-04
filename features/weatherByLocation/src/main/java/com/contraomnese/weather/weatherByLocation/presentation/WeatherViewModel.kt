@@ -6,8 +6,8 @@ import com.contraomnese.weather.domain.exceptions.logPrefix
 import com.contraomnese.weather.domain.exceptions.notInitialize
 import com.contraomnese.weather.domain.home.usecase.AddFavoriteUseCase
 import com.contraomnese.weather.domain.home.usecase.ObserveFavoritesUseCase
-import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveForecastWeatherUseCase
-import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateForecastWeatherUseCase
+import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveSingleForecastUseCase
+import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateForecastUseCase
 import com.contraomnese.weather.presentation.architecture.MviModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.catch
@@ -19,8 +19,8 @@ import kotlinx.coroutines.flow.map
 
 internal class WeatherViewModel(
     private val observeAppSettingsUseCase: ObserveAppSettingsUseCase,
-    private val observeForecastWeatherUseCase: ObserveForecastWeatherUseCase,
-    private val updateForecastWeatherUseCase: UpdateForecastWeatherUseCase,
+    private val observeSingleForecastUseCase: ObserveSingleForecastUseCase,
+    private val updateForecastUseCase: UpdateForecastUseCase,
     private val observeFavoritesUseCase: ObserveFavoritesUseCase,
     private val addFavoriteUseCase: AddFavoriteUseCase,
     private val navLocationId: Int,
@@ -36,7 +36,7 @@ internal class WeatherViewModel(
             .distinctUntilChanged()
             .flatMapLatest { locationId ->
                 combine(
-                    observeForecastWeatherUseCase(locationId),
+                    observeSingleForecastUseCase(locationId),
                     observeAppSettingsUseCase(),
                     observeFavoritesUseCase()
                 ) { weather, appSettings, favorites ->
@@ -48,7 +48,7 @@ internal class WeatherViewModel(
                                 favorites = favorites
                             )
                         )
-                    } ?: updateForecastWeatherUseCase(locationId)
+                    } ?: updateForecastUseCase(locationId)
                 }
                     .catch {
                         push(WeatherScreenEvent.HandleError(notInitialize(logPrefix("Bootstrap failed"), it)))

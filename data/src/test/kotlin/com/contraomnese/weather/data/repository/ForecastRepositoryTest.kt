@@ -99,7 +99,7 @@ class ForecastRepositoryTest {
 
             try {
                 Locale.setDefault(Locale(realAppSettings.language.value))
-                repository.observeForecastByLocationId(locationId).test {
+                repository.observeSingleForecast(locationId).test {
                     val item = awaitItem()
                     assertEquals(expectedData, item)
                     awaitComplete()
@@ -121,7 +121,7 @@ class ForecastRepositoryTest {
             coEvery { appSettingsRepository.observeSettings() } returns flowOf(expectedSettings)
             every { any<ForecastData>().toDomain(any<AppSettings>()) } returns expectedData
 
-            repository.observeForecastByLocationId(locationId).test {
+            repository.observeSingleForecast(locationId).test {
                 val item = awaitItem()
                 assertEquals(expectedData, item)
                 awaitComplete()
@@ -148,7 +148,7 @@ class ForecastRepositoryTest {
             coEvery { forecastDao.observeForecastBy(locationId) } returns flowOf(null)
             coEvery { appSettingsRepository.observeSettings() } returns flowOf(appSettingsFirstItem)
 
-            repository.observeForecastByLocationId(locationId).test {
+            repository.observeSingleForecast(locationId).test {
                 val item = awaitItem()
                 assertEquals(expectedData, item)
                 awaitComplete()
@@ -169,7 +169,7 @@ class ForecastRepositoryTest {
             every { forecastDataFirstItem.toDomain(appSettingsFirstItem) } returns forecastFirstItem
             every { forecastDataSecondItem.toDomain(appSettingsFirstItem) } returns forecastSecondItem
 
-            repository.observeForecastByLocationId(locationId).test {
+            repository.observeSingleForecast(locationId).test {
                 val item1 = awaitItem()
                 assertEquals(forecastFirstItem, item1)
 
@@ -204,7 +204,7 @@ class ForecastRepositoryTest {
             coEvery { appSettingsRepository.observeSettings() } returns flowOf(appSettingsFirstItem)
             every { any<ForecastData>().toDomain(any<AppSettings>()) } throws mappingException
 
-            repository.observeForecastByLocationId(locationId).test {
+            repository.observeSingleForecast(locationId).test {
                 val actualException = awaitError()
                 assertEquals(expectedException.message, actualException.message)
             }
@@ -229,7 +229,7 @@ class ForecastRepositoryTest {
             coEvery { locationsDao.insertForecastLocation(any<ForecastLocationEntity>()) } returns forecastLocationId
             coEvery { forecastDao.insertForecastDay(any<ForecastDailyEntity>()) } returns forecastDailyId
 
-            val actualResult = repository.refreshForecastByLocationId(locationId)
+            val actualResult = repository.updateForecastByLocationId(locationId)
 
             val actualData = actualResult.assertIsSuccess()
 
@@ -271,7 +271,7 @@ class ForecastRepositoryTest {
             every { apiParser.parseOrThrowError(response) } returns forecastResponse
             every { any<ForecastLocationNetwork>().toEntity(locationId) } returns forecastLocation
 
-            repository.refreshForecastByLocationId(locationId)
+            repository.updateForecastByLocationId(locationId)
 
             coVerify(exactly = 1) { locationsDao.insertForecastLocation(match { it.name == "Fallback Name" }) }
         }
@@ -285,7 +285,7 @@ class ForecastRepositoryTest {
             val mutex = Mutex(true)
             refreshForecastLocks[locationId] = mutex
 
-            val actualResult = repository.refreshForecastByLocationId(locationId)
+            val actualResult = repository.updateForecastByLocationId(locationId)
 
             val actualException = actualResult.assertIsFailure()
 
@@ -304,7 +304,7 @@ class ForecastRepositoryTest {
             val mutex = Mutex(true)
             refreshForecastLocks[locationId] = mutex
 
-            repository.refreshForecastByLocationId(locationId)
+            repository.updateForecastByLocationId(locationId)
 
             verify { network wasNot Called }
             verify { apiParser wasNot Called }
@@ -317,7 +317,7 @@ class ForecastRepositoryTest {
 
             coEvery { locationsDao.getMatchingLocation(locationId) } throws RuntimeException()
 
-            repository.refreshForecastByLocationId(locationId)
+            repository.updateForecastByLocationId(locationId)
 
             val mutex = refreshForecastLocks[locationId]
             assertNotNull(mutex)
@@ -332,7 +332,7 @@ class ForecastRepositoryTest {
 
             coEvery { locationsDao.getMatchingLocation(locationId) } throws storageException
 
-            val actualResult = repository.refreshForecastByLocationId(locationId)
+            val actualResult = repository.updateForecastByLocationId(locationId)
             val actualException = actualResult.assertIsFailure()
 
             assertEquals(expectedException::class.java, actualException::class.java)
@@ -350,7 +350,7 @@ class ForecastRepositoryTest {
             coEvery { locationsDao.getMatchingLocation(locationId) } returns matchingLocation
             coEvery { network.getForecast(matchingLocation.toTextPoints()) } throws storageException
 
-            val actualResult = repository.refreshForecastByLocationId(locationId)
+            val actualResult = repository.updateForecastByLocationId(locationId)
             val actualException = actualResult.assertIsFailure()
 
             assertEquals(expectedException::class.java, actualException::class.java)
@@ -370,7 +370,7 @@ class ForecastRepositoryTest {
             coEvery { network.getForecast(matchingLocation.toTextPoints()) } returns response
             every { apiParser.parseOrThrowError(response) } throws expectedException
 
-            val actualResult = repository.refreshForecastByLocationId(locationId)
+            val actualResult = repository.updateForecastByLocationId(locationId)
             val actualException = actualResult.assertIsFailure()
 
             assertEquals(expectedException::class.java, actualException::class.java)
@@ -390,7 +390,7 @@ class ForecastRepositoryTest {
             every { apiParser.parseOrThrowError(any<Response<WeatherApiForecastResponse>>()) } returns forecastResponse
             every { any<ForecastLocationNetwork>().toEntity(matchingLocation.networkId) } throws mappingException
 
-            val actualResult = repository.refreshForecastByLocationId(locationId)
+            val actualResult = repository.updateForecastByLocationId(locationId)
             val actualException = actualResult.assertIsFailure()
 
             assertEquals(expectedException::class.java, actualException::class.java)
@@ -411,7 +411,7 @@ class ForecastRepositoryTest {
             every { apiParser.parseOrThrowError(any<Response<WeatherApiForecastResponse>>()) } returns forecastResponse
             coEvery { storage.forecastDao() } throws storageException
 
-            val actualResult = repository.refreshForecastByLocationId(locationId)
+            val actualResult = repository.updateForecastByLocationId(locationId)
             val actualException = actualResult.assertIsFailure()
 
             assertEquals(expectedException::class.java, actualException::class.java)

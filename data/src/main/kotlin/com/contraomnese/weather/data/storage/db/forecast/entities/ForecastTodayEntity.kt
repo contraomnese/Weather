@@ -21,6 +21,10 @@ data class ForecastTodayEntity(
     @ColumnInfo(name = FORECAST_LOCATION_ID) val forecastLocationId: Int,
     @ColumnInfo(name = TEMP_C) val tempC: Double,
     @ColumnInfo(name = TEMP_F) val tempF: Double,
+    @ColumnInfo(name = MAX_TEMP_C) val maxTempC: Double,
+    @ColumnInfo(name = MAX_TEMP_F) val maxTempF: Double,
+    @ColumnInfo(name = MIN_TEMP_C) val minTempC: Double,
+    @ColumnInfo(name = MIN_TEMP_F) val minTempF: Double,
     @ColumnInfo(name = IS_DAY) val isDay: Int,
     @ColumnInfo(name = CONDITION_CODE) val conditionCode: Int,
     @ColumnInfo(name = WIND_MPH) val windMph: Double,
@@ -56,6 +60,10 @@ data class ForecastTodayEntity(
         const val FORECAST_LOCATION_ID = "forecast_location_id"
         const val TEMP_C = "temp_c"
         const val TEMP_F = "temp_f"
+        const val MAX_TEMP_C = "max_temp_c"
+        const val MAX_TEMP_F = "max_temp_f"
+        const val MIN_TEMP_C = "min_temp_c"
+        const val MIN_TEMP_F = "min_temp_f"
         const val IS_DAY = "is_day"
         const val CONDITION_CODE = "condition_code"
         const val WIND_MPH = "wind_mph"

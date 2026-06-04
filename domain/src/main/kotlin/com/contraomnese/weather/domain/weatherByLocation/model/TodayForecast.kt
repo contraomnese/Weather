@@ -1,6 +1,6 @@
 package com.contraomnese.weather.domain.weatherByLocation.model
 
-data class Weather(
+data class TodayForecast(
     val temperature: String,
     val feelsLikeTemperature: String,
     val isDay: Boolean,

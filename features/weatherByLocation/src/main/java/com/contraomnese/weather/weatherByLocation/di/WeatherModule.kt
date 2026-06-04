@@ -12,8 +12,8 @@ internal val weatherModule
             val locationId: Int = params.get()
 
             WeatherViewModel(
-                updateForecastWeatherUseCase = get(),
-                observeForecastWeatherUseCase = get(),
+                updateForecastUseCase = get(),
+                observeSingleForecastUseCase = get(),
                 observeAppSettingsUseCase = get(),
                 observeFavoritesUseCase = get(),
                 addFavoriteUseCase = get(),

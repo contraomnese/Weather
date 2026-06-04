@@ -11,8 +11,8 @@ import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeather
 import com.contraomnese.weather.domain.weatherByLocation.model.LocationDateTime
 import com.contraomnese.weather.domain.weatherByLocation.model.LocationTime
 import com.contraomnese.weather.domain.weatherByLocation.model.PollutantLevel
+import com.contraomnese.weather.domain.weatherByLocation.model.TodayForecast
 import com.contraomnese.weather.domain.weatherByLocation.model.UvIndex
-import com.contraomnese.weather.domain.weatherByLocation.model.Weather
 import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.datetime.LocalDateTime
@@ -107,7 +107,7 @@ object MockForecastReal {
             longitude = 37.616,
             timeZone = TimeZone.of("Europe/Moscow")
         ),
-        today = Weather(
+        today = TodayForecast(
             airQuality = AirQuality(
                 aqiIndex = 7,
                 aqiText = "High",

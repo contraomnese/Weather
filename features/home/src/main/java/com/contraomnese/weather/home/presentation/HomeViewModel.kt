@@ -10,7 +10,7 @@ import com.contraomnese.weather.domain.home.usecase.RemoveFavoriteUseCase
 import com.contraomnese.weather.domain.weatherByLocation.model.Location
 import com.contraomnese.weather.domain.weatherByLocation.model.LocationCoordinates
 import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveFavoritesForecastsUseCase
-import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateForecastWeatherUseCase
+import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateForecastUseCase
 import com.contraomnese.weather.presentation.architecture.MviModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
@@ -27,7 +27,7 @@ internal class HomeViewModel(
     private val addFavoriteUseCase: AddFavoriteUseCase,
     private val removeFavoriteUseCase: RemoveFavoriteUseCase,
     private val observeFavoritesForecastsUseCase: ObserveFavoritesForecastsUseCase,
-    private val updateForecastWeatherUseCase: UpdateForecastWeatherUseCase,
+    private val updateForecastUseCase: UpdateForecastUseCase,
 ) : MviModel<HomeScreenAction, HomeScreenEffect, HomeScreenEvent, HomeScreenState>(
     defaultState = HomeScreenState.DEFAULT,
     tag = "HomeViewModel",
@@ -119,7 +119,7 @@ internal class HomeViewModel(
     private suspend fun processFavoriteAdd(locationId: Int) {
         addFavoriteUseCase(locationId)
             .onSuccess { favorite ->
-                updateForecastWeatherUseCase(favorite)
+                updateForecastUseCase(favorite)
             }
             .onFailure { push(HomeScreenEvent.HandleError(it)) }
     }
@@ -147,7 +147,7 @@ internal class HomeViewModel(
                 push(
                     HomeScreenEffect.FavoritesForecastUpdated(
                         favorites = favorites,
-                        favoritesForecast = forecasts.associateBy { it.location.id })
+                        favoritesForecast = forecasts.associateBy { it.locationId })
                 )
             }
     }

@@ -19,6 +19,7 @@ import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
 import com.contraomnese.weather.domain.exceptions.logPrefix
 import com.contraomnese.weather.domain.exceptions.operationFailed
 import com.contraomnese.weather.domain.exceptions.storageError
+import com.contraomnese.weather.domain.weatherByLocation.model.FavoriteForecast
 import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 import com.contraomnese.weather.domain.weatherByLocation.repository.ForecastRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -40,9 +41,9 @@ class ForecastRepositoryImpl(
     private val transactionProvider: TransactionProvider,
 ) : ForecastRepository {
 
-    override fun observeForecastByLocationId(id: Int): Flow<Forecast?> {
+    override fun observeSingleForecast(locationId: Int): Flow<Forecast?> {
         return combine(
-            database.forecastDao().observeForecastBy(id),
+            database.forecastDao().observeForecastBy(locationId),
             appSettingsRepository.observeSettings()
         ) { entity, settings ->
             Pair(entity, settings)
@@ -53,9 +54,9 @@ class ForecastRepositoryImpl(
             .flowOn(dispatcher)
     }
 
-    override fun observeForecastsByFavoritesIds(ids: List<Int>): Flow<List<Forecast>> {
+    override fun observeForecasts(locationIds: List<Int>): Flow<List<Forecast>> {
         return combine(
-            database.forecastDao().observeForecastsBy(ids),
+            database.forecastDao().observeForecastsBy(locationIds),
             appSettingsRepository.observeSettings()
         ) { entities, settings ->
             entities
@@ -65,12 +66,24 @@ class ForecastRepositoryImpl(
             .flowOn(dispatcher)
     }
 
-    override suspend fun refreshForecastByLocationId(id: Int): Result<Int> {
-        val mutex = refreshForecastLocks.computeIfAbsent(id) { Mutex() }
+    override fun observeFavoriteForecasts(locationIds: List<Int>): Flow<List<FavoriteForecast>> {
+        return combine(
+            database.forecastDao().observeFavoriteForecastsBy(locationIds),
+            appSettingsRepository.observeSettings()
+        ) { entities, settings ->
+            entities
+                .filter { it.todayForecast != null }
+                .map { it.toDomain(settings) }
+        }
+            .flowOn(dispatcher)
+    }
+
+    override suspend fun updateForecastByLocationId(locationId: Int): Result<Int> {
+        val mutex = refreshForecastLocks.computeIfAbsent(locationId) { Mutex() }
 
         return if (mutex.tryLock()) {
             try {
-                updateForecast(id)
+                updateForecast(locationId)
             } finally {
                 mutex.unlock()
             }
@@ -168,7 +181,7 @@ class ForecastRepositoryImpl(
             val forecastLocationId = locationsDao.insertForecastLocation(location).toInt()
 
             val forecastDao = database.forecastDao()
-            forecastDao.insertForecastCurrent(forecast.current.toEntity(forecastLocationId))
+            forecastDao.insertForecastCurrent(current = forecast.current.toEntity(forecastLocationId))
             forecastDao.insertAlerts(forecast.alerts.alert.map { it.toEntity(forecastLocationId) })
 
             forecast.forecast.forecastDay.forEach { forecastDay ->

@@ -93,7 +93,7 @@ import com.contraomnese.weather.design.theme.itemWidth64
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding4
 import com.contraomnese.weather.design.theme.space8
-import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
+import com.contraomnese.weather.domain.weatherByLocation.model.FavoriteForecast
 import com.contraomnese.weather.domain.weatherByLocation.model.Location
 import com.contraomnese.weather.presentation.architecture.collectEvent
 import com.contraomnese.weather.presentation.utils.handleError
@@ -588,7 +588,7 @@ fun MatchLocation(
 private fun FavoritesLocations(
     currentTime: Instant,
     favorites: ImmutableList<Location>,
-    favoritesForecast: ImmutableMap<Int, Forecast>,
+    favoritesForecast: ImmutableMap<Int, FavoriteForecast>,
     pushAction: (HomeScreenAction) -> Unit = {},
     onNavigateToWeatherByLocation: (Int) -> Unit,
 ) {
@@ -613,13 +613,13 @@ private fun FavoritesLocations(
                         .fillMaxWidth()
                         .height(itemHeight160),
                     locationName = location.name,
-                    locationCountry = it.location.country,
-                    timeZone = it.location.timeZone,
-                    temperature = it.today.temperature,
-                    maxTemperature = it.forecast.today.maxTemperature,
-                    minTemperature = it.forecast.today.minTemperature,
-                    conditionText = stringResource(it.today.condition.getConditionResId()),
-                    background = it.today.condition.getResources().backgroundResId,
+                    locationCountry = it.locationName,
+                    timeZone = it.timeZone,
+                    temperature = it.temperature,
+                    maxTemperature = it.maxTemperature,
+                    minTemperature = it.minTemperature,
+                    conditionText = stringResource(it.conditionText.getConditionResId()),
+                    background = it.conditionText.getResources().backgroundResId,
                     onTapClicked = {
                         onNavigateToWeatherByLocation(
                             location.id

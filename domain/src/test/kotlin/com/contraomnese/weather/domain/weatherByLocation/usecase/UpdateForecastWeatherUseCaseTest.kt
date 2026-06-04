@@ -15,12 +15,12 @@ import org.junit.jupiter.api.Test
 
 class UpdateForecastWeatherUseCaseTest {
 
-    private lateinit var useCase: UpdateForecastWeatherUseCase
+    private lateinit var useCase: UpdateForecastUseCase
     private val repository = mockk<ForecastRepository>()
 
     @BeforeEach
     fun setUp() {
-        useCase = UpdateForecastWeatherUseCaseImpl(repository)
+        useCase = UpdateForecastUseCaseImpl(repository)
     }
 
     @Test
@@ -28,12 +28,12 @@ class UpdateForecastWeatherUseCaseTest {
 
         val expectedData = locationId
 
-        coEvery { repository.refreshForecastByLocationId(locationId) } returns Result.success(expectedData)
+        coEvery { repository.updateForecastByLocationId(locationId) } returns Result.success(expectedData)
         val actualResult = useCase(locationId)
 
         val actualData = actualResult.assertIsSuccess()
         assertEquals(expectedData, actualData)
-        coVerify(exactly = 1) { repository.refreshForecastByLocationId(locationId) }
+        coVerify(exactly = 1) { repository.updateForecastByLocationId(locationId) }
         confirmVerified(repository)
     }
 
@@ -42,12 +42,12 @@ class UpdateForecastWeatherUseCaseTest {
 
         val expectedException = repositoryException
 
-        coEvery { repository.refreshForecastByLocationId(locationId) } returns Result.failure(expectedException)
+        coEvery { repository.updateForecastByLocationId(locationId) } returns Result.failure(expectedException)
         val actualResult = useCase(locationId)
 
         val actualException = actualResult.assertIsFailure()
         assertEquals(expectedException.message, actualException.message)
-        coVerify(exactly = 1) { repository.refreshForecastByLocationId(locationId) }
+        coVerify(exactly = 1) { repository.updateForecastByLocationId(locationId) }
         confirmVerified(repository)
     }
 

@@ -18,14 +18,14 @@ import com.contraomnese.weather.domain.home.usecase.ObserveFavoritesUseCase
 import com.contraomnese.weather.domain.home.usecase.ObserveFavoritesUseCaseImpl
 import com.contraomnese.weather.domain.home.usecase.RemoveFavoriteUseCase
 import com.contraomnese.weather.domain.home.usecase.RemoveFavoriteUseCaseImpl
-import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveFavoritesFavoritesForecastsUseCaseImpl
 import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveFavoritesForecastsUseCase
-import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveForecastWeatherUseCase
-import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveForecastWeatherUseCaseImpl
+import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveFavoritesForecastsUseCaseImpl
+import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveSingleForecastUseCase
+import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveSingleForecastUseCaseImpl
 import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateFavoritesForecastsUseCase
 import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateFavoritesForecastsUseCaseImpl
-import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateForecastWeatherUseCase
-import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateForecastWeatherUseCaseImpl
+import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateForecastUseCase
+import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateForecastUseCaseImpl
 import org.koin.dsl.module
 
 val domainModule = module {
@@ -65,18 +65,18 @@ val domainModule = module {
             repository = get()
         )
     }
-    factory<ObserveForecastWeatherUseCase> {
-        ObserveForecastWeatherUseCaseImpl(
+    factory<ObserveSingleForecastUseCase> {
+        ObserveSingleForecastUseCaseImpl(
             repository = get()
         )
     }
     factory<ObserveFavoritesForecastsUseCase> {
-        ObserveFavoritesFavoritesForecastsUseCaseImpl(
+        ObserveFavoritesForecastsUseCaseImpl(
             repository = get()
         )
     }
-    factory<UpdateForecastWeatherUseCase> {
-        UpdateForecastWeatherUseCaseImpl(
+    factory<UpdateForecastUseCase> {
+        UpdateForecastUseCaseImpl(
             repository = get()
         )
     }

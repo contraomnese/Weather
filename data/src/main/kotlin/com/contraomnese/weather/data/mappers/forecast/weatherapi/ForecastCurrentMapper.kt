@@ -15,6 +15,10 @@ internal fun ForecastCurrentNetwork.toEntity(forecastLocationId: Int) = Forecast
     forecastLocationId = forecastLocationId,
     tempC = tempC,
     tempF = tempF,
+    maxTempC = 0.0,
+    maxTempF = 0.0,
+    minTempC = 0.0,
+    minTempF = 0.0,
     isDay = isDay,
     conditionCode = condition.code,
     windMph = windMph,
@@ -50,6 +54,20 @@ internal fun ForecastTodayEntity.toTemperatureDomain(temperatureUnit: Temperatur
     return when (temperatureUnit) {
         TemperatureUnit.Celsius -> this.tempC.roundToInt().toString()
         TemperatureUnit.Fahrenheit -> this.tempF.roundToInt().toString()
+    }
+}
+
+internal fun ForecastTodayEntity.toMaxTemperatureDomain(temperatureUnit: TemperatureUnit): String {
+    return when (temperatureUnit) {
+        TemperatureUnit.Celsius -> this.maxTempC.roundToInt().toString()
+        TemperatureUnit.Fahrenheit -> this.maxTempF.roundToInt().toString()
+    }
+}
+
+internal fun ForecastTodayEntity.toMinTemperatureDomain(temperatureUnit: TemperatureUnit): String {
+    return when (temperatureUnit) {
+        TemperatureUnit.Celsius -> this.minTempC.roundToInt().toString()
+        TemperatureUnit.Fahrenheit -> this.minTempF.roundToInt().toString()
     }
 }
 

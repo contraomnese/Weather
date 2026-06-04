@@ -2,15 +2,15 @@ package com.contraomnese.weather.domain.weatherByLocation.usecase
 
 import com.contraomnese.weather.domain.weatherByLocation.repository.ForecastRepository
 
-fun interface UpdateForecastWeatherUseCase {
+fun interface UpdateForecastUseCase {
     suspend operator fun invoke(request: Int): Result<Int>
 }
 
-class UpdateForecastWeatherUseCaseImpl(
+class UpdateForecastUseCaseImpl(
     private val repository: ForecastRepository,
-) : UpdateForecastWeatherUseCase {
+) : UpdateForecastUseCase {
 
     override suspend fun invoke(request: Int) =
-        repository.refreshForecastByLocationId(request)
+        repository.updateForecastByLocationId(request)
 
 }

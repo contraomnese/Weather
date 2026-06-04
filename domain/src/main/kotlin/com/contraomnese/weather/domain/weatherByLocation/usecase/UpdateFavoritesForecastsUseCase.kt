@@ -33,7 +33,7 @@ class UpdateFavoritesForecastsUseCaseImpl(
 
     private suspend fun updateSingleLocation(id: Int): Result<Int> {
         return try {
-            repository.refreshForecastByLocationId(id)
+            repository.updateForecastByLocationId(id)
         } catch (e: Exception) {
             Result.failure(e)
         }

@@ -14,7 +14,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.contraomnese.weather.domain.home.usecase.GetFavoritesUseCase
-import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveForecastWeatherUseCase
+import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveSingleForecastUseCase
 import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateFavoritesForecastsUseCase
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Clock
@@ -30,7 +30,7 @@ class WeatherUpdateWorker(
     workerParams: WorkerParameters,
     private val updateFavoritesForecastsUseCase: UpdateFavoritesForecastsUseCase,
     private val getFavoritesUseCase: GetFavoritesUseCase,
-    private val observeForecastWeatherUseCase: ObserveForecastWeatherUseCase,
+    private val observeSingleForecastUseCase: ObserveSingleForecastUseCase,
 ) :
     CoroutineWorker(appContext, workerParams) {
 
@@ -45,7 +45,7 @@ class WeatherUpdateWorker(
                     updateFavoritesForecastsUseCase(it.map { it.id })
                         .onSuccess { favoritesUpdated ->
                             val forecastFirstFavoriteLocation =
-                                observeForecastWeatherUseCase(favoritesUpdated.first()).first()
+                                observeSingleForecastUseCase(favoritesUpdated.first()).first()
                             forecastFirstFavoriteLocation?.let { forecast ->
                                 notificationManager.notify(
                                     1, createNewWeatherForecastNotification(

@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             WeatherTheme {
                 KoinAndroidContext {
-                    WeatherScreen(activateWeatherSync = { setupWeatherSync(this) })
+                    WeatherScreen(activateForecastSync = { setupWeatherSync(this) })
                 }
             }
         }
@@ -41,7 +41,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 internal fun WeatherScreen(
     viewModel: MainActivityViewModel = koinViewModel(),
-    activateWeatherSync: () -> Unit,
+    activateForecastSync: () -> Unit,
 ) {
 
     val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
@@ -50,7 +50,7 @@ internal fun WeatherScreen(
         if (loading) {
             SplashScreen(uiState.isLoading)
         } else {
-            if (uiState.isForecastAutoSync) activateWeatherSync()
+            if (uiState.isForecastAutoSync) activateForecastSync()
 
             WeatherHost(
                 startDestination = uiState.startDestination,

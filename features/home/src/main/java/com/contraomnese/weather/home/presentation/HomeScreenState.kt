@@ -3,7 +3,7 @@ package com.contraomnese.weather.home.presentation
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.input.TextFieldValue
-import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
+import com.contraomnese.weather.domain.weatherByLocation.model.FavoriteForecast
 import com.contraomnese.weather.domain.weatherByLocation.model.Location
 import com.contraomnese.weather.presentation.architecture.MviState
 import kotlinx.collections.immutable.ImmutableList
@@ -31,7 +31,7 @@ internal data class HomeScreenState(
     val gps: Gps = Gps(),
     val matchingLocations: ImmutableList<Location> = persistentListOf(),
     val favorites: ImmutableList<Location> = persistentListOf(),
-    val favoritesForecast: ImmutableMap<Int, Forecast> = persistentMapOf(),
+    val favoritesForecast: ImmutableMap<Int, FavoriteForecast> = persistentMapOf(),
     val currentTime: Instant = Clock.System.now(),
 ) : MviState {
 
@@ -62,7 +62,7 @@ internal data class HomeScreenState(
 
     fun setFavoritesForecast(
         newFavorites: List<Location>,
-        newFavoritesForecast: Map<Int, Forecast>,
+        newFavoritesForecast: Map<Int, FavoriteForecast>,
     ): HomeScreenState =
         if (newFavorites.isNotEmpty()) copy(
             isLoading = false,
