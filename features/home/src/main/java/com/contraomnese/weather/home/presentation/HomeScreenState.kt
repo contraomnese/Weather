@@ -1,7 +1,6 @@
 package com.contraomnese.weather.home.presentation
 
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.input.TextFieldValue
 import com.contraomnese.weather.domain.weatherByLocation.model.FavoriteForecast
 import com.contraomnese.weather.domain.weatherByLocation.model.Location
@@ -15,6 +14,9 @@ import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 
+
+typealias Favorites = ImmutableMap<Location, FavoriteForecast>
+
 @Immutable
 internal data class Gps(
     val location: Location? = null,
@@ -26,20 +28,17 @@ internal data class Gps(
 internal data class HomeScreenState(
     override val isLoading: Boolean = false,
     val isSearching: Boolean = false,
-    @Stable
     val inputLocation: TextFieldValue = TextFieldValue(),
     val gps: Gps = Gps(),
     val matchingLocations: ImmutableList<Location> = persistentListOf(),
-    val favorites: ImmutableList<Location> = persistentListOf(),
-    val favoritesForecast: ImmutableMap<Int, FavoriteForecast> = persistentMapOf(),
+    val favorites: Favorites = persistentMapOf(),
     val currentTime: Instant = Clock.System.now(),
 ) : MviState {
 
     private fun cleanFavorites(): HomeScreenState = copy(
         isLoading = false,
         isSearching = false,
-        favorites = persistentListOf(),
-        favoritesForecast = persistentMapOf()
+        favorites = persistentMapOf()
     )
 
     fun setInputLocation(newValue: TextFieldValue): HomeScreenState {
@@ -50,34 +49,32 @@ internal data class HomeScreenState(
         )
     }
 
-    fun setGpsLocation(location: Location): HomeScreenState = copy(
-        gps = gps.copy(
-            location = location,
-            isGpsMode = false
-        )
-    )
+    fun setGpsLocation(location: Location): HomeScreenState =
+        copy(gps = gps.copy(location = location, isGpsMode = false))
 
     fun setMatchingLocations(locations: List<Location>): HomeScreenState =
         copy(matchingLocations = locations.toPersistentList(), isSearching = false)
 
-    fun setFavoritesForecast(
-        newFavorites: List<Location>,
-        newFavoritesForecast: Map<Int, FavoriteForecast>,
+    fun setFavorites(
+        newFavorites: Map<Location, FavoriteForecast>,
     ): HomeScreenState =
-        if (newFavorites.isNotEmpty()) copy(
-            isLoading = false,
-            isSearching = false,
-            favorites = newFavorites.toPersistentList(),
-            favoritesForecast = newFavoritesForecast.toPersistentMap(),
-        )
-        else cleanFavorites()
+        if (newFavorites.isEmpty())
+            cleanFavorites()
+        else
+            copy(
+                isLoading = false,
+                isSearching = false,
+                favorites = newFavorites.toPersistentMap(),
+            )
 
     fun setAccessFineLocationPermissionGranted(isGranted: Boolean): HomeScreenState =
         copy(gps = gps.copy(isPermissionGranted = isGranted))
 
-    fun setGpsModeEnabled(isEnabled: Boolean): HomeScreenState = copy(gps = gps.copy(isGpsMode = isEnabled))
+    fun setGpsModeEnabled(isEnabled: Boolean): HomeScreenState =
+        copy(gps = gps.copy(isGpsMode = isEnabled))
 
-    fun setTime(time: Instant): HomeScreenState = copy(currentTime = time)
+    fun setTime(time: Instant): HomeScreenState =
+        copy(currentTime = time)
 
     companion object {
         val DEFAULT = HomeScreenState(isLoading = true)

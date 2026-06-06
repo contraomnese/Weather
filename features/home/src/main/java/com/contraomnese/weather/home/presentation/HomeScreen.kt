@@ -93,15 +93,15 @@ import com.contraomnese.weather.design.theme.itemWidth64
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding4
 import com.contraomnese.weather.design.theme.space8
-import com.contraomnese.weather.domain.weatherByLocation.model.FavoriteForecast
 import com.contraomnese.weather.domain.weatherByLocation.model.Location
 import com.contraomnese.weather.presentation.architecture.collectEvent
 import com.contraomnese.weather.presentation.utils.handleError
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.ImmutableMap
-import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -249,15 +249,14 @@ internal fun MainScreen(
         if (uiState.inputLocation.text.isNotEmpty()) {
             MatchingLocations(
                 uiState.matchingLocations,
-                uiState.favorites,
+                uiState.favorites.keys,
                 pushAction,
                 onNavigateToWeatherByLocation,
                 uiState.isSearching
             )
-        } else FavoritesLocations(
+        } else Favorites(
             uiState.currentTime,
             uiState.favorites,
-            uiState.favoritesForecast,
             pushAction,
             onNavigateToWeatherByLocation
         )
@@ -304,20 +303,18 @@ internal fun WelcomeScreen(
 
         if (uiState.inputLocation.text.isNotEmpty() && searchBarOnTop) {
             MatchingLocations(
-                locations = uiState.matchingLocations,
-                favorites = uiState.favorites,
+                matchingLocations = uiState.matchingLocations,
+                favoriteLocations = uiState.favorites.keys,
                 pushAction,
                 onNavigateToWeatherByLocation,
                 uiState.isSearching
             )
-        } else FavoritesLocations(
+        } else Favorites(
             uiState.currentTime,
             uiState.favorites,
-            uiState.favoritesForecast,
             pushAction,
             onNavigateToWeatherByLocation
         )
-
 
         // uiState.gps.isGpsMode is ON when click GPS button in SearchBar
         if (gpsModeEnabled) {
@@ -429,27 +426,22 @@ private fun TextSearchBar(
 
 @Composable
 private fun MatchingLocations(
-    locations: ImmutableList<Location>,
-    favorites: ImmutableList<Location>,
+    matchingLocations: ImmutableList<Location>,
+    favoriteLocations: ImmutableSet<Location>,
     pushAction: (HomeScreenAction) -> Unit = {},
     onNavigateToWeatherByLocation: (Int) -> Unit = {},
     isSearching: Boolean,
 ) {
-    if (!isSearching && locations.isEmpty()) {
+    if (!isSearching && matchingLocations.isEmpty()) {
         val snackBarHostState = LocalSnackbarHostState.current
         val emptyMatchingLocationsMessage = stringResource(R.string.empty_matching_locations)
-        LaunchedEffect(locations) {
+        LaunchedEffect(matchingLocations) {
             snackBarHostState.showSnackbar(
                 message = emptyMatchingLocationsMessage,
                 duration = SnackbarDuration.Short
             )
         }
     } else {
-        val locationsInFavorites = remember(locations, favorites) {
-            val favoriteIds = favorites.map { it.id }.toSet()
-            locations.associateWith { it.id in favoriteIds }
-        }
-
         LazyColumn(
             modifier = Modifier
                 .testTag("matching_locations")
@@ -458,20 +450,21 @@ private fun MatchingLocations(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(
-                items = locations,
+                items = matchingLocations,
                 key = { it.id }
             ) { location ->
+                val inFavorites = favoriteLocations.any { it.id == location.id }
                 MatchLocation(
                     onClick = { onNavigateToWeatherByLocation.invoke(location.id) },
                     onFavoriteClick = {
-                        if (locationsInFavorites.getOrDefault(location, false)) {
+                        if (inFavorites) {
                             pushAction(HomeScreenAction.RemoveFavorite(location.id))
                         } else {
                             pushAction(HomeScreenAction.AddFavorite(location.id))
                         }
                     },
                     favoriteIcon =
-                        if (locationsInFavorites.getOrDefault(location, false)) WeatherIcons.RemoveFavorite
+                        if (inFavorites) WeatherIcons.RemoveFavorite
                         else WeatherIcons.AddFavorite,
                     name = location.name,
                     countryCode = location.countryCode,
@@ -585,10 +578,9 @@ fun MatchLocation(
 }
 
 @Composable
-private fun FavoritesLocations(
+private fun Favorites(
     currentTime: Instant,
-    favorites: ImmutableList<Location>,
-    favoritesForecast: ImmutableMap<Int, FavoriteForecast>,
+    favorites: Favorites,
     pushAction: (HomeScreenAction) -> Unit = {},
     onNavigateToWeatherByLocation: (Int) -> Unit,
 ) {
@@ -606,29 +598,27 @@ private fun FavoritesLocations(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(space8),
     ) {
-        items(favorites, key = { location -> location.id }) { location ->
-            favoritesForecast[location.id]?.let {
-                FavoriteItem(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(itemHeight160),
-                    locationName = location.name,
-                    locationCountry = it.locationName,
-                    timeZone = it.timeZone,
-                    temperature = it.temperature,
-                    maxTemperature = it.maxTemperature,
-                    minTemperature = it.minTemperature,
-                    conditionText = stringResource(it.conditionText.getConditionResId()),
-                    background = it.conditionText.getResources().backgroundResId,
-                    onTapClicked = {
-                        onNavigateToWeatherByLocation(
-                            location.id
-                        )
-                    },
-                    currentTime = currentTime,
-                    onDeleteClicked = { pushAction(HomeScreenAction.RemoveFavorite(location.id)) }
-                )
-            }
+        items(favorites.entries.toImmutableList(), key = { entry -> entry.key.id }) { (location, forecast) ->
+            FavoriteItem(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(itemHeight160),
+                locationName = location.name,
+                locationCountry = forecast.locationName,
+                timeZone = forecast.timeZone,
+                temperature = forecast.temperature,
+                maxTemperature = forecast.maxTemperature,
+                minTemperature = forecast.minTemperature,
+                conditionText = stringResource(forecast.conditionText.getConditionResId()),
+                background = forecast.conditionText.getResources().backgroundResId,
+                onTapClicked = {
+                    onNavigateToWeatherByLocation(
+                        location.id
+                    )
+                },
+                currentTime = currentTime,
+                onDeleteClicked = { pushAction(HomeScreenAction.RemoveFavorite(location.id)) }
+            )
         }
         item {
             Spacer(
@@ -706,7 +696,7 @@ private fun HomeScreenPreview() {
 
     val uiState = HomeScreenState(
         isSearching = false,
-        favorites = listOf(Location.EMPTY).toPersistentList()
+        favorites = persistentMapOf()
     )
 
     WeatherTheme {

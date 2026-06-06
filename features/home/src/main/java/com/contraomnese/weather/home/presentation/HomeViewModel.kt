@@ -7,9 +7,10 @@ import com.contraomnese.weather.domain.home.usecase.GetLocationUseCase
 import com.contraomnese.weather.domain.home.usecase.GetLocationsUseCase
 import com.contraomnese.weather.domain.home.usecase.ObserveFavoritesUseCase
 import com.contraomnese.weather.domain.home.usecase.RemoveFavoriteUseCase
+import com.contraomnese.weather.domain.weatherByLocation.model.FavoriteForecast
 import com.contraomnese.weather.domain.weatherByLocation.model.Location
 import com.contraomnese.weather.domain.weatherByLocation.model.LocationCoordinates
-import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveFavoritesForecastsUseCase
+import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveFavoriteForecastsUseCase
 import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateForecastUseCase
 import com.contraomnese.weather.presentation.architecture.MviModel
 import kotlinx.coroutines.delay
@@ -26,7 +27,7 @@ internal class HomeViewModel(
     private val observeFavoritesUseCase: ObserveFavoritesUseCase,
     private val addFavoriteUseCase: AddFavoriteUseCase,
     private val removeFavoriteUseCase: RemoveFavoriteUseCase,
-    private val observeFavoritesForecastsUseCase: ObserveFavoritesForecastsUseCase,
+    private val observeFavoriteForecastsUseCase: ObserveFavoriteForecastsUseCase,
     private val updateForecastUseCase: UpdateForecastUseCase,
 ) : MviModel<HomeScreenAction, HomeScreenEffect, HomeScreenEvent, HomeScreenState>(
     defaultState = HomeScreenState.DEFAULT,
@@ -34,7 +35,7 @@ internal class HomeViewModel(
 ) {
 
     companion object {
-        private const val LOCATION_UPDATE_DELAY = 2000L
+        private const val RUN_SEARCHING_DELAY = 2000L
     }
 
     init {
@@ -61,59 +62,63 @@ internal class HomeViewModel(
     }
 
     override fun reducer(effect: HomeScreenEffect, previousState: HomeScreenState): HomeScreenState = when (effect) {
-        is HomeScreenEffect.InputLocationUpdated -> previousState.setInputLocation(effect.input)
-        is HomeScreenEffect.GpsLocationUpdated -> previousState.setGpsLocation(effect.location)
-        is HomeScreenEffect.MatchingLocationsUpdated -> previousState.setMatchingLocations(effect.locations)
-        is HomeScreenEffect.FavoritesForecastUpdated -> previousState.setFavoritesForecast(
-            effect.favorites,
-            effect.favoritesForecast
-        )
+        is HomeScreenEffect.InputLocationUpdated,
+            -> previousState.setInputLocation(effect.input)
 
-        is HomeScreenEffect.AccessFineLocationPermissionGranted -> previousState.setAccessFineLocationPermissionGranted(
-            effect.isGranted
-        )
+        is HomeScreenEffect.GpsLocationUpdated,
+            -> previousState.setGpsLocation(effect.location)
 
-        is HomeScreenEffect.GpsModeEnabled -> previousState.setGpsModeEnabled(effect.isEnabled)
-        is HomeScreenEffect.CurrentTimeUpdated -> previousState.setTime(effect.time)
+        is HomeScreenEffect.MatchingLocationsUpdated,
+            -> previousState.setMatchingLocations(effect.locations)
+
+        is HomeScreenEffect.FavoritesUpdated,
+            -> previousState.setFavorites(effect.forecasts)
+
+        is HomeScreenEffect.AccessFineLocationPermissionGranted,
+            -> previousState.setAccessFineLocationPermissionGranted(effect.isGranted)
+
+        is HomeScreenEffect.GpsModeEnabled,
+            -> previousState.setGpsModeEnabled(effect.isEnabled)
+
+        is HomeScreenEffect.CurrentTimeUpdated,
+            -> previousState.setTime(effect.time)
     }
 
     override suspend fun actor(action: HomeScreenAction) = when (action) {
-        is HomeScreenAction.InputLocation -> processLocationInput(action.input)
-        is HomeScreenAction.UpdateGpsLocation -> processGpsLocationChange(
-            LocationCoordinates.from(
-                action.lat,
-                action.lon
-            )
-        )
 
-        is HomeScreenAction.AddFavorite -> processFavoriteAdd(action.locationId)
-        is HomeScreenAction.RemoveFavorite -> processFavoriteRemove(action.locationId)
-        is HomeScreenAction.AccessFineLocationPermissionGranted -> processAccessFineLocationPermissionGranted(action.granted)
-        is HomeScreenAction.DeviceGpsModeEnabled -> processGpsModeEnabled(action.enabled)
-        is HomeScreenAction.UpdateFavorites -> processFavoritesUpdate(action.favorites)
+        is HomeScreenAction.InputLocation,
+            -> processLocationInput(action.input)
+
+        is HomeScreenAction.UpdateGpsLocation,
+            -> processGpsLocationChange(LocationCoordinates.from(action.lat, action.lon))
+
+        is HomeScreenAction.AccessFineLocationPermissionGranted,
+            -> processAccessFineLocationPermissionGranted(action.granted)
+
+        is HomeScreenAction.DeviceGpsModeEnabled,
+            -> processGpsModeEnabled(action.enabled)
+
+        is HomeScreenAction.AddFavorite,
+            -> processFavoriteAdd(action.locationId)
+
+        is HomeScreenAction.RemoveFavorite,
+            -> processFavoriteRemove(action.locationId)
+
+        is HomeScreenAction.UpdateFavorites,
+            -> processFavoritesUpdate(action.favorites)
     }
 
     private suspend fun processLocationInput(input: TextFieldValue) {
 
         push(HomeScreenEffect.InputLocationUpdated(input))
         if (input.text.isNotEmpty()) {
-            delay(LOCATION_UPDATE_DELAY)
+            delay(RUN_SEARCHING_DELAY)
             getLocationsUseCase(input.text)
                 .onFailure { push(HomeScreenEvent.HandleError(it)) }
                 .onSuccess {
                     push(HomeScreenEffect.MatchingLocationsUpdated(it))
                 }
         }
-    }
-
-    private suspend fun processGpsLocationChange(coordinates: LocationCoordinates) {
-        getLocationUseCase(coordinates)
-            .onFailure { push(HomeScreenEvent.HandleError(it)) }
-            .onSuccess {
-                push(HomeScreenEffect.GpsLocationUpdated(it))
-                push(HomeScreenEvent.NavigateToGpsLocation(it.id))
-            }
-
     }
 
     private suspend fun processFavoriteAdd(locationId: Int) {
@@ -131,6 +136,28 @@ internal class HomeViewModel(
             }
     }
 
+    private suspend fun processFavoritesUpdate(newFavoriteLocations: List<Location>) {
+
+        val newFavoriteLocationIds = newFavoriteLocations.map { it.id }
+        observeFavoriteForecastsUseCase(newFavoriteLocationIds)
+            .collectLatest { newFavoriteForecasts ->
+
+                val forecastsById: Map<Int, FavoriteForecast> = newFavoriteForecasts.associateBy { it.locationId }
+                val forecasts: Map<Location, FavoriteForecast> = newFavoriteLocations
+                    .mapNotNull { location ->
+                        val forecast = forecastsById[location.id]
+                        if (forecast != null) {
+                            location to forecast
+                        } else {
+                            null
+                        }
+                    }
+                    .toMap()
+
+                push(HomeScreenEffect.FavoritesUpdated(forecasts = forecasts))
+            }
+    }
+
     private suspend fun processAccessFineLocationPermissionGranted(isGranted: Boolean) {
         delay(1000)
         push(HomeScreenEffect.AccessFineLocationPermissionGranted(isGranted))
@@ -141,14 +168,13 @@ internal class HomeViewModel(
         if (isEnabled) push(HomeScreenEvent.GetGpsLocation)
     }
 
-    private suspend fun processFavoritesUpdate(favorites: List<Location>) {
-        observeFavoritesForecastsUseCase(favorites.map { it.id })
-            .collectLatest { forecasts ->
-                push(
-                    HomeScreenEffect.FavoritesForecastUpdated(
-                        favorites = favorites,
-                        favoritesForecast = forecasts.associateBy { it.locationId })
-                )
+    private suspend fun processGpsLocationChange(coordinates: LocationCoordinates) {
+        getLocationUseCase(coordinates)
+            .onFailure { push(HomeScreenEvent.HandleError(it)) }
+            .onSuccess {
+                push(HomeScreenEffect.GpsLocationUpdated(it))
+                push(HomeScreenEvent.NavigateToGpsLocation(it.id))
             }
     }
+
 }

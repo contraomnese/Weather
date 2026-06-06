@@ -18,8 +18,8 @@ import com.contraomnese.weather.domain.home.usecase.ObserveFavoritesUseCase
 import com.contraomnese.weather.domain.home.usecase.ObserveFavoritesUseCaseImpl
 import com.contraomnese.weather.domain.home.usecase.RemoveFavoriteUseCase
 import com.contraomnese.weather.domain.home.usecase.RemoveFavoriteUseCaseImpl
-import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveFavoritesForecastsUseCase
-import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveFavoritesForecastsUseCaseImpl
+import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveFavoriteForecastsUseCase
+import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveFavoriteForecastsUseCaseImpl
 import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveSingleForecastUseCase
 import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveSingleForecastUseCaseImpl
 import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateFavoritesForecastsUseCase
@@ -70,8 +70,8 @@ val domainModule = module {
             repository = get()
         )
     }
-    factory<ObserveFavoritesForecastsUseCase> {
-        ObserveFavoritesForecastsUseCaseImpl(
+    factory<ObserveFavoriteForecastsUseCase> {
+        ObserveFavoriteForecastsUseCaseImpl(
             repository = get()
         )
     }
