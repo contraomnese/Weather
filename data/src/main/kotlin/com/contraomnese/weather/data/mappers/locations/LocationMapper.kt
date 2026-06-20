@@ -13,15 +13,16 @@ import com.contraomnese.weather.data.network.models.openmeteo.geolocation.Locati
 
 private const val UNKNOWN = "Unknown"
 
-fun IQLocationNetwork.toEntity() = MatchingLocationEntity(
+fun IQLocationNetwork.toEntity(timeZone: String) = MatchingLocationEntity(
     networkId = placeId.toInt(),
     latitude = lat.toDouble(),
     longitude = lon.toDouble(),
-    name = displayName,
+    name = address.city ?: displayName,
     city = address.city,
     state = address.state,
     country = address.country,
     countryCode = address.countryCode,
+    timeZoneId = timeZone
 )
 
 fun OMLocationNetwork.toEntity() = MatchingLocationEntity(
@@ -44,7 +45,7 @@ fun MatchingLocationEntity.toForecastLocationEntity(networkId: Int) = ForecastLo
     city = city ?: UNKNOWN,
     region = state ?: UNKNOWN,
     country = country ?: UNKNOWN,
-    timeZoneId = timeZoneId ?: "GMT",
+    timeZoneId = timeZoneId,
     lastUpdated = System.currentTimeMillis()
 )
 
@@ -64,7 +65,7 @@ fun MatchingLocationEntity.toDomain() =
 fun List<IQLocationNetwork>.toEntities() = try {
     filter { it.type == "city" || it.type == "town" }
         .ifEmpty { this }
-        .map { it.toEntity() }
+        .map { it.toEntity("GMT") } // TODO need to get timezone from network for current location
 } catch (cause: Exception) {
     throw operationFailed(logPrefix("Impossible convert matching locations from network"), cause)
 }

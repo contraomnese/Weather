@@ -1,6 +1,7 @@
 package com.contraomnese.weather.data.network.api
 
 import com.contraomnese.weather.data.network.models.locationiq.LocationNetwork
+import com.contraomnese.weather.data.network.models.locationiq.TimeZoneResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -21,5 +22,12 @@ interface LocationsIQApi {
         @Query("lon") longitude: Double,
         @Query("format") format: String = "json",
     ): Response<LocationNetwork>
+
+    @GET("timezone")
+    suspend fun getTimeZone(
+        @Query("lat") latitude: Double,
+        @Query("lon") longitude: Double,
+        @Query("format") format: String = "json",
+    ): Response<TimeZoneResponse>
 
 }

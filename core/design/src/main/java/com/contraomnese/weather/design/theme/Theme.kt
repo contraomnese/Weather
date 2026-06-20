@@ -17,14 +17,14 @@ import com.contraomnese.weather.design.LocalAirQualityColors
 
 private val weatherScheme = lightColorScheme(
     primary = Color(0xFFFFFFFF),
-    onPrimary = Color(0xFF000000),
+    onPrimary = Color(0xFF0F1E36),
     background = Color(0xFF2C72A1),
     onBackground = Color(0xFFFFFFFF),
     surface = Color(0xFF2D3340),
     onSurface = Color(0xFFFFFFFF),
     surfaceVariant = Color(0xFFFFFFFF),
-    secondary = Color(0xFF3B8EB8),
-    onSecondary = Color(0xFF000000),
+    secondary = Color(0xFF4A90E2),
+    onSecondary = Color(0xFFFFFFFF),
     error = Color(0xFFFF453A),
     onError = Color(0xFFFFFFFF)
 )

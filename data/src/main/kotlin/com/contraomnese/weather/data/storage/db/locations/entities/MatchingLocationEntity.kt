@@ -17,7 +17,7 @@ data class MatchingLocationEntity(
     @ColumnInfo(name = STATE) val state: String? = null,
     @ColumnInfo(name = COUNTRY) val country: String? = null,
     @ColumnInfo(name = COUNTRY_CODE) val countryCode: String? = null,
-    @ColumnInfo(name = TIMEZONE_ID) val timeZoneId: String? = null,
+    @ColumnInfo(name = TIMEZONE_ID) val timeZoneId: String,
 ) {
     companion object {
         const val TABLE_NAME = "matching_locations"

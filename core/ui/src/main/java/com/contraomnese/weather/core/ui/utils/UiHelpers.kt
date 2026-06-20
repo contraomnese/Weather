@@ -23,6 +23,10 @@ import com.contraomnese.weather.design.theme.WeatherConditionsRain
 import com.contraomnese.weather.design.theme.WeatherConditionsRainShowers
 import com.contraomnese.weather.design.theme.WeatherConditionsSnowFall
 import com.contraomnese.weather.design.theme.WeatherConditionsThunderStorm
+import com.contraomnese.weather.domain.app.model.PrecipitationUnit
+import com.contraomnese.weather.domain.app.model.PressureUnit
+import com.contraomnese.weather.domain.app.model.TemperatureUnit
+import com.contraomnese.weather.domain.app.model.WindSpeedUnit
 import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -40,6 +44,31 @@ fun extractBottomColor(bitmap: Bitmap): Color {
     val avgBlue = pixels.map { it and 0xFF }.average().toInt()
 
     return Color(avgRed, avgGreen, avgBlue)
+}
+
+inline fun <reified T : Enum<T>> T.toTextRes(): Int = when (this) {
+    is TemperatureUnit -> when (this) {
+        TemperatureUnit.Celsius -> R.string.temperature_celsius
+        TemperatureUnit.Fahrenheit -> R.string.temperature_fahrenheit
+    }
+
+    is WindSpeedUnit -> when (this) {
+        WindSpeedUnit.Kph -> R.string.speed_kph
+        WindSpeedUnit.Mph -> R.string.speed_mph
+        WindSpeedUnit.Ms -> R.string.speed_ms
+    }
+
+    is PrecipitationUnit -> when (this) {
+        PrecipitationUnit.Millimeters -> R.string.precipitation_mm
+        PrecipitationUnit.Inches -> R.string.precipitation_in
+    }
+
+    is PressureUnit -> when (this) {
+        PressureUnit.MmHg -> R.string.pressure_mmhg
+        PressureUnit.GPa -> R.string.pressure_gpa
+    }
+
+    else -> error("Unsupported enum type: ${T::class.simpleName}")
 }
 
 fun animateDrag(

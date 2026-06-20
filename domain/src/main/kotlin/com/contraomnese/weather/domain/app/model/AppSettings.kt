@@ -7,7 +7,8 @@ data class AppSettings(
     val precipitationUnit: PrecipitationUnit = PrecipitationUnit.Millimeters,
     val temperatureUnit: TemperatureUnit = TemperatureUnit.Celsius,
     val pressureUnit: PressureUnit = PressureUnit.MmHg,
-    val forecastAutoSync: Boolean = false,
+    val forecastAutoSyncEnabled: Boolean = false,
+    val pushNotificationsEnabled: Boolean = false,
 )
 
 @JvmInline

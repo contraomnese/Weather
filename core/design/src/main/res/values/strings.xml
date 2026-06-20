@@ -9,7 +9,8 @@
     <string name="local_time_title">Local time</string>
     <string name="use_search_title">Use the search</string>
     <string name="use_gps_title">or GPS determination</string>
-    <string name="get_forecast_auto">Get weather automatically</string>
+    <string name="forecast_auto_sync_enable">Get weather automatically</string>
+    <string name="push_notifications_enable">Get push notifications</string>
 
     <!-- Notifications -->
     <string name="notification_channel_title">Weather forecast updates</string>
@@ -28,6 +29,8 @@
     <string name="humidity_title">HUMIDITY</string>
     <string name="rainfall_title">RAINFALL</string>
     <string name="pressure_title">PRESSURE</string>
+    <string name="settings_units_title">Units of Measurement</string>
+    <string name="settings_preferences_title">Preferences</string>
 
     <!--  Aqi section -->
     <string name="aqi_good">%1$d - Good</string>

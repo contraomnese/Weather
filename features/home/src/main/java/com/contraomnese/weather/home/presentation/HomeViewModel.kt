@@ -2,6 +2,8 @@ package com.contraomnese.weather.home.presentation
 
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.viewModelScope
+import com.contraomnese.weather.domain.app.usecase.DisablePushNotificationUseCase
+import com.contraomnese.weather.domain.app.usecase.ObserveAppSettingsUseCase
 import com.contraomnese.weather.domain.home.usecase.AddFavoriteUseCase
 import com.contraomnese.weather.domain.home.usecase.GetLocationUseCase
 import com.contraomnese.weather.domain.home.usecase.GetLocationsUseCase
@@ -29,6 +31,8 @@ internal class HomeViewModel(
     private val removeFavoriteUseCase: RemoveFavoriteUseCase,
     private val observeFavoriteForecastsUseCase: ObserveFavoriteForecastsUseCase,
     private val updateForecastUseCase: UpdateForecastUseCase,
+    private val observeAppSettingsUseCase: ObserveAppSettingsUseCase,
+    private val disablePushNotificationUseCase: DisablePushNotificationUseCase,
 ) : MviModel<HomeScreenAction, HomeScreenEffect, HomeScreenEvent, HomeScreenState>(
     defaultState = HomeScreenState.DEFAULT,
     tag = "HomeViewModel",
@@ -55,10 +59,19 @@ internal class HomeViewModel(
     }
 
     override suspend fun bootstrap() {
-        observeFavoritesUseCase()
-            .collectLatest { favorites ->
-                push(HomeScreenAction.UpdateFavorites(favorites))
-            }
+        viewModelScope.launch {
+            observeAppSettingsUseCase()
+                .collectLatest { settings ->
+                    push(HomeScreenEffect.PushNotificationsEnabled(settings.pushNotificationsEnabled))
+                }
+        }
+
+        viewModelScope.launch {
+            observeFavoritesUseCase()
+                .collectLatest { favorites ->
+                    push(HomeScreenAction.UpdateFavorites(favorites))
+                }
+        }
     }
 
     override fun reducer(effect: HomeScreenEffect, previousState: HomeScreenState): HomeScreenState = when (effect) {
@@ -77,11 +90,11 @@ internal class HomeViewModel(
         is HomeScreenEffect.AccessFineLocationPermissionGranted,
             -> previousState.setAccessFineLocationPermissionGranted(effect.isGranted)
 
-        is HomeScreenEffect.GpsModeEnabled,
-            -> previousState.setGpsModeEnabled(effect.isEnabled)
-
         is HomeScreenEffect.CurrentTimeUpdated,
             -> previousState.setTime(effect.time)
+
+        is HomeScreenEffect.PushNotificationsEnabled,
+            -> previousState.setPushNotificationsEnabled(effect.isEnabled)
     }
 
     override suspend fun actor(action: HomeScreenAction) = when (action) {
@@ -106,6 +119,8 @@ internal class HomeViewModel(
 
         is HomeScreenAction.UpdateFavorites,
             -> processFavoritesUpdate(action.favorites)
+
+        HomeScreenAction.DisablePushNotification -> processDisablePushNotification()
     }
 
     private suspend fun processLocationInput(input: TextFieldValue) {
@@ -158,13 +173,18 @@ internal class HomeViewModel(
             }
     }
 
+    private suspend fun processDisablePushNotification() {
+        disablePushNotificationUseCase()
+            .onSuccess { push(HomeScreenEffect.PushNotificationsEnabled(false)) }
+            .onFailure { push(HomeScreenEvent.HandleError(it)) }
+    }
+
     private suspend fun processAccessFineLocationPermissionGranted(isGranted: Boolean) {
         delay(1000)
         push(HomeScreenEffect.AccessFineLocationPermissionGranted(isGranted))
     }
 
     private fun processGpsModeEnabled(isEnabled: Boolean) {
-        push(HomeScreenEffect.GpsModeEnabled(isEnabled))
         if (isEnabled) push(HomeScreenEvent.GetGpsLocation)
     }
 

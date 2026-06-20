@@ -18,8 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -84,7 +82,10 @@ fun GpsModeAlertDialog(
             activity = activity,
             gpsUnavailable = gpsUnavailable,
             gpsDialogError = gpsDialogError,
-            gpsEnabled = { enabled -> gpsEnabled = enabled },
+            gpsEnabled = { enabled ->
+                gpsEnabled = enabled
+                onGpsModeEnabled(gpsEnabled)
+            },
             activateGps = { intentSenderRequest ->
                 intentSenderRequestToActivateGps = intentSenderRequest
             },
@@ -129,6 +130,7 @@ private fun GpsActivateDialog(
                 .padding(horizontal = padding16)
                 .wrapContentHeight(),
             shape = MaterialTheme.shapes.large,
+            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
             tonalElevation = AlertDialogDefaults.TonalElevation
         ) {
             Column(
@@ -139,7 +141,8 @@ private fun GpsActivateDialog(
 
                 Text(
                     text = stringResource(R.string.gps_alert_title),
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
 
                 Row(
@@ -147,16 +150,11 @@ private fun GpsActivateDialog(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Button(
-                        onClick = onClicked,
-                        colors = ButtonDefaults.buttonColors().copy(
-                            containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                        )
+                    SelectButton(
+                        textId = R.string.gps_activate_title,
+                        isConfirm = true
                     ) {
-                        Text(
-                            text = stringResource(R.string.gps_activate_title),
-                            style = MaterialTheme.typography.titleMedium
-                        )
+                        onClicked()
                     }
 
                     Text(
@@ -165,10 +163,11 @@ private fun GpsActivateDialog(
                             errorMessage != null -> errorMessage
                             else -> stringResource(R.string.gps_disabled_title)
                         },
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.labelSmall,
                         maxLines = 2,
                         textAlign = TextAlign.Center,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
 

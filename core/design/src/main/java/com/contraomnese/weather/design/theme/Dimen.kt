@@ -79,6 +79,7 @@ val cornerRadius16 = 16.dp
 val cornerRadius32 = 32.dp
 val cornerRadius40 = 40.dp
 
+val space4 = 4.dp
 val space8 = 8.dp
 val space16 = 16.dp
 val space24 = 24.dp

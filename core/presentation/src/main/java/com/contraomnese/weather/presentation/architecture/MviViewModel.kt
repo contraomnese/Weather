@@ -16,12 +16,13 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -73,7 +74,10 @@ internal class MviViewModel<Action : MviAction, Effect : MviEffect, Event : MviE
                     effectChannel
                         .receiveAsFlow()
                         .onEach(logger::log)
-                        .map { reducer(it, stateFlow.value) }
+                        .scan(defaultState) { currentState, effect ->
+                            reducer(effect, currentState)
+                        }
+                        .drop(1)
                         .onEach(bufferStateFlow::emit)
                         .onEach(logger::log)
                         .retryIfError()

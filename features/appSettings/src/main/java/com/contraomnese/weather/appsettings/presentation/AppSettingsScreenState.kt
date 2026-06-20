@@ -11,24 +11,42 @@ import com.contraomnese.weather.presentation.architecture.MviState
 @Immutable
 internal data class AppSettingsScreenState(
     override val isLoading: Boolean = false,
-    val appSettings: AppSettings? = null,
+    val temperatureUnit: TemperatureUnit = TemperatureUnit.Celsius,
+    val pressureUnit: PressureUnit = PressureUnit.MmHg,
+    val precipitationUnit: PrecipitationUnit = PrecipitationUnit.Millimeters,
+    val windSpeedUnit: WindSpeedUnit = WindSpeedUnit.Kph,
+    val forecastAutoSyncEnabled: Boolean = false,
+    val pushNotificationsEnabled: Boolean = false,
 ) : MviState {
-    fun setAppSettings(appSettings: AppSettings): AppSettingsScreenState = copy(appSettings = appSettings, isLoading = false)
+
+    fun update(appSettings: AppSettings): AppSettingsScreenState =
+        copy(
+            isLoading = false,
+            temperatureUnit = appSettings.temperatureUnit,
+            pressureUnit = appSettings.pressureUnit,
+            precipitationUnit = appSettings.precipitationUnit,
+            windSpeedUnit = appSettings.windSpeedUnit,
+            forecastAutoSyncEnabled = appSettings.forecastAutoSyncEnabled,
+            pushNotificationsEnabled = appSettings.pushNotificationsEnabled
+        )
 
     fun setTemperatureUnit(temperatureUnit: TemperatureUnit): AppSettingsScreenState =
-        copy(appSettings = appSettings!!.copy(temperatureUnit = temperatureUnit))
+        copy(temperatureUnit = temperatureUnit)
 
     fun setPressureUnit(pressureUnit: PressureUnit): AppSettingsScreenState =
-        copy(appSettings = appSettings!!.copy(pressureUnit = pressureUnit))
+        copy(pressureUnit = pressureUnit)
 
     fun setPrecipitationUnit(precipitationUnit: PrecipitationUnit): AppSettingsScreenState =
-        copy(appSettings = appSettings!!.copy(precipitationUnit = precipitationUnit))
+        copy(precipitationUnit = precipitationUnit)
 
     fun setWindSpeedUnit(windSpeedUnit: WindSpeedUnit): AppSettingsScreenState =
-        copy(appSettings = appSettings!!.copy(windSpeedUnit = windSpeedUnit))
+        copy(windSpeedUnit = windSpeedUnit)
 
     fun setForecastAutoSync(enabled: Boolean): AppSettingsScreenState =
-        copy(appSettings = appSettings!!.copy(forecastAutoSync = enabled))
+        copy(forecastAutoSyncEnabled = enabled)
+
+    fun setPushNotifications(enabled: Boolean): AppSettingsScreenState =
+        copy(pushNotificationsEnabled = enabled)
 
     companion object {
         val DEFAULT = AppSettingsScreenState(isLoading = true)

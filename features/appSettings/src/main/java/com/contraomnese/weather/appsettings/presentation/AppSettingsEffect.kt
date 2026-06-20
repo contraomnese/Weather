@@ -8,10 +8,11 @@ import com.contraomnese.weather.domain.app.model.WindSpeedUnit
 import com.contraomnese.weather.presentation.architecture.MviEffect
 
 internal sealed interface AppSettingsEffect : MviEffect {
+    data class SettingsUpdate(val appSettings: AppSettings) : AppSettingsEffect
     data class TemperatureUnitChanged(val temperatureUnit: TemperatureUnit) : AppSettingsEffect
     data class PressureUnitChanged(val pressureUnit: PressureUnit) : AppSettingsEffect
     data class PrecipitationUnitChanged(val precipitationUnit: PrecipitationUnit) : AppSettingsEffect
     data class WindSpeedUnitChanged(val windSpeedUnit: WindSpeedUnit) : AppSettingsEffect
     data class ForecastAutoSyncChanged(val enabled: Boolean) : AppSettingsEffect
-    data class SettingsUpdated(val appSettings: AppSettings) : AppSettingsEffect
+    data class PushNotificationsChanged(val enabled: Boolean) : AppSettingsEffect
 }

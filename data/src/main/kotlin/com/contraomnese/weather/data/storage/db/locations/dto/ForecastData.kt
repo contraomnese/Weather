@@ -15,7 +15,7 @@ data class ForecastData(
         parentColumn = ForecastLocationEntity.ID,
         entityColumn = ForecastTodayEntity.FORECAST_LOCATION_ID
     )
-    val todayForecast: ForecastTodayEntity?,
+    val todayForecast: ForecastTodayEntity,
 
     @Relation(
         entity = ForecastDailyEntity::class,

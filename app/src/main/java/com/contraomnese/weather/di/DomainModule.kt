@@ -1,7 +1,23 @@
 package com.contraomnese.weather.di
 
+import com.contraomnese.weather.domain.app.usecase.DisableForecastAutoSyncOnAppSettingsUseCase
+import com.contraomnese.weather.domain.app.usecase.DisableForecastAutoSyncOnAppSettingsUseCaseImpl
+import com.contraomnese.weather.domain.app.usecase.DisablePushNotificationUseCase
+import com.contraomnese.weather.domain.app.usecase.DisablePushNotificationUseCaseImpl
+import com.contraomnese.weather.domain.app.usecase.EnableForecastAutoSyncOnAppSettingsUseCase
+import com.contraomnese.weather.domain.app.usecase.EnableForecastAutoSyncOnAppSettingsUseCaseImpl
+import com.contraomnese.weather.domain.app.usecase.EnablePushNotificationUseCase
+import com.contraomnese.weather.domain.app.usecase.EnablePushNotificationUseCaseImpl
 import com.contraomnese.weather.domain.app.usecase.ObserveAppSettingsUseCase
 import com.contraomnese.weather.domain.app.usecase.ObserveAppSettingsUseCaseImpl
+import com.contraomnese.weather.domain.app.usecase.SetPrecipitationUnitOnAppSettingsUseCase
+import com.contraomnese.weather.domain.app.usecase.SetPrecipitationUnitOnAppSettingsUseCaseImpl
+import com.contraomnese.weather.domain.app.usecase.SetPressureUnitOnAppSettingsUseCase
+import com.contraomnese.weather.domain.app.usecase.SetPressureUnitOnAppSettingsUseCaseImpl
+import com.contraomnese.weather.domain.app.usecase.SetTemperatureUnitOnAppSettingsUseCase
+import com.contraomnese.weather.domain.app.usecase.SetTemperatureUnitOnAppSettingsUseCaseImpl
+import com.contraomnese.weather.domain.app.usecase.SetWindSpeedUnitOnAppSettingsUseCase
+import com.contraomnese.weather.domain.app.usecase.SetWindSpeedUnitOnAppSettingsUseCaseImpl
 import com.contraomnese.weather.domain.app.usecase.UpdateAppSettingsUseCase
 import com.contraomnese.weather.domain.app.usecase.UpdateAppSettingsUseCaseImpl
 import com.contraomnese.weather.domain.home.usecase.AddFavoriteUseCase
@@ -90,8 +106,49 @@ val domainModule = module {
             repository = get()
         )
     }
+
     factory<UpdateFavoritesForecastsUseCase> {
         UpdateFavoritesForecastsUseCaseImpl(
+            repository = get()
+        )
+    }
+    factory<SetTemperatureUnitOnAppSettingsUseCase> {
+        SetTemperatureUnitOnAppSettingsUseCaseImpl(
+            repository = get()
+        )
+    }
+    factory<SetPressureUnitOnAppSettingsUseCase> {
+        SetPressureUnitOnAppSettingsUseCaseImpl(
+            repository = get()
+        )
+    }
+    factory<SetPrecipitationUnitOnAppSettingsUseCase> {
+        SetPrecipitationUnitOnAppSettingsUseCaseImpl(
+            repository = get()
+        )
+    }
+    factory<SetWindSpeedUnitOnAppSettingsUseCase> {
+        SetWindSpeedUnitOnAppSettingsUseCaseImpl(
+            repository = get()
+        )
+    }
+    factory<EnablePushNotificationUseCase> {
+        EnablePushNotificationUseCaseImpl(
+            repository = get()
+        )
+    }
+    factory<DisablePushNotificationUseCase> {
+        DisablePushNotificationUseCaseImpl(
+            repository = get()
+        )
+    }
+    factory<EnableForecastAutoSyncOnAppSettingsUseCase> {
+        EnableForecastAutoSyncOnAppSettingsUseCaseImpl(
+            repository = get()
+        )
+    }
+    factory<DisableForecastAutoSyncOnAppSettingsUseCase> {
+        DisableForecastAutoSyncOnAppSettingsUseCaseImpl(
             repository = get()
         )
     }

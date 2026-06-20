@@ -7,7 +7,9 @@ import com.contraomnese.weather.domain.exceptions.notInitialize
 import com.contraomnese.weather.domain.home.usecase.GetFirstFavoriteIdUseCase
 import com.contraomnese.weather.presentation.architecture.MviModel
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 
 internal class MainActivityViewModel(
@@ -21,8 +23,10 @@ internal class MainActivityViewModel(
         push(MainActivityEffect.WeatherDestinationIdChanged(getFirstFavoriteIdUseCase()))
 
         observeAppSettingsUseCase()
-            .onEach {
-                push(MainActivityEffect.ForecastAutoSyncChanged(it.forecastAutoSync))
+            .map { it.forecastAutoSyncEnabled }
+            .distinctUntilChanged()
+            .onEach { isEnabled ->
+                push(MainActivityEffect.ForecastAutoSyncChanged(isEnabled))
             }
             .catch {
                 push(MainActivityEvent.HandleError(notInitialize(logPrefix("Bootstrap failed"), it)))

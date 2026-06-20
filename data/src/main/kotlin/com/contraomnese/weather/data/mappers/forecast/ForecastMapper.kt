@@ -54,8 +54,6 @@ fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
     val todayEntity = dailyForecast.first()
     val nextDayEntity = dailyForecast[1]
 
-    val today = todayForecast!! // todayEntity.toForecastTodayDomain(appSettings, timeZone)
-
     val forecastHours = forecastHoursEntity.map { it.toDomain(appSettings, timeZone) }.toMutableList()
     val indexOfSunrise =
         forecastHoursEntity.indexOf(forecastHoursEntity.find { it.timeEpoch > todayEntity.astro.sunrise })

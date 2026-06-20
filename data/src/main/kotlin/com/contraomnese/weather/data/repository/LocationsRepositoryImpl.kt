@@ -3,9 +3,9 @@ package com.contraomnese.weather.data.repository
 import com.contraomnese.weather.data.mappers.favorite.toDomain
 import com.contraomnese.weather.data.mappers.locations.toDomain
 import com.contraomnese.weather.data.mappers.locations.toEntity
-import com.contraomnese.weather.data.mappers.locations.toForecastLocationEntity
 import com.contraomnese.weather.data.network.api.LocationsIQApi
 import com.contraomnese.weather.data.network.models.locationiq.LocationNetwork
+import com.contraomnese.weather.data.network.models.locationiq.TimeZoneResponse
 import com.contraomnese.weather.data.network.parsers.INetworkParser
 import com.contraomnese.weather.data.network.remotes.locations.LocationsRemote
 import com.contraomnese.weather.data.storage.db.WeatherAppDatabase
@@ -29,7 +29,6 @@ class LocationsRepositoryImpl(
     private val database: WeatherAppDatabase,
     private val networkParser: INetworkParser,
     private val dispatcher: CoroutineDispatcher,
-    private val transactionProvider: TransactionProvider,
 ) : LocationsRepository {
 
     override suspend fun getFavorites(): Result<List<Location>> =
@@ -51,12 +50,7 @@ class LocationsRepositoryImpl(
     override suspend fun addFavorite(locationId: Int): Result<Int> = withContext(dispatcher) {
 
         try {
-            transactionProvider.runWithTransaction {
-                val locationsDao = database.locationsDao()
-                val forecastLocation = locationsDao.getMatchingLocation(locationId).toForecastLocationEntity(locationId)
-                locationsDao.insertForecastLocation(forecastLocation)
-                database.favoritesDao().addFavorite(locationId)
-            }
+            database.favoritesDao().addFavorite(locationId)
             Result.success(locationId)
         } catch (cause: Exception) {
             Result.failure(storageError(logPrefix("Impossible add favorite to storage"), cause))
@@ -81,7 +75,10 @@ class LocationsRepositoryImpl(
 
     override suspend fun getLocationByCoordinates(latitude: Double, longitude: Double): Result<Location> =
         getMatchingLocation(latitude = latitude, longitude = longitude)
-            .mapCatching { it.toEntity() }
+            .mapCatching {
+                val timezoneResponse = getTimeZone(latitude = latitude, longitude = longitude).getOrThrow()
+                it.toEntity(timezoneResponse.timezone.name)
+            }
             .mapCatching { entity ->
                 insertMatchingLocation(entity)
                 entity.toDomain()
@@ -115,11 +112,33 @@ class LocationsRepositoryImpl(
         }
     }
 
+    private suspend fun getTimeZone(latitude: Double, longitude: Double) = withContext(dispatcher) {
+        try {
+            Result.success(
+                parseTimeZone(
+                    reverseGeocodingApi.getTimeZone(
+                        latitude = latitude,
+                        longitude = longitude
+                    )
+                )
+            )
+        } catch (cause: Exception) {
+            Result.failure(cause)
+        }
+    }
+
     private fun parseMatchingLocation(matchingLocation: Response<LocationNetwork>) =
         try {
             networkParser.parseOrThrowError(matchingLocation)
         } catch (cause: Exception) {
             throw operationFailed(logPrefix("Impossible parse matching location from network"), cause)
+        }
+
+    private fun parseTimeZone(timeZone: Response<TimeZoneResponse>) =
+        try {
+            networkParser.parseOrThrowError(timeZone)
+        } catch (cause: Exception) {
+            throw operationFailed(logPrefix("Impossible parse timezone location from network"), cause)
         }
 
     private suspend fun insertMatchingLocations(locations: List<MatchingLocationEntity>) = withContext(dispatcher) {

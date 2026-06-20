@@ -12,6 +12,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
@@ -163,7 +164,7 @@ private fun HomePage(
 }
 
 @Composable
-private fun HomeScreen(
+private fun BoxScope.HomeScreen(
     uiState: HomeScreenState,
     eventFlow: Flow<HomeScreenEvent>,
     snackBar: SnackbarHostState,
@@ -173,13 +174,13 @@ private fun HomeScreen(
 ) {
     val context = LocalContext.current
 
-    val versionNotification by rememberSaveable { mutableStateOf(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) }
-    var canShowNotificationDialog by rememberSaveable { mutableStateOf(false) }
+    val buildAndroidVersionHigherThenOrIs13 by rememberSaveable { mutableStateOf(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) }
+    var runPushNotificationDialog by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        if (versionNotification) {
+        if (buildAndroidVersionHigherThenOrIs13) {
             delay(1500)
-            canShowNotificationDialog = true
+            runPushNotificationDialog = true
         }
     }
 
@@ -199,9 +200,13 @@ private fun HomeScreen(
         }
     }
 
-    if (canShowNotificationDialog) {
+    if (uiState.isPushNotificationEnabled && runPushNotificationDialog) {
         PermissionAlertDialog(
-            onDismissRequest = { canShowNotificationDialog = false },
+            modifier = Modifier.align(Alignment.BottomCenter),
+            onDismissRequest = {
+                runPushNotificationDialog = false
+                pushAction(HomeScreenAction.DisablePushNotification)
+            },
             onPermissionGranted = { granted -> },
             deniedTitle = R.string.permission_notification_denied_title,
             firstTimeTitle = R.string.permission_notification_first_time_title,
@@ -239,20 +244,20 @@ internal fun MainScreen(
     Column {
         SearchBar(
             modifier = Modifier.testTag("search_bar"),
-            inputLocation = uiState.inputLocation,
+            inputLocation = uiState.userInputToSearchBar,
             isSearchMode = true,
-            isSearching = uiState.isSearching,
+            isSearching = uiState.isSearchingByUserInput,
             pushAction = pushAction,
             onNavigateToAppSettings = onNavigateToAppSettings,
         )
 
-        if (uiState.inputLocation.text.isNotEmpty()) {
+        if (uiState.userInputToSearchBar.text.isNotEmpty()) {
             MatchingLocations(
                 uiState.matchingLocations,
                 uiState.favorites.keys,
                 pushAction,
                 onNavigateToWeatherByLocation,
-                uiState.isSearching
+                uiState.isSearchingByUserInput
             )
         } else Favorites(
             uiState.currentTime,
@@ -266,7 +271,7 @@ internal fun MainScreen(
 @OptIn(ExperimentalLayoutApi::class)
 @SuppressLint("MissingPermission")
 @Composable
-internal fun WelcomeScreen(
+internal fun BoxScope.WelcomeScreen(
     uiState: HomeScreenState,
     pushAction: (HomeScreenAction) -> Unit = {},
     onNavigateToWeatherByLocation: (Int) -> Unit = { },
@@ -276,38 +281,68 @@ internal fun WelcomeScreen(
 
     val searchBarOnTop = WindowInsets.isImeVisible
 
-    val topBarOffset by animateDpAsState(
+    val searchBarOffset by animateDpAsState(
         targetValue = if (searchBarOnTop) 0.dp else screenHeight / 2.5f,
         animationSpec = tween(ANIMATION_DURATION)
     )
-    var gpsModeEnabled by rememberSaveable { mutableStateOf(false) }
+    var searchLocationByGpsEnabled by rememberSaveable { mutableStateOf(false) }
+
+    // uiState.gps.isGpsMode is ON when click GPS button in SearchBar
+    if (searchLocationByGpsEnabled) {
+        PermissionAlertDialog(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            onDismissRequest = {
+                searchLocationByGpsEnabled = false
+            },
+            onPermissionGranted = { granted ->
+                pushAction(HomeScreenAction.AccessFineLocationPermissionGranted(granted))
+            },
+            deniedTitle = R.string.permission_location_denied_title,
+            firstTimeTitle = R.string.permission_location_first_time_title,
+            permission = android.Manifest.permission.ACCESS_FINE_LOCATION
+        )
+    }
+    if (uiState.searchByGpsModeData.accessFineLocationPermissionGranted
+        && searchLocationByGpsEnabled
+    ) {
+        GpsModeAlertDialog(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            onDismissRequest = {
+                searchLocationByGpsEnabled = false
+            },
+            onGpsModeEnabled = { enabled ->
+                pushAction(HomeScreenAction.DeviceGpsModeEnabled(enabled))
+                searchLocationByGpsEnabled = false
+            }
+        )
+    }
 
     Column(
         modifier = Modifier
             .offset {
-                val yPx = with(this) { topBarOffset.roundToPx() }
+                val yPx = with(this) { searchBarOffset.roundToPx() }
                 IntOffset(x = 0, y = yPx)
             }
     ) {
         SearchBar(
             modifier = Modifier.testTag("search_bar"),
-            inputLocation = uiState.inputLocation,
+            inputLocation = uiState.userInputToSearchBar,
             isSearchMode = searchBarOnTop,
-            isSearching = uiState.isSearching,
+            isSearching = uiState.isSearchingByUserInput,
             pushAction = pushAction,
             onNavigateToAppSettings = onNavigateToAppSettings,
             onGpsClickButton = {
-                gpsModeEnabled = true
+                searchLocationByGpsEnabled = true
             }
         )
 
-        if (uiState.inputLocation.text.isNotEmpty() && searchBarOnTop) {
+        if (uiState.userInputToSearchBar.text.isNotEmpty() && searchBarOnTop) {
             MatchingLocations(
                 matchingLocations = uiState.matchingLocations,
                 favoriteLocations = uiState.favorites.keys,
                 pushAction,
                 onNavigateToWeatherByLocation,
-                uiState.isSearching
+                uiState.isSearchingByUserInput
             )
         } else Favorites(
             uiState.currentTime,
@@ -315,34 +350,6 @@ internal fun WelcomeScreen(
             pushAction,
             onNavigateToWeatherByLocation
         )
-
-        // uiState.gps.isGpsMode is ON when click GPS button in SearchBar
-        if (gpsModeEnabled) {
-            PermissionAlertDialog(
-                onDismissRequest = {
-                    gpsModeEnabled = false
-                },
-                onPermissionGranted = { granted ->
-                    pushAction(HomeScreenAction.AccessFineLocationPermissionGranted(granted))
-                },
-                deniedTitle = R.string.permission_location_denied_title,
-                firstTimeTitle = R.string.permission_location_first_time_title,
-                permission = android.Manifest.permission.ACCESS_FINE_LOCATION
-            )
-        }
-        if (uiState.gps.isPermissionGranted
-            && gpsModeEnabled
-        ) {
-            GpsModeAlertDialog(
-                onDismissRequest = {
-                    gpsModeEnabled = false
-                },
-                onGpsModeEnabled = { enabled ->
-                    pushAction(HomeScreenAction.DeviceGpsModeEnabled(enabled))
-                    gpsModeEnabled = false
-                }
-            )
-        }
     }
 }
 
@@ -676,13 +683,17 @@ private fun getGpsLocation(
         val location = fusedClient.getCurrentLocation(
             Priority.PRIORITY_HIGH_ACCURACY, null
         )
-        location.addOnSuccessListener {
-            if (it != null) {
-                pushAction(HomeScreenAction.UpdateGpsLocation(lat = it.latitude, lon = it.longitude))
-            } else {
+        location
+            .addOnSuccessListener {
+                if (it != null) {
+                    pushAction(HomeScreenAction.UpdateGpsLocation(lat = it.latitude, lon = it.longitude))
+                } else {
+                    Toast.makeText(context, "Can't find location", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .addOnFailureListener {
                 Toast.makeText(context, "Can't find location", Toast.LENGTH_SHORT).show()
             }
-        }
     } catch (e: Exception) {
         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
     }
@@ -695,7 +706,7 @@ private fun HomeScreenPreview() {
     val snackbarHostState = remember { SnackbarHostState() }
 
     val uiState = HomeScreenState(
-        isSearching = false,
+        isSearchingByUserInput = false,
         favorites = persistentMapOf()
     )
 
