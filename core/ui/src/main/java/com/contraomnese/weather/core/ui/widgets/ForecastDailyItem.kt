@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -68,13 +69,7 @@ fun ForecastDailyItem(
             precipitationProbability = precipitationProbability,
             modifier = Modifier.size(itemWidth40)
         )
-        Text(
-            modifier = Modifier.width(itemWidth40),
-            text = stringResource(R.string.current_temperature_title, minTemperature.toString()),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-            textAlign = TextAlign.Right
-        )
+        TemperatureItem(minTemperature)
         TemperatureRangeLine(
             minRange = minRangeTemperature,
             maxRange = maxRangeTemperature,
@@ -86,14 +81,19 @@ fun ForecastDailyItem(
                 .weight(1f)
                 .height(itemHeight10),
         )
-        Text(
-            modifier = Modifier.width(itemWidth40),
-            text = stringResource(R.string.current_temperature_title, maxTemperature.toString()),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-            textAlign = TextAlign.Start
-        )
+        TemperatureItem(maxTemperature)
     }
+}
+
+@Composable
+private fun TemperatureItem(temperature: Int) {
+    Text(
+        modifier = Modifier.wrapContentWidth(),
+        text = stringResource(R.string.current_temperature_title, temperature.toString()),
+        style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.onSurface,
+        textAlign = TextAlign.Start
+    )
 }
 
 @Preview(showBackground = true, device = "id:pixel_5", backgroundColor = 0xFF1C232B, showSystemUi = false)
@@ -105,12 +105,12 @@ private fun ForecastDailyItemPreview() {
                 dayNumber = "21.06",
                 dayName = "Пн",
                 condition = WeatherCondition.RAIN_SLIGHT,
-                minTemperature = 7,
-                maxTemperature = 14,
+                minTemperature = 99,
+                maxTemperature = 140,
                 maxRangeTemperature = 16,
                 minRangeTemperature = 7,
                 currentTemperature = 11,
-                temperatureUnit = TemperatureUnit.Celsius,
+                temperatureUnit = TemperatureUnit.Fahrenheit,
                 precipitationProbability = 10
             )
             ForecastDailyItem(
