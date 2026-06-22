@@ -31,6 +31,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.TimeZone
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
 
 class ForecastRepositoryImpl(
     private val forecastRemoteApi: ForecastRemote,
@@ -82,9 +83,20 @@ class ForecastRepositoryImpl(
         val mutex = refreshForecastLocks.computeIfAbsent(locationId) { Mutex() }
 
         return if (mutex.tryLock()) {
-            val forecastId = database.forecastDao().getForecastIdBy(locationId)
-            forecastId?.let {
-                Result.success(locationId)
+            val forecastLastUpdated = database.forecastDao().getLastUpdatedTimeBy(locationId)
+            forecastLastUpdated?.let {
+                val currentTime = System.currentTimeMillis()
+                val timeDiff = currentTime - it
+                val updateThreshold = TimeUnit.HOURS.toMillis(4)
+                if (timeDiff < updateThreshold) {
+                    Result.success(locationId)
+                } else {
+                    try {
+                        updateForecast(locationId)
+                    } finally {
+                        mutex.unlock()
+                    }
+                }
             } ?: try {
                 updateForecast(locationId)
             } finally {

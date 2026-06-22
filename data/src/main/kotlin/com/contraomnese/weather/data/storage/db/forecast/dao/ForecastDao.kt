@@ -44,6 +44,9 @@ interface ForecastDao {
     @Query("SELECT id FROM forecast_location WHERE location_id = :locationId")
     suspend fun getForecastIdBy(locationId: Int): Long?
 
+    @Query("SELECT last_updated FROM forecast_location WHERE location_id = :locationId")
+    suspend fun getLastUpdatedTimeBy(locationId: Int): Long?
+
     @Transaction
     @Query("SELECT * FROM forecast_location WHERE location_id = :locationId")
     fun observeForecastBy(locationId: Int): Flow<ForecastData?>
