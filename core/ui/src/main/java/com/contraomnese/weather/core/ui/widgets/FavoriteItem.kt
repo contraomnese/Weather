@@ -49,11 +49,10 @@ import com.contraomnese.weather.design.theme.itemWidth56
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding8
 import com.contraomnese.weather.design.theme.space8
-import com.contraomnese.weather.domain.weatherByLocation.model.LocationDateTime
+import com.contraomnese.weather.domain.weatherByLocation.model.LocationTime
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 
 @Composable
 fun FavoriteItem(
@@ -73,7 +72,7 @@ fun FavoriteItem(
     var deleteVisible by remember { mutableStateOf(false) }
 
     val localTime = remember(currentTime, timeZone) {
-        LocationDateTime(currentTime.toLocalDateTime(timeZone)).toLocalTime()
+        LocationTime.fromInstant(currentTime, timeZone).toLocalTime()
     }
 
     Row(

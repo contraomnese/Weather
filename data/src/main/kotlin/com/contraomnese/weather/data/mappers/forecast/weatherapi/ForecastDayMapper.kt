@@ -1,11 +1,9 @@
 package com.contraomnese.weather.data.mappers.forecast.weatherapi
 
 import com.contraomnese.weather.data.network.models.weatherapi.ForecastDayNetwork
-import com.contraomnese.weather.data.parsers.DateTimeParser
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDailyEntity
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastDayEntity
 import com.contraomnese.weather.data.storage.db.locations.dto.DailyForecastData
-import com.contraomnese.weather.data.utils.getAmPmTime
 import com.contraomnese.weather.data.utils.getDayOfWeek
 import com.contraomnese.weather.data.utils.getNumberOfMonth
 import com.contraomnese.weather.domain.app.model.AppSettings
@@ -13,6 +11,7 @@ import com.contraomnese.weather.domain.app.model.PrecipitationUnit
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastDay
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastToday
+import com.contraomnese.weather.domain.weatherByLocation.model.LocationTime
 import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
 import kotlinx.datetime.TimeZone
 import kotlin.math.roundToInt
@@ -35,8 +34,8 @@ internal fun DailyForecastData.toForecastTodayDomain(appSettings: AppSettings, t
             PrecipitationUnit.Millimeters -> day.totalPrecipMm.roundToInt().toString()
             PrecipitationUnit.Inches -> day.totalPrecipIn.roundToInt().toString()
         },
-        sunrise = DateTimeParser.parseAmPmTime(getAmPmTime(astro.sunrise, timeZone.id)),
-        sunset = DateTimeParser.parseAmPmTime(getAmPmTime(astro.sunset, timeZone.id)),
+        sunrise = LocationTime.fromEpochSeconds(astro.sunrise, timeZone),
+        sunset = LocationTime.fromEpochSeconds(astro.sunset, timeZone),
     )
 }
 

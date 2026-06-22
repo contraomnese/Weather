@@ -5,20 +5,18 @@ import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastHourEn
 import com.contraomnese.weather.domain.app.model.AppSettings
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastHour
-import com.contraomnese.weather.domain.weatherByLocation.model.LocationDateTime
+import com.contraomnese.weather.domain.weatherByLocation.model.LocationTime
 import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import kotlin.math.roundToInt
 
 private const val IS_DAY = 1
 
 internal fun ForecastHourEntity.toDomain(appSettings: AppSettings, timeZone: TimeZone): ForecastHour {
 
-    val instant = Instant.fromEpochSeconds(timeEpoch)
-    val localDateTime = instant.toLocalDateTime(timeZone)
-    val locationDateTime = LocationDateTime(localDateTime)
+//    val instant = Instant.fromEpochSeconds(timeEpoch)
+//    val localDateTime = instant.toLocalDateTime(timeZone)
+    val locationTime = LocationTime.fromEpochSeconds(timeEpoch, timeZone)
 
     return ForecastHour(
         temperature = when (appSettings.temperatureUnit) {
@@ -26,7 +24,7 @@ internal fun ForecastHourEntity.toDomain(appSettings: AppSettings, timeZone: Tim
             TemperatureUnit.Fahrenheit -> tempF.roundToInt().toString()
         },
         condition = WeatherCondition.fromWeatherApi(conditionCode),
-        time = locationDateTime.toLocalTime(),
+        time = locationTime.toLocalTime(),
         isDay = isDay == IS_DAY,
         precipitationProbability = chanceOfRain.takeIf { it != 0 } ?: chanceOfSnow
     )

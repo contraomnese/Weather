@@ -10,11 +10,6 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -25,39 +20,17 @@ import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight140
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding8
-import com.contraomnese.weather.domain.weatherByLocation.model.LocationDateTime
 import com.contraomnese.weather.domain.weatherByLocation.model.LocationTime
-import kotlinx.coroutines.delay
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 
 @Composable
 fun SunriseItem(
     modifier: Modifier = Modifier,
     sunriseTime: LocationTime,
     sunsetTime: LocationTime,
-    timeZone: TimeZone,
+    localTime: LocationTime,
     isDay: Boolean,
 ) {
-
-    var localTime by remember {
-        mutableStateOf(
-            LocationDateTime(Clock.System.now().toLocalDateTime(timeZone))
-        )
-    }
-
-    LaunchedEffect(timeZone) {
-        while (true) {
-            val instant = Clock.System.now()
-//                .minus(317.toDuration(DurationUnit.MINUTES)) // only for test preview
-            val dateTime = instant.toLocalDateTime(timeZone)
-            localTime = LocationDateTime(dateTime)
-            val millisToNextMinute = 60_000L - dateTime.second * 1000
-            delay(millisToNextMinute)
-        }
-    }
 
     Row(
         modifier = modifier
@@ -125,10 +98,10 @@ fun SunriseItemPreview(modifier: Modifier = Modifier) {
 
         SunriseItem(
             modifier = modifier,
-            sunriseTime = LocationTime(LocalTime(5, 23, 0, 0)),
+            sunriseTime = LocationTime(LocalTime(10, 23, 0, 0)),
             sunsetTime = LocationTime(LocalTime(18, 15, 0, 0)),
-            timeZone = TimeZone.of("Europe/Moscow"),
-            isDay = true
+            localTime = LocationTime(LocalTime(9, 21, 0, 0)),
+            isDay = false
         )
     }
 }

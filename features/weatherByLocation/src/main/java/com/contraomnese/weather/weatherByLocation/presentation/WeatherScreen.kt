@@ -282,7 +282,7 @@ private fun WeatherScreen(
             HourlyForecastSection(),
             DailyForecastSection(),
             AqiSection(),
-            SunriseSection(isDay = weather.today.isDay),
+            SunriseSection(),
             UVIndexSection(),
             WindSection(),
             HumiditySection(),

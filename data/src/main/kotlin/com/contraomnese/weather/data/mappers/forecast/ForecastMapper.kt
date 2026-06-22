@@ -19,7 +19,7 @@ import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastHour
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastLocation
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastWeather
-import com.contraomnese.weather.domain.weatherByLocation.model.LocationDateTime
+import com.contraomnese.weather.domain.weatherByLocation.model.LocationTime
 import com.contraomnese.weather.domain.weatherByLocation.model.TodayForecast
 import com.contraomnese.weather.domain.weatherByLocation.model.UvIndex
 import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
@@ -64,14 +64,14 @@ fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
         forecastHours.add(
             index = forecastHoursEntity.indexOf(forecastHoursEntity.find { it.timeEpoch > todayEntity.astro.sunset }),
             ForecastHour(
-                time = LocationDateTime.toLocalTimeFromEpochSeconds(todayEntity.astro.sunset, timeZone),
+                time = LocationTime.fromEpochSeconds(todayEntity.astro.sunset, timeZone).toLocalTime(),
                 condition = WeatherCondition.SUNSET,
             )
         )
         forecastHours.add(
             index = forecastHoursEntity.indexOf(forecastHoursEntity.find { it.timeEpoch > nextDayEntity.astro.sunrise }),
             ForecastHour(
-                time = LocationDateTime.toLocalTimeFromEpochSeconds(nextDayEntity.astro.sunrise, timeZone),
+                time = LocationTime.fromEpochSeconds(nextDayEntity.astro.sunrise, timeZone).toLocalTime(),
                 condition = WeatherCondition.SUNRISE,
             )
         )
@@ -79,14 +79,14 @@ fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
         forecastHours.add(
             index = forecastHoursEntity.indexOf(forecastHoursEntity.find { it.timeEpoch > nextDayEntity.astro.sunrise }),
             ForecastHour(
-                time = LocationDateTime.toLocalTimeFromEpochSeconds(nextDayEntity.astro.sunrise, timeZone),
+                time = LocationTime.fromEpochSeconds(nextDayEntity.astro.sunrise, timeZone).toLocalTime(),
                 condition = WeatherCondition.SUNRISE,
             )
         )
         forecastHours.add(
             index = forecastHoursEntity.indexOf(forecastHoursEntity.find { it.timeEpoch > nextDayEntity.astro.sunset }),
             ForecastHour(
-                time = LocationDateTime.toLocalTimeFromEpochSeconds(nextDayEntity.astro.sunset, timeZone),
+                time = LocationTime.fromEpochSeconds(nextDayEntity.astro.sunset, timeZone).toLocalTime(),
                 condition = WeatherCondition.SUNSET,
             )
         )
@@ -94,14 +94,14 @@ fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
         forecastHours.add(
             index = indexOfSunrise,
             ForecastHour(
-                time = LocationDateTime.toLocalTimeFromEpochSeconds(todayEntity.astro.sunrise, timeZone),
+                time = LocationTime.fromEpochSeconds(todayEntity.astro.sunrise, timeZone).toLocalTime(),
                 condition = WeatherCondition.SUNRISE,
             )
         )
         forecastHours.add(
             index = indexOfSunset,
             ForecastHour(
-                time = LocationDateTime.toLocalTimeFromEpochSeconds(todayEntity.astro.sunset, timeZone),
+                time = LocationTime.fromEpochSeconds(todayEntity.astro.sunset, timeZone).toLocalTime(),
                 condition = WeatherCondition.SUNSET,
             )
         )
