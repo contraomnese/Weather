@@ -15,7 +15,9 @@ import com.contraomnese.weather.design.theme.itemHeight120
 import com.contraomnese.weather.design.theme.padding16
 import com.contraomnese.weather.design.theme.padding32
 import com.contraomnese.weather.domain.weatherByLocation.model.ForecastHour
+import com.contraomnese.weather.domain.weatherByLocation.model.LocationTime
 import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
+import kotlinx.datetime.LocalTime
 import kotlin.random.Random
 
 
@@ -36,7 +38,7 @@ fun ForecastHourlyLazyRow(
         ) {
             itemsIndexed(items) { index, it ->
                 ForecastHourlyItem(
-                    time = it.time,
+                    time = it.time.toLocalTime(),
                     condition = it.condition,
                     temperature = it.temperature,
                     isSunCycle = it.condition == WeatherCondition.SUNRISE || it.condition == WeatherCondition.SUNSET,
@@ -59,7 +61,7 @@ private fun ForecastHourlyLazyRowPreview() {
                 .height(120.dp),
             items = List(9) { index ->
                 ForecastHour(
-                    time = "0${index}:00",
+                    time = LocationTime(LocalTime(index, 0, 0)),
                     condition = WeatherCondition.entries.toTypedArray().random(),
                     temperature = "${index + index}",
                     isDay = Random.nextBoolean(),

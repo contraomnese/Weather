@@ -40,86 +40,56 @@ private const val DEFAULT_RAINFALL = 0.0
 fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
 
     val timeZone = TimeZone.of(location.timeZoneId)
-    val now = Clock.System.now().toLocalDateTime(timeZone).toInstant(timeZone).epochSeconds
-    val nextDaySeconds = now + HOURS * MINUTES * SECONDS
+    val nowEpoch = Clock.System.now().toLocalDateTime(timeZone).toInstant(timeZone).epochSeconds
+    val after24HoursEpoch = nowEpoch + HOURS * MINUTES * SECONDS
 
-    val nowHour = dailyForecast.first().hour.last { it.timeEpoch <= now }
-    val hoursToNight = dailyForecast.first().hour.filter { it.timeEpoch > now }
-    val hoursNextDayFromNightToNowNextDay = dailyForecast[1].hour.filter { it.timeEpoch <= nextDaySeconds }
-
-    val forecastHoursEntity = mutableListOf(nowHour)
-    forecastHoursEntity.addAll(hoursToNight)
-    forecastHoursEntity.addAll(hoursNextDayFromNightToNowNextDay)
-
-    val todayEntity = dailyForecast.first()
+    val todayEntity = dailyForecast[0]
     val nextDayEntity = dailyForecast[1]
 
-    val forecastHours = forecastHoursEntity.map { it.toDomain(appSettings, timeZone) }.toMutableList()
-    val indexOfSunrise =
-        forecastHoursEntity.indexOf(forecastHoursEntity.find { it.timeEpoch > todayEntity.astro.sunrise })
-    val indexOfSunset =
-        forecastHoursEntity.indexOf(forecastHoursEntity.find { it.timeEpoch > todayEntity.astro.sunset })
+    val nowHour = todayEntity.hour.last { it.timeEpoch <= nowEpoch }
+    val hoursToNextDay = todayEntity.hour.filter { it.timeEpoch > nowEpoch }
+    val hoursToNowInNextDay = nextDayEntity.hour.filter { it.timeEpoch <= after24HoursEpoch }
 
-    if (indexOfSunrise == 0) {
-        forecastHours.add(
-            index = forecastHoursEntity.indexOf(forecastHoursEntity.find { it.timeEpoch > todayEntity.astro.sunset }),
-            ForecastHour(
-                time = LocationTime.fromEpochSeconds(todayEntity.astro.sunset, timeZone).toLocalTime(),
-                condition = WeatherCondition.SUNSET,
+    val forecastHoursEntity = listOf(nowHour) + hoursToNextDay + hoursToNowInNextDay
+
+    val forecastHours = forecastHoursEntity.map { it.toDomain(appSettings, timeZone) }.toMutableList()
+
+    val firstTime = forecastHoursEntity.firstOrNull()?.timeEpoch ?: 0
+    val lastTime = forecastHoursEntity.lastOrNull()?.timeEpoch ?: 0
+
+    val astroEvents = listOf(
+        todayEntity.astro.sunrise to WeatherCondition.SUNRISE,
+        todayEntity.astro.sunset to WeatherCondition.SUNSET,
+        nextDayEntity.astro.sunrise to WeatherCondition.SUNRISE,
+        nextDayEntity.astro.sunset to WeatherCondition.SUNSET
+    )
+
+    astroEvents.forEach { (timeEpoch, condition) ->
+        if (timeEpoch in firstTime..lastTime) {
+            forecastHours.add(
+                index = forecastHoursEntity.indexOfFirst { it.timeEpoch > timeEpoch },
+                ForecastHour(
+                    time = LocationTime.fromEpochSeconds(timeEpoch, timeZone),
+                    condition = condition,
+                )
             )
-        )
-        forecastHours.add(
-            index = forecastHoursEntity.indexOf(forecastHoursEntity.find { it.timeEpoch > nextDayEntity.astro.sunrise }),
-            ForecastHour(
-                time = LocationTime.fromEpochSeconds(nextDayEntity.astro.sunrise, timeZone).toLocalTime(),
-                condition = WeatherCondition.SUNRISE,
-            )
-        )
-    } else if (indexOfSunset == 0) {
-        forecastHours.add(
-            index = forecastHoursEntity.indexOf(forecastHoursEntity.find { it.timeEpoch > nextDayEntity.astro.sunrise }),
-            ForecastHour(
-                time = LocationTime.fromEpochSeconds(nextDayEntity.astro.sunrise, timeZone).toLocalTime(),
-                condition = WeatherCondition.SUNRISE,
-            )
-        )
-        forecastHours.add(
-            index = forecastHoursEntity.indexOf(forecastHoursEntity.find { it.timeEpoch > nextDayEntity.astro.sunset }),
-            ForecastHour(
-                time = LocationTime.fromEpochSeconds(nextDayEntity.astro.sunset, timeZone).toLocalTime(),
-                condition = WeatherCondition.SUNSET,
-            )
-        )
-    } else {
-        forecastHours.add(
-            index = indexOfSunrise,
-            ForecastHour(
-                time = LocationTime.fromEpochSeconds(todayEntity.astro.sunrise, timeZone).toLocalTime(),
-                condition = WeatherCondition.SUNRISE,
-            )
-        )
-        forecastHours.add(
-            index = indexOfSunset,
-            ForecastHour(
-                time = LocationTime.fromEpochSeconds(todayEntity.astro.sunset, timeZone).toLocalTime(),
-                condition = WeatherCondition.SUNSET,
-            )
-        )
+        }
     }
 
+    val precipUnit = appSettings.precipitationUnit
 
-    val rainfallBeforeNow = dailyForecast[0].hour.filter { hour -> hour.timeEpoch < now }
-        .map { it.toPrecipitationDomain(precipitationUnit = appSettings.precipitationUnit) }
+    val rainfallBeforeNow = todayEntity.hour
+        .filter { hour -> hour.timeEpoch < nowEpoch }
+        .map { it.toPrecipitationDomain(precipitationUnit = precipUnit) }
 
-    val rainfallAfterNow = dailyForecast[0].hour.filter { hour -> hour.timeEpoch > now }
-        .map { it.toPrecipitationDomain(precipitationUnit = appSettings.precipitationUnit) } +
-            dailyForecast[1].hour.filter { hour -> hour.timeEpoch < nextDaySeconds }
-                .map { it.toPrecipitationDomain(precipitationUnit = appSettings.precipitationUnit) }
+    val rainfallAfterNow = (todayEntity.hour.filter { it.timeEpoch > nowEpoch } +
+            nextDayEntity.hour.filter { it.timeEpoch < after24HoursEpoch })
+        .map { it.toPrecipitationDomain(precipUnit) }
 
-    val rainfallNow =
-        (dailyForecast[0].hour.firstOrNull { hour -> hour.timeEpoch > now }
-            ?: dailyForecast[1].hour.first())
-            .toPrecipitationDomain(precipitationUnit = appSettings.precipitationUnit)
+    val rainfallNow = (todayEntity.hour.firstOrNull { it.timeEpoch > nowEpoch } ?: nextDayEntity.hour.first())
+        .toPrecipitationDomain(precipUnit)
+
+    val allRainfall = rainfallBeforeNow + rainfallNow + rainfallAfterNow
 
     return Forecast(
         location = ForecastLocation(
@@ -129,7 +99,7 @@ fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
             country = location.country,
             latitude = location.latitude,
             longitude = location.longitude,
-            timeZone = TimeZone.of(location.timeZoneId),
+            timeZone = timeZone,
             isSunUp = dailyForecast.first().astro.isSunUp == IS_SUN_UP
         ),
         today = TodayForecast(
@@ -148,7 +118,7 @@ fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
             rainfallBeforeNow = rainfallBeforeNow,
             rainfallAfterNow = rainfallAfterNow,
             rainfallNow = rainfallNow,
-            maxRainfall = rainfallBeforeNow.plus(rainfallNow).plus(rainfallAfterNow).maxOrNull() ?: DEFAULT_RAINFALL,
+            maxRainfall = allRainfall.maxOrNull() ?: DEFAULT_RAINFALL,
             humidity = todayForecast.humidity,
             dewPoint = todayForecast.toDewPoint(appSettings.temperatureUnit),
             uvIndex = UvIndex(todayForecast.uv.roundToInt()),

@@ -14,8 +14,6 @@ private const val IS_DAY = 1
 
 internal fun ForecastHourEntity.toDomain(appSettings: AppSettings, timeZone: TimeZone): ForecastHour {
 
-//    val instant = Instant.fromEpochSeconds(timeEpoch)
-//    val localDateTime = instant.toLocalDateTime(timeZone)
     val locationTime = LocationTime.fromEpochSeconds(timeEpoch, timeZone)
 
     return ForecastHour(
@@ -24,7 +22,7 @@ internal fun ForecastHourEntity.toDomain(appSettings: AppSettings, timeZone: Tim
             TemperatureUnit.Fahrenheit -> tempF.roundToInt().toString()
         },
         condition = WeatherCondition.fromWeatherApi(conditionCode),
-        time = locationTime.toLocalTime(),
+        time = locationTime,
         isDay = isDay == IS_DAY,
         precipitationProbability = chanceOfRain.takeIf { it != 0 } ?: chanceOfSnow
     )
