@@ -118,7 +118,6 @@ internal fun WeatherRoute(
 }
 
 @Composable
-
 private fun WeatherPage(
     uiState: WeatherScreenState,
     eventFlow: Flow<WeatherScreenEvent>,
@@ -162,84 +161,82 @@ private fun WeatherPage(
         },
         containerColor = Color.Transparent,
     ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-        ) {
+        AnimatedBackground(condition = uiState.weather?.today?.condition) {
+            Box(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+            ) {
 
-            when {
-                uiState.isLoading -> LoadingIndicator(
-                    Modifier
-                        .align(Alignment.Center)
-                        .width(itemWidth64)
-                )
+                when {
+                    uiState.isLoading -> LoadingIndicator(
+                        Modifier
+                            .align(Alignment.Center)
+                            .width(itemWidth64)
+                    )
 
-                else -> {
-                    val coroutineScope = rememberCoroutineScope()
-                    var offsetX by remember { mutableFloatStateOf(0f) }
-                    val screenWidth = LocalConfiguration.current.screenWidthDp.dp.toPx()
+                    else -> {
+                        val coroutineScope = rememberCoroutineScope()
+                        var offsetX by remember { mutableFloatStateOf(0f) }
+                        val screenWidth = LocalConfiguration.current.screenWidthDp.dp.toPx()
 
-                    val scaleAnimated = remember { Animatable(1f) }
-                    val alphaAnimated = remember { Animatable(1f) }
+                        val scaleAnimated = remember { Animatable(1f) }
+                        val alphaAnimated = remember { Animatable(1f) }
 
-                    uiState.weather?.let {
-                        AnimatedBackground(condition = it.today.condition)
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .pointerInput(currentFavoriteIndex) {
-                                detectHorizontalDragGestures(
-                                    onDragEnd = {
-                                        handleHorizontalDragEnd(
-                                            offset = offsetX,
-                                            onOffsetChange = { offsetX = it },
-                                            screenWidth = screenWidth,
-                                            currentFavoriteIndex = currentFavoriteIndex,
-                                            lastFavoriteIndex = uiState.favorites.lastIndex,
-                                            coroutineScope = coroutineScope,
-                                            scaleAnimated = scaleAnimated,
-                                            alphaAnimated = alphaAnimated,
-                                            onDragNext = {
-                                                pushAction(
-                                                    WeatherScreenAction.SwapFavorite(
-                                                        currentFavoriteIndex + 1
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .pointerInput(currentFavoriteIndex) {
+                                    detectHorizontalDragGestures(
+                                        onDragEnd = {
+                                            handleHorizontalDragEnd(
+                                                offset = offsetX,
+                                                onOffsetChange = { offsetX = it },
+                                                screenWidth = screenWidth,
+                                                currentFavoriteIndex = currentFavoriteIndex,
+                                                lastFavoriteIndex = uiState.favorites.lastIndex,
+                                                coroutineScope = coroutineScope,
+                                                scaleAnimated = scaleAnimated,
+                                                alphaAnimated = alphaAnimated,
+                                                onDragNext = {
+                                                    pushAction(
+                                                        WeatherScreenAction.SwapFavorite(
+                                                            currentFavoriteIndex + 1
+                                                        )
                                                     )
-                                                )
-                                            },
-                                            onDragPrev = {
-                                                pushAction(
-                                                    WeatherScreenAction.SwapFavorite(
-                                                        currentFavoriteIndex - 1
+                                                },
+                                                onDragPrev = {
+                                                    pushAction(
+                                                        WeatherScreenAction.SwapFavorite(
+                                                            currentFavoriteIndex - 1
+                                                        )
                                                     )
-                                                )
-                                            }
-                                        )
-                                    },
-                                    onHorizontalDrag = { _, dragAmount ->
-                                        offsetX += dragAmount
-                                    }
+                                                }
+                                            )
+                                        },
+                                        onHorizontalDrag = { _, dragAmount ->
+                                            offsetX += dragAmount
+                                        }
+                                    )
+                                }
+                        ) {
+                            key(currentFavoriteIndex) {
+
+                                requireNotNull(uiState.weather)
+                                requireNotNull(uiState.appSettings)
+
+                                WeatherScreen(
+                                    weather = requireNotNull(uiState.weather),
+                                    appSettings = requireNotNull(uiState.appSettings),
+                                    modifier = Modifier
+                                        .offset { IntOffset(offsetX.roundToInt(), 0) }
+                                        .graphicsLayer {
+                                            scaleX = scaleAnimated.value
+                                            scaleY = scaleAnimated.value
+                                            alpha = alphaAnimated.value
+                                        }
                                 )
                             }
-                    ) {
-                        key(currentFavoriteIndex) {
-
-                            requireNotNull(uiState.weather)
-                            requireNotNull(uiState.appSettings)
-
-                            WeatherScreen(
-                                weather = requireNotNull(uiState.weather),
-                                appSettings = requireNotNull(uiState.appSettings),
-                                modifier = Modifier
-                                    .offset { IntOffset(offsetX.roundToInt(), 0) }
-                                    .graphicsLayer {
-                                        scaleX = scaleAnimated.value
-                                        scaleY = scaleAnimated.value
-                                        alpha = alphaAnimated.value
-                                    }
-                            )
                         }
                     }
                 }
@@ -468,13 +465,19 @@ private fun WeatherScreen(
 }
 
 @Composable
-private fun AnimatedBackground(condition: WeatherCondition) {
+private fun AnimatedBackground(
+    condition: WeatherCondition?,
+    content: @Composable () -> Unit = {},
+) {
     Crossfade(
         targetState = condition,
         animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing),
         label = "WeatherBackground"
     ) { targetCondition ->
-        ImageBackgroundWithGradient(condition = targetCondition)
+        ImageBackgroundWithGradient(
+            condition = targetCondition,
+            content = content
+        )
     }
 }
 

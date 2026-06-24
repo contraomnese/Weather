@@ -25,53 +25,61 @@ import com.contraomnese.weather.domain.weatherByLocation.model.WeatherCondition
 
 @Composable
 fun ImageBackgroundWithGradient(
-    condition: WeatherCondition,
+    condition: WeatherCondition?,
+    content: @Composable () -> Unit = {},
 ) {
     val isPreview = LocalInspectionMode.current
     val heightScreen = LocalConfiguration.current.screenHeightDp
     val density = LocalDensity.current
-    if (isPreview) {
-        Image(
-            painter = painterResource(id = condition.getResources().backgroundResId),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
-        )
-    } else {
-        SubcomposeAsyncImage(
-            model = condition.getResources().backgroundResId,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxSize()
-                .graphicsLayer {
-                    translationY = with(density) { heightScreen * -0.2f }
-                },
-            loading = {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(condition.getResources().color)
-                )
-            },
-        )
-    }
 
     Box(
-        modifier = Modifier
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color.Transparent,
-                        condition.getResources().color,
-                        condition.getResources().color
-                    ),
-                    startY = with(LocalDensity.current) { (400.dp).toPx() },
-                    endY = Float.POSITIVE_INFINITY
-                ),
+        modifier = Modifier.fillMaxSize()
+    ) {
+        condition?.let {
+            if (isPreview) {
+                Image(
+                    painter = painterResource(id = condition.getResources().backgroundResId),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
+                )
+            } else {
+                SubcomposeAsyncImage(
+                    model = condition.getResources().backgroundResId,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .graphicsLayer {
+                            translationY = with(density) { heightScreen * -0.2f }
+                        },
+                    loading = {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(condition.getResources().color)
+                        )
+                    },
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                condition.getResources().color,
+                                condition.getResources().color
+                            ),
+                            startY = with(LocalDensity.current) { (400.dp).toPx() },
+                            endY = Float.POSITIVE_INFINITY
+                        ),
+                    )
+                    .fillMaxSize()
             )
-            .fillMaxSize()
-    )
+        }
+        content()
+    }
 }
 
 @Preview(showBackground = true)
