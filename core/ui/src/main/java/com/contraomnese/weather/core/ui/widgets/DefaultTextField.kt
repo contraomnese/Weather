@@ -155,7 +155,7 @@ private fun PlaceholderText(placeholder: String) {
         text = placeholder,
         style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.W400),
         textAlign = TextAlign.Start,
-        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
     )
 }
 

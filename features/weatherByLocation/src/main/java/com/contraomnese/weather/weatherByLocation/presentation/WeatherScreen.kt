@@ -40,7 +40,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -65,7 +64,6 @@ import com.contraomnese.weather.core.ui.widgets.TitleSection
 import com.contraomnese.weather.core.ui.widgets.WeatherBottomBar
 import com.contraomnese.weather.core.ui.widgets.WeatherSnackBarHost
 import com.contraomnese.weather.design.theme.WeatherTheme
-import com.contraomnese.weather.design.theme.backgroundGradient
 import com.contraomnese.weather.design.theme.itemHeight150
 import com.contraomnese.weather.design.theme.itemHeight300
 import com.contraomnese.weather.design.theme.itemHeight32
@@ -129,9 +127,7 @@ private fun WeatherPage(
 
     val backgroundModifier =
         if (uiState.isLoading) Modifier.background(
-            brush = Brush.verticalGradient(
-                colorStops = MaterialTheme.colorScheme.backgroundGradient.toTypedArray(),
-            )
+            MaterialTheme.colorScheme.primary
         ) else Modifier
     val currentFavoriteIndex = uiState.favorites.indexOfFirst { it.id == uiState.locationId }
 

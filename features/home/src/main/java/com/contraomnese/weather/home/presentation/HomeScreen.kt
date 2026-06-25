@@ -3,7 +3,6 @@ package com.contraomnese.weather.home.presentation
 import android.R.attr.country
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.widget.Toast
 import androidx.compose.animation.core.animateDpAsState
@@ -11,7 +10,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -53,20 +51,14 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.LinkAnnotation
-import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.LineBreak
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contraomnese.weather.core.ui.composition.LocalSnackbarHostState
 import com.contraomnese.weather.core.ui.utils.getConditionResId
@@ -78,6 +70,7 @@ import com.contraomnese.weather.core.ui.widgets.CountryFlagWidget
 import com.contraomnese.weather.core.ui.widgets.FavoriteItem
 import com.contraomnese.weather.core.ui.widgets.GpsModeAlertDialog
 import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
+import com.contraomnese.weather.core.ui.widgets.LocationApiItem
 import com.contraomnese.weather.core.ui.widgets.PermissionAlertDialog
 import com.contraomnese.weather.core.ui.widgets.SearchTextField
 import com.contraomnese.weather.design.R
@@ -479,7 +472,7 @@ private fun MatchingLocations(
                 )
             }
             item {
-                LocationApiLink(
+                LocationApiItem(
                     modifier = Modifier
                         .padding(vertical = padding16)
                         .fillMaxWidth(),
@@ -636,42 +629,6 @@ private fun Favorites(
     }
 }
 
-@Composable
-private fun LocationApiLink(
-    modifier: Modifier,
-    url: String,
-    description: String,
-) {
-    val context = LocalContext.current
-
-    val style = MaterialTheme.typography.labelMedium.toSpanStyle().copy(
-        color = MaterialTheme.colorScheme.onBackground,
-        textDecoration = TextDecoration.Underline
-    )
-
-    val annotatedText = remember(url, description) {
-        buildAnnotatedString {
-            withLink(
-                link = LinkAnnotation.Url(
-                    url = url,
-                    styles = TextLinkStyles(style = style),
-                    linkInteractionListener = {
-                        val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                        context.startActivity(intent)
-                    }
-                )
-            ) {
-                append(description)
-            }
-        }
-    }
-
-    Text(
-        modifier = modifier,
-        text = annotatedText,
-        textAlign = TextAlign.Center,
-    )
-}
 
 @SuppressLint("MissingPermission")
 private fun getGpsLocation(
@@ -724,19 +681,12 @@ private fun HomeScreenPreview() {
 private fun MatchLocationPreview() {
     WeatherTheme {
         CompositionLocalProvider {
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
+            MatchLocation(
+                favoriteIcon = WeatherIcons.AddFavorite,
+                name = "123",
+                state = null,
+                countryCode = "RU"
             )
-            {
-                MatchLocation(
-                    favoriteIcon = WeatherIcons.AddFavorite,
-                    name = "123",
-                    state = null,
-                    countryCode = "RU"
-                )
-            }
         }
     }
 }

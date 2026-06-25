@@ -11,18 +11,6 @@ internal val AirUnhealthyColor = Color(0xFFff4d50)
 internal val AirVeryUnhealthyColor = Color(0xFF960132)
 internal val AirHazardousColor = Color(0xFF7d2181)
 
-val ColorScheme.backgroundGradient: List<Pair<Float, Color>>
-    @Composable
-    get() = listOf(
-        0.00f to Color(0xFF2E83FA),
-        0.15f to Color(0xFF2A7AEC),
-        0.35f to Color(0xFF2673E2),
-        0.55f to Color(0xFF2169D0),
-        0.75f to Color(0xFF1C5DBB),
-        1.00f to Color(0xFF1955AC)
-    )
-
-
 val ColorScheme.emojiColors: List<Color>
     @Composable
     get() = listOf(Color(0xFFFFD93B), Color(0xFFEFAC40), Color(0xFFDEB435))

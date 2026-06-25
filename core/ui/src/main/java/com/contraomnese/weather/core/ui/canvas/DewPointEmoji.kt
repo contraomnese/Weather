@@ -48,8 +48,8 @@ fun DewPointEmoji(
     state: DewPointState,
 ) {
     val emojiColors = MaterialTheme.colorScheme.emojiColors
-    val mouthColor = MaterialTheme.colorScheme.onPrimary
-    val eyeColor = MaterialTheme.colorScheme.primary
+    val mouthColor = MaterialTheme.colorScheme.surface
+    val eyeColor = MaterialTheme.colorScheme.onSurface
     Canvas(modifier = modifier) {
         val radius = size.minDimension / 2f
 

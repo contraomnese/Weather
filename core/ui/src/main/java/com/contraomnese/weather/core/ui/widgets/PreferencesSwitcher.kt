@@ -46,7 +46,7 @@ fun PreferencesSwitcher(
             onCheckedChange = onEnabled,
             colors = SwitchDefaults.colors(
                 checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                checkedTrackColor = MaterialTheme.colorScheme.secondary,
+                checkedTrackColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f),
                 uncheckedThumbColor = MaterialTheme.colorScheme.surfaceVariant,
                 uncheckedTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f),
                 uncheckedBorderColor = Color.Transparent

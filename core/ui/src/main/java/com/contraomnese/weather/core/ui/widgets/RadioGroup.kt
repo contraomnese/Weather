@@ -66,7 +66,7 @@ inline fun <reified T : Enum<T>> RadioGroup(
                             .clip(CircleShape)
                             .clickable { onSelected(option) }
                             .background(
-                                if (isSelected) MaterialTheme.colorScheme.secondary
+                                if (isSelected) MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f)
                                 else Color.Transparent
                             )
                             .padding(horizontal = padding12, vertical = padding8),
