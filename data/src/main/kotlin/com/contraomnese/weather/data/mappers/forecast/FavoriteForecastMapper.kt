@@ -12,17 +12,16 @@ import kotlinx.datetime.TimeZone
 fun FavoriteForecastData.toDomain(appSettings: AppSettings): FavoriteForecast {
 
     val timeZone = TimeZone.of(location.timeZoneId)
-    val today = todayForecast!!
 
     return FavoriteForecast(
         locationId = location.locationId,
         locationName = location.name,
         locationCountry = location.country,
         timeZone = timeZone,
-        temperature = today.toTemperatureDomain(appSettings.temperatureUnit),
-        maxTemperature = today.toMaxTemperatureDomain(appSettings.temperatureUnit),
-        minTemperature = today.toMinTemperatureDomain(appSettings.temperatureUnit),
-        conditionText = WeatherCondition.fromWeatherApi(todayForecast.conditionCode),
+        temperature = todayForecast.toTemperatureDomain(appSettings.temperatureUnit),
+        maxTemperature = todayForecast.toMaxTemperatureDomain(appSettings.temperatureUnit),
+        minTemperature = todayForecast.toMinTemperatureDomain(appSettings.temperatureUnit),
+        condition = WeatherCondition.fromWeatherApi(todayForecast.conditionCode),
     )
 }
 

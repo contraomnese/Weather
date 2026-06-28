@@ -13,12 +13,15 @@ interface AppSettingsStorage {
     fun getSettings(): AppSettingsEntity
     suspend fun saveSettings(settings: AppSettingsEntity)
 
-    suspend fun setLanguage(language: Language)
-    suspend fun setTimezone(timezone: String)
-    suspend fun setWindSpeedUnit(unit: WindSpeedUnit)
-    suspend fun setPrecipitationUnit(unit: PrecipitationUnit)
-    suspend fun setTemperatureUnit(unit: TemperatureUnit)
-    suspend fun setPressureUnit(unit: PressureUnit)
-    suspend fun setForecastAutoSyncEnabled(enabled: Boolean)
-    suspend fun setNotificationEnabled(enabled: Boolean)
+    suspend fun saveLanguage(language: Language)
+    suspend fun saveTimezone(timezone: String)
+    suspend fun saveWindSpeedUnit(unit: WindSpeedUnit)
+    suspend fun savePrecipitationUnit(unit: PrecipitationUnit)
+    suspend fun saveTemperatureUnit(unit: TemperatureUnit)
+    suspend fun savePressureUnit(unit: PressureUnit)
+    suspend fun saveFavoritesForecastUpdateEnabled(enabled: Boolean)
+    suspend fun saveFavoritesForecastNotificationEnabled(enabled: Boolean)
+    suspend fun readFavoritesForecastNotificationEnabled(): Boolean
+    suspend fun saveFavoritesForecastUpdateInterval(selectedTime: Long)
+    suspend fun readFavoritesForecastUpdateInterval(): Long
 }

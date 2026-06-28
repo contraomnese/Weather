@@ -1,5 +1,7 @@
 package com.contraomnese.weather.domain.app.model
 
+import java.util.concurrent.TimeUnit
+
 data class AppSettings(
     val language: Language = Language("en"),
     val timezone: String = "Europe/Moscow",
@@ -7,8 +9,9 @@ data class AppSettings(
     val precipitationUnit: PrecipitationUnit = PrecipitationUnit.Millimeters,
     val temperatureUnit: TemperatureUnit = TemperatureUnit.Celsius,
     val pressureUnit: PressureUnit = PressureUnit.MmHg,
-    val forecastAutoSyncEnabled: Boolean = false,
-    val pushNotificationsEnabled: Boolean = false,
+    val favoritesForecastUpdateEnabled: Boolean = false,
+    val favoritesForecastNotificationEnabled: Boolean = false,
+    val favoritesForecastUpdateInterval: Long = TimeUnit.SECONDS.toMillis(15),
 )
 
 @JvmInline

@@ -17,8 +17,9 @@ class AppSettingsMapper {
         precipitationUnit = PrecipitationUnit.entries.firstOrNull { it.name == entity.precipitationUnit } ?: PrecipitationUnit.Millimeters,
         temperatureUnit = TemperatureUnit.entries.firstOrNull { it.name == entity.temperatureUnit } ?: TemperatureUnit.Celsius,
         pressureUnit = PressureUnit.entries.firstOrNull { it.name == entity.pressureUnit } ?: PressureUnit.MmHg,
-        forecastAutoSyncEnabled = entity.forecastAutoSyncEnabled,
-        pushNotificationsEnabled = entity.notificationsEnabled
+        favoritesForecastUpdateEnabled = entity.favoritesForecastUpdateEnabled,
+        favoritesForecastNotificationEnabled = entity.favoritesForecastNotificationEnabled,
+        favoritesForecastUpdateInterval = entity.favoritesForecastUpdateInterval
     )
 
     fun toEntity(model: AppSettings): AppSettingsEntity = AppSettingsEntity(
@@ -28,7 +29,8 @@ class AppSettingsMapper {
         precipitationUnit = model.precipitationUnit.name,
         temperatureUnit = model.temperatureUnit.name,
         pressureUnit = model.pressureUnit.name,
-        forecastAutoSyncEnabled = model.forecastAutoSyncEnabled,
-        notificationsEnabled = model.pushNotificationsEnabled
+        favoritesForecastUpdateEnabled = model.favoritesForecastUpdateEnabled,
+        favoritesForecastNotificationEnabled = model.favoritesForecastNotificationEnabled,
+        favoritesForecastUpdateInterval = model.favoritesForecastUpdateInterval
     )
 }

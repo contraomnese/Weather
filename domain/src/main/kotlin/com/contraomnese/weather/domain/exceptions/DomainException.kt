@@ -21,6 +21,9 @@ sealed class DomainException(
 fun operationFailed(message: String, cause: Throwable? = null) =
     DomainException.OperationFailed(message, cause)
 
+fun noInternetConnection(message: String, cause: Throwable? = null) =
+    DomainException.InternetUnavailable(message, cause)
+
 fun storageError(message: String, cause: Throwable? = null) =
     DomainException.StorageError(message, cause)
 

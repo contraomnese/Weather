@@ -13,4 +13,5 @@ internal sealed interface HomeScreenAction : MviAction {
     data class DeviceGpsModeEnabled(val enabled: Boolean) : HomeScreenAction
     data class UpdateFavorites(val favorites: List<Location>) : HomeScreenAction
     data object DisablePushNotification : HomeScreenAction
+    data object StopLoading : HomeScreenAction
 }

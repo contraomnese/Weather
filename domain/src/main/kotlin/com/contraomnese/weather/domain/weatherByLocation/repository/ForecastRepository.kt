@@ -10,5 +10,6 @@ interface ForecastRepository {
     fun observeSingleForecast(locationId: Int): Flow<Forecast?>
     fun observeForecasts(locationIds: List<Int>): Flow<List<Forecast>>
     fun observeFavoriteForecasts(locationIds: List<Int>): Flow<List<FavoriteForecast>>
+    fun observeFavoriteForecast(locationId: Int): Flow<FavoriteForecast?>
 }
 

@@ -67,7 +67,7 @@ class AppSettingsRepositoryImpl(
 
     override suspend fun setLanguage(language: Language): Result<Unit> = withContext(dispatcher) {
         try {
-            storage.setLanguage(language)
+            storage.saveLanguage(language)
             Result.success(Unit)
         } catch (exception: Exception) {
             Result.failure(storageError(logPrefix("Storage failure during change language"), exception))
@@ -77,7 +77,7 @@ class AppSettingsRepositoryImpl(
 
     override suspend fun setTimezone(timezone: String): Result<Unit> = withContext(dispatcher) {
         try {
-            storage.setTimezone(timezone)
+            storage.saveTimezone(timezone)
             Result.success(Unit)
         } catch (exception: Exception) {
             Result.failure(storageError(logPrefix("Storage failure during change timezone"), exception))
@@ -86,7 +86,7 @@ class AppSettingsRepositoryImpl(
 
     override suspend fun setWindSpeedUnit(unit: WindSpeedUnit): Result<Unit> = withContext(dispatcher) {
         try {
-            storage.setWindSpeedUnit(unit)
+            storage.saveWindSpeedUnit(unit)
             Result.success(Unit)
         } catch (exception: Exception) {
             Result.failure(storageError(logPrefix("Storage failure during change wind speed unit"), exception))
@@ -95,7 +95,7 @@ class AppSettingsRepositoryImpl(
 
     override suspend fun setPrecipitationUnit(unit: PrecipitationUnit): Result<Unit> = withContext(dispatcher) {
         try {
-            storage.setPrecipitationUnit(unit)
+            storage.savePrecipitationUnit(unit)
             Result.success(Unit)
         } catch (exception: Exception) {
             Result.failure(storageError(logPrefix("Storage failure during change precipitation unit"), exception))
@@ -104,7 +104,7 @@ class AppSettingsRepositoryImpl(
 
     override suspend fun setTemperatureUnit(unit: TemperatureUnit): Result<Unit> = withContext(dispatcher) {
         try {
-            storage.setTemperatureUnit(unit)
+            storage.saveTemperatureUnit(unit)
             Result.success(Unit)
         } catch (exception: Exception) {
             Result.failure(storageError(logPrefix("Storage failure during change temperature unit"), exception))
@@ -113,16 +113,16 @@ class AppSettingsRepositoryImpl(
 
     override suspend fun setPressureUnit(unit: PressureUnit): Result<Unit> = withContext(dispatcher) {
         try {
-            storage.setPressureUnit(unit)
+            storage.savePressureUnit(unit)
             Result.success(Unit)
         } catch (exception: Exception) {
             Result.failure(storageError(logPrefix("Storage failure during change pressure unit"), exception))
         }
     }
 
-    override suspend fun setForecastAutoSyncEnabled(enabled: Boolean): Result<Unit> = withContext(dispatcher) {
+    override suspend fun setFavoritesForecastUpdateEnabled(enabled: Boolean): Result<Unit> = withContext(dispatcher) {
         try {
-            storage.setForecastAutoSyncEnabled(enabled)
+            storage.saveFavoritesForecastUpdateEnabled(enabled)
             Result.success(Unit)
         } catch (exception: Exception) {
             Result.failure(
@@ -134,17 +134,52 @@ class AppSettingsRepositoryImpl(
         }
     }
 
-    override suspend fun setPushNotificationEnabled(enabled: Boolean): Result<Unit> = withContext(dispatcher) {
-        try {
-            storage.setNotificationEnabled(enabled)
-            Result.success(Unit)
-        } catch (exception: Exception) {
-            Result.failure(
-                storageError(
-                    logPrefix("Storage failure during enable/disable notifications"),
-                    exception
+    override suspend fun setFavoritesForecastNotificationEnabled(enabled: Boolean): Result<Unit> =
+        withContext(dispatcher) {
+            try {
+                storage.saveFavoritesForecastNotificationEnabled(enabled)
+                Result.success(Unit)
+            } catch (exception: Exception) {
+                Result.failure(
+                    storageError(
+                        logPrefix("Storage failure during enable/disable notifications"),
+                        exception
+                    )
                 )
-            )
+            }
         }
-    }
+
+    override suspend fun getFavoritesForecastNotificationEnabled(): Result<Boolean> =
+        withContext(dispatcher) {
+            try {
+                Result.success(storage.readFavoritesForecastNotificationEnabled())
+            } catch (exception: Exception) {
+                Result.failure(
+                    storageError(
+                        logPrefix("Storage failure during get forecast notification status"),
+                        exception
+                    )
+                )
+            }
+        }
+
+    override suspend fun setFavoritesForecastUpdateScheduleTime(selectedTime: Long) =
+        withContext(dispatcher) {
+            storage.saveFavoritesForecastUpdateInterval(selectedTime)
+
+        }
+
+    override suspend fun getFavoritesForecastUpdateScheduleTime(): Result<Long> =
+        withContext(dispatcher) {
+            try {
+                Result.success(storage.readFavoritesForecastUpdateInterval())
+            } catch (exception: Exception) {
+                Result.failure(
+                    storageError(
+                        logPrefix("Storage failure during get forecast update schedule"),
+                        exception
+                    )
+                )
+            }
+        }
 }

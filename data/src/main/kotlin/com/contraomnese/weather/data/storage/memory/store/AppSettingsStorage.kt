@@ -1,8 +1,10 @@
 package com.contraomnese.weather.data.storage.memory.store
 
 import android.content.Context
+import android.content.Intent
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.contraomnese.weather.data.storage.memory.api.AppSettingsStorage
@@ -17,12 +19,23 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 val Context.appSettingsDataStore by preferencesDataStore("app_settings")
+private const val BROADCAST_FAVORITES_FORECAST_UPDATE_ACTION = "com.contraomnese.weather.FAVORITES_FORECAST_UPDATE"
+val DEFAULT_FAVORITES_FORECAST_UPDATE_INTERVAL = TimeUnit.HOURS.toMillis(4)
+const val FAVORITES_FORECAST_UPDATE_TIME_EXTRA_NAME = "favoritesForecastUpdateTime"
+const val STOP_FAVORITES_FORECAST_UPDATE_EXTRA_NAME = "stopFavoritesForecastUpdate"
 
 class AppSettingsStorageImpl(
     private val context: Context,
@@ -36,8 +49,9 @@ class AppSettingsStorageImpl(
         val PRECIPITATION_UNIT = stringPreferencesKey("precipitation_unit")
         val TEMPERATURE_UNIT = stringPreferencesKey("temperature_unit")
         val PRESSURE_UNIT = stringPreferencesKey("pressure_unit")
-        val FORECAST_AUTO_SYNC_ENABLED = booleanPreferencesKey("forecast_auto_sync_enabled")
-        val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
+        val FORECAST_UPDATE_ENABLED = booleanPreferencesKey("forecast_auto_sync_enabled")
+        val FAVORITES_FORECAST_UPDATE_INTERVAL = longPreferencesKey("favorites_forecast_update_interval")
+        val FAVORITES_FORECAST_NOTIFICATION_ENABLED = booleanPreferencesKey("favorites_forecast_notification_enabled")
     }
 
     private lateinit var settings: AppSettingsEntity
@@ -57,8 +71,9 @@ class AppSettingsStorageImpl(
                 precipitationUnit = prefs[Keys.PRECIPITATION_UNIT] ?: PrecipitationUnit.Millimeters.name,
                 temperatureUnit = prefs[Keys.TEMPERATURE_UNIT] ?: TemperatureUnit.Celsius.name,
                 pressureUnit = prefs[Keys.PRESSURE_UNIT] ?: PressureUnit.MmHg.name,
-                forecastAutoSyncEnabled = prefs[Keys.FORECAST_AUTO_SYNC_ENABLED] ?: true,
-                notificationsEnabled = prefs[Keys.NOTIFICATIONS_ENABLED] ?: true
+                favoritesForecastUpdateEnabled = prefs[Keys.FORECAST_UPDATE_ENABLED] ?: true,
+                favoritesForecastUpdateInterval = readFavoritesForecastUpdateInterval(),
+                favoritesForecastNotificationEnabled = readFavoritesForecastNotificationEnabled()
             )
             settings
         }
@@ -78,57 +93,96 @@ class AppSettingsStorageImpl(
                 prefs[Keys.PRECIPITATION_UNIT] = settings.precipitationUnit
                 prefs[Keys.TEMPERATURE_UNIT] = settings.temperatureUnit
                 prefs[Keys.PRESSURE_UNIT] = settings.pressureUnit
-                prefs[Keys.FORECAST_AUTO_SYNC_ENABLED] = settings.forecastAutoSyncEnabled
-                prefs[Keys.NOTIFICATIONS_ENABLED] = settings.notificationsEnabled
+                prefs[Keys.FORECAST_UPDATE_ENABLED] = settings.favoritesForecastUpdateEnabled
+                prefs[Keys.FAVORITES_FORECAST_NOTIFICATION_ENABLED] = settings.favoritesForecastNotificationEnabled
             }
         }
     }
 
-    override suspend fun setLanguage(language: Language) {
+    override suspend fun saveLanguage(language: Language) {
         context.appSettingsDataStore.edit { prefs ->
             prefs[Keys.LANGUAGE] = language.value
         }
     }
 
-    override suspend fun setTimezone(timezone: String) {
+    override suspend fun saveTimezone(timezone: String) {
         context.appSettingsDataStore.edit { prefs ->
             prefs[Keys.TIMEZONE] = timezone
         }
     }
 
-    override suspend fun setTemperatureUnit(unit: TemperatureUnit) {
+    override suspend fun saveTemperatureUnit(unit: TemperatureUnit) {
         context.appSettingsDataStore.edit { prefs ->
             prefs[Keys.TEMPERATURE_UNIT] = unit.name
         }
     }
 
-    override suspend fun setPrecipitationUnit(unit: PrecipitationUnit) {
+    override suspend fun savePrecipitationUnit(unit: PrecipitationUnit) {
         context.appSettingsDataStore.edit { prefs ->
             prefs[Keys.PRECIPITATION_UNIT] = unit.name
         }
     }
 
-    override suspend fun setPressureUnit(unit: PressureUnit) {
+    override suspend fun savePressureUnit(unit: PressureUnit) {
         context.appSettingsDataStore.edit { prefs ->
             prefs[Keys.PRESSURE_UNIT] = unit.name
         }
     }
 
-    override suspend fun setWindSpeedUnit(unit: WindSpeedUnit) {
+    override suspend fun saveWindSpeedUnit(unit: WindSpeedUnit) {
         context.appSettingsDataStore.edit { prefs ->
             prefs[Keys.SPEED_UNIT] = unit.name
         }
     }
 
-    override suspend fun setForecastAutoSyncEnabled(enabled: Boolean) {
+    override suspend fun saveFavoritesForecastUpdateEnabled(enabled: Boolean) {
         context.appSettingsDataStore.edit { prefs ->
-            prefs[Keys.FORECAST_AUTO_SYNC_ENABLED] = enabled
+            prefs[Keys.FORECAST_UPDATE_ENABLED] = enabled
+        }
+        launchFavoritesForecastUpdate(enabled)
+    }
+
+    override suspend fun saveFavoritesForecastNotificationEnabled(enabled: Boolean) {
+        context.appSettingsDataStore.edit { prefs ->
+            prefs[Keys.FAVORITES_FORECAST_NOTIFICATION_ENABLED] = enabled
         }
     }
 
-    override suspend fun setNotificationEnabled(enabled: Boolean) {
-        context.appSettingsDataStore.edit { prefs ->
-            prefs[Keys.NOTIFICATIONS_ENABLED] = enabled
+    override suspend fun readFavoritesForecastNotificationEnabled(): Boolean = context.appSettingsDataStore.data
+        .map { preferences ->
+            preferences[Keys.FAVORITES_FORECAST_NOTIFICATION_ENABLED] ?: true
+        }.first()
+
+    override suspend fun saveFavoritesForecastUpdateInterval(selectedTime: Long) {
+        context.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.FAVORITES_FORECAST_UPDATE_INTERVAL] = selectedTime
         }
+    }
+
+    override suspend fun readFavoritesForecastUpdateInterval(): Long = context.appSettingsDataStore.data
+        .map { preferences ->
+            preferences[Keys.FAVORITES_FORECAST_UPDATE_INTERVAL] ?: DEFAULT_FAVORITES_FORECAST_UPDATE_INTERVAL
+        }.first()
+
+    private suspend fun launchFavoritesForecastUpdate(enabled: Boolean) {
+        val intent = Intent().also { intent ->
+            intent.action = BROADCAST_FAVORITES_FORECAST_UPDATE_ACTION
+            intent.putExtra(STOP_FAVORITES_FORECAST_UPDATE_EXTRA_NAME, !enabled)
+            intent.putExtra(FAVORITES_FORECAST_UPDATE_TIME_EXTRA_NAME, readFavoritesForecastUpdateInterval())
+            intent.setPackage(context.packageName)
+        }
+
+        context.sendBroadcast(intent)
+    }
+
+    private fun getDelayUntilMidnight(): Long {
+        val now = Clock.System.now()
+        val timeZone = TimeZone.currentSystemDefault()
+
+        val today = now.toLocalDateTime(timeZone).date
+        val tomorrowMidnight = today
+            .plus(1, DateTimeUnit.DAY)
+            .atStartOfDayIn(timeZone)
+        return (tomorrowMidnight - now).inWholeSeconds
     }
 }

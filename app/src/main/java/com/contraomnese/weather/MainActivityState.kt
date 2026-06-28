@@ -7,7 +7,6 @@ import com.contraomnese.weather.weatherByLocation.navigation.WeatherByLocationDe
 
 internal data class MainActivityState(
     override val isLoading: Boolean = true,
-    val isForecastAutoSync: Boolean,
     val startDestination: MviDestination,
 ) : MviState {
 
@@ -18,10 +17,9 @@ internal data class MainActivityState(
         } ?: HomeDestination
     )
 
-    fun setForecastAutoSync(enabled: Boolean): MainActivityState = copy(isForecastAutoSync = enabled)
     fun finishLoading(): MainActivityState = copy(isLoading = false)
 
     companion object {
-        val DEFAULT = MainActivityState(startDestination = HomeDestination, isForecastAutoSync = false)
+        val DEFAULT = MainActivityState(startDestination = HomeDestination)
     }
 }

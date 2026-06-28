@@ -4,10 +4,10 @@ import com.contraomnese.weather.domain.app.model.PrecipitationUnit
 import com.contraomnese.weather.domain.app.model.PressureUnit
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import com.contraomnese.weather.domain.app.model.WindSpeedUnit
-import com.contraomnese.weather.domain.app.usecase.DisableForecastAutoSyncOnAppSettingsUseCase
-import com.contraomnese.weather.domain.app.usecase.DisablePushNotificationUseCase
-import com.contraomnese.weather.domain.app.usecase.EnableForecastAutoSyncOnAppSettingsUseCase
-import com.contraomnese.weather.domain.app.usecase.EnablePushNotificationUseCase
+import com.contraomnese.weather.domain.app.usecase.DisableFavoritesForecastPushNotificationUseCase
+import com.contraomnese.weather.domain.app.usecase.DisableFavoritesForecastUpdateUseCase
+import com.contraomnese.weather.domain.app.usecase.EnableFavoritesForecastPushNotificationUseCase
+import com.contraomnese.weather.domain.app.usecase.EnableFavoritesForecastUpdateUseCase
 import com.contraomnese.weather.domain.app.usecase.ObserveAppSettingsUseCase
 import com.contraomnese.weather.domain.app.usecase.SetPrecipitationUnitOnAppSettingsUseCase
 import com.contraomnese.weather.domain.app.usecase.SetPressureUnitOnAppSettingsUseCase
@@ -26,10 +26,10 @@ internal class AppSettingsViewModel(
     private val setPressureUnitOnAppSettingsUseCase: SetPressureUnitOnAppSettingsUseCase,
     private val setPrecipitationUnitOnAppSettingsUseCase: SetPrecipitationUnitOnAppSettingsUseCase,
     private val setWindSpeedUnitOnAppSettingsUseCase: SetWindSpeedUnitOnAppSettingsUseCase,
-    private val enableForecastAutoSyncOnAppSettingsUseCase: EnableForecastAutoSyncOnAppSettingsUseCase,
-    private val disableForecastAutoSyncOnAppSettingsUseCase: DisableForecastAutoSyncOnAppSettingsUseCase,
-    private val enablePushNotificationUseCase: EnablePushNotificationUseCase,
-    private val disablePushNotificationUseCase: DisablePushNotificationUseCase,
+    private val enableFavoritesForecastUpdateUseCase: EnableFavoritesForecastUpdateUseCase,
+    private val disableFavoritesForecastUpdateUseCase: DisableFavoritesForecastUpdateUseCase,
+    private val enableFavoritesForecastPushNotificationUseCase: EnableFavoritesForecastPushNotificationUseCase,
+    private val disablePushNotificationUseCase: DisableFavoritesForecastPushNotificationUseCase,
 ) : MviModel<AppSettingsAction, AppSettingsEffect, AppSettingsEvent, AppSettingsScreenState>(
     defaultState = AppSettingsScreenState.DEFAULT,
     tag = "AppSettingsViewModel"
@@ -68,15 +68,15 @@ internal class AppSettingsViewModel(
 
     private suspend fun processForecastAutoSyncChange(enabled: Boolean) {
         if (enabled) {
-            enableForecastAutoSyncOnAppSettingsUseCase()
+            enableFavoritesForecastUpdateUseCase()
         } else {
-            disableForecastAutoSyncOnAppSettingsUseCase()
+            disableFavoritesForecastUpdateUseCase()
         }
     }
 
     private suspend fun processPushNotificationChange(enabled: Boolean) {
         if (enabled) {
-            enablePushNotificationUseCase()
+            enableFavoritesForecastPushNotificationUseCase()
         } else {
             disablePushNotificationUseCase()
         }

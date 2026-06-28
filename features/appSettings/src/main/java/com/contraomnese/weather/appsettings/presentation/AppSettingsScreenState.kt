@@ -26,8 +26,8 @@ internal data class AppSettingsScreenState(
             pressureUnit = appSettings.pressureUnit,
             precipitationUnit = appSettings.precipitationUnit,
             windSpeedUnit = appSettings.windSpeedUnit,
-            forecastAutoSyncEnabled = appSettings.forecastAutoSyncEnabled,
-            pushNotificationsEnabled = appSettings.pushNotificationsEnabled
+            forecastAutoSyncEnabled = appSettings.favoritesForecastUpdateEnabled,
+            pushNotificationsEnabled = appSettings.favoritesForecastNotificationEnabled
         )
 
     fun setTemperatureUnit(temperatureUnit: TemperatureUnit): AppSettingsScreenState =

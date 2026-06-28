@@ -1,13 +1,15 @@
 package com.contraomnese.weather.di
 
-import com.contraomnese.weather.domain.app.usecase.DisableForecastAutoSyncOnAppSettingsUseCase
-import com.contraomnese.weather.domain.app.usecase.DisableForecastAutoSyncOnAppSettingsUseCaseImpl
-import com.contraomnese.weather.domain.app.usecase.DisablePushNotificationUseCase
-import com.contraomnese.weather.domain.app.usecase.DisablePushNotificationUseCaseImpl
-import com.contraomnese.weather.domain.app.usecase.EnableForecastAutoSyncOnAppSettingsUseCase
-import com.contraomnese.weather.domain.app.usecase.EnableForecastAutoSyncOnAppSettingsUseCaseImpl
-import com.contraomnese.weather.domain.app.usecase.EnablePushNotificationUseCase
-import com.contraomnese.weather.domain.app.usecase.EnablePushNotificationUseCaseImpl
+import com.contraomnese.weather.domain.app.usecase.DisableFavoritesForecastPushNotificationUseCase
+import com.contraomnese.weather.domain.app.usecase.DisableFavoritesForecastPushNotificationUseCaseImpl
+import com.contraomnese.weather.domain.app.usecase.DisableFavoritesForecastUpdateUseCase
+import com.contraomnese.weather.domain.app.usecase.DisableFavoritesForecastUpdateUseCaseImpl
+import com.contraomnese.weather.domain.app.usecase.EnableFavoritesForecastPushNotificationUseCase
+import com.contraomnese.weather.domain.app.usecase.EnableFavoritesForecastPushNotificationUseCaseImpl
+import com.contraomnese.weather.domain.app.usecase.EnableFavoritesForecastUpdateUseCase
+import com.contraomnese.weather.domain.app.usecase.EnableFavoritesForecastUpdateUseCaseImpl
+import com.contraomnese.weather.domain.app.usecase.GetFavoritesForecastPushNotificationRunningUseCase
+import com.contraomnese.weather.domain.app.usecase.GetFavoritesForecastPushNotificationRunningUseCaseImpl
 import com.contraomnese.weather.domain.app.usecase.ObserveAppSettingsUseCase
 import com.contraomnese.weather.domain.app.usecase.ObserveAppSettingsUseCaseImpl
 import com.contraomnese.weather.domain.app.usecase.SetPrecipitationUnitOnAppSettingsUseCase
@@ -34,6 +36,8 @@ import com.contraomnese.weather.domain.home.usecase.ObserveFavoritesUseCase
 import com.contraomnese.weather.domain.home.usecase.ObserveFavoritesUseCaseImpl
 import com.contraomnese.weather.domain.home.usecase.RemoveFavoriteUseCase
 import com.contraomnese.weather.domain.home.usecase.RemoveFavoriteUseCaseImpl
+import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveFavoriteForecastUseCase
+import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveFavoriteForecastUseCaseImpl
 import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveFavoriteForecastsUseCase
 import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveFavoriteForecastsUseCaseImpl
 import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveSingleForecastUseCase
@@ -91,6 +95,11 @@ val domainModule = module {
             repository = get()
         )
     }
+    factory<ObserveFavoriteForecastUseCase> {
+        ObserveFavoriteForecastUseCaseImpl(
+            repository = get()
+        )
+    }
     factory<UpdateForecastUseCase> {
         UpdateForecastUseCaseImpl(
             repository = get()
@@ -132,23 +141,28 @@ val domainModule = module {
             repository = get()
         )
     }
-    factory<EnablePushNotificationUseCase> {
-        EnablePushNotificationUseCaseImpl(
+    factory<EnableFavoritesForecastPushNotificationUseCase> {
+        EnableFavoritesForecastPushNotificationUseCaseImpl(
             repository = get()
         )
     }
-    factory<DisablePushNotificationUseCase> {
-        DisablePushNotificationUseCaseImpl(
+    factory<DisableFavoritesForecastPushNotificationUseCase> {
+        DisableFavoritesForecastPushNotificationUseCaseImpl(
             repository = get()
         )
     }
-    factory<EnableForecastAutoSyncOnAppSettingsUseCase> {
-        EnableForecastAutoSyncOnAppSettingsUseCaseImpl(
+    factory<EnableFavoritesForecastUpdateUseCase> {
+        EnableFavoritesForecastUpdateUseCaseImpl(
             repository = get()
         )
     }
-    factory<DisableForecastAutoSyncOnAppSettingsUseCase> {
-        DisableForecastAutoSyncOnAppSettingsUseCaseImpl(
+    factory<DisableFavoritesForecastUpdateUseCase> {
+        DisableFavoritesForecastUpdateUseCaseImpl(
+            repository = get()
+        )
+    }
+    factory<GetFavoritesForecastPushNotificationRunningUseCase> {
+        GetFavoritesForecastPushNotificationRunningUseCaseImpl(
             repository = get()
         )
     }

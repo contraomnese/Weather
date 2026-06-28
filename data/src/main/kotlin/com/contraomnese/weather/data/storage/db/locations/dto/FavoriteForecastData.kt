@@ -13,5 +13,5 @@ data class FavoriteForecastData(
         parentColumn = ForecastLocationEntity.ID,
         entityColumn = ForecastTodayEntity.FORECAST_LOCATION_ID
     )
-    val todayForecast: ForecastTodayEntity?,
+    val todayForecast: ForecastTodayEntity,
 )

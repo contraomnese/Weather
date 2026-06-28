@@ -609,8 +609,8 @@ private fun Favorites(
                 temperature = forecast.temperature,
                 maxTemperature = forecast.maxTemperature,
                 minTemperature = forecast.minTemperature,
-                conditionText = stringResource(forecast.conditionText.getConditionResId()),
-                background = forecast.conditionText.getResources().backgroundResId,
+                conditionText = stringResource(forecast.condition.getConditionResId()),
+                background = forecast.condition.getResources().backgroundResId,
                 onTapClicked = {
                     onNavigateToWeatherByLocation(
                         location.id

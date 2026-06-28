@@ -2,7 +2,7 @@ package com.contraomnese.weather.home.presentation
 
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.viewModelScope
-import com.contraomnese.weather.domain.app.usecase.DisablePushNotificationUseCase
+import com.contraomnese.weather.domain.app.usecase.DisableFavoritesForecastPushNotificationUseCase
 import com.contraomnese.weather.domain.app.usecase.ObserveAppSettingsUseCase
 import com.contraomnese.weather.domain.home.usecase.AddFavoriteUseCase
 import com.contraomnese.weather.domain.home.usecase.GetLocationUseCase
@@ -13,6 +13,7 @@ import com.contraomnese.weather.domain.weatherByLocation.model.FavoriteForecast
 import com.contraomnese.weather.domain.weatherByLocation.model.Location
 import com.contraomnese.weather.domain.weatherByLocation.model.LocationCoordinates
 import com.contraomnese.weather.domain.weatherByLocation.usecase.ObserveFavoriteForecastsUseCase
+import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateFavoritesForecastsUseCase
 import com.contraomnese.weather.domain.weatherByLocation.usecase.UpdateForecastUseCase
 import com.contraomnese.weather.presentation.architecture.MviModel
 import kotlinx.coroutines.delay
@@ -31,8 +32,9 @@ internal class HomeViewModel(
     private val removeFavoriteUseCase: RemoveFavoriteUseCase,
     private val observeFavoriteForecastsUseCase: ObserveFavoriteForecastsUseCase,
     private val updateForecastUseCase: UpdateForecastUseCase,
+    private val updateFavoritesForecastsUseCase: UpdateFavoritesForecastsUseCase,
     private val observeAppSettingsUseCase: ObserveAppSettingsUseCase,
-    private val disablePushNotificationUseCase: DisablePushNotificationUseCase,
+    private val disablePushNotificationUseCase: DisableFavoritesForecastPushNotificationUseCase,
 ) : MviModel<HomeScreenAction, HomeScreenEffect, HomeScreenEvent, HomeScreenState>(
     defaultState = HomeScreenState.DEFAULT,
     tag = "HomeViewModel",
@@ -62,14 +64,19 @@ internal class HomeViewModel(
         viewModelScope.launch {
             observeAppSettingsUseCase()
                 .collectLatest { settings ->
-                    push(HomeScreenEffect.PushNotificationsEnabled(settings.pushNotificationsEnabled))
+                    push(HomeScreenEffect.PushNotificationsEnabled(settings.favoritesForecastNotificationEnabled))
                 }
         }
 
         viewModelScope.launch {
             observeFavoritesUseCase()
                 .collectLatest { favorites ->
-                    push(HomeScreenAction.UpdateFavorites(favorites))
+                    if (favorites.isEmpty()) {
+                        push(HomeScreenAction.StopLoading)
+                    } else {
+                        push(HomeScreenAction.UpdateFavorites(favorites))
+                    }
+
                 }
         }
     }
@@ -95,6 +102,9 @@ internal class HomeViewModel(
 
         is HomeScreenEffect.PushNotificationsEnabled,
             -> previousState.setPushNotificationsEnabled(effect.isEnabled)
+
+        HomeScreenEffect.StopLoading,
+            -> previousState.setLoading(false)
     }
 
     override suspend fun actor(action: HomeScreenAction) = when (action) {
@@ -120,7 +130,10 @@ internal class HomeViewModel(
         is HomeScreenAction.UpdateFavorites,
             -> processFavoritesUpdate(action.favorites)
 
-        HomeScreenAction.DisablePushNotification -> processDisablePushNotification()
+        HomeScreenAction.DisablePushNotification,
+            -> processDisablePushNotification()
+
+        HomeScreenAction.StopLoading -> processStopLoading()
     }
 
     private suspend fun processLocationInput(input: TextFieldValue) {
@@ -138,10 +151,13 @@ internal class HomeViewModel(
 
     private suspend fun processFavoriteAdd(locationId: Int) {
         addFavoriteUseCase(locationId)
-            .onSuccess { favorite ->
-                updateForecastUseCase(favorite)
-            }
-            .onFailure { push(HomeScreenEvent.HandleError(it)) }
+//            .onSuccess { favorite ->
+//                updateForecastUseCase(favorite)
+//                    .onFailure {
+//                        processFavoriteRemove(locationId)
+//                        push(HomeScreenEvent.HandleError(it))
+//                    }
+//            }
     }
 
     private suspend fun processFavoriteRemove(locationId: Int) {
@@ -156,6 +172,21 @@ internal class HomeViewModel(
         val newFavoriteLocationIds = newFavoriteLocations.map { it.id }
         observeFavoriteForecastsUseCase(newFavoriteLocationIds)
             .collectLatest { newFavoriteForecasts ->
+
+                if (newFavoriteForecasts.isEmpty()) {
+                    val updatedFavorites = updateFavoritesForecastsUseCase(newFavoriteLocationIds)
+
+                    updatedFavorites.onEachIndexed { idx, result ->
+                        result
+                            .onFailure {
+                                val notUpdatedLocationId = newFavoriteLocations[idx].id
+                                push(HomeScreenAction.RemoveFavorite(notUpdatedLocationId))
+                                push(HomeScreenEvent.HandleError(it))
+                            }
+                    }
+
+                    return@collectLatest
+                }
 
                 val forecastsById: Map<Int, FavoriteForecast> = newFavoriteForecasts.associateBy { it.locationId }
                 val forecasts: Map<Location, FavoriteForecast> = newFavoriteLocations
@@ -195,6 +226,10 @@ internal class HomeViewModel(
                 push(HomeScreenEffect.GpsLocationUpdated(it))
                 push(HomeScreenEvent.NavigateToGpsLocation(it.id))
             }
+    }
+
+    private fun processStopLoading() {
+        push(HomeScreenEffect.StopLoading)
     }
 
 }

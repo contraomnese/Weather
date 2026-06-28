@@ -17,6 +17,7 @@ import com.contraomnese.weather.data.storage.db.WeatherAppDatabase
 import com.contraomnese.weather.data.storage.db.locations.entities.MatchingLocationEntity
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
 import com.contraomnese.weather.domain.exceptions.logPrefix
+import com.contraomnese.weather.domain.exceptions.noInternetConnection
 import com.contraomnese.weather.domain.exceptions.operationFailed
 import com.contraomnese.weather.domain.exceptions.storageError
 import com.contraomnese.weather.domain.weatherByLocation.model.FavoriteForecast
@@ -30,6 +31,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.TimeZone
+import java.net.SocketTimeoutException
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
@@ -73,9 +75,21 @@ class ForecastRepositoryImpl(
             appSettingsRepository.observeSettings()
         ) { entities, settings ->
             entities
-                .filter { it.todayForecast != null }
                 .map { it.toDomain(settings) }
         }
+            .flowOn(dispatcher)
+    }
+
+    override fun observeFavoriteForecast(locationId: Int): Flow<FavoriteForecast?> {
+        return combine(
+            database.forecastDao().observeFavoriteForecastBy(locationId),
+            appSettingsRepository.observeSettings()
+        ) { entity, settings ->
+            Pair(entity, settings)
+        }
+            .map { (entity, settings) ->
+                entity?.let { entity.toDomain(settings) }
+            }
             .flowOn(dispatcher)
     }
 
@@ -85,17 +99,17 @@ class ForecastRepositoryImpl(
         return if (mutex.tryLock()) {
             val forecastLastUpdated = database.forecastDao().getLastUpdatedTimeBy(locationId)
             forecastLastUpdated?.let {
-                val currentTime = System.currentTimeMillis()
-                val timeDiff = currentTime - it
-                val updateThreshold = TimeUnit.HOURS.toMillis(4)
-                if (timeDiff < updateThreshold) {
-                    Result.success(locationId)
-                } else {
-                    try {
+                try {
+                    val currentTime = System.currentTimeMillis()
+                    val timeDiff = currentTime - it
+                    val updateThreshold = TimeUnit.HOURS.toMillis(4)
+                    if (timeDiff < updateThreshold) {
+                        Result.success(locationId)
+                    } else {
                         updateForecast(locationId)
-                    } finally {
-                        mutex.unlock()
                     }
+                } finally {
+                    mutex.unlock()
                 }
             } ?: try {
                 updateForecast(locationId)
@@ -179,7 +193,17 @@ class ForecastRepositoryImpl(
         }
         Result.success(Unit)
     } catch (cause: Exception) {
-        Result.failure(operationFailed(logPrefix("Impossible save new forecast to storage"), cause))
+        when (cause) {
+            is SocketTimeoutException -> Result.failure(
+                noInternetConnection(
+                    logPrefix("Impossible get forecast from network"),
+                    cause
+                )
+            )
+
+            else -> Result.failure(operationFailed(logPrefix("Impossible save new forecast to storage"), cause))
+        }
+
     }
 
 

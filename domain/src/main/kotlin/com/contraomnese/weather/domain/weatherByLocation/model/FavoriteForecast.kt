@@ -10,5 +10,5 @@ data class FavoriteForecast(
     val temperature: String,
     val maxTemperature: String,
     val minTemperature: String,
-    val conditionText: WeatherCondition,
+    val condition: WeatherCondition,
 )

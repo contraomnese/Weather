@@ -154,7 +154,7 @@ private fun AppSettingsScreen(
                 PreferencesSwitcher(
                     title = R.string.push_notifications_enable,
                     enabled = uiState.pushNotificationsEnabled,
-                    onEnabled = { pushAction(AppSettingsAction.ForecastAutoSyncChange(it)) }
+                    onEnabled = { pushAction(AppSettingsAction.PushNotificationsChange(it)) }
                 )
             }
         }

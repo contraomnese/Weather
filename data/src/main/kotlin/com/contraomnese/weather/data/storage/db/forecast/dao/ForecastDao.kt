@@ -58,4 +58,8 @@ interface ForecastDao {
     @Transaction
     @Query("SELECT * FROM forecast_location WHERE location_id IN (:locationIds)")
     fun observeFavoriteForecastsBy(locationIds: List<Int>): Flow<List<FavoriteForecastData>>
+
+    @Transaction
+    @Query("SELECT * FROM forecast_location WHERE location_id = :locationId")
+    fun observeFavoriteForecastBy(locationId: Int): Flow<FavoriteForecastData?>
 }

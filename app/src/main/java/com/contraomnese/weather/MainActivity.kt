@@ -14,7 +14,6 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.navigation.WeatherHost
-import com.contraomnese.weather.workers.setupWeatherSync
 import org.koin.androidx.compose.KoinAndroidContext
 import org.koin.androidx.compose.koinViewModel
 
@@ -31,7 +30,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             WeatherTheme {
                 KoinAndroidContext {
-                    WeatherScreen(activateForecastSync = { setupWeatherSync(this) })
+                    WeatherScreen()
                 }
             }
         }
@@ -39,10 +38,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-internal fun WeatherScreen(
-    viewModel: MainActivityViewModel = koinViewModel(),
-    activateForecastSync: () -> Unit,
-) {
+internal fun WeatherScreen(viewModel: MainActivityViewModel = koinViewModel()) {
 
     val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
 
@@ -50,8 +46,6 @@ internal fun WeatherScreen(
         if (loading) {
             SplashScreen(uiState.isLoading)
         } else {
-            if (uiState.isForecastAutoSync) activateForecastSync()
-
             WeatherHost(
                 startDestination = uiState.startDestination,
                 eventFlow = viewModel.eventFlow

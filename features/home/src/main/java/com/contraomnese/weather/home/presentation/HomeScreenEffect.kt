@@ -14,4 +14,5 @@ internal sealed interface HomeScreenEffect : MviEffect {
     data class AccessFineLocationPermissionGranted(val isGranted: Boolean) : HomeScreenEffect
     data class CurrentTimeUpdated(val time: Instant) : HomeScreenEffect
     data class PushNotificationsEnabled(val isEnabled: Boolean) : HomeScreenEffect
+    data object StopLoading : HomeScreenEffect
 }

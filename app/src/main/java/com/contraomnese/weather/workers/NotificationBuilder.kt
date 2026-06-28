@@ -24,7 +24,7 @@ fun createNewWeatherForecastNotification(
     locationName: String,
     maxTemperature: String,
     minTemperature: String,
-    feelsLikeTemperature: String,
+    temperature: String,
     condition: WeatherCondition,
 ): Notification {
 
@@ -42,7 +42,7 @@ fun createNewWeatherForecastNotification(
         locationName,
         maxTemperature = maxTemperature,
         minTemperature = minTemperature,
-        feelsLikeTemperature = feelsLikeTemperature,
+        temperature = temperature,
         condition = condition
     )
 
@@ -54,7 +54,7 @@ fun buildNewWeatherForecastNotification(
     locationName: String,
     maxTemperature: String,
     minTemperature: String,
-    feelsLikeTemperature: String,
+    temperature: String,
     condition: WeatherCondition,
 ): Notification {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -75,7 +75,7 @@ fun buildNewWeatherForecastNotification(
             .setContentText(
                 context.getString(
                     R.string.feels_like_temperature_title,
-                    feelsLikeTemperature,
+                    temperature,
                     maxTemperature,
                     minTemperature
                 )
@@ -96,7 +96,7 @@ fun buildNewWeatherForecastNotification(
             .setContentText(
                 context.getString(
                     R.string.feels_like_temperature_title,
-                    feelsLikeTemperature,
+                    temperature,
                     maxTemperature,
                     minTemperature
                 )

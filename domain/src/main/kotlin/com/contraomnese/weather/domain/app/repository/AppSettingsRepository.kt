@@ -20,7 +20,9 @@ interface AppSettingsRepository {
     suspend fun setPrecipitationUnit(unit: PrecipitationUnit): Result<Unit>
     suspend fun setTemperatureUnit(unit: TemperatureUnit): Result<Unit>
     suspend fun setPressureUnit(unit: PressureUnit): Result<Unit>
-    suspend fun setForecastAutoSyncEnabled(enabled: Boolean): Result<Unit>
-    suspend fun setPushNotificationEnabled(enabled: Boolean): Result<Unit>
-
+    suspend fun setFavoritesForecastUpdateEnabled(enabled: Boolean): Result<Unit>
+    suspend fun setFavoritesForecastNotificationEnabled(enabled: Boolean): Result<Unit>
+    suspend fun getFavoritesForecastNotificationEnabled(): Result<Boolean>
+    suspend fun setFavoritesForecastUpdateScheduleTime(selectedTime: Long)
+    suspend fun getFavoritesForecastUpdateScheduleTime(): Result<Long>
 }

@@ -77,6 +77,10 @@ internal data class HomeScreenState(
     fun setPushNotificationsEnabled(isEnabled: Boolean): HomeScreenState =
         this.copy(isPushNotificationEnabled = isEnabled)
 
+    fun setLoading(isLoading: Boolean): HomeScreenState =
+        this.copy(isLoading = isLoading)
+
+
     companion object {
         val DEFAULT = HomeScreenState(isLoading = true)
     }

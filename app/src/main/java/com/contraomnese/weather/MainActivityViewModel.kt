@@ -1,6 +1,8 @@
 package com.contraomnese.weather
 
 import androidx.lifecycle.viewModelScope
+import com.contraomnese.weather.domain.app.usecase.DisableFavoritesForecastUpdateUseCase
+import com.contraomnese.weather.domain.app.usecase.EnableFavoritesForecastUpdateUseCase
 import com.contraomnese.weather.domain.app.usecase.ObserveAppSettingsUseCase
 import com.contraomnese.weather.domain.exceptions.logPrefix
 import com.contraomnese.weather.domain.exceptions.notInitialize
@@ -15,6 +17,8 @@ import kotlinx.coroutines.flow.onEach
 internal class MainActivityViewModel(
     private val getFirstFavoriteIdUseCase: GetFirstFavoriteIdUseCase,
     private val observeAppSettingsUseCase: ObserveAppSettingsUseCase,
+    private val enableFavoritesForecastUpdateUseCase: EnableFavoritesForecastUpdateUseCase,
+    private val disableFavoritesForecastUpdateUseCase: DisableFavoritesForecastUpdateUseCase,
 ) : MviModel<MainActivityAction, MainActivityEffect, MainActivityEvent, MainActivityState>(
     tag = "MainActivity",
     defaultState = MainActivityState.DEFAULT
@@ -23,10 +27,11 @@ internal class MainActivityViewModel(
         push(MainActivityEffect.WeatherDestinationIdChanged(getFirstFavoriteIdUseCase()))
 
         observeAppSettingsUseCase()
-            .map { it.forecastAutoSyncEnabled }
+            .map { it.favoritesForecastUpdateEnabled }
             .distinctUntilChanged()
             .onEach { isEnabled ->
-                push(MainActivityEffect.ForecastAutoSyncChanged(isEnabled))
+                if (isEnabled) enableFavoritesForecastUpdateUseCase()
+                else disableFavoritesForecastUpdateUseCase()
             }
             .catch {
                 push(MainActivityEvent.HandleError(notInitialize(logPrefix("Bootstrap failed"), it)))
@@ -36,7 +41,6 @@ internal class MainActivityViewModel(
 
     override fun reducer(effect: MainActivityEffect, previousState: MainActivityState): MainActivityState = when (effect) {
         is MainActivityEffect.LoadingFinished -> previousState.finishLoading()
-        is MainActivityEffect.ForecastAutoSyncChanged -> previousState.setForecastAutoSync(effect.enabled)
         is MainActivityEffect.WeatherDestinationIdChanged -> previousState.setWeatherDestinationId(effect.id)
     }
 }

@@ -7,6 +7,7 @@ data class AppSettingsEntity(
     val precipitationUnit: String,
     val temperatureUnit: String,
     val pressureUnit: String,
-    val forecastAutoSyncEnabled: Boolean,
-    val notificationsEnabled: Boolean,
+    val favoritesForecastUpdateEnabled: Boolean,
+    val favoritesForecastUpdateInterval: Long,
+    val favoritesForecastNotificationEnabled: Boolean,
 )

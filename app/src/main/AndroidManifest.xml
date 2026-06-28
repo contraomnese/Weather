@@ -40,6 +40,14 @@
                 android:value="androidx.startup"
                 tools:node="remove" />
         </provider>
+        <receiver
+            android:name=".br.FavoritesForecastUpdateReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.contraomnese.weather.FAVORITES_FORECAST_UPDATE" />
+            </intent-filter>
+        </receiver>
         <profileable
             android:shell="true"
             tools:targetApi="29" />
