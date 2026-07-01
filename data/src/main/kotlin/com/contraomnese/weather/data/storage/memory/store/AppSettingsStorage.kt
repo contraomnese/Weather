@@ -1,7 +1,6 @@
 package com.contraomnese.weather.data.storage.memory.store
 
 import android.content.Context
-import android.content.Intent
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
@@ -14,6 +13,7 @@ import com.contraomnese.weather.domain.app.model.PrecipitationUnit
 import com.contraomnese.weather.domain.app.model.PressureUnit
 import com.contraomnese.weather.domain.app.model.TemperatureUnit
 import com.contraomnese.weather.domain.app.model.WindSpeedUnit
+import com.contraomnese.weather.domain.scheduler.ForecastUpdateScheduler
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -30,16 +30,15 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.minutes
 
 val Context.appSettingsDataStore by preferencesDataStore("app_settings")
-private const val BROADCAST_FAVORITES_FORECAST_UPDATE_ACTION = "com.contraomnese.weather.FAVORITES_FORECAST_UPDATE"
-val DEFAULT_FAVORITES_FORECAST_UPDATE_INTERVAL = TimeUnit.HOURS.toMillis(4)
-const val FAVORITES_FORECAST_UPDATE_TIME_EXTRA_NAME = "favoritesForecastUpdateTime"
-const val STOP_FAVORITES_FORECAST_UPDATE_EXTRA_NAME = "stopFavoritesForecastUpdate"
+val DEFAULT_FAVORITES_FORECAST_UPDATE_INTERVAL = TimeUnit.HOURS.toMillis(3)
 
 class AppSettingsStorageImpl(
     private val context: Context,
     private val dispatcher: CoroutineDispatcher,
+    private val forecastUpdateScheduler: ForecastUpdateScheduler,
 ) : AppSettingsStorage {
 
     private object Keys {
@@ -165,14 +164,14 @@ class AppSettingsStorageImpl(
         }.first()
 
     private suspend fun launchFavoritesForecastUpdate(enabled: Boolean) {
-        val intent = Intent().also { intent ->
-            intent.action = BROADCAST_FAVORITES_FORECAST_UPDATE_ACTION
-            intent.putExtra(STOP_FAVORITES_FORECAST_UPDATE_EXTRA_NAME, !enabled)
-            intent.putExtra(FAVORITES_FORECAST_UPDATE_TIME_EXTRA_NAME, readFavoritesForecastUpdateInterval())
-            intent.setPackage(context.packageName)
+        if (enabled) {
+            forecastUpdateScheduler.scheduleFavoritesUpdate(
+                intervalMs = readFavoritesForecastUpdateInterval(),
+                initialDelayMs = getDelayUntilMidnight()
+            )
+        } else {
+            forecastUpdateScheduler.stopFavoritesUpdate()
         }
-
-        context.sendBroadcast(intent)
     }
 
     private fun getDelayUntilMidnight(): Long {
@@ -180,9 +179,12 @@ class AppSettingsStorageImpl(
         val timeZone = TimeZone.currentSystemDefault()
 
         val today = now.toLocalDateTime(timeZone).date
+
         val tomorrowMidnight = today
             .plus(1, DateTimeUnit.DAY)
             .atStartOfDayIn(timeZone)
-        return (tomorrowMidnight - now).inWholeSeconds
+            .plus(15.minutes)
+
+        return (tomorrowMidnight - now).inWholeMilliseconds
     }
 }

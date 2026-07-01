@@ -15,31 +15,43 @@ import com.contraomnese.weather.data.network.remotes.weather.OpenMeteoRemote
 import com.contraomnese.weather.data.network.remotes.weather.WeatherApiRemote
 import com.contraomnese.weather.data.storage.db.WeatherAppDatabase
 import com.contraomnese.weather.data.storage.db.locations.entities.MatchingLocationEntity
+import com.contraomnese.weather.data.storage.memory.store.DEFAULT_FAVORITES_FORECAST_UPDATE_INTERVAL
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
 import com.contraomnese.weather.domain.exceptions.logPrefix
 import com.contraomnese.weather.domain.exceptions.noInternetConnection
 import com.contraomnese.weather.domain.exceptions.operationFailed
 import com.contraomnese.weather.domain.exceptions.storageError
+import com.contraomnese.weather.domain.weatherByLocation.model.ExpirableData
 import com.contraomnese.weather.domain.weatherByLocation.model.FavoriteForecast
 import com.contraomnese.weather.domain.weatherByLocation.model.Forecast
 import com.contraomnese.weather.domain.weatherByLocation.repository.ForecastRepository
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
 import java.net.SocketTimeoutException
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.minutes
 
 class ForecastRepositoryImpl(
     private val forecastRemoteApi: ForecastRemote,
     private val appSettingsRepository: AppSettingsRepository,
     private val database: WeatherAppDatabase,
     private val dispatcher: CoroutineDispatcher,
+    private val externalScope: CoroutineScope,
     private val refreshForecastLocks: MutableMap<Int, Mutex> = ConcurrentHashMap(),
     private val transactionProvider: TransactionProvider,
 ) : ForecastRepository {
@@ -51,9 +63,8 @@ class ForecastRepositoryImpl(
         ) { entity, settings ->
             Pair(entity, settings)
         }
-            .map { (entity, settings) ->
-                entity?.let { entity.toDomain(settings) }
-            }
+            .map { (entity, settings) -> entity?.toDomain(settings) }
+            .triggerUpdateIfExpired()
             .flowOn(dispatcher)
     }
 
@@ -63,9 +74,9 @@ class ForecastRepositoryImpl(
             appSettingsRepository.observeSettings()
         ) { entities, settings ->
             entities
-                .filter { it.todayForecast != null }
                 .map { it.toDomain(settings) }
         }
+            .triggerUpdateIfExpiredList()
             .flowOn(dispatcher)
     }
 
@@ -77,6 +88,7 @@ class ForecastRepositoryImpl(
             entities
                 .map { it.toDomain(settings) }
         }
+            .triggerUpdateIfExpiredList()
             .flowOn(dispatcher)
     }
 
@@ -90,6 +102,7 @@ class ForecastRepositoryImpl(
             .map { (entity, settings) ->
                 entity?.let { entity.toDomain(settings) }
             }
+            .triggerUpdateIfExpired()
             .flowOn(dispatcher)
     }
 
@@ -97,16 +110,20 @@ class ForecastRepositoryImpl(
         val mutex = refreshForecastLocks.computeIfAbsent(locationId) { Mutex() }
 
         return if (mutex.tryLock()) {
-            val forecastLastUpdated = database.forecastDao().getLastUpdatedTimeBy(locationId)
-            forecastLastUpdated?.let {
+            val forecastLastUpdatedData = database.forecastDao().getLastUpdatedBy(locationId)
+            val forecastExpireInterval = appSettingsRepository.getFavoritesForecastUpdateScheduleTime().getOrNull()
+                ?: DEFAULT_FAVORITES_FORECAST_UPDATE_INTERVAL
+            forecastLastUpdatedData?.let {
                 try {
-                    val currentTime = System.currentTimeMillis()
-                    val timeDiff = currentTime - it
-                    val updateThreshold = TimeUnit.HOURS.toMillis(4)
-                    if (timeDiff < updateThreshold) {
-                        Result.success(locationId)
-                    } else {
+                    if (isForecastExpired(
+                            expiredTime = forecastLastUpdatedData.lastUpdatedTime + forecastExpireInterval,
+                            lastUpdatedTime = forecastLastUpdatedData.lastUpdatedTime,
+                            locationTimeZoneId = forecastLastUpdatedData.timeZoneId
+                        )
+                    ) {
                         updateForecast(locationId)
+                    } else {
+                        Result.success(locationId)
                     }
                 } finally {
                     mutex.unlock()
@@ -119,6 +136,24 @@ class ForecastRepositoryImpl(
         } else {
             Result.failure(operationFailed(logPrefix("Refreshing already launch for this location id")))
         }
+    }
+
+    private fun isForecastExpired(expiredTime: Long, lastUpdatedTime: Long, locationTimeZoneId: String): Boolean {
+        val now = Clock.System.now()
+        val timeZone = TimeZone.of(locationTimeZoneId)
+
+        val lastUpdatedInstant = Instant.fromEpochMilliseconds(lastUpdatedTime)
+        val lastUpdatedDay = lastUpdatedInstant.toLocalDateTime(timeZone).date
+
+        val lastUpdatedMidnight = lastUpdatedDay
+            .plus(1, DateTimeUnit.DAY)
+            .atStartOfDayIn(timeZone)
+            .plus(15.minutes)
+
+        val isForecastExpiredByUpdateInterval = now.toEpochMilliseconds() >= expiredTime
+        val isForecastExpiredBecauseBeginNewDay = now >= lastUpdatedMidnight
+
+        return isForecastExpiredByUpdateInterval || isForecastExpiredBecauseBeginNewDay
     }
 
     private suspend fun updateForecast(locationId: Int): Result<Int> {
@@ -137,13 +172,6 @@ class ForecastRepositoryImpl(
             )
         }
     }
-
-    private suspend fun getMatchingLocation(locationId: Int): Result<MatchingLocationEntity> =
-        try {
-            Result.success(database.locationsDao().getMatchingLocation(locationId))
-        } catch (cause: Exception) {
-            Result.failure(storageError(logPrefix("Current location didn't find in storage"), cause))
-        }
 
     private suspend fun getForecastLocation(locationId: Int): Result<MatchingLocationEntity> =
         try {
@@ -242,5 +270,20 @@ class ForecastRepositoryImpl(
         Result.success(Unit)
     } catch (cause: Exception) {
         Result.failure(operationFailed(logPrefix("Impossible save new forecast to storage"), cause))
+    }
+
+    private fun <T : ExpirableData?> Flow<T>.triggerUpdateIfExpired(): Flow<T> = onEach { data ->
+        if (data != null && data.expiresAt <= System.currentTimeMillis()) {
+            externalScope.launch { updateForecastByLocationId(data.updateTargetId) }
+        }
+    }
+
+    // Для списков
+    private fun <T : ExpirableData> Flow<List<T>>.triggerUpdateIfExpiredList(): Flow<List<T>> = onEach { list ->
+        list.forEach { data ->
+            if (data.expiresAt <= System.currentTimeMillis()) {
+                externalScope.launch { updateForecastByLocationId(data.updateTargetId) }
+            }
+        }
     }
 }

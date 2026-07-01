@@ -85,7 +85,7 @@ class FavoritesForecastUpdateWorker(
 
     companion object {
 
-        internal fun enqueue(workManager: WorkManager, interval: Long) {
+        internal fun enqueue(workManager: WorkManager, interval: Long, initialDelay: Long) {
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .setRequiresBatteryNotLow(true)
@@ -95,6 +95,7 @@ class FavoritesForecastUpdateWorker(
                 TimeUnit.MILLISECONDS.toHours(interval),
                 TimeUnit.HOURS,
             )
+                .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
                 .setConstraints(constraints)
                 .addTag(WORKER_TAG)
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 15, TimeUnit.MINUTES)

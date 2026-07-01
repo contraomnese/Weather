@@ -6,4 +6,5 @@ import com.contraomnese.weather.presentation.architecture.MviEvent
 internal sealed interface WeatherScreenEvent : MviEvent {
     data object NavigateToHome : WeatherScreenEvent
     data class HandleError(val cause: Throwable) : WeatherScreenEvent
+    data object ForecastUpdated : WeatherScreenEvent
 }

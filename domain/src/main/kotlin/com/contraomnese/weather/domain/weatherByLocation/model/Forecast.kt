@@ -7,7 +7,10 @@ data class Forecast(
     val today: TodayForecast,
     val forecast: ForecastWeather,
     val alerts: AlertsWeather,
-)
+    override val expiresAt: Long,
+) : ExpirableData {
+    override val updateTargetId: Int get() = location.id
+}
 
 data class ForecastLocation(
     val id: Int,

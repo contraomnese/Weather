@@ -1,6 +1,5 @@
 package com.contraomnese.weather.weatherByLocation.presentation.sections
 
-import android.R.attr.timeZone
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -68,7 +67,7 @@ data class SunriseSection(
             }
         }
 
-        LaunchedEffect(timeZone) {
+        LaunchedEffect(Unit) {
             while (true) {
                 val instant = Clock.System.now()
                 val dateTime = instant.toLocalDateTime(location.timeZone)

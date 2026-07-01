@@ -6,4 +6,5 @@ internal sealed interface WeatherScreenAction : MviAction {
     data object NavigateToHome : WeatherScreenAction
     data class SwapFavorite(val index: Int) : WeatherScreenAction
     data class AddFavorite(val locationId: Int) : WeatherScreenAction
+    data class UpdateForecast(val locationId: Int) : WeatherScreenAction
 }

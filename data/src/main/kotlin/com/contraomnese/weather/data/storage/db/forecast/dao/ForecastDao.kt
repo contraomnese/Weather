@@ -13,6 +13,7 @@ import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastHourEn
 import com.contraomnese.weather.data.storage.db.forecast.entities.ForecastTodayEntity
 import com.contraomnese.weather.data.storage.db.locations.dto.FavoriteForecastData
 import com.contraomnese.weather.data.storage.db.locations.dto.ForecastData
+import com.contraomnese.weather.data.storage.db.locations.dto.LastUpdatedData
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -44,8 +45,8 @@ interface ForecastDao {
     @Query("SELECT id FROM forecast_location WHERE location_id = :locationId")
     suspend fun getForecastIdBy(locationId: Int): Long?
 
-    @Query("SELECT last_updated FROM forecast_location WHERE location_id = :locationId")
-    suspend fun getLastUpdatedTimeBy(locationId: Int): Long?
+    @Query("SELECT last_updated_time, time_zone_id FROM forecast_location WHERE location_id = :locationId")
+    suspend fun getLastUpdatedBy(locationId: Int): LastUpdatedData?
 
     @Transaction
     @Query("SELECT * FROM forecast_location WHERE location_id = :locationId")

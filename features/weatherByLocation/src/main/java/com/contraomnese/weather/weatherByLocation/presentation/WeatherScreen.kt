@@ -63,6 +63,7 @@ import com.contraomnese.weather.core.ui.widgets.LoadingIndicator
 import com.contraomnese.weather.core.ui.widgets.TitleSection
 import com.contraomnese.weather.core.ui.widgets.WeatherBottomBar
 import com.contraomnese.weather.core.ui.widgets.WeatherSnackBarHost
+import com.contraomnese.weather.design.R
 import com.contraomnese.weather.design.theme.WeatherTheme
 import com.contraomnese.weather.design.theme.itemHeight150
 import com.contraomnese.weather.design.theme.itemHeight300
@@ -130,12 +131,18 @@ private fun WeatherPage(
             MaterialTheme.colorScheme.primary
         ) else Modifier
     val currentFavoriteIndex = uiState.favorites.indexOfFirst { it.id == uiState.locationId }
+    val forecastUpdatedNotification = stringResource(R.string.notification_forecast_updated)
 
     eventFlow.collectEvent { event ->
         when (event) {
             is WeatherScreenEvent.NavigateToHome -> onNavigateToHome()
             is WeatherScreenEvent.HandleError -> snackBarHostState.showSnackbar(
                 message = event.cause.handleError(context),
+                duration = SnackbarDuration.Short
+            )
+
+            WeatherScreenEvent.ForecastUpdated -> snackBarHostState.showSnackbar(
+                message = forecastUpdatedNotification,
                 duration = SnackbarDuration.Short
             )
         }
@@ -230,7 +237,7 @@ private fun WeatherPage(
                                             scaleX = scaleAnimated.value
                                             scaleY = scaleAnimated.value
                                             alpha = alphaAnimated.value
-                                        }
+                                        },
                                 )
                             }
                         }

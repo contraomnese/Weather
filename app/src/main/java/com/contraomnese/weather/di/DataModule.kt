@@ -30,9 +30,10 @@ import com.contraomnese.weather.data.storage.memory.api.AppSettingsStorage
 import com.contraomnese.weather.data.storage.memory.store.AppSettingsStorageImpl
 import com.contraomnese.weather.domain.app.repository.AppSettingsRepository
 import com.contraomnese.weather.domain.home.repository.LocationsRepository
+import com.contraomnese.weather.domain.scheduler.ForecastUpdateScheduler
 import com.contraomnese.weather.domain.weatherByLocation.repository.ForecastRepository
+import com.contraomnese.weather.schedulers.WorkManagerForecastScheduler
 import com.google.gson.GsonBuilder
-import kotlinx.coroutines.Dispatchers
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
@@ -45,6 +46,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
+private const val APPLICATION_COROUTINE_SCOPE = "ApplicationScope"
+private const val I0_DISPATCHER = "IoDispatcher"
 private const val W_API = "WeatherApi"
 private const val LIQ_API = "LocationIQApi"
 private const val OM_FORECAST = "OpenMeteoForecast"
@@ -165,7 +168,7 @@ val dataModule = module {
 
     // --- Storage & DB ---
     single<WeatherAppDatabase> { WeatherAppDatabase.create(get()) }
-    single<AppSettingsStorage> { AppSettingsStorageImpl(get(), Dispatchers.IO) }
+    single<AppSettingsStorage> { AppSettingsStorageImpl(get(), get(named(I0_DISPATCHER)), get()) }
 
     // --- API Services ---
     single<OpenMeteoForecastApi> { get<Retrofit>(named(OM_FORECAST)).create(OpenMeteoForecastApi::class.java) }
@@ -201,7 +204,7 @@ val dataModule = module {
             get(),
             get(),
             get(named(OM_GEO)),
-            Dispatchers.IO,
+            get(named(I0_DISPATCHER)),
         )
     }
 
@@ -210,15 +213,18 @@ val dataModule = module {
             get(),
             get(),
             get(),
-            Dispatchers.IO,
-            transactionProvider = RoomTransactionProvider(get<WeatherAppDatabase>())
+            get(named(I0_DISPATCHER)),
+            externalScope = get(named(APPLICATION_COROUTINE_SCOPE)),
+            transactionProvider = RoomTransactionProvider(get<WeatherAppDatabase>()),
         )
     }
 
     single<AppSettingsRepository> {
         AppSettingsRepositoryImpl(
             storage = get(),
-            dispatcher = Dispatchers.IO
+            dispatcher = get(named(I0_DISPATCHER))
         )
     }
+
+    single<ForecastUpdateScheduler> { WorkManagerForecastScheduler(get()) }
 }

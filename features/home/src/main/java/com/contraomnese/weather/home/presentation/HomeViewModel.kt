@@ -54,9 +54,10 @@ internal class HomeViewModel(
                         (60 - now.toLocalDateTime(TimeZone.currentSystemDefault()).second) * 1000L
                     )
                 }
-            }.collect {
-                push(HomeScreenEffect.CurrentTimeUpdated(it))
             }
+                .collect {
+                    push(HomeScreenEffect.CurrentTimeUpdated(it))
+                }
         }
     }
 
@@ -151,13 +152,9 @@ internal class HomeViewModel(
 
     private suspend fun processFavoriteAdd(locationId: Int) {
         addFavoriteUseCase(locationId)
-//            .onSuccess { favorite ->
-//                updateForecastUseCase(favorite)
-//                    .onFailure {
-//                        processFavoriteRemove(locationId)
-//                        push(HomeScreenEvent.HandleError(it))
-//                    }
-//            }
+            .onFailure {
+                push(HomeScreenEvent.HandleError(it))
+            }
     }
 
     private suspend fun processFavoriteRemove(locationId: Int) {

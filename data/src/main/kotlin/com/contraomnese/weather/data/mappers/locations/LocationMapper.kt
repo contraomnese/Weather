@@ -37,17 +37,21 @@ fun OMLocationNetwork.toEntity() = MatchingLocationEntity(
     timeZoneId = timezone
 )
 
-fun MatchingLocationEntity.toForecastLocationEntity(networkId: Int) = ForecastLocationEntity(
-    locationId = networkId,
-    latitude = latitude,
-    longitude = longitude,
-    name = name,
-    city = city ?: UNKNOWN,
-    region = state ?: UNKNOWN,
-    country = country ?: UNKNOWN,
-    timeZoneId = timeZoneId,
-    lastUpdated = System.currentTimeMillis()
-)
+fun MatchingLocationEntity.toForecastLocationEntity(networkId: Int): ForecastLocationEntity {
+    val now = System.currentTimeMillis()
+
+    return ForecastLocationEntity(
+        locationId = networkId,
+        latitude = latitude,
+        longitude = longitude,
+        name = name,
+        city = city ?: UNKNOWN,
+        region = state ?: UNKNOWN,
+        country = country ?: UNKNOWN,
+        timeZoneId = timeZoneId,
+        lastUpdatedTime = now
+    )
+}
 
 fun MatchingLocationEntity.toDomain() =
     Location(

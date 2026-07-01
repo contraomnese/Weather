@@ -22,6 +22,7 @@ fun FavoriteForecastData.toDomain(appSettings: AppSettings): FavoriteForecast {
         maxTemperature = todayForecast.toMaxTemperatureDomain(appSettings.temperatureUnit),
         minTemperature = todayForecast.toMinTemperatureDomain(appSettings.temperatureUnit),
         condition = WeatherCondition.fromWeatherApi(todayForecast.conditionCode),
+        expiresAt = location.lastUpdatedTime + appSettings.favoritesForecastUpdateInterval,
     )
 }
 

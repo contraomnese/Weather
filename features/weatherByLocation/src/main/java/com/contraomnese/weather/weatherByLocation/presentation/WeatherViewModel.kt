@@ -74,6 +74,7 @@ internal class WeatherViewModel(
         is WeatherScreenAction.NavigateToHome -> push(WeatherScreenEvent.NavigateToHome)
         is WeatherScreenAction.SwapFavorite -> processSwapFavorite(action.index)
         is WeatherScreenAction.AddFavorite -> processFavoriteAdd(action.locationId)
+        is WeatherScreenAction.UpdateForecast -> processUpdateForecast(action.locationId)
     }
 
     private fun processSwapFavorite(index: Int) {
@@ -84,6 +85,14 @@ internal class WeatherViewModel(
 
     private suspend fun processFavoriteAdd(locationId: Int) {
         addFavoriteUseCase(locationId)
+            .onFailure { push(WeatherScreenEvent.HandleError(it)) }
+    }
+
+    private suspend fun processUpdateForecast(locationId: Int) {
+        updateForecastUseCase(locationId)
+            .onSuccess {
+                push(WeatherScreenEvent.ForecastUpdated)
+            }
             .onFailure { push(WeatherScreenEvent.HandleError(it)) }
     }
 }

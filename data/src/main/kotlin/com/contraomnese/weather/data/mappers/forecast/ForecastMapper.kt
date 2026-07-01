@@ -134,7 +134,8 @@ fun ForecastData.toDomain(appSettings: AppSettings): Forecast {
         alerts = AlertsWeather(
             alerts = alerts.filter { it.desc.isNotEmpty() }
                 .map { it.desc.replaceFirstChar { char -> char.uppercaseChar() } }
-        )
+        ),
+        expiresAt = location.lastUpdatedTime + appSettings.favoritesForecastUpdateInterval
     )
 }
 

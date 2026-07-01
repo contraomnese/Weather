@@ -3054,7 +3054,7 @@ object MockForecastDataReal {
         location = ForecastLocationEntity(
             country = "Russia",
             id = 1,
-            lastUpdated = 1763993042829L,
+            expiredTime = 1763993042829L,
             latitude = 55.752,
             localtime = "2025-11-24 17:03",
             localTimeEpoch = 1763993017L,

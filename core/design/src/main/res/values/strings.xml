@@ -15,6 +15,7 @@
     <!-- Notifications -->
     <string name="notification_channel_title">Weather forecast updates</string>
     <string name="notification_channel_description">Come at the time of weather forecast update</string>
+    <string name="notification_forecast_updated">Forecast updated</string>
 
     <!-- System messages -->
     <string name="empty_matching_locations">Matching locations not found. Please, try again.</string>

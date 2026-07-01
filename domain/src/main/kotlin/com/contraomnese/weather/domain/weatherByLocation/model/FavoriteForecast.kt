@@ -11,4 +11,7 @@ data class FavoriteForecast(
     val maxTemperature: String,
     val minTemperature: String,
     val condition: WeatherCondition,
-)
+    override val expiresAt: Long,
+) : ExpirableData {
+    override val updateTargetId: Int get() = locationId
+}

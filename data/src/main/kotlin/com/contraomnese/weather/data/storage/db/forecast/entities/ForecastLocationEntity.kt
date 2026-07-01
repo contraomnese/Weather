@@ -16,7 +16,7 @@ data class ForecastLocationEntity(
     @ColumnInfo(name = LATITUDE) val latitude: Double,
     @ColumnInfo(name = LONGITUDE) val longitude: Double,
     @ColumnInfo(name = TIME_ZONE_ID) val timeZoneId: String,
-    @ColumnInfo(name = LAST_UPDATED) val lastUpdated: Long,
+    @ColumnInfo(name = LAST_UPDATED_TIME) val lastUpdatedTime: Long,
 ) {
     companion object {
         const val TABLE_NAME = "forecast_location"
@@ -29,6 +29,6 @@ data class ForecastLocationEntity(
         const val LATITUDE = "latitude"
         const val LONGITUDE = "longitude"
         const val TIME_ZONE_ID = "time_zone_id"
-        const val LAST_UPDATED = "last_updated"
+        const val LAST_UPDATED_TIME = "last_updated_time"
     }
 }
